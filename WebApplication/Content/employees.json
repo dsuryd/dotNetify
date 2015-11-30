@@ -1,0 +1,122 @@
+[
+    {
+        "Id": 1,
+        "FirstName": "Robert",
+        "LastName": "Kwang",
+        "ReportTo": 0
+    },
+    {
+        "Id": 2,
+        "FirstName": "Daniel",
+        "LastName": "Johnson",
+        "ReportTo": 1
+    },
+    {
+        "Id": 3,
+        "FirstName": "Catherine",
+        "LastName": "Hatwell",
+        "ReportTo": 1
+    },
+    {
+        "Id": 4,
+        "FirstName": "David",
+        "LastName": "Ibrahim",
+        "ReportTo": 1
+    },
+    {
+        "Id": 5,
+        "FirstName": "Pierre",
+        "LastName": "Thompson",
+        "ReportTo": 2
+    },
+    {
+        "Id": 6,
+        "FirstName": "Harry",
+        "LastName": "Bennett",
+        "ReportTo": 2
+    },
+    {
+        "Id": 7,
+        "FirstName": "Abigail",
+        "LastName": "Connor",
+        "ReportTo": 2
+    },
+    {
+        "Id": 8,
+        "FirstName": "Musa",
+        "LastName": "Al-Akhim",
+        "ReportTo": 3
+    },
+    {
+        "Id": 9,
+        "FirstName": "Eugene",
+        "LastName": "Cook",
+        "ReportTo": 4
+    },
+    {
+        "Id": 10,
+        "FirstName": "Stephen",
+        "LastName": "Haskell",
+        "ReportTo": 4
+    },
+    {
+        "Id": 11,
+        "FirstName": "Roger",
+        "LastName": "Bernie",
+        "ReportTo": 8
+    },
+    {
+        "Id": 12,
+        "FirstName": "Stefan",
+        "LastName": "Kurniawan",
+        "ReportTo": 8
+    },
+    {
+        "Id": 13,
+        "FirstName": "Kathy",
+        "LastName": "Gonzalez",
+        "ReportTo": 5
+    },
+    {
+        "Id": 14,
+        "FirstName": "Ruchira",
+        "LastName": "Khan",
+        "ReportTo": 5
+    },
+    {
+        "Id": 15,
+        "FirstName": "Srinivas",
+        "LastName": "Agarwal",
+        "ReportTo": 5
+    },
+    {
+        "Id": 16,
+        "FirstName": "Robert",
+        "LastName": "Simone",
+        "ReportTo": 12
+    },
+    {
+        "Id": 17,
+        "FirstName": "Michael",
+        "LastName": "Washington",
+        "ReportTo": 12
+    },
+    {
+        "Id": 18,
+        "FirstName": "Jack",
+        "LastName": "Macintosh",
+        "ReportTo": 10
+    },
+    {
+        "Id": 19,
+        "FirstName": "Ian",
+        "LastName": "Hernandez",
+        "ReportTo": 10
+    },
+    {
+        "Id": 20,
+        "FirstName": "Zhang",
+        "LastName": "Li",
+        "ReportTo": 10
+    }
+]

@@ -1,0 +1,82 @@
+﻿body {
+    background-color: #eef0f0;
+}
+
+.well {
+   background-color: #ced0d0;
+   padding: 1em;
+}
+
+.copyright-notice {
+   font-size: x-small;
+}
+
+.no-bullet li {
+    list-style-type: none;
+}
+
+span.tree-indent {
+    display: inline-block;
+    width: 32px;
+}
+
+span.canExpand {
+    color: #31b0d5;
+}
+
+span.tree-btn.btn-lg {
+    padding: 8px 8px;
+}
+
+span.indent {
+    display: inline-block;
+    width: 24px;
+}
+
+span.canExpand {
+    color: #31b0d5;
+}
+
+span.btn-lg {
+    padding: 8px 4px;
+}
+
+.btn-md {
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+.tododay {
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: -7px;
+    text-align: right;
+}
+
+.todoweek {
+    margin-top: -3px;
+    text-align: right;
+}
+
+.bigfont {
+    font-weight: bold;
+    font-size: x-large;
+}
+
+.circle {
+   display: inline-block;
+   width: 20px;
+   height: 20px;
+   border-radius: 50%;
+   background: #92d050;
+   box-shadow: white 0px 0px 20px 0px;
+}

@@ -1,0 +1,5 @@
+﻿var BookStoreVM = (function () {
+   return {
+      
+   }
+})();
