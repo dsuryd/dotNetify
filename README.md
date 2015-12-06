@@ -1,4 +1,4 @@
-# dotNetify
+#&nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify
 DotNetify is a free, open source project dedicated to .NET developers who believe that the .NET framework can still be relevant and competitive in the front-end web development of today. 
 
 This project offers those developers the architecture and tools to write single-page web applications on ASP.NET platform that are just as sophisticated, richly interactive, bandwidth efficient, support real-time push notification and yet, powered with .NET language features and patterns, are so much easier to develop and maintain.
