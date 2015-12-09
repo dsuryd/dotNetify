@@ -18,6 +18,7 @@ It does not attempt to get away from the current open web standards, but rather 
 ##Documentation
 
 All the documentation and live examples can be found in the [official website](http://dotnetify.net).
+Want a super simple example to try out?  Go [here](https://github.com/dsuryd/dotNetify-example-livechart).
 
 ##License
 Licensed under the Apache License, Version 2.0.
