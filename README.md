@@ -21,6 +21,12 @@ All the documentation and live examples can be found in the [official website](h
 
 Want a super simple example to try out?  Go [here](https://github.com/dsuryd/dotNetify-example-livechart).
 
+##NuGet
+
+The pre-release version is available from NuGet.org. It will install the DotNetify assembly, the scripts and their dependencies.  After installing, see this [Configuring Your Project](http://dotnetify.net/index/Installing) section on how to include the script and register the assembly where your view models will be.
+
+*PM> Install-Package DotNetify -Pre*
+
 ##License
 Licensed under the Apache License, Version 2.0.
 
@@ -29,5 +35,5 @@ All contribution is welcome; reach out to find out how you can help.  If you lik
 
 ##Short-term Todos
 - Convert the solution structure to ASP.NET v5.
-- Create NuGet package.
+- ~~Create NuGet package.~~
 - Incorporate Typescript into examples.
