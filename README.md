@@ -4,8 +4,7 @@ DotNetify is a free, open source project dedicated to .NET developers who believ
 This project offers those developers the architecture and tools to write single-page web applications on ASP.NET platform that are just as sophisticated, richly interactive, bandwidth efficient, support real-time push notification and yet, powered with .NET language features and patterns, are so much easier to develop and maintain.
 
 Written in both Javascript and C# .NET, dotNetify builds on popular open-source libraries like 
-[jQuery](http://jquery.com), [Knockout](http://knockoutjs.com) and [SignalR](http://asp.net/signalr).  
-It does not attempt to get away from the current open web standards, but rather complement and enhance them in such a way that brings the most benefit to you!
+[jQuery](http://jquery.com), [Knockout](http://knockoutjs.com) and [SignalR](http://asp.net/signalr). It does not attempt to get away from the current open web standards, but rather complement and enhance them in such a way that brings the most benefit to you!
 
 ##Features
 
@@ -19,7 +18,8 @@ It does not attempt to get away from the current open web standards, but rather 
 
 All the documentation and live examples can be found in the [official website](http://dotnetify.net).
 
-Want a super simple example to try out?  Go [here](https://github.com/dsuryd/dotNetify-example-livechart).
+Want a super simple example to try out?  Use this [basic template](https://github.com/dsuryd/dotNetify-example-livechart).  
+Read all about it in the CodeProject article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
 
 ##NuGet
 
