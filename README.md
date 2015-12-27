@@ -36,4 +36,4 @@ All contribution is welcome; reach out to find out how you can help.  If you lik
 ##Short-term Todos
 - Convert the solution structure to ASP.NET v5.
 - ~~Create NuGet package.~~
-- Incorporate Typescript into examples.
+- ~~Incorporate Typescript into examples.~~
