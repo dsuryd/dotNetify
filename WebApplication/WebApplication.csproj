@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -25,6 +26,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TypeScriptToolsVersion>1.7</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -158,15 +160,13 @@
     <Content Include="Scripts\DemoLibs\highlight.pack.js" />
     <Content Include="Scripts\DemoLibs\jquery.nicescroll.min.js" />
     <Content Include="Scripts\DemoLibs\zabuto_calendar.min.js" />
-    <Content Include="Scripts\Demo\BetterList.js" />
-    <Content Include="Scripts\Demo\CompositeView.js" />
-    <Content Include="Scripts\Demo\Dashboard.js" />
+    <Content Include="Scripts\Demo.PlainJS\BetterList.js" />
+    <Content Include="Scripts\Demo.PlainJS\CompositeView.js" />
+    <Content Include="Scripts\Demo.PlainJS\Dashboard.js" />
+    <Content Include="Scripts\Demo.PlainJS\GridView.js" />
+    <Content Include="Scripts\Demo.PlainJS\LiveChart.js" />
+    <Content Include="Scripts\Demo.PlainJS\TreeView.js" />
     <Content Include="Scripts\Demo\demoApp.js" />
-    <Content Include="Scripts\Demo\GridView.js" />
-    <Content Include="Scripts\Demo\LiveChart.js" />
-    <Content Include="Scripts\Demo\main.js" />
-    <Content Include="Scripts\Demo\TreeView.js" />
-    <Content Include="Scripts\Demo\WebStore.js" />
     <Content Include="Scripts\dotnetify.js" />
     <Content Include="Scripts\dotnetify.router.js" />
     <Content Include="Scripts\jquery-1.11.3.min.js" />
@@ -177,6 +177,7 @@
     <Content Include="Scripts\knockout.mapping-latest.js" />
     <Content Include="Scripts\path.min.js" />
     <Content Include="Scripts\require.min.js" />
+    <Content Include="Views\AFITop100.html" />
     <Content Include="Views\BetterList.html" />
     <Content Include="Views\CompositeView.html" />
     <Content Include="Views\ControlTypes.html" />
@@ -232,11 +233,43 @@
       <Name>ViewModels</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\Demo\BetterList.ts" />
+    <TypeScriptCompile Include="Scripts\Demo\CompositeView.ts" />
+    <TypeScriptCompile Include="Scripts\Demo\Dashboard.ts" />
+    <TypeScriptCompile Include="Scripts\Demo\GridView.ts" />
+    <TypeScriptCompile Include="Scripts\Demo\LiveChart.ts" />
+    <TypeScriptCompile Include="Scripts\Demo\TreeView.ts" />
+    <TypeScriptCompile Include="Scripts\typings\chartjs\chart.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\AFITop100.json" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <TypeScriptTarget>ES3</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>False</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">

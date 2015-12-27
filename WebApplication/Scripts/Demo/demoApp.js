@@ -11,11 +11,7 @@
       "signalr": "jquery.signalR-2.2.0.min",
       "signalr-hub": "/signalr/hubs?",
       "bootstrap": "DemoLibs/bootstrap.min",
-      "chart": "DemoLibs/chart.min",
       "calendar": "DemoLibs/zabuto_calendar.min",
-      "demo-chart": "Demo/LiveChart",
-      "demo-dashboard": "Demo/Dashboard",
-      "demo-composite-view": "Demo/CompositeView"
    },
    shim: {
       "jquery": { exports: "$" },
@@ -28,7 +24,7 @@
    }
 });
 
-require(['jquery', 'knockout', 'dotnetify', 'router', 'path', 'bootstrap', 'calendar', 'chart', 'demo-chart', 'demo-dashboard', 'demo-composite-view'], function ($) {
+require(['jquery', 'knockout', 'dotnetify', 'router', 'path', 'bootstrap', 'calendar'], function ($) {
    $(function () {
       dotnetify.debug = true;
    });
