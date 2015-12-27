@@ -31,7 +31,7 @@ var dotNetify = {};
    ko.mapping = komapping;
    dotnetify =
    {
-      version: "1.0.0-BETA",
+      version: "1.0.1-BETA",
       hub: null,
       debug: false,
       debugFn: null,
@@ -361,7 +361,13 @@ var dotNetify = {};
          }
 
          // Map the module in global namespace whose name matches the view model type.
-         self._Inject(self.VM, window[self.VMType]);
+         var jsModule = window[self.VMType];
+         if (jsModule != null) {
+            // If the module is a Typescript class, instantiate it.
+            if (typeof jsModule === "function")
+               jsModule = new jsModule();
+            self._Inject(self.VM, jsModule);
+         }
 
          // Add plugin functions.
          $.each(dotnetify.plugins, function (pluginId, plugin) {
