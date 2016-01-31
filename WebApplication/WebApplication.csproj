@@ -185,6 +185,7 @@
     <Content Include="Views\GridView.html" />
     <Content Include="Views\HelloWorld.html" />
     <Content Include="Views\Index.html" />
+    <Content Include="Views\JobQueue.html" />
     <Content Include="Views\LiveChart.html" />
     <Content Include="Views\SimpleList.html" />
     <Content Include="Views\TreeView.html" />
@@ -238,6 +239,7 @@
     <TypeScriptCompile Include="Scripts\Demo\CompositeView.ts" />
     <TypeScriptCompile Include="Scripts\Demo\Dashboard.ts" />
     <TypeScriptCompile Include="Scripts\Demo\GridView.ts" />
+    <TypeScriptCompile Include="Scripts\Demo\JobQueue.ts" />
     <TypeScriptCompile Include="Scripts\Demo\LiveChart.ts" />
     <TypeScriptCompile Include="Scripts\Demo\TreeView.ts" />
     <TypeScriptCompile Include="Scripts\typings\chartjs\chart.d.ts" />

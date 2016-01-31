@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AFITop100Model.cs" />
     <Compile Include="AFITop100VM.cs" />
+    <Compile Include="JobQueueVM.cs" />
     <Compile Include="LiveChartVM.cs" />
     <Compile Include="ControlTypesVM.cs" />
     <Compile Include="Dashboard\DashboardPanelVM.cs" />
