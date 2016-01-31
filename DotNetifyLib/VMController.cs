@@ -77,7 +77,7 @@ namespace DotNetify
             // Don't serialize properties that are decorated with [Ignore] or whose name are in the given list.
             if (iMember.GetCustomAttribute(typeof(BaseVM.IgnoreAttribute)) != null)
                property.Ignored = true;
-            else if (_IgnoredPropertyNames != null && _IgnoredPropertyNames.Contains( property.PropertyName) )
+            else if (_IgnoredPropertyNames != null && _IgnoredPropertyNames.Contains(property.PropertyName))
                property.Ignored = true;
 
             return property;
@@ -93,6 +93,11 @@ namespace DotNetify
       /// Active instances of view models.
       /// </summary>
       protected ConcurrentDictionary<string, VMInfo> _ActiveVMs = new ConcurrentDictionary<string, VMInfo>();
+
+      /// <summary>
+      /// Delegate used for creating view model instances. 
+      /// </summary>
+      protected static Func<Type, object[], object> _createInstanceFunc = (type, args) => Activator.CreateInstance(type, args);
 
       #endregion
 
@@ -111,6 +116,15 @@ namespace DotNetify
             kvp.Value.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
             kvp.Value.Instance.Dispose();
          }
+      }
+
+      /// <summary>
+      /// Delegate to override default mechanism used for creating view model instances.
+      /// </summary>
+      public static Func<Type, object[], object> CreateInstance
+      {
+         get { return _createInstanceFunc; }
+         set { _createInstanceFunc = value; }
       }
 
       /// <summary>
@@ -274,7 +288,7 @@ namespace DotNetify
             try
             {
                if (vmInstanceId != null)
-                  vmInstance = Activator.CreateInstance(vmType, new object[] { vmInstanceId }) as BaseVM;
+                  vmInstance = CreateInstance(vmType, new object[] { vmInstanceId }) as BaseVM;
             }
             catch (MissingMethodException)
             {
@@ -284,7 +298,7 @@ namespace DotNetify
             try
             {
                if (vmInstance == null)
-                  vmInstance = Activator.CreateInstance(vmType) as BaseVM;
+                  vmInstance = CreateInstance(vmType, null) as BaseVM;
             }
             catch (MissingMethodException)
             {
@@ -411,8 +425,8 @@ namespace DotNetify
       /// <returns>Serialized string.</returns>
       protected virtual string Serialize(object iData)
       {
-         List<string> ignoredPropertyNames = iData is BaseVM ? ( iData as BaseVM ).IgnoredProperties : null;
-         return JsonConvert.SerializeObject(iData, new JsonSerializerSettings { ContractResolver = new CustomResolver( ignoredPropertyNames ) });
+         List<string> ignoredPropertyNames = iData is BaseVM ? (iData as BaseVM).IgnoredProperties : null;
+         return JsonConvert.SerializeObject(iData, new JsonSerializerSettings { ContractResolver = new CustomResolver(ignoredPropertyNames) });
       }
 
       /// <summary>

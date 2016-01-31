@@ -85,7 +85,7 @@ namespace ViewModels
       public BaseVM CreateWidgetVM(string iWidgetTypeName, string iWidgetId)
       {
          var widgetType = GetType().Assembly.GetExportedTypes().FirstOrDefault(i => i.Name == iWidgetTypeName);
-         return Activator.CreateInstance(widgetType, new object[] { iWidgetId }) as BaseVM;
+         return VMController.CreateInstance(widgetType, new object[] { iWidgetId }) as BaseVM;
       }
    }
 }

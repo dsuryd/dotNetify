@@ -56,7 +56,7 @@ namespace DotNetify.Routing
          {
             try
             {
-               oModel = template.VMType != null ? Activator.CreateInstance(template.VMType) as IRoutable : null;
+               oModel = template.VMType != null ? VMController.CreateInstance(template.VMType, null) as IRoutable : null;
                if (oModel != null)
                   oModel.RouteUrl(ref iViewData);
                return template.ViewUrl;
