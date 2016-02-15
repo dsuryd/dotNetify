@@ -31,7 +31,7 @@ var dotNetify = {};
    ko.mapping = komapping;
    dotnetify =
    {
-      version: "1.0.1-BETA",
+      version: "1.0.2-BETA",
       hub: null,
       debug: false,
       debugFn: null,
@@ -377,6 +377,7 @@ var dotNetify = {};
       },
 
       // Inject the context with observables mapped from an object.
+      // Properties that start with underscore are mapped to observables.
       // Functions that start with underscore are mapped to pure computed observables.
       _Inject: function (iContext, iObject) {
          for (prop in iObject) {
@@ -391,7 +392,8 @@ var dotNetify = {};
                else
                   iContext[prop] = iObject[prop];
             }
-            else {
+            else if (prop.indexOf("_") == 0)
+            {
                iContext[prop] = ko.observable(iObject[prop]);
 
                // Prevent it from being subscribed so it won't get sent to server. 
