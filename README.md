@@ -1,7 +1,7 @@
 #&nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify
 DotNetify is a free, open source project dedicated to .NET developers who believe that the .NET framework can still be relevant and competitive in the front-end web development of today. 
 
-This project offers those developers the architecture and tools to write single-page web applications on .NET platform that are just as sophisticated, richly interactive, bandwidth efficient, support real-time push notification and yet, powered with .NET language features and patterns, are so much easier to develop and maintain.
+This project offers those developers the architecture and tools to write single-page web applications on .NET platform (including Mono) that are just as sophisticated, richly interactive, bandwidth efficient, support real-time push notification and yet, powered with .NET language features and patterns, are so much easier to develop and maintain.
 
 Written in both Javascript and C# .NET, dotNetify builds on popular open-source libraries like 
 [jQuery](http://jquery.com), [Knockout](http://knockoutjs.com) and [SignalR](http://asp.net/signalr). It does not attempt to get away from the current open web standards, but rather complement and enhance them in such a way that brings the most benefit to you!
