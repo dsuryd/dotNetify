@@ -32,7 +32,7 @@ namespace DotNetify
       /// <summary>
       /// View model controllers by the client connection Ids.
       /// </summary>
-      private static Lazy<MemoryCache> sControllersCache = new Lazy<MemoryCache>(() => new MemoryCache("DotNetify"));
+      private static Lazy<MemoryCache> _controllersCache = new Lazy<MemoryCache>(() => new MemoryCache("DotNetify"));
 
       /// <summary>
       /// How long to keep a view model controller in memory after it hasn't been accessed for a while.
@@ -67,7 +67,7 @@ namespace DotNetify
       {
          get
          {
-            var cache = GetControllersCache != null ? GetControllersCache() : sControllersCache.Value;
+            var cache = GetControllersCache != null ? GetControllersCache() : _controllersCache.Value;
 
             var newValue = new Lazy<VMController>();
             var cachedValue = cache.AddOrGetExisting(Context.ConnectionId, newValue, GetCacheItemPolicy()) as Lazy<VMController>;
@@ -78,18 +78,18 @@ namespace DotNetify
       /// <summary>
       /// Handles when a client gets disconnected.
       /// </summary>
-      /// <param name="iStopCalled">True, if stop was called on the client closing the connection gracefully;
+      /// <param name="stopCalled">True, if stop was called on the client closing the connection gracefully;
       /// false, if the connection has been lost for longer than the timeout.</param>
       /// <returns></returns>
-      public override Task OnDisconnected(bool iStopCalled)
+      public override Task OnDisconnected(bool stopCalled)
       {
-         var cache = GetControllersCache != null ? GetControllersCache() : sControllersCache.Value;
+         var cache = GetControllersCache != null ? GetControllersCache() : _controllersCache.Value;
 
          // Remove the controller on disconnection.
          if (cache.Contains(Context.ConnectionId))
             cache.Remove(Context.ConnectionId);
 
-         return base.OnDisconnected(iStopCalled);
+         return base.OnDisconnected(stopCalled);
       }
 
       /// <summary>
@@ -110,14 +110,14 @@ namespace DotNetify
       /// <summary>
       /// This method is called by browser clients to request view model data.
       /// </summary>
-      /// <param name="iVMId">Identifies the view model.</param>
-      /// <param name="iVMArg">Optional view model's initialization argument.</param>
-      public void Request_VM(string iVMId, object iVMArg)
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmArg">Optional view model's initialization argument.</param>
+      public void Request_VM(string vmId, object vmArg)
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Request_VM: {0} {1}", iVMId, Context.ConnectionId));
-            VMController.OnRequestVM(Context.ConnectionId, iVMId, iVMArg);
+            Debug.WriteLine(String.Format("[DEBUG] Request_VM: {0} {1}", vmId, Context.ConnectionId));
+            VMController.OnRequestVM(Context.ConnectionId, vmId, vmArg);
          }
          catch (Exception ex)
          {
@@ -128,14 +128,14 @@ namespace DotNetify
       /// <summary>
       /// This method is called by browser clients to update a view model's value.
       /// </summary>
-      /// <param name="iVMId">Identifies the view model.</param>
-      /// <param name="iVMData">View model update data, where key is the property path and value is the property's new value.</param>
-      public void Update_VM(string iVMId, Dictionary<string, object> iVMData)
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
+      public void Update_VM(string vmId, Dictionary<string, object> vmData)
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Update_VM: {0} {1} {2}", iVMId, Context.ConnectionId, JsonConvert.SerializeObject(iVMData)));
-            VMController.OnUpdateVM(Context.ConnectionId, iVMId, iVMData);
+            Debug.WriteLine(String.Format("[DEBUG] Update_VM: {0} {1} {2}", vmId, Context.ConnectionId, JsonConvert.SerializeObject(vmData)));
+            VMController.OnUpdateVM(Context.ConnectionId, vmId, vmData);
          }
          catch (Exception ex)
          {
@@ -146,12 +146,12 @@ namespace DotNetify
       /// <summary>
       /// This method is called by browser clients to remove its view model as it's no longer used.
       /// </summary>
-      /// <param name="iVMId">Identifies the view model.  By convention, this should match a view model class name.</param>
-      public void Dispose_VM(string iVMId)
+      /// <param name="vmId">Identifies the view model.  By convention, this should match a view model class name.</param>
+      public void Dispose_VM(string vmId)
       {
          try
          {
-            VMController.OnDisposeVM(Context.ConnectionId, iVMId);
+            VMController.OnDisposeVM(Context.ConnectionId, vmId);
          }
          catch (Exception ex)
          {
@@ -166,12 +166,12 @@ namespace DotNetify
       /// <summary>
       /// This method is called by the VMManager to send response back to browser clients.
       /// </summary>
-      /// <param name="iConnectionId">Identifies the browser client making prior request.</param>
-      /// <param name="iVMId">Identifies the view model.</param>
-      /// <param name="iVMData">View model data in serialized JSON.</param>
-      public static void Response_VM(string iConnectionId, string iVMId, string iVMData)
+      /// <param name="connectionId">Identifies the browser client making prior request.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data in serialized JSON.</param>
+      public static void Response_VM(string connectionId, string vmId, string vmData)
       {
-         HubContext.Clients.Client(iConnectionId).Response_VM(iVMId, iVMData);
+         HubContext.Clients.Client(connectionId).Response_VM(vmId, vmData);
       }
 
       #endregion

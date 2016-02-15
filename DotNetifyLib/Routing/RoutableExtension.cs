@@ -33,10 +33,10 @@ namespace DotNetify.Routing
       public string OriginRoot { get; set; }
       public RouteTemplate ActiveTemplate { get; set; }
 
-      public RoutingViewData(string iUrlPath, string iViewUrl, Type iVMType)
+      public RoutingViewData(string urlPath, string viewUrl, Type vmType)
       {
-         UrlPath = iUrlPath;
-         ActiveTemplate = new RouteTemplate { ViewUrl = iViewUrl, VMType = iVMType };
+         UrlPath = urlPath;
+         ActiveTemplate = new RouteTemplate { ViewUrl = viewUrl, VMType = vmType };
          Root = Origin = "";
       }
    }
@@ -46,19 +46,19 @@ namespace DotNetify.Routing
       /// <summary>
       /// Call this method from the controller to perform routing.
       /// </summary>
-      /// <param name="iViewData">Routing view data.</param>
+      /// <param name="viewData">Routing view data.</param>
       /// <param name="oModel">Model to be passed to the view.</param>
       /// <returns>View URL.</returns>
-      public static string Route(ref RoutingViewData iViewData, out IRoutable oModel)
+      public static string Route(ref RoutingViewData viewData, out IRoutable oModel)
       {
-         var template = iViewData.ActiveTemplate;
+         var template = viewData.ActiveTemplate;
          if (template != null)
          {
             try
             {
                oModel = template.VMType != null ? VMController.CreateInstance(template.VMType, null) as IRoutable : null;
                if (oModel != null)
-                  oModel.RouteUrl(ref iViewData);
+                  oModel.RouteUrl(ref viewData);
                return template.ViewUrl;
             }
             catch (Exception ex)
@@ -74,96 +74,96 @@ namespace DotNetify.Routing
       /// <summary>
       /// Registers route templates.
       /// </summary>
-      /// <param name="iRoutable">Routable view model.</param>
-      /// <param name="iRoot">Root path to which all other paths will be evaluated.</param>
-      /// <param name="iRouteTemplates">Route templates that belong to the view model.</param>
-      public static void RegisterRoutes(this IRoutable iRoutable, string iRoot, List<RouteTemplate> iRouteTemplates)
+      /// <param name="routable">Routable view model.</param>
+      /// <param name="root">Root path to which all other paths will be evaluated.</param>
+      /// <param name="routeTemplates">Route templates that belong to the view model.</param>
+      public static void RegisterRoutes(this IRoutable routable, string root, List<RouteTemplate> routeTemplates)
       {
-         iRoutable.RoutingState = new RoutingState { Root = iRoot, Templates = iRouteTemplates };
+         routable.RoutingState = new RoutingState { Root = root, Templates = routeTemplates };
       }
 
       /// <summary>
       /// Defines a route from a route template that belongs to the view model.
       /// </summary>
-      /// <param name="iRoutable">Routable view model.</param>
-      /// <param name="iTemplateId">Identifies a template that belongs to this view model.</param>
-      /// <param name="iPath">Optional path, to be used to replace parameterized template's URL pattern.</param>
+      /// <param name="routable">Routable view model.</param>
+      /// <param name="templateId">Identifies a template that belongs to this view model.</param>
+      /// <param name="path">Optional path, to be used to replace parameterized template's URL pattern.</param>
       /// <returns>Route object to be bound to vmRoute on the view.</returns>
-      public static Route GetRoute(this IRoutable iRoutable, string iTemplateId, string iPath = null)
+      public static Route GetRoute(this IRoutable routable, string templateId, string path = null)
       {
-         if (iRoutable.RoutingState == null)
-            iRoutable.RoutingState = new RoutingState();
+         if (routable.RoutingState == null)
+            routable.RoutingState = new RoutingState();
 
          RouteTemplate template = null;
-         if (iRoutable.RoutingState.Templates != null)
-            template = iRoutable.RoutingState.Templates.FirstOrDefault(i => i.Id == iTemplateId);
+         if (routable.RoutingState.Templates != null)
+            template = routable.RoutingState.Templates.FirstOrDefault(i => i.Id == templateId);
 
          if (template == null)
-            throw new InvalidOperationException(String.Format("ERROR: Route template '{0}' was not found.", iTemplateId));
+            throw new InvalidOperationException(String.Format("ERROR: Route template '{0}' was not found.", templateId));
 
-         return new Route { TemplateId = template.Id, Path = iPath ?? template.UrlPattern };
+         return new Route { TemplateId = template.Id, Path = path ?? template.UrlPattern };
       }
 
       /// <summary>
       /// Defines a route that belongs to another view model.
       /// </summary>
-      /// <param name="iRoutable">Routable view model.</param>
-      /// <param name="iRedirectRoot">Root path of the route. If the path partially matches the view model's root path, they will be combined.</param>
-      /// <param name="iPath">Route path.</param>
+      /// <param name="routable">Routable view model.</param>
+      /// <param name="redirectRoot">Root path of the route. If the path partially matches the view model's root path, they will be combined.</param>
+      /// <param name="path">Route path.</param>
       /// <returns>Route object to be bound to vmRoute on the view.</returns>
-      public static Route Redirect(this IRoutable iRoutable, string iRedirectRoot, string iPath)
+      public static Route Redirect(this IRoutable routable, string redirectRoot, string path)
       {
-         if (iRoutable.RoutingState == null)
-            iRoutable.RoutingState = new RoutingState();
+         if (routable.RoutingState == null)
+            routable.RoutingState = new RoutingState();
 
-         return new Route { RedirectRoot = iRedirectRoot, Path = iPath };
+         return new Route { RedirectRoot = redirectRoot, Path = path };
       }
 
       /// <summary>
       /// Handles the activate event, which occurs when a route is being activated.
       /// </summary>
       /// <param name="iRoutable">Routable view model.</param>
-      /// <param name="iEventHandler">Activate event handler.</param>
-      public static void OnActivated(this IRoutable iRoutable, EventHandler<ActivatedEventArgs> iEventHandler)
+      /// <param name="eventHandler">Activate event handler.</param>
+      public static void OnActivated(this IRoutable iRoutable, EventHandler<ActivatedEventArgs> eventHandler)
       {
          if (iRoutable.RoutingState == null)
             iRoutable.RoutingState = new RoutingState();
 
-         iRoutable.RoutingState.Activated += iEventHandler;
+         iRoutable.RoutingState.Activated += eventHandler;
       }
 
       /// <summary>
       /// Handles the routed event, which occurs when this view model is being routed to.
       /// </summary>
-      /// <param name="iRoutable">Routable view model.</param>
-      /// <param name="iEventHandler">Routed event handler.</param>
-      public static void OnRouted(this IRoutable iRoutable, EventHandler<RoutedEventArgs> iEventHandler)
+      /// <param name="routable">Routable view model.</param>
+      /// <param name="eventHandler">Routed event handler.</param>
+      public static void OnRouted(this IRoutable routable, EventHandler<RoutedEventArgs> eventHandler)
       {
-         if (iRoutable.RoutingState == null)
-            iRoutable.RoutingState = new RoutingState();
+         if (routable.RoutingState == null)
+            routable.RoutingState = new RoutingState();
 
-         iRoutable.RoutingState.Routed += iEventHandler;
+         routable.RoutingState.Routed += eventHandler;
       }
 
       /// <summary>
       /// Performs routing. The URL path is given inside the view data, along with the initial route template to start from.
       /// This is a recursive method that will be called again by the nested views until the route is resolved.
       /// </summary>
-      /// <param name="iRoutable">Routable view model.</param>
-      /// <param name="iViewData">Routing view data.</param>
-      public static void RouteUrl(this IRoutable iRoutable, ref RoutingViewData iViewData)
+      /// <param name="routable">Routable view model.</param>
+      /// <param name="viewData">Routing view data.</param>
+      public static void RouteUrl(this IRoutable routable, ref RoutingViewData viewData)
       {
-         var routingState = iRoutable.RoutingState;
+         var routingState = routable.RoutingState;
 
-         iViewData.ActiveTemplate = null;
-         routingState.Origin = iViewData.Origin;
+         viewData.ActiveTemplate = null;
+         routingState.Origin = viewData.Origin;
          if (routingState.Templates != null)
          {
-            iViewData.Root = iViewData.Root + "/" + routingState.Root;
-            var bestMatch = MatchTemplate(routingState.Templates, iViewData.UrlPath, iViewData.Root);
+            viewData.Root = viewData.Root + "/" + routingState.Root;
+            var bestMatch = MatchTemplate(routingState.Templates, viewData.UrlPath, viewData.Root);
             if (bestMatch != null)
             {
-               iViewData.ActiveTemplate = bestMatch.Value.Key;
+               viewData.ActiveTemplate = bestMatch.Value.Key;
                if (bestMatch.Value.Value != null && typeof(IRoutable).IsAssignableFrom(bestMatch.Value.Key.VMType))
                   routingState.Active = bestMatch.Value.Value;
                else
@@ -174,31 +174,31 @@ namespace DotNetify.Routing
             {
                bestMatch = MatchTemplate(routingState.Templates, routingState.Active, null);
                if (bestMatch != null)
-                  iViewData.ActiveTemplate = bestMatch.Value.Key;
+                  viewData.ActiveTemplate = bestMatch.Value.Key;
             }
          }
 
          // Pass along information from this view to the next nested view.
-         iViewData.Origin = routingState.Active;
+         viewData.Origin = routingState.Active;
       }
 
       /// <summary>
       /// Returns HTML data attribute markup that contains routing initialization arguments.
       /// This needs to be placed in the same DOM element that has the "data-vm" attribute.
       /// </summary>
-      /// <param name="iRoutable">Routable view model.</param>
-      /// <param name="iViewData">Routing view data.</param>
+      /// <param name="routable">Routable view model.</param>
+      /// <param name="viewData">Routing view data.</param>
       /// <returns>HTML data attribute markup.</returns>
-      public static string InitArgs(this IRoutable iRoutable, object iViewData)
+      public static string InitArgs(this IRoutable routable, object viewData)
       {
-         var routingState = iRoutable.RoutingState;
+         var routingState = routable.RoutingState;
 
          string originRoot = "";
-         if (iViewData is RoutingViewData)
+         if (viewData is RoutingViewData)
          {
-            var viewData = iViewData as RoutingViewData;
-            originRoot = viewData.OriginRoot;
-            viewData.OriginRoot += "/" + routingState.Root;
+            var routingViewData = viewData as RoutingViewData;
+            originRoot = routingViewData.OriginRoot;
+            routingViewData.OriginRoot += "/" + routingState.Root;
          }
          return string.Format("data-vm-root=\"{0}\" data-vm-arg = \"{{'RoutingState.Active': '{1}', 'RoutingState.Origin': '{2}'}}\"", originRoot, routingState.Active, routingState.Origin);
       }
@@ -206,21 +206,21 @@ namespace DotNetify.Routing
       /// <summary>
       /// Matches a URL path to any of the route templates.
       /// </summary>
-      /// <param name="iTemplates">Route templates.</param>
-      /// <param name="iUrlPath">Url path to match.</param>
-      /// <param name="iRoot">Root path.</param>
+      /// <param name="templates">Route templates.</param>
+      /// <param name="urlPath">Url path to match.</param>
+      /// <param name="root">Root path.</param>
       /// <returns>The matching route template and local path.</returns>
-      private static KeyValuePair<RouteTemplate, string>? MatchTemplate(List<RouteTemplate> iTemplates, string iUrlPath, string iRoot)
+      private static KeyValuePair<RouteTemplate, string>? MatchTemplate(List<RouteTemplate> templates, string urlPath, string rootPath)
       {
          KeyValuePair<RouteTemplate, string>? bestMatch = null;
 
          var match = new Dictionary<RouteTemplate, string>();
-         foreach (var template in iTemplates)
+         foreach (var template in templates)
          {
             // Attempt to find a route template that at least partially matches the URL path.
-            var root = template.Root != null ? template.Root : iRoot;
+            var root = template.Root != null ? template.Root : rootPath;
             string path;
-            if (Match(iUrlPath, root, template.UrlPattern, out path))
+            if (Match(urlPath, root, template.UrlPattern, out path))
                match.Add(template, path);
          }
 
@@ -236,22 +236,22 @@ namespace DotNetify.Routing
       /// <summary>
       /// Matches the URL path with the given URL pattern.
       /// </summary>
-      /// <param name="iUrlPath">URL path.</param>
-      /// <param name="iUrlPattern">URL pattern from a route template.</param>
+      /// <param name="urlPath">URL path.</param>
+      /// <param name="urlPattern">URL pattern from a route template.</param>
       /// <param name="oMatchedPatch">Matched path.</param>
       /// <returns>True if the URL path matches the pattern.</returns>
-      private static bool Match(string iUrlPath, string iRoot, string iUrlPattern, out string oPath)
+      private static bool Match(string urlPath, string root, string urlPattern, out string oPath)
       {
-         iUrlPath = iUrlPath.ToLower();
-         oPath = iUrlPattern;
+         urlPath = urlPath.ToLower();
+         oPath = urlPattern;
 
-         var route = iRoot != null ? iRoot.TrimEnd('/').ToLower() + "/" + iUrlPattern.ToLower() : iUrlPattern.ToLower();
+         var route = root != null ? root.TrimEnd('/').ToLower() + "/" + urlPattern.ToLower() : urlPattern.ToLower();
          route = route.TrimEnd('/');
 
          if (!route.Contains(":"))
-            return iUrlPath.StartsWith(route);
+            return urlPath.StartsWith(route);
 
-         var paths = iUrlPath.Split('/').ToList();
+         var paths = urlPath.Split('/').ToList();
          var routes = route.Split('/').ToList().ConvertAll(i => i.Trim('('));
 
          var actionArgs = new Dictionary<string, string>();

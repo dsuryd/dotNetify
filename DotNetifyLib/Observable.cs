@@ -27,8 +27,8 @@ namespace DotNetify
    /// </summary>
    public class Observable : INotifyPropertyChanged, IDisposable
    {
-      protected Dictionary<string, object> mPropertyValues = new Dictionary<string, object>();
-      protected Stack<string> mPropertyChangedStack = new Stack<string>();
+      protected Dictionary<string, object> _propertyValues = new Dictionary<string, object>();
+      protected Stack<string> _propertyChangedStack = new Stack<string>();
 
       /// <summary>
       /// Occurs when a property value is changed.
@@ -53,12 +53,12 @@ namespace DotNetify
       /// Property accessor. Use this for observable properties.
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
-      /// <param name="iPropertyName">Property name.</param>
+      /// <param name="propertyName">Property name.</param>
       /// <returns>Property value.</returns>
-      protected T Get<T>([CallerMemberName] string iPropertyName = null)
+      protected T Get<T>([CallerMemberName] string propertyName = null)
       {
-         if (mPropertyValues.ContainsKey(iPropertyName))
-            return (T)mPropertyValues[iPropertyName];
+         if (_propertyValues.ContainsKey(propertyName))
+            return (T)_propertyValues[propertyName];
          return default(T);
       }
 
@@ -67,43 +67,43 @@ namespace DotNetify
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
       /// <param name="iValue">Property value.</param>
-      /// <param name="iPropertyName">Property name.</param>
-      protected void Set<T>(T iValue, [CallerMemberName] string iPropertyName = null)
+      /// <param name="propertyName">Property name.</param>
+      protected void Set<T>(T iValue, [CallerMemberName] string propertyName = null)
       {
-         mPropertyValues[iPropertyName] = iValue;
-         Changed(iPropertyName);
+         _propertyValues[propertyName] = iValue;
+         Changed(propertyName);
       }
 
       /// <summary>
       /// Fires property changed event.
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
-      /// <param name="iExpression">Expression containing property name, to avoid hardcoding it.</param>
-      protected void Changed<T>(Expression<Func<T>> iExpression)
+      /// <param name="expression">Expression containing property name, to avoid hardcoding it.</param>
+      protected void Changed<T>(Expression<Func<T>> expression)
       {
-         Changed(((MemberExpression)iExpression.Body).Member.Name);
+         Changed(((MemberExpression)expression.Body).Member.Name);
       }
 
       /// <summary>
       /// Fires property changed event.
       /// </summary>
-      /// <param name="iPropertyName">Property name.</param>
-      protected virtual void Changed(string iPropertyName)
+      /// <param name="propertyName">Property name.</param>
+      protected virtual void Changed(string propertyName)
       {
          if (PropertyChanged != null)
          {
             // Use a stack to keep track of things to avoid any circular loop situation that might arise.
-            if (mPropertyChangedStack.Contains(iPropertyName))
+            if (_propertyChangedStack.Contains(propertyName))
                return;
 
-            mPropertyChangedStack.Push(iPropertyName);
+            _propertyChangedStack.Push(propertyName);
             try
             {
-               PropertyChanged(this, new PropertyChangedEventArgs(iPropertyName));
+               PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
             finally
             {
-               mPropertyChangedStack.Pop();
+               _propertyChangedStack.Pop();
             }
          }
       }

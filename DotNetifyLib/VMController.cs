@@ -56,28 +56,28 @@ namespace DotNetify
       /// </summary>
       protected class CustomResolver : DefaultContractResolver
       {
-         private List<string> _IgnoredPropertyNames;
+         private List<string> _ignoredPropertyNames;
 
          /// <summary>
          /// Constructor that accepts list of property names to exclude from serialization.
          /// </summary>
-         /// <param name="iIgnoredPropertyNames">Property names to exclude from serialization.</param>
-         public CustomResolver(List<string> iIgnoredPropertyNames = null) : base()
+         /// <param name="ignoredPropertyNames">Property names to exclude from serialization.</param>
+         public CustomResolver(List<string> ignoredPropertyNames = null) : base()
          {
-            _IgnoredPropertyNames = iIgnoredPropertyNames;
+            _ignoredPropertyNames = ignoredPropertyNames;
          }
 
          /// <summary>
          /// Overrides this method to exclude properties with [Ignore] attribute or those that are in the given list.
          /// </summary>
-         protected override JsonProperty CreateProperty(MemberInfo iMember, MemberSerialization iMemberSerialization)
+         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
          {
-            var property = base.CreateProperty(iMember, iMemberSerialization);
+            var property = base.CreateProperty(member, memberSerialization);
 
             // Don't serialize properties that are decorated with [Ignore] or whose name are in the given list.
-            if (iMember.GetCustomAttribute(typeof(BaseVM.IgnoreAttribute)) != null)
+            if (member.GetCustomAttribute(typeof(BaseVM.IgnoreAttribute)) != null)
                property.Ignored = true;
-            else if (_IgnoredPropertyNames != null && _IgnoredPropertyNames.Contains(property.PropertyName))
+            else if (_ignoredPropertyNames != null && _ignoredPropertyNames.Contains(property.PropertyName))
                property.Ignored = true;
 
             return property;
@@ -87,12 +87,12 @@ namespace DotNetify
       /// <summary>
       /// List of known view model classes.
       /// </summary>
-      protected static List<Type> _VMTypes = new List<Type>();
+      protected static List<Type> _vmTypes = new List<Type>();
 
       /// <summary>
       /// Active instances of view models.
       /// </summary>
-      protected ConcurrentDictionary<string, VMInfo> _ActiveVMs = new ConcurrentDictionary<string, VMInfo>();
+      protected ConcurrentDictionary<string, VMInfo> _activeVMs = new ConcurrentDictionary<string, VMInfo>();
 
       /// <summary>
       /// Delegate used for creating view model instances. 
@@ -111,7 +111,7 @@ namespace DotNetify
       /// </summary>
       public virtual void Dispose()
       {
-         foreach (var kvp in _ActiveVMs)
+         foreach (var kvp in _activeVMs)
          {
             kvp.Value.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
             kvp.Value.Instance.Dispose();
@@ -130,53 +130,53 @@ namespace DotNetify
       /// <summary>
       /// Registers all view model types in an assembly.
       /// </summary>
-      /// <param name="iVMAssembly">Assembly.</param>
-      public static void RegisterAssembly(Assembly iVMAssembly)
+      /// <param name="vmAssembly">Assembly.</param>
+      public static void RegisterAssembly(Assembly vmAssembly)
       {
-         if (iVMAssembly == null)
+         if (vmAssembly == null)
             return;
 
          bool hasVMTypes = false;
-         foreach (Type vmType in iVMAssembly.GetExportedTypes().Where(i => typeof(BaseVM).IsAssignableFrom(i)))
+         foreach (Type vmType in vmAssembly.GetExportedTypes().Where(i => typeof(BaseVM).IsAssignableFrom(i)))
          {
             hasVMTypes = true;
-            if (_VMTypes.Find(i => i == vmType) == null)
-               _VMTypes.Add(vmType);
+            if (_vmTypes.Find(i => i == vmType) == null)
+               _vmTypes.Add(vmType);
             else
                throw new Exception(String.Format("ERROR: View model '{0}' was already registered by another assembly!", vmType.Name));
          }
 
          if (!hasVMTypes)
-            throw new Exception(String.Format("ERROR: Assembly '{0}' does not define any view model!", iVMAssembly.GetName().Name));
+            throw new Exception(String.Format("ERROR: Assembly '{0}' does not define any view model!", vmAssembly.GetName().Name));
       }
 
       /// <summary>
       /// Handles a request for a view model from a browser client.
       /// </summary>
-      /// <param name="iConnectionId">Identifies the client connection.</param>
-      /// <param name="iVMId">Identifies the view model.</param>
-      /// <param name="iVMArg">Optional view model's initialization argument.</param>
-      public virtual void OnRequestVM(string iConnectionId, string iVMId, object iVMArg = null)
+      /// <param name="connectionId">Identifies the client connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmArg">Optional view model's initialization argument.</param>
+      public virtual void OnRequestVM(string connectionId, string vmId, object vmArg = null)
       {
          // Create a new view model instance whose class name is matching the given VMId.
-         BaseVM vmInstance = !_ActiveVMs.ContainsKey(iVMId) ? CreateVM(iVMId, iVMArg) : _ActiveVMs[iVMId].Instance;
+         BaseVM vmInstance = !_activeVMs.ContainsKey(vmId) ? CreateVM(vmId, vmArg) : _activeVMs[vmId].Instance;
 
          var vmData = Serialize(vmInstance);
 
          // Send the view model data back to the browser client.
-         DotNetifyHub.Response_VM(iConnectionId, iVMId, vmData);
+         DotNetifyHub.Response_VM(connectionId, vmId, vmData);
 
          // Reset the changed property states.
          vmInstance.AcceptChangedProperties();
 
          // Add the view model instance to the controller.
-         if (!_ActiveVMs.ContainsKey(iVMId))
+         if (!_activeVMs.ContainsKey(vmId))
          {
-            _ActiveVMs.TryAdd(iVMId, new VMInfo { Instance = vmInstance, ConnectionId = iConnectionId });
+            _activeVMs.TryAdd(vmId, new VMInfo { Instance = vmInstance, ConnectionId = connectionId });
             vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
          }
          else
-            _ActiveVMs[iVMId].ConnectionId = iConnectionId;
+            _activeVMs[vmId].ConnectionId = connectionId;
 
          // If this request causes other view models to change, push those new values back to the client.
          PushUpdates();
@@ -185,26 +185,26 @@ namespace DotNetify
       /// <summary>
       /// Handles view model update from a browser client.
       /// </summary>
-      /// <param name="iConnectionId">Identifies the client connection.</param>
-      /// <param name="iVMId">Identifies the view model.</param>
+      /// <param name="connectionId">Identifies the client connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
       /// <param name="iData">View model update.</param>
-      public virtual void OnUpdateVM(string iConnectionId, string iVMId, Dictionary<string, object> iData)
+      public virtual void OnUpdateVM(string connectionId, string vmId, Dictionary<string, object> data)
       {
          bool isRecreated = false;
-         if (!_ActiveVMs.ContainsKey(iVMId))
+         if (!_activeVMs.ContainsKey(vmId))
          {
             // No view model found; it must have expired and needs to be recreated.
             isRecreated = true;
-            OnRequestVM(iConnectionId, iVMId);
-            if (!_ActiveVMs.ContainsKey(iVMId))
+            OnRequestVM(connectionId, vmId);
+            if (!_activeVMs.ContainsKey(vmId))
                return;
          }
 
          // Update the new values from the client to the server view model.
-         var vmInstance = _ActiveVMs[iVMId].Instance;
+         var vmInstance = _activeVMs[vmId].Instance;
          lock (vmInstance)
          {
-            foreach (var kvp in iData)
+            foreach (var kvp in data)
             {
                UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
 
@@ -221,14 +221,14 @@ namespace DotNetify
       /// <summary>
       /// Handles request from a browser client to remove a view model.
       /// </summary>
-      /// <param name="iConnectionId">Identifies the client connection.</param>
-      /// <param name="iVMId">Identifies the view model.</param>
-      public virtual void OnDisposeVM(string iConnectionId, string iVMId)
+      /// <param name="connectionId">Identifies the client connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      public virtual void OnDisposeVM(string connectionId, string vmId)
       {
-         if (_ActiveVMs.ContainsKey(iVMId))
+         if (_activeVMs.ContainsKey(vmId))
          {
             VMInfo vmInfo;
-            _ActiveVMs.TryRemove(iVMId, out vmInfo);
+            _activeVMs.TryRemove(vmId, out vmInfo);
             vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
             vmInfo.Instance.Dispose();
          }
@@ -237,35 +237,35 @@ namespace DotNetify
       /// <summary>
       /// Creates a view model.
       /// </summary>
-      /// <param name="iVMId">Identifies the view model.</param>
-      /// <param name="iVMArg">Optional view model's initialization argument.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmArg">Optional view model's initialization argument.</param>
       /// <returns>View model instance.</returns>
-      protected virtual BaseVM CreateVM(string iVMId, object iVMArg = null)
+      protected virtual BaseVM CreateVM(string vmId, object vmArg = null)
       {
          BaseVM vmInstance = null;
 
          // If the view model Id is in the form of a delimited path, it has a master view model.
          BaseVM masterVM = null;
-         var path = iVMId.Split('.');
+         var path = vmId.Split('.');
          if (path.Length > 1)
          {
             // Get the master view model; create the instance if it doesn't exist.
-            var masterVMId = iVMId.Remove(iVMId.LastIndexOf('.'));
-            lock (_ActiveVMs)
+            var masterVMId = vmId.Remove(vmId.LastIndexOf('.'));
+            lock (_activeVMs)
             {
-               if (!_ActiveVMs.ContainsKey(masterVMId))
+               if (!_activeVMs.ContainsKey(masterVMId))
                {
                   masterVM = CreateVM(masterVMId);
-                  _ActiveVMs.TryAdd(masterVMId, new VMInfo { Instance = masterVM });
+                  _activeVMs.TryAdd(masterVMId, new VMInfo { Instance = masterVM });
                }
                else
-                  masterVM = _ActiveVMs[masterVMId].Instance;
+                  masterVM = _activeVMs[masterVMId].Instance;
             }
-            iVMId = iVMId.Remove(0, iVMId.LastIndexOf('.') + 1);
+            vmId = vmId.Remove(0, vmId.LastIndexOf('.') + 1);
          }
 
          // If the view model Id contains instance Id, parse it out.
-         string vmTypeName = iVMId;
+         string vmTypeName = vmId;
          string vmInstanceId = null;
          if (vmTypeName.Contains('$'))
          {
@@ -281,9 +281,9 @@ namespace DotNetify
          // If still no view model instance, create it ourselves here.
          if (vmInstance == null)
          {
-            var vmType = _VMTypes.FirstOrDefault(i => i.Name == vmTypeName);
+            var vmType = _vmTypes.FirstOrDefault(i => i.Name == vmTypeName);
             if (vmType == null)
-               throw new Exception(String.Format("ERROR: '{0}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.", iVMId));
+               throw new Exception(String.Format("ERROR: '{0}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.", vmId));
 
             try
             {
@@ -307,10 +307,10 @@ namespace DotNetify
          }
 
          // If there are view model arguments, set them into the instance.
-         if (iVMArg != null)
+         if (vmArg != null)
          {
-            var vmArg = (JObject)iVMArg;
-            foreach (var prop in vmArg.Properties())
+            var vmJsonArg = (JObject)vmArg;
+            foreach (var prop in vmJsonArg.Properties())
                UpdateVM(vmInstance, prop.Name, prop.Value.ToString());
          }
 
@@ -320,16 +320,16 @@ namespace DotNetify
       /// <summary>
       /// Updates a value of a view model.
       /// </summary>
-      /// <param name="iVMInstance">View model instance.</param>
-      /// <param name="iVMPath">View model property path.</param>
-      /// <param name="iNewValue">New value.</param>
-      protected virtual void UpdateVM(BaseVM iVMInstance, string iVMPath, string iNewValue)
+      /// <param name="vmInstance">View model instance.</param>
+      /// <param name="vmPath">View model property path.</param>
+      /// <param name="newValue">New value.</param>
+      protected virtual void UpdateVM(BaseVM vmInstance, string vmPath, string newValue)
       {
          try
          {
-            object vmObject = iVMInstance;
+            object vmObject = vmInstance;
             var vmType = vmObject.GetType();
-            var path = iVMPath.Split('.');
+            var path = vmPath.Split('.');
             for (int i = 0; i < path.Length; i++)
             {
                var propName = path[i];
@@ -367,22 +367,22 @@ namespace DotNetify
                {
                   // Update the new value to the property.
                   if (propInfo.PropertyType.IsClass && propInfo.PropertyType != typeof(string))
-                     propInfo.SetValue(vmObject, JsonConvert.DeserializeObject(iNewValue, propInfo.PropertyType));
+                     propInfo.SetValue(vmObject, JsonConvert.DeserializeObject(newValue, propInfo.PropertyType));
                   else
                   {
                      var typeConverter = TypeDescriptor.GetConverter(propInfo.PropertyType);
                      if (typeConverter != null)
-                        propInfo.SetValue(vmObject, typeConverter.ConvertFromString(iNewValue));
+                        propInfo.SetValue(vmObject, typeConverter.ConvertFromString(newValue));
                   }
 
                   // Don't include the property we just updated in the ChangedProperties of the view model
                   // unless the value is changed internally, so that we don't send the same value back to the client
                   // during PushUpdates call by this VMController.
-                  var changedProperties = iVMInstance.ChangedProperties;
-                  if (changedProperties.ContainsKey(iVMPath) && (changedProperties[iVMPath] ?? String.Empty).ToString() == iNewValue)
+                  var changedProperties = vmInstance.ChangedProperties;
+                  if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? String.Empty).ToString() == newValue)
                   {
                      object value;
-                     changedProperties.TryRemove(iVMPath, out value);
+                     changedProperties.TryRemove(vmPath, out value);
                   }
                }
             }
@@ -391,7 +391,7 @@ namespace DotNetify
          {
             // If we cannot resolve the property path, forward the info to the instance
             // to give it a chance to resolve it.
-            iVMInstance.OnUnresolvedUpdate(iVMPath, iNewValue);
+            vmInstance.OnUnresolvedUpdate(vmPath, newValue);
          }
       }
 
@@ -400,7 +400,7 @@ namespace DotNetify
       /// </summary>
       protected virtual void PushUpdates()
       {
-         foreach (var kvp in _ActiveVMs)
+         foreach (var kvp in _activeVMs)
          {
             var vmInstance = kvp.Value.Instance;
             lock (vmInstance)
@@ -421,12 +421,12 @@ namespace DotNetify
       /// <summary>
       /// Serializes an object.
       /// </summary>
-      /// <param name="iData">Data to serialize.</param>
+      /// <param name="data">Data to serialize.</param>
       /// <returns>Serialized string.</returns>
-      protected virtual string Serialize(object iData)
+      protected virtual string Serialize(object data)
       {
-         List<string> ignoredPropertyNames = iData is BaseVM ? (iData as BaseVM).IgnoredProperties : null;
-         return JsonConvert.SerializeObject(iData, new JsonSerializerSettings { ContractResolver = new CustomResolver(ignoredPropertyNames) });
+         List<string> ignoredPropertyNames = data is BaseVM ? (data as BaseVM).IgnoredProperties : null;
+         return JsonConvert.SerializeObject(data, new JsonSerializerSettings { ContractResolver = new CustomResolver(ignoredPropertyNames) });
       }
 
       /// <summary>

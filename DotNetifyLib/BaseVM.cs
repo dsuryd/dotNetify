@@ -28,8 +28,8 @@ namespace DotNetify
    /// </summary>
    public class BaseVM : Observable
    {
-      protected ConcurrentDictionary<string, object> mChangedProperties = new ConcurrentDictionary<string, object>();
-      private List<string> mIgnoredProperties = null;
+      protected ConcurrentDictionary<string, object> _changedProperties = new ConcurrentDictionary<string, object>();
+      private List<string> _ignoredProperties = null;
 
       public class IgnoreAttribute : Attribute { }
 
@@ -45,7 +45,7 @@ namespace DotNetify
       [Ignore]
       public ConcurrentDictionary<string, object> ChangedProperties
       {
-         get { return mChangedProperties; }
+         get { return _changedProperties; }
       }
 
       /// <summary>
@@ -56,9 +56,9 @@ namespace DotNetify
       {
          get
          {
-            if (mIgnoredProperties == null)
-               mIgnoredProperties = GetType().GetProperties().Where(i => i.GetCustomAttribute(typeof(IgnoreAttribute)) != null).ToList().ConvertAll(j => j.Name);
-            return mIgnoredProperties;
+            if (_ignoredProperties == null)
+               _ignoredProperties = GetType().GetProperties().Where(i => i.GetCustomAttribute(typeof(IgnoreAttribute)) != null).ToList().ConvertAll(j => j.Name);
+            return _ignoredProperties;
          }
       }
 
@@ -67,7 +67,7 @@ namespace DotNetify
       /// </summary>
       public void AcceptChangedProperties()
       {
-         mChangedProperties.Clear();
+         _changedProperties.Clear();
       }
 
       /// <summary>
@@ -78,21 +78,21 @@ namespace DotNetify
       /// communication among them. If null is returned, the VMController will create the 
       /// instance itself.
       /// </summary>
-      /// <param name="iVMTypeName">View model type name.</param>
-      /// <param name="iVMInstanceId">View model instance identifier.</param>
+      /// <param name="vmTypeName">View model type name.</param>
+      /// <param name="vmInstanceId">View model instance identifier.</param>
       /// <param name="iVMArg">View model's initialization argument.</param> 
       /// <returns>View model instance.</returns>
-      public virtual BaseVM GetSubVM(string iVMTypeName, string iVMInstanceId)
+      public virtual BaseVM GetSubVM(string vmTypeName, string vmInstanceId)
       {
-         return String.IsNullOrEmpty(iVMInstanceId) ? GetSubVM(iVMTypeName) : null;
+         return String.IsNullOrEmpty(vmInstanceId) ? GetSubVM(vmTypeName) : null;
       }
 
       /// <summary>
       /// Overload of GetSubVM that only acceptes view model type name.
       /// </summary>
-      /// <param name="iVMTypeName">View model type name.</param>
+      /// <param name="vmTypeName">View model type name.</param>
       /// <returns>View model instance.</returns>
-      public virtual BaseVM GetSubVM(string iVMTypeName)
+      public virtual BaseVM GetSubVM(string vmTypeName)
       {
          return null;
       }
@@ -101,21 +101,21 @@ namespace DotNetify
       /// Prevent a property from being bound.
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
-      /// <param name="iExpression">Expression containing property name, to avoid hardcoding it.</param>
-      public void Ignore<T>(Expression<Func<T>> iExpression)
+      /// <param name="expression">Expression containing property name, to avoid hardcoding it.</param>
+      public void Ignore<T>(Expression<Func<T>> expression)
       {
-         var propertyName = ((MemberExpression)iExpression.Body).Member.Name;
-         if (!mIgnoredProperties.Contains(propertyName))
-            mIgnoredProperties.Add(propertyName);
+         var propertyName = ((MemberExpression)expression.Body).Member.Name;
+         if (!_ignoredProperties.Contains(propertyName))
+            _ignoredProperties.Add(propertyName);
       }
 
       /// <summary>
       /// Overrides this method to handle a value update from a property path that cannot
       /// be resolved by the VMController.
       /// </summary>
-      /// <param name="iVMPath">View model property path.</param>
-      /// <param name="iValue">New value.</param>
-      public virtual void OnUnresolvedUpdate(string iVMPath, string iValue)
+      /// <param name="vmPath">View model property path.</param>
+      /// <param name="value">New value.</param>
+      public virtual void OnUnresolvedUpdate(string vmPath, string value)
       {
       }
 
@@ -131,17 +131,17 @@ namespace DotNetify
       /// <summary>
       /// Fires property changed event.
       /// </summary>
-      /// <param name="iPropertyName">Property name.</param>
-      protected override void Changed(string iPropertyName)
+      /// <param name="propertyName">Property name.</param>
+      protected override void Changed(string propertyName)
       {
-         base.Changed(iPropertyName);
+         base.Changed(propertyName);
 
          // Skip property that's decorated with [Ignore].
-         if (IgnoredProperties.Contains(iPropertyName))
+         if (IgnoredProperties.Contains(propertyName))
             return;
 
          // Mark property as changed, to allow the server view model to forward changes back to the client view model.
-         mChangedProperties[iPropertyName] = GetType().GetProperty(iPropertyName).GetValue(this);
+         _changedProperties[propertyName] = GetType().GetProperty(propertyName).GetValue(this);
       }
    }
 }

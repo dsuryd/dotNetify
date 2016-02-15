@@ -25,36 +25,36 @@ namespace DotNetify
       /// Used in CRUD operations to add a new item to the list.
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
-      /// <param name="iExpression">Expression containing property name of the list.</param>
-      /// <param name="iItem">List item to be added.</param>
-      public static void AddList<T>(this BaseVM iVM, Expression<Func<T>> iExpression, object iItem)
+      /// <param name="expression">Expression containing property name of the list.</param>
+      /// <param name="item">List item to be added.</param>
+      public static void AddList<T>(this BaseVM vm, Expression<Func<T>> expression, object item)
       {
-         var propName = ((MemberExpression)iExpression.Body).Member.Name;
-         iVM.ChangedProperties[propName + "_add"] = iItem;
+         var propName = ((MemberExpression)expression.Body).Member.Name;
+         vm.ChangedProperties[propName + "_add"] = item;
       }
 
       /// <summary>
       /// Used in CRUD operations to update an existing item on the list.
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
-      /// <param name="iExpression">Expression containing property name of the list.</param>
-      /// <param name="iItem">List item to be updated.</param>
-      public static void UpdateList<T>(this BaseVM iVM, Expression<Func<T>> iExpression, object iItem)
+      /// <param name="expression">Expression containing property name of the list.</param>
+      /// <param name="item">List item to be updated.</param>
+      public static void UpdateList<T>(this BaseVM vm, Expression<Func<T>> expression, object item)
       {
-         var propName = ((MemberExpression)iExpression.Body).Member.Name;
-         iVM.ChangedProperties[propName + "_update"] = iItem;
+         var propName = ((MemberExpression)expression.Body).Member.Name;
+         vm.ChangedProperties[propName + "_update"] = item;
       }
 
       /// <summary>
       /// Used in CRUD operations to remove an item from a list.
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
-      /// <param name="iExpression">Expression containing property name of the list.</param>
-      /// <param name="iItemKey">Identifies the list item to be removed.</param>
-      public static void RemoveList<T>(this BaseVM iVM, Expression<Func<T>> iExpression, object iItemKey)
+      /// <param name="expression">Expression containing property name of the list.</param>
+      /// <param name="itemKey">Identifies the list item to be removed.</param>
+      public static void RemoveList<T>(this BaseVM vm, Expression<Func<T>> expression, object itemKey)
       {
-         var propName = ((MemberExpression)iExpression.Body).Member.Name;
-         iVM.ChangedProperties[propName + "_remove"] = iItemKey;
+         var propName = ((MemberExpression)expression.Body).Member.Name;
+         vm.ChangedProperties[propName + "_remove"] = itemKey;
       }
    }
 }
