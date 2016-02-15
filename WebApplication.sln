@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication", "WebApplication\WebApplication.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetifyLib", "DotNetifyLib\DotNetifyLib.csproj", "{329F210E-0721-462C-A368-14121DCEE135}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModels", "ViewModels\ViewModels.csproj", "{D777B14B-C36D-48A8-B5A8-2F5B0FCEB0CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{A9D45EF3-F162-4E15-BCE5-E2F2501D9079}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{D777B14B-C36D-48A8-B5A8-2F5B0FCEB0CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D777B14B-C36D-48A8-B5A8-2F5B0FCEB0CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D777B14B-C36D-48A8-B5A8-2F5B0FCEB0CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9D45EF3-F162-4E15-BCE5-E2F2501D9079}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9D45EF3-F162-4E15-BCE5-E2F2501D9079}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9D45EF3-F162-4E15-BCE5-E2F2501D9079}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9D45EF3-F162-4E15-BCE5-E2F2501D9079}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
