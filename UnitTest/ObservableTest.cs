@@ -18,75 +18,75 @@ namespace UnitTest
          public string String
          {
             get { return Get<string>(); }
-            set { Set( value ); }
+            set { Set(value); }
          }
 
          public int Int
          {
             get { return Get<int>(); }
-            set { Set( value ); }
+            set { Set(value); }
          }
 
          public double Double
          {
             get { return Get<double>(); }
-            set { Set( value ); }
+            set { Set(value); }
          }
 
          public bool Bool
          {
             get { return Get<bool>(); }
-            set { Set( value ); }
+            set { Set(value); }
          }
 
          public TestObject Object
          {
             get { return Get<TestObject>(); }
-            set { Set( value ); }
+            set { Set(value); }
          }
       }
 
       [TestMethod]
-      public void PropertyChanged()
+      public void Observable_PropertyChanged()
       {
          var vm = new TestObservable();
 
          string propertyChanged = null;
-         vm.PropertyChanged += ( sender, e ) => propertyChanged = e.PropertyName;
+         vm.PropertyChanged += (sender, e) => propertyChanged = e.PropertyName;
 
          vm.String = "MyString";
-         Assert.AreEqual( "MyString", vm.String );
-         Assert.AreEqual( "String", propertyChanged );
+         Assert.AreEqual("MyString", vm.String);
+         Assert.AreEqual("String", propertyChanged);
 
          vm.Int = 42;
-         Assert.AreEqual( 42, vm.Int );
-         Assert.AreEqual( "Int", propertyChanged );
+         Assert.AreEqual(42, vm.Int);
+         Assert.AreEqual("Int", propertyChanged);
 
          vm.Double = 3.1456;
-         Assert.AreEqual( 3.1456, vm.Double );
-         Assert.AreEqual( "Double", propertyChanged );
+         Assert.AreEqual(3.1456, vm.Double);
+         Assert.AreEqual("Double", propertyChanged);
 
          vm.Bool = true;
-         Assert.IsTrue( vm.Bool );
-         Assert.AreEqual( "Bool", propertyChanged );
+         Assert.IsTrue(vm.Bool);
+         Assert.AreEqual("Bool", propertyChanged);
 
          vm.Object = new TestObject { String = "TestString", Int = 13 };
-         Assert.IsNotNull( vm.Object );
-         Assert.AreEqual( "TestString", vm.Object.String );
-         Assert.AreEqual( 13, vm.Object.Int );
-         Assert.AreEqual( "Object", propertyChanged );
+         Assert.IsNotNull(vm.Object);
+         Assert.AreEqual("TestString", vm.Object.String);
+         Assert.AreEqual(13, vm.Object.Int);
+         Assert.AreEqual("Object", propertyChanged);
       }
 
       [TestMethod]
-      public void Dispose()
+      public void Observable_Dispose()
       {
          var vm = new TestObservable();
 
          bool disposed = false;
-         vm.Disposed += ( sender, e ) => disposed = true;
+         vm.Disposed += (sender, e) => disposed = true;
 
          vm.Dispose();
-         Assert.IsTrue( disposed );
+         Assert.IsTrue(disposed);
       }
    }
 }
