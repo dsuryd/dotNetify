@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2015 Dicky Suryadi
+Copyright 2016 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using DotNetify.Routing;
 
 namespace DotNetify
 {
@@ -33,6 +32,31 @@ namespace DotNetify
    /// </summary>
    public class VMController : IDisposable
    {
+      /// <summary>
+      /// Exception that gets thrown when the VMController cannot resolve a JSON view model update from the client.
+      /// </summary>
+      public class UnresolvedVMUpdateException : Exception { }
+
+      #region Delegates
+
+      /// <summary>
+      /// Delegate used by the view model to provide response back to the client.
+      /// </summary>
+      /// <param name="connectionId">Identifies the connection.</param>
+      /// <param name="vmId">Identifies the view model providing the response.</param>
+      /// <param name="vmData">Response data.</param>
+      public delegate void VMResponseDelegate(string connectionId, string vmId, string vmData);
+
+      /// <summary>
+      /// Delegate to create view models.
+      /// </summary>
+      /// <param name="type">Class type.</param>
+      /// <param name="args">Optional constructor arguments.</param>
+      /// <returns>Object of type T.</returns>
+      public delegate object CreateInstanceDelegate(Type type, object[] args);
+
+      #endregion
+
       #region Fields
 
       /// <summary>
@@ -95,16 +119,27 @@ namespace DotNetify
       protected ConcurrentDictionary<string, VMInfo> _activeVMs = new ConcurrentDictionary<string, VMInfo>();
 
       /// <summary>
-      /// Delegate used for creating view model instances. 
+      /// Function invoked by the view model to provide response back to the client.
       /// </summary>
-      protected static Func<Type, object[], object> _createInstanceFunc = (type, args) => Activator.CreateInstance(type, args);
+      protected readonly VMResponseDelegate _vmResponse;
 
       #endregion
 
       /// <summary>
-      /// Exception that gets thrown when the VMController cannot resolve a JSON view model update from the client.
+      /// Delegate to override default mechanism used for creating view model instances.
       /// </summary>
-      public class UnresolvedVMUpdateException : Exception { }
+      public static CreateInstanceDelegate CreateInstance { get; set; } = (type, args) => Activator.CreateInstance(type, args);
+
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="vmResponse">Function invoked by the view model to provide response back to the client.</param>
+      public VMController(VMResponseDelegate vmResponse)
+      {
+         _vmResponse = vmResponse;
+         if (_vmResponse == null)
+            throw new ArgumentNullException();
+      }
 
       /// <summary>
       /// Disposes active view models.
@@ -116,15 +151,6 @@ namespace DotNetify
             kvp.Value.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
             kvp.Value.Instance.Dispose();
          }
-      }
-
-      /// <summary>
-      /// Delegate to override default mechanism used for creating view model instances.
-      /// </summary>
-      public static Func<Type, object[], object> CreateInstance
-      {
-         get { return _createInstanceFunc; }
-         set { _createInstanceFunc = value; }
       }
 
       /// <summary>
@@ -164,7 +190,7 @@ namespace DotNetify
          var vmData = Serialize(vmInstance);
 
          // Send the view model data back to the browser client.
-         DotNetifyHub.Response_VM(connectionId, vmId, vmData);
+         _vmResponse(connectionId, vmId, vmData);
 
          // Reset the changed property states.
          vmInstance.AcceptChangedProperties();
@@ -409,7 +435,7 @@ namespace DotNetify
                if (changedProperties.Count > 0)
                {
                   var vmData = Serialize(changedProperties);
-                  DotNetifyHub.Response_VM(kvp.Value.ConnectionId, kvp.Key, vmData);
+                  _vmResponse(kvp.Value.ConnectionId, kvp.Key, vmData);
 
                   // After the changes are forwarded, accept the changes so they won't be marked as changed anymore.
                   vmInstance.AcceptChangedProperties();

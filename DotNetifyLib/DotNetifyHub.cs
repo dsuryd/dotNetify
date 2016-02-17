@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2015 Dicky Suryadi
+Copyright 2016 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,49 +30,41 @@ namespace DotNetify
    public class DotNetifyHub : Hub
    {
       /// <summary>
-      /// View model controllers by the client connection Ids.
+      /// Factory of view model controllers.
       /// </summary>
-      private static Lazy<MemoryCache> _controllersCache = new Lazy<MemoryCache>(() => new MemoryCache("DotNetify"));
-
-      /// <summary>
-      /// How long to keep a view model controller in memory after it hasn't been accessed for a while.
-      /// </summary>
-      public static TimeSpan CacheExpiration { get; set; }
-
-      /// <summary>
-      /// Delegate to override default static memory caching to store view model controllers.
-      /// </summary>
-      public static Func<MemoryCache> GetControllersCache { get; set; }
+      private readonly IVMControllerFactory _vmControllerFactory;
 
       /// <summary>
       /// Provides access to our hub.
       /// </summary>
-      public static IHubContext HubContext
+      private static IHubContext HubContext
       {
          get { return GlobalHost.ConnectionManager.GetHubContext<DotNetifyHub>(); }
       }
 
       /// <summary>
-      /// Static constructor to initialize default cache expiration.
+      /// View model controller associated with the current connection.
       /// </summary>
-      static DotNetifyHub()
+      private VMController VMController
       {
-         CacheExpiration = new TimeSpan(0, 20, 0);
+         get { return _vmControllerFactory.GetInstance(Context.ConnectionId); }
       }
 
       /// <summary>
-      /// View model controller associated with this client connection.
+      /// Default constructor.
       /// </summary>
-      public VMController VMController
+      public DotNetifyHub()
       {
-         get
-         {
-            var cache = GetControllersCache != null ? GetControllersCache() : _controllersCache.Value;
+         _vmControllerFactory = VMControllerFactory.Singleton;
+      }
 
-            var newValue = new Lazy<VMController>();
-            var cachedValue = cache.AddOrGetExisting(Context.ConnectionId, newValue, GetCacheItemPolicy()) as Lazy<VMController>;
-            return cachedValue == null ? newValue.Value : cachedValue.Value;
-         }
+      /// <summary>
+      /// Constructor for dependency injection.
+      /// </summary>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      public DotNetifyHub(IVMControllerFactory vmControllerFactory)
+      {
+         _vmControllerFactory = vmControllerFactory;
       }
 
       /// <summary>
@@ -83,26 +75,9 @@ namespace DotNetify
       /// <returns></returns>
       public override Task OnDisconnected(bool stopCalled)
       {
-         var cache = GetControllersCache != null ? GetControllersCache() : _controllersCache.Value;
-
          // Remove the controller on disconnection.
-         if (cache.Contains(Context.ConnectionId))
-            cache.Remove(Context.ConnectionId);
-
+         _vmControllerFactory.Remove(Context.ConnectionId);
          return base.OnDisconnected(stopCalled);
-      }
-
-      /// <summary>
-      /// Returns cached item policy for view model controllers.
-      /// </summary>
-      /// <returns>Cache item policy.</returns>
-      private CacheItemPolicy GetCacheItemPolicy()
-      {
-         return new CacheItemPolicy
-         {
-            SlidingExpiration = CacheExpiration,
-            RemovedCallback = i => ((i.CacheItem.Value as Lazy<VMController>).Value as IDisposable).Dispose()
-         };
       }
 
       #region Client Requests
