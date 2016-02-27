@@ -56,11 +56,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ObservableTest.cs" />
+    <Compile Include="DotNetifyLibTest\ObservableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BaseVMTest.cs" />
-    <Compile Include="BaseVMCRUDExtensionTest.cs" />
-    <Compile Include="VMControllerTest.cs" />
+    <Compile Include="DotNetifyLibTest\BaseVMTest.cs" />
+    <Compile Include="DotNetifyLibTest\BaseVMCRUDExtensionTest.cs" />
+    <Compile Include="DotNetifyLibTest\VMControllerFactoryTest.cs" />
+    <Compile Include="DotNetifyLibTest\VMControllerTest.cs" />
+    <Compile Include="ViewModelsTest\HelloWorldVMTest.cs" />
+    <Compile Include="ViewModelsTest\ControlTypesVMTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetifyLib\DotNetifyLib.csproj">
