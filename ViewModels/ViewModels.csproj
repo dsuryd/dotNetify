@@ -56,7 +56,6 @@
     <Compile Include="LiveChartVM.cs" />
     <Compile Include="ControlTypesVM.cs" />
     <Compile Include="Dashboard\DashboardPanelVM.cs" />
-    <Compile Include="Docs\DocumentationVM.cs" />
     <Compile Include="EmployeeModel.cs" />
     <Compile Include="HelloWorldVM.cs" />
     <Compile Include="GridViewVM.cs" />
@@ -68,7 +67,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Docs\StudentsVM.cs" />
     <Compile Include="SimpleListVM.cs" />
     <Compile Include="BetterListVM.cs" />
     <Compile Include="TreeViewVM.cs" />
