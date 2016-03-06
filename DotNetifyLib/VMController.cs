@@ -114,6 +114,11 @@ namespace DotNetify
       protected static List<Type> _vmTypes = new List<Type>();
 
       /// <summary>
+      /// List of registered assemblies.
+      /// </summary>
+      protected static List<string> _registeredAssemblies = new List<string>();
+
+      /// <summary>
       /// Active instances of view models.
       /// </summary>
       protected ConcurrentDictionary<string, VMInfo> _activeVMs = new ConcurrentDictionary<string, VMInfo>();
@@ -160,7 +165,12 @@ namespace DotNetify
       public static void RegisterAssembly(Assembly vmAssembly)
       {
          if (vmAssembly == null)
+            throw new ArgumentNullException();
+
+         if (_registeredAssemblies.Exists(i => i == vmAssembly.FullName))
             return;
+
+         _registeredAssemblies.Add(vmAssembly.FullName);
 
          bool hasVMTypes = false;
          foreach (Type vmType in vmAssembly.GetExportedTypes().Where(i => typeof(BaseVM).IsAssignableFrom(i)))
