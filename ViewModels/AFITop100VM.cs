@@ -19,9 +19,9 @@ namespace ViewModels
             IEnumerable<MovieRecord> results;
 
             if (!String.IsNullOrEmpty(Query))
-               results = AFITop100Model.AllRecords.Where(Query);
+               results = _model.AllRecords.Where(Query);
             else
-               results = AFITop100Model.AllRecords;
+               results = _model.AllRecords;
 
             return Paginate(results);
          }
@@ -82,14 +82,17 @@ namespace ViewModels
 
       private static int _recordsPerPage = 10;
       private static readonly List<string> _propertyNames = typeof(MovieRecord).GetProperties().ToList().ConvertAll(i => i.Name);
+      private AFITop100Model _model;
       private List<MovieRecord> _queryTest = new List<MovieRecord>();
       private int _errorPos;
 
       /// <summary>
       /// Constructor.
       /// </summary>
-      public AFITop100VM()
+      /// <param name="model">Model containing AFI Top 100 movie records.</param>
+      public AFITop100VM(AFITop100Model model)
       {
+         _model = model;
          EnableAutoComplete = true;
          AutoCompleteCaption = "Auto-complete";
       }
