@@ -38,3 +38,4 @@ All contribution is welcome; reach out to find out how you can help.  If you lik
 ##Todos
 - Increase unit test coverage.
 - Convert the solution structure to ASP.NET Core 1.0.
+- Look at supporting Polymer web components.
