@@ -35,16 +35,16 @@ namespace ViewModels
 
    public class EmployeeModel
    {
-      private List<EmployeeRecord> _employeeRecords;
-      private int _newId = 100;
-      private int? _numRecords;
+      protected List<EmployeeRecord> _employeeRecords;
+      protected int _newId = 100;
+      protected int? _numRecords;
 
       public EmployeeModel(int? numRecords = null)
       {
          _numRecords = numRecords;
       }
 
-      public List<EmployeeRecord> GetAllRecords()
+      public virtual List<EmployeeRecord> GetAllRecords()
       {
          if (_employeeRecords == null)
             _employeeRecords = _numRecords != null ? EmployeeRecord.GetMockupData().Take(_numRecords.Value).ToList() : EmployeeRecord.GetMockupData();

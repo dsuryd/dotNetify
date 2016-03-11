@@ -64,6 +64,8 @@
     <Compile Include="DotNetifyLibTest\VMControllerTest.cs" />
     <Compile Include="ViewModelsTest\HelloWorldVMTest.cs" />
     <Compile Include="ViewModelsTest\ControlTypesVMTest.cs" />
+    <Compile Include="ViewModelsTest\BetterListVMTest.cs" />
+    <Compile Include="ViewModelsTest\SimpleListVMTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetifyLib\DotNetifyLib.csproj">
