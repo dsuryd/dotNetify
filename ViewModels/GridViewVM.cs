@@ -18,7 +18,7 @@ namespace ViewModels
       // but just do a pass-through from the database to the client.   The usage of private variable here is just
       // for DEMO purpose, to allow users to edit the data and see the updates reflected on the server without
       // doing actual permanent editing.
-      private EmployeeModel _Model = new EmployeeModel();
+      private readonly EmployeeModel _model;
 
       /// <summary>
       /// This class holds the list header info.
@@ -118,7 +118,7 @@ namespace ViewModels
             if (SelectedId == 0)
                return new { FullName = "", Phone = "" };
 
-            var record = _Model.GetRecord(SelectedId);
+            var record = _model.GetRecord(SelectedId);
             return new { FullName = record.FullName, Phone = record.Phone };
          }
       }
@@ -149,7 +149,7 @@ namespace ViewModels
          get
          {
             // Get the list content, filtered by the search text. 
-            var records = _Model.GetAllRecords().Where(i => String.IsNullOrEmpty(Search) || i.FirstName.ToLower().StartsWith(Search) || i.LastName.ToLower().StartsWith(Search));
+            var records = _model.GetAllRecords().Where(i => String.IsNullOrEmpty(Search) || i.FirstName.ToLower().StartsWith(Search) || i.LastName.ToLower().StartsWith(Search));
 
             // If the current selection is not on the new list, move the selection to the first one on the list.
             if (records.Any(i => i.Id == SelectedId) == false)
@@ -164,13 +164,13 @@ namespace ViewModels
       /// By convention, when VMController receives a list item from the client, it will look for the function that starts
       /// with the list property name and ends with "_get" to access the list item for the purpose of updating its value.
       /// </summary>
-      /// <param name="iKey">List item key.</param>
+      /// <param name="key">List item key.</param>
       /// <returns>List item.</returns>
-      public EmployeeInfo Employees_get(string iKey)
+      public EmployeeInfo Employees_get(string key)
       {
          EmployeeInfo employeeInfo = null;
 
-         var record = _Model.GetRecord(int.Parse(iKey));
+         var record = _model.GetRecord(int.Parse(key));
          if (record != null)
             employeeInfo = new EmployeeInfo { Id = record.Id, FirstName = record.FirstName, LastName = record.LastName };
 
@@ -188,12 +188,12 @@ namespace ViewModels
       {
          var employeeInfo = sender as EmployeeInfo;
 
-         var record = _Model.GetRecord(employeeInfo.Id);
+         var record = _model.GetRecord(employeeInfo.Id);
          if (record != null)
          {
             record.FirstName = employeeInfo.FirstName;
             record.LastName = employeeInfo.LastName;
-            _Model.UpdateRecord(record);
+            _model.UpdateRecord(record);
          }
 
          // If the record is currently selected, also update the displayed info of the selection.
@@ -204,8 +204,9 @@ namespace ViewModels
       /// <summary>
       /// Constructor.
       /// </summary>
-      public GridViewVM()
+      public GridViewVM(EmployeeModel model)
       {
+         _model = model;
          SelectedId = 1;
       }
    }

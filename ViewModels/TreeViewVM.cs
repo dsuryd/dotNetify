@@ -11,6 +11,12 @@ namespace ViewModels
    /// </summary>
    public class TreeViewVM : BaseVM
    {
+      // In real world app we wouldn't store big data in a private variable (can be taxing for web server resource),
+      // but just do a pass-through from the database to the client.   The usage of private variable here is just
+      // for DEMO purpose, to allow users to edit the data and see the updates reflected on the server without
+      // doing actual permanent editing.
+      private readonly EmployeeModel _model;
+
       /// <summary>
       /// The class that holds a tree item data.
       /// </summary>
@@ -59,13 +65,22 @@ namespace ViewModels
       public Func<TreeItem> ExpandedItemFunc { get; set; }
 
       /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="model">Employee model.</param>
+      public TreeViewVM(EmployeeModel model)
+      {
+         _model = model;
+      }
+
+      /// <summary>
       /// Gets the root tree item.
       /// </summary>
       /// <returns></returns>
       private TreeItem GetRoot()
       {
          TreeItem root = null;
-         var bigBoss = EmployeeModel.AllRecords.FirstOrDefault(i => i.ReportTo == 0);
+         var bigBoss = _model.GetAllRecords().FirstOrDefault(i => i.ReportTo == 0);
          if (bigBoss != null)
             root = LoadTreeItem(bigBoss.Id);
 
@@ -84,7 +99,7 @@ namespace ViewModels
 
          var treeItem = LoadTreeItem(SelectedId);
 
-         var records = EmployeeModel.AllRecords;
+         var records = _model.GetAllRecords();
          var record = records.FirstOrDefault(i => i.Id == SelectedId);
          var reportToId = record.ReportTo;
 
@@ -106,13 +121,15 @@ namespace ViewModels
       /// <returns>Tree item.</returns>
       protected TreeItem LoadTreeItem(int iId)
       {
+         var allRecords = _model.GetAllRecords();
+
          // Find the tree item.
-         var record = EmployeeModel.AllRecords.FirstOrDefault(i => i.Id == iId);
+         var record = allRecords.FirstOrDefault(i => i.Id == iId);
          if (record == null)
             return null;
 
          // Find the tree item's children.
-         var directReports = EmployeeModel.AllRecords.Where(i => i.ReportTo == iId);
+         var directReports = allRecords.Where(i => i.ReportTo == iId);
          var treeItem = new TreeItem { Id = record.Id, Name = record.FullName, CanExpand = directReports.Count() > 0, Expanded = true };
          if (directReports.Count() > 0)
          {
@@ -120,7 +137,7 @@ namespace ViewModels
             foreach (var person in directReports)
             {
                // Check if each child has children to determine whether it can expand.
-               bool hasDirectReports = EmployeeModel.AllRecords.Exists(i => i.ReportTo == person.Id);
+               bool hasDirectReports = allRecords.Exists(i => i.ReportTo == person.Id);
                treeItem.Children.Add(new TreeItem { Id = person.Id, Name = person.FullName, CanExpand = hasDirectReports });
             }
          }

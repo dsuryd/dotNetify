@@ -16,7 +16,7 @@ namespace ViewModels
       // but just do a pass-through from the database to the client.   The usage of private variable here is just
       // for DEMO purpose, to allow users to edit the data and see the updates reflected on the server without
       // doing actual permanent editing.
-      private EmployeeModel _Model = new EmployeeModel(7);
+      private readonly EmployeeModel _model;
 
       /// <summary>
       /// The class that holds employee info to send to the client.  It inherits from Observable
@@ -68,7 +68,7 @@ namespace ViewModels
          set
          {
             var record = new EmployeeRecord { FirstName = FirstName, LastName = LastName };
-            _Model.AddRecord(ref record);
+            _model.AddRecord(ref record);
 
             // Call this base method to send the new employee info back to the client.
             this.AddList(() => Employees, new EmployeeInfo { Id = record.Id, FirstName = record.FirstName, LastName = record.LastName });
@@ -86,7 +86,7 @@ namespace ViewModels
          get { return 0; }
          set
          {
-            _Model.RemoveRecord(value);
+            _model.RemoveRecord(value);
 
             // Call this base method to tell the client to remove the employee from the list it holds.
             this.RemoveList(() => Employees, value);
@@ -98,7 +98,16 @@ namespace ViewModels
       /// </summary>
       public IEnumerable<EmployeeInfo> Employees
       {
-         get { return _Model.GetAllRecords().ConvertAll(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName }); }
+         get { return _model.GetAllRecords().ConvertAll(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName }); }
+      }
+
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="model">Employee model.</param>
+      public SimpleListVM(EmployeeModel model)
+      {
+         _model = model;
       }
 
       /// <summary>
@@ -112,7 +121,7 @@ namespace ViewModels
       {
          EmployeeInfo employeeInfo = null;
 
-         var record = _Model.GetRecord(int.Parse(iKey));
+         var record = _model.GetRecord(int.Parse(iKey));
          if (record != null)
          {
             employeeInfo = new EmployeeInfo { Id = record.Id, FirstName = record.FirstName, LastName = record.LastName };
@@ -133,12 +142,12 @@ namespace ViewModels
          var employeeInfo = sender as EmployeeInfo;
 
          /// Real world app would do database update operation here.
-         var record = _Model.GetRecord(employeeInfo.Id);
+         var record = _model.GetRecord(employeeInfo.Id);
          if (record != null)
          {
             record.FirstName = employeeInfo.FirstName;
             record.LastName = employeeInfo.LastName;
-            _Model.UpdateRecord(record);
+            _model.UpdateRecord(record);
          }
       }
    }

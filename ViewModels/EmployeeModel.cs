@@ -35,51 +35,46 @@ namespace ViewModels
 
    public class EmployeeModel
    {
-      private List<EmployeeRecord> _EmployeeRecords;
-      private int _NewId = 100;
-      private int _NumRecords = 0;
+      private List<EmployeeRecord> _employeeRecords;
+      private int _newId = 100;
+      private int? _numRecords;
 
-      public EmployeeModel(int NumRecords = 0)
+      public EmployeeModel(int? numRecords = null)
       {
-         _NumRecords = NumRecords;
+         _numRecords = numRecords;
       }
 
       public List<EmployeeRecord> GetAllRecords()
       {
-         if (_EmployeeRecords == null)
-            _EmployeeRecords = _NumRecords > 0 ? EmployeeRecord.GetMockupData().Take(_NumRecords).ToList() : EmployeeRecord.GetMockupData();
+         if (_employeeRecords == null)
+            _employeeRecords = _numRecords != null ? EmployeeRecord.GetMockupData().Take(_numRecords.Value).ToList() : EmployeeRecord.GetMockupData();
 
-         return _EmployeeRecords;
+         return _employeeRecords;
       }
 
-      public void AddRecord( ref EmployeeRecord iRecord )
+      public void AddRecord(ref EmployeeRecord record)
       {
-         iRecord.Id = _NewId++;
-         _EmployeeRecords.Add(iRecord);
+         record.Id = _newId++;
+         _employeeRecords.Add(record);
       }
 
-      public EmployeeRecord GetRecord(int iId)
+      public EmployeeRecord GetRecord(int id)
       {
-         if (_EmployeeRecords == null)
+         if (_employeeRecords == null)
             GetAllRecords();
-         return _EmployeeRecords.FirstOrDefault(i => i.Id == iId);
+         return _employeeRecords.FirstOrDefault(i => i.Id == id);
       }
 
-      public void UpdateRecord(EmployeeRecord iRecord)
+      public void UpdateRecord(EmployeeRecord record)
       {
-         var idx = _EmployeeRecords.FindIndex(i => i.Id == iRecord.Id);
+         var idx = _employeeRecords.FindIndex(i => i.Id == record.Id);
          if (idx >= 0)
-            _EmployeeRecords[idx] = iRecord;
+            _employeeRecords[idx] = record;
       }
 
-      public void RemoveRecord( int iId )
+      public void RemoveRecord(int id)
       {
-         _EmployeeRecords.Remove(_EmployeeRecords.FirstOrDefault(i => i.Id == iId));
-      }
-
-      public static List<EmployeeRecord> AllRecords
-      {
-         get { return EmployeeRecord.GetMockupData(); }
+         _employeeRecords.Remove(_employeeRecords.FirstOrDefault(i => i.Id == id));
       }
    }
 }

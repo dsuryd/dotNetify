@@ -10,15 +10,15 @@ namespace ViewModels
    /// </summary>
    public class CompositeViewVM : BaseVM
    {
-      private LinkedGridViewVM _GridViewVM;
-      private LinkedTreeViewVM _TreeViewVM;
+      private LinkedGridViewVM _gridViewVM;
+      private LinkedTreeViewVM _treeViewVM;
 
       /// <summary>
       /// A subclass of GridViewVM that hides the SelectedDetails property from the view.
       /// </summary>
       private class LinkedGridViewVM : GridViewVM
       {
-         public LinkedGridViewVM() : base() { Ignore(() => SelectedDetails); }
+         public LinkedGridViewVM(EmployeeModel model) : base(model) { Ignore(() => SelectedDetails); }
       }
 
       /// <summary>
@@ -37,26 +37,28 @@ namespace ViewModels
          {
             if (iId != SelectedId) { SelectedId = iId; Changed(() => Root); }
          }
+
+         public LinkedTreeViewVM(EmployeeModel model) : base(model) { }
       }
 
       /// <summary>
       /// Constructor.
       /// </summary>
-      public CompositeViewVM()
+      public CompositeViewVM(EmployeeModel model)
       {
-         _GridViewVM = new LinkedGridViewVM();
-         _TreeViewVM = new LinkedTreeViewVM();
+         _gridViewVM = new LinkedGridViewVM(model);
+         _treeViewVM = new LinkedTreeViewVM(model);
 
-         _GridViewVM.PropertyChanged += (sender, e) =>
+         _gridViewVM.PropertyChanged += (sender, e) =>
          {
             if (e.PropertyName == "SelectedId")
-               _TreeViewVM.ExpandTo(_GridViewVM.SelectedId);
+               _treeViewVM.ExpandTo(_gridViewVM.SelectedId);
          };
 
-         _TreeViewVM.PropertyChanged += (sender, e) =>
+         _treeViewVM.PropertyChanged += (sender, e) =>
          {
             if (e.PropertyName == "SelectedId")
-               _GridViewVM.SelectedId = _TreeViewVM.SelectedId;
+               _gridViewVM.SelectedId = _treeViewVM.SelectedId;
          };
       }
 
@@ -68,9 +70,9 @@ namespace ViewModels
       public override BaseVM GetSubVM(string iVMTypeName)
       {
          if (iVMTypeName == typeof(LinkedGridViewVM).Name)
-            return _GridViewVM;
+            return _gridViewVM;
          else if (iVMTypeName == typeof(LinkedTreeViewVM).Name)
-            return _TreeViewVM;
+            return _treeViewVM;
 
          return base.GetSubVM(iVMTypeName);
       }
