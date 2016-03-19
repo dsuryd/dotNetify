@@ -36,6 +36,6 @@ Licensed under the Apache License, Version 2.0.
 All contribution is welcome; reach out to find out how you can help.  If you like the idea behind this project, please let others know about it! 
 
 ##Todos
-- Increase unit test coverage.
+- ~~Increase unit test coverage~~.
 - Convert the solution structure to ASP.NET Core 1.0.
 - Look at supporting Polymer web components.
