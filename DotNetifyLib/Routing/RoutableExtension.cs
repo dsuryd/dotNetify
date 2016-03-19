@@ -154,6 +154,8 @@ namespace DotNetify.Routing
       public static void RouteUrl(this IRoutable routable, ref RoutingViewData viewData)
       {
          var routingState = routable.RoutingState;
+         if (routingState == null)
+            return;
 
          viewData.ActiveTemplate = null;
          routingState.Origin = viewData.Origin;
