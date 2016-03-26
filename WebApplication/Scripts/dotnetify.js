@@ -31,7 +31,7 @@ var dotNetify = {};
    ko.mapping = komapping;
    dotnetify =
    {
-      version: "1.0.3",
+      version: "1.0.5",
       hub: null,
       debug: false,
       debugFn: null,
