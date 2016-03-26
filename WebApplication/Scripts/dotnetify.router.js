@@ -28,7 +28,7 @@ limitations under the License.
    // Add plugin functions.
    dotnetify.router =
       {
-         version: "1.0.0-BETA",
+         version: "1.0.3",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
