@@ -27,17 +27,12 @@ Read all about it in the CodeProject article: [Real-Time Web App Made Simple wit
 
 ##NuGet
 
-The pre-release version is available from NuGet.org. It will install the DotNetify assembly, the scripts and their dependencies.  After installing, see this [Configuring Your Project](http://dotnetify.net/index/Installing) section on how to include the script and register the assembly where your view models will be.
+The v1.0 version is available from NuGet.org. It will install the DotNetify assembly, the scripts and their dependencies.  After installing, see this [Configuring Your Project](http://dotnetify.net/index/Installing) section on how to include the script and register the assembly where your view models will be.
 
-*PM> Install-Package DotNetify -Pre*
+*PM> Install-Package DotNetify
 
 ##License
 Licensed under the Apache License, Version 2.0.
 
 ##Contributing
 All contribution is welcome; reach out to find out how you can help.  If you like the idea behind this project, please let others know about it! 
-
-##Todos
-- ~~Increase unit test coverage~~.
-- Convert the solution structure to ASP.NET Core 1.0.
-- Look at supporting Polymer web components.
