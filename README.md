@@ -27,9 +27,9 @@ Read all about it in the CodeProject article: [Real-Time Web App Made Simple wit
 
 ##NuGet
 
-The v1.0 version is available from NuGet.org. It will install the DotNetify assembly, the scripts and their dependencies.  After installing, see this [Configuring Your Project](http://dotnetify.net/index/Installing) section on how to include the script and register the assembly where your view models will be.
+*PM> Install-Package DotNetify*
 
-*PM> Install-Package DotNetify
+After installing, see this [Configuring Your Project](http://dotnetify.net/index/Installing) section.
 
 ##License
 Licensed under the Apache License, Version 2.0.
