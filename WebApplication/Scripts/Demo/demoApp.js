@@ -7,8 +7,6 @@
       "ko-mapping": "knockout.mapping-latest",
       "dotnetify": "dotnetify",
       "router": "dotnetify.router",
-      "binder": "dotnetify.binder",
-      "binder-polymer": "dotnetify.binder.polymer",
       "path": "path.min",
       "signalr": "jquery.signalR-2.2.0.min",
       "signalr-hub": "/signalr/hubs?",
@@ -22,12 +20,11 @@
       "bootstrap": ["jquery"],
       "calendar": ["jquery"],
       "signalr": { deps: ["jquery"], exports: "$.connection" },
-      "signalr-hub": ["signalr"],
-      "binder-polymer": ["binder"]
+      "signalr-hub": ["signalr"]
    }
 });
 
-require(['jquery', 'knockout', 'dotnetify', 'router', 'path', 'binder-polymer', 'bootstrap', 'calendar'], function ($) {
+require(['jquery', 'knockout', 'dotnetify', 'router', 'path', 'bootstrap', 'calendar'], function ($) {
    $(function () {
       dotnetify.debug = true;
    });

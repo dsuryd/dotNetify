@@ -31,9 +31,6 @@ namespace DotNetify
       protected ConcurrentDictionary<string, object> _changedProperties = new ConcurrentDictionary<string, object>();
       private List<string> _ignoredProperties = null;
 
-      /// <summary>
-      /// Attribute to prevent a property from being sent to the client.
-      /// </summary>
       public class IgnoreAttribute : Attribute { }
 
       /// <summary>

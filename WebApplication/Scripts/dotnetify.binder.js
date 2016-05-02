@@ -48,54 +48,7 @@ limitations under the License.
             var koBinder = (function () {
                 return {
                     setBindings: function (elem, bind) {
-                        var vm = this;
-                        var koNotations = ["enable", "visible", "css", "options"];
-                        var koValueNotations = ["optionsCaption", "optionsText", "optionsValue"];
-
-                        bind = koBinder.setIdBinding.apply(vm, [elem, bind]);
-                        for (i in koNotations)
-                            bind = vm.$binder.bindToObservable(koNotations[i], elem, bind);
-                        for (i in koValueNotations)
-                            bind = koBinder.bindToObservableValue.apply(vm, [koValueNotations[i], elem, bind]);
-                        bind = koBinder.setAttrBindings.apply(vm, [elem, bind]);
-                        return bind;
-                    },
-
-                    // Id binding.
-                    setIdBinding: function (elem, bind) {
-                        var vm = this;
-                        var id = elem.id;
-                        var tagName = elem.tagName.toLowerCase();
-
-                        if (!vm.$binder.bindable(id))
-                            return bind;
-
-                        // If the id is period-delimited, use the last item as id.
-                        var ids = id.split(".");
-                        if (ids.length > 1)
-                            id = ids[ids.length - 1];
-
-                        bind += bind.length > 0 ? ", " : "";
-                        if (tagName == "input") {
-                            var type = elem.type.toLowerCase();
-                            if (type == "search")
-                                bind += "textInput: " + id;
-                            else if (type == "checkbox" || type == "radio")
-                                bind += "checked: " + id;
-                            else if (type == "button")
-                                bind += "vmCommand: " + id;
-                            else
-                                bind += "value: " + id;
-                        }
-                        else if (tagName == "button")
-                            bind += "vmCommand: " + id;
-                        else if (tagName == "select" || tagName == "textarea")
-                            bind += "value: " + id;
-                        else if (vm.hasOwnProperty(id) && 'push' in vm[id])    // If property is an observable array.
-                            bind += "foreach: " + id;
-                        else
-                            bind += "html: " + id;
-
+                        bind = koBinder.setAttrBindings.apply(this, [elem, bind]);
                         return bind;
                     },
 
@@ -108,7 +61,7 @@ limitations under the License.
                         // These properties will be bound using the attr binding notation.
                         var props = {};
                         for (prop in vm) {
-                            if (prop != id && prop.startsWith(id + "_") && vm.$binder.bindable(prop) && typeof vm[prop].$bound === "undefined")
+                            if (prop != id && prop.startsWith(id + "_") && ko.observable(vm[prop]) && typeof vm[prop].$bound === "undefined") 
                                 props[prop] = vm[prop];
                         }
 
@@ -149,26 +102,11 @@ limitations under the License.
                         }
 
                         return bind;
-                    },
-
-                    // Binding to the value of an observable view model property.
-                    bindToObservableValue: function (notation, elem, bind) {
-                        var vm = this;
-                        var id = elem.id;
-                        var prop = id + "_" + notation;
-
-                        if (vm.hasOwnProperty(prop) && vm.$binder.bindable(prop)) {
-                            bind += bind.length > 0 ? ", " : "";
-                            bind += notation + ": '" + vm[prop]() + "'";
-                            vm[prop].$bound = true;
-                        }
-                        return bind;
                     }
                 }
             })();
 
             return {
-                // Initialize bindings.
                 init: function () {
                     var vm = this;
 
@@ -194,36 +132,6 @@ limitations under the License.
                     });
 
                 }.bind(iScope),
-
-                // Whether a view model property is bindable.
-                bindable: function (prop, parent) {
-                    var vm = this;
-                    if (typeof parent === "undefined")
-                        parent = vm;
-
-                    // If it's a nested property, resolve it recursively.
-                    var props = prop.split(".");
-                    if (props.length > 1 && vm.hasOwnProperty(props[0]))
-                        return vm.$binder.bindable(prop.substring(props[0].length + 1), vm[props[0]]);
-
-                    if (prop == "$data")
-                        return true;
-                    return parent.hasOwnProperty(prop) && ko.observable(prop);
-                }.bind(iScope),
-
-                // Binding to an observable view model property.
-                bindToObservable: function (notation, elem, bind) {
-                    var vm = this;
-                    var id = elem.id;
-                    var prop = id + "_" + notation;
-
-                    if (vm.hasOwnProperty(prop) && vm.$binder.bindable(prop)) {
-                        bind += bind.length > 0 ? ", " : "";
-                        bind += notation + ": " + prop;
-                        vm[prop].$bound = true;
-                    }
-                    return bind;
-                }.bind(iScope)
             }
         })(iVM)
     }
