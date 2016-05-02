@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="BaseVM.CRUDExtension.cs" />
     <Compile Include="BaseVM.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="DotNetifyHub.cs" />
     <Compile Include="IVMControllerFactory.cs" />
     <Compile Include="Routing\RoutingState.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Routing\Route.cs" />
     <Compile Include="VMController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VMContractResolver.cs" />
     <Compile Include="VMControllerFactory.cs" />
   </ItemGroup>
   <ItemGroup>
