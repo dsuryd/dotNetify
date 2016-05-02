@@ -93,7 +93,7 @@ limitations under the License.
                             bind += "value: " + id;
                         else if (vm.hasOwnProperty(id) && 'push' in vm[id])    // If property is an observable array.
                             bind += "foreach: " + id;
-                        else
+                        else if (tagName.indexOf("-") < 0)   // If element isn't a web component.
                             bind += "html: " + id;
 
                         return bind;
