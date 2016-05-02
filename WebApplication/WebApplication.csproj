@@ -167,6 +167,8 @@
     <Content Include="Scripts\Demo.PlainJS\LiveChart.js" />
     <Content Include="Scripts\Demo.PlainJS\TreeView.js" />
     <Content Include="Scripts\Demo\demoApp.js" />
+    <Content Include="Scripts\dotnetify.binder.polymer.js" />
+    <Content Include="Scripts\dotnetify.binder.js" />
     <Content Include="Scripts\dotnetify.js" />
     <Content Include="Scripts\dotnetify.router.js" />
     <Content Include="Scripts\jquery-1.11.3.min.js" />
@@ -180,6 +182,7 @@
     <Content Include="Views\AFITop100.html" />
     <Content Include="Views\BetterList.html" />
     <Content Include="Views\CompositeView.html" />
+    <Content Include="Views\ControlTypes2.html" />
     <Content Include="Views\ControlTypes.html" />
     <Content Include="Views\Dashboard.html" />
     <Content Include="Views\GridView.html" />
@@ -187,6 +190,7 @@
     <Content Include="Views\Index.html" />
     <Content Include="Views\JobQueue.html" />
     <Content Include="Views\LiveChart.html" />
+    <Content Include="Views\PolymerPaper.html" />
     <Content Include="Views\SimpleList.html" />
     <Content Include="Views\TreeView.html" />
     <Content Include="Views\WebStore\BookCategory.html" />
@@ -250,6 +254,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\AFITop100.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".bowerrc" />
+    <Content Include="bower.json" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

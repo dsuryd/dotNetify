@@ -52,6 +52,8 @@
   <ItemGroup>
     <Compile Include="AFITop100Model.cs" />
     <Compile Include="AFITop100VM.cs" />
+    <Compile Include="ControlTypes2VM.cs" />
+    <Compile Include="PolymerPaperVM.cs" />
     <Compile Include="JobQueueVM.cs" />
     <Compile Include="LiveChartVM.cs" />
     <Compile Include="ControlTypesVM.cs" />
