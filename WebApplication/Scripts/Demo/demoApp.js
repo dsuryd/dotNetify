@@ -12,22 +12,21 @@
       "path": "path.min",
       "signalr": "jquery.signalR-2.2.0.min",
       "signalr-hub": "/signalr/hubs?",
-      "bootstrap": "DemoLibs/bootstrap.min",
-      "calendar": "DemoLibs/zabuto_calendar.min",
+      "bootstrap": "DemoLibs/bootstrap.min"
    },
    shim: {
       "jquery": { exports: "$" },
       "knockout": { exports: "ko" },
       "path": { exports: "Path" },
+      "router": ["path"],
       "bootstrap": ["jquery"],
-      "calendar": ["jquery"],
       "signalr": { deps: ["jquery"], exports: "$.connection" },
       "signalr-hub": ["signalr"],
       "binder-polymer": ["binder"]
    }
 });
 
-require(['jquery', 'knockout', 'dotnetify', 'router', 'path', 'binder-polymer', 'bootstrap', 'calendar'], function ($) {
+require(['jquery', 'knockout', 'dotnetify', 'router', 'binder-polymer', 'bootstrap'], function ($) {
    $(function () {
       dotnetify.debug = true;
    });
