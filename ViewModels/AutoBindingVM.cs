@@ -7,10 +7,13 @@ using DotNetify;
 namespace ViewModels
 {
    /// <summary>
-   /// This view model demonstrates different types of bindings that can applied to HTML elements.
-   /// This is by no means comprehensive; for more binding types, see KnockoutJS documentation.
+   /// This view model demonstrates using the Binder plugin to automate the binding declarations
+   /// on the HTML elements.  To bind a view model property to an HTML element, set the ID tag to the
+   /// property name.  The plugin will select the binding notation based on the type of the element.
+   /// For property name that contains underscore, it will apply attribute binding to that property,
+   /// with the attribute name set to the string following the underscore.
    /// </summary>
-   public class ControlTypes2VM : BaseVM
+   public class AutoBindingVM : BaseVM
    {
       #region Text Box
 
@@ -151,7 +154,7 @@ namespace ViewModels
          }
       }
 
-      public string RadioButtonStyle_css => RadioButtonValue == "green" ? "label-success" : "label-warning"; 
+      public string RadioButtonStyle_css => RadioButtonValue == "green" ? "label-success" : "label-warning";
 
       #endregion
 
@@ -170,7 +173,7 @@ namespace ViewModels
       /// <summary>
       /// Constructor.
       /// </summary>
-      public ControlTypes2VM()
+      public AutoBindingVM()
       {
          ShowMeCheckBox = true;
          EnableMeCheckBox = true;

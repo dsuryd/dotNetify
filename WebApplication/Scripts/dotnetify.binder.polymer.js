@@ -16,36 +16,40 @@ limitations under the License.
 
 // Support using RequireJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
-    if (typeof define === "function" && define["amd"]) {
-        define(['jquery', 'knockout', 'dotnetify'], factory);
-    }
-    else {
-        factory(jQuery, ko, binder);
-    }
+   if (typeof define === "function" && define["amd"]) {
+      define(['jquery', 'knockout', 'dotnetify'], factory);
+   }
+   else {
+      factory(jQuery, ko, binder);
+   }
 }
 (function ($, ko, dotnetify) {
 
-    // Add extension for binding to Google polymer elements.
-    dotnetify.binder.extensions["polymer-paper"] =
-       {
-           version: "1.0.5",
+   // Add extension for binding to Google polymer elements.
+   dotnetify.binder.extensions["polymer-paper"] =
+      {
+         version: "1.0.5",
 
-           // Called by dotNetify before binding is applied.
-           setBindings: function (elem, bind) {
-               var vm = this;
-               var id = elem.id;
+         // Called by dotNetify before binding is applied.
+         setBindings: function (elem, bind) {
+            var vm = this;
+            var id = elem.id;
 
-               // If the id matches an unbound view model property, bind the property to the element.
-               if (vm.$binder.bindable(id)) {
-                   var tagName = elem.tagName.toLowerCase();
-                   if (tagName == "paper-input") {
-                       bind += bind.length > 0 ? ", " : "";
-                       bind += "value: " + id;
-                       vm[id].$bound = true;
-                   }
-               }
-
+            if (!vm.$binder.bindable(id))
                return bind;
-           }
-       }
+
+            var tagName = elem.tagName.toLowerCase();
+            if (tagName == "paper-input") {
+               bind += bind.length > 0 ? ", " : "";
+               var type = elem.type;
+               if (type == "search")
+                  bind += "textInput: " + id;
+               else
+                  bind += "value: " + id;
+               vm[id].$bound = true;
+            }
+
+            return bind;
+         }
+      }
 }))

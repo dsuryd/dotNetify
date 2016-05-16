@@ -182,7 +182,7 @@
     <Content Include="Views\AFITop100.html" />
     <Content Include="Views\BetterList.html" />
     <Content Include="Views\CompositeView.html" />
-    <Content Include="Views\ControlTypes2.html" />
+    <Content Include="Views\AutoBinding\ControlTypes.html" />
     <Content Include="Views\ControlTypes.html" />
     <Content Include="Views\Dashboard.html" />
     <Content Include="Views\GridView.html" />
@@ -190,7 +190,7 @@
     <Content Include="Views\Index.html" />
     <Content Include="Views\JobQueue.html" />
     <Content Include="Views\LiveChart.html" />
-    <Content Include="Views\PolymerPaper.html" />
+    <Content Include="Views\AutoBinding\PolymerPaperTypes.html" />
     <Content Include="Views\SimpleList.html" />
     <Content Include="Views\TreeView.html" />
     <Content Include="Views\WebStore\BookCategory.html" />
