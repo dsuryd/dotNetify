@@ -38,9 +38,14 @@ limitations under the License.
             if (!vm.$binder.bindable(id))
                return bind;
 
+            bind += bind.length > 0 ? ", " : "";
+
             var tagName = elem.tagName.toLowerCase();
+            if (tagName == "paper-button") {
+               bind += "vmCommand: " + id;
+               vm[id].$bound = true;
+            }
             if (tagName == "paper-input") {
-               bind += bind.length > 0 ? ", " : "";
                var type = elem.type;
                if (type == "search")
                   bind += "textInput: " + id;
@@ -48,8 +53,69 @@ limitations under the License.
                   bind += "value: " + id;
                vm[id].$bound = true;
             }
+            else if (tagName == "paper-checkbox") {
+               bind += "attr: { checked: " + id + " }";
+               $(elem).on("change", function () { vm[id](!vm[id]()) });
+               vm[id].$bound = true;
+            }
+            else if (tagName == "paper-dropdown-menu") {
+               var propOptions = id + "_options";
+               var propCaption = id + "_optionsCaption";
+               var propText = id + "_optionsText";
+               var propValue = id + "_optionsValue";
 
+               if (vm.hasOwnProperty(propCaption))
+                  bind += "attr: { label: " + propCaption + " }";
+
+               var listbox = $(elem).find("paper-listbox");
+               if (listbox.length > 0 && vm.hasOwnProperty(propOptions)) {
+
+                  // Add a function that returns the list index of the selected item.
+                  vm[id].$selected = function (value) {
+                     var key = vm[propValue]();
+                     if (typeof value === "undefined") {
+                        var match = ko.utils.arrayFirst(vm[propOptions](), function (i) { return i[key]() == vm[id]() });
+                        return match != null ? vm[propOptions]().indexOf(match) : null;
+                     }
+                     else
+                        vm[id](vm[propOptions]()[value][key]());
+                  }.bind(vm);
+
+                  var bindListbox = listbox.attr("data-bind");
+                  if (typeof bindListbox === "undefined")
+                     bindListbox = "";
+
+                  bindListbox += bindListbox.length > 0 ? ", " : "";
+                  bindListbox += "foreach: " + propOptions;
+                  bindListbox += ", attr: { selected: " + id + ".$selected() }";
+                  listbox.attr("data-bind", bindListbox);
+                  listbox.on("iron-select", function () { vm[id].$selected(this.selected) });
+
+                  var item = listbox.find("paper-item");
+                  if (item.length > 0 && vm.hasOwnProperty(propText)) {
+                     var bindItem = item.attr("data-bind");
+                     if (typeof bindItem === "undefined")
+                        bindItem = "";
+
+                     bindItem += bindItem.length > 0 ? ", " : "";
+                     bindItem += "html: " + vm[propText]();
+                     item.attr("data-bind", bindItem);
+                  }
+               }
+               vm[id].$bound = true;
+            }
+            else if (tagName == "paper-radio-group") {
+               bind += "attr: { selected: " + id + " }";
+               $(elem).on("paper-radio-group-changed", function () { vm[id](this.selected) });
+               vm[id].$bound = true;
+            }
+
+            bind = bind.replace(/,\s*$/, "");
             return bind;
+         },
+
+         setDropDownBindings: function (elem, bind) {
+
          }
       }
 }))

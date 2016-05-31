@@ -1,10 +1,16 @@
 {
-	"name": "ASP.NET",
-	"private": true,
+   "name": "ASP.NET",
+   "private": true,
    "dependencies": {
-      "polymer": "Polymer/polymer#^1.4.0",
       "iron-icon": "PolymerElements/iron-icon#^1.0.0",
       "iron-icons": "PolymerElements/iron-icons#^1.0.0",
-      "paper-input": "PolymerElements/paper-input#^1.0.0"
+      "paper-card": "PolymerElements/paper-card#^1.0.0",
+      "paper-checkbox": "PolymerElements/paper-checkbox#^1.0.0",
+      "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.0.0",
+      "paper-input": "PolymerElements/paper-input#^1.0.0",
+      "paper-item": "PolymerElements/paper-item#^1.0.0",
+      "paper-listbox": "polymerelements/paper-listbox#^1.0.0",
+      "paper-radio-button": "PolymerElements/paper-radio-button#^1.0.0",
+      "paper-radio-group": "PolymerElements/paper-radio-group#^1.0.0"
    }
 }

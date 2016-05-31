@@ -98,7 +98,7 @@ namespace ViewModels
          }
       }
 
-      public List<string> SimpleDropDown_options => new List<string> { "One", "Two", "Three", "Four" };
+      public List<string> SimpleDropDown_options => new List<string> { "Option One", "Option Two", "Option Three", "Option Four" };
 
       public string SimpleDropDown_optionsCaption => "Choose...";
 
