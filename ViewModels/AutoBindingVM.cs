@@ -170,6 +170,20 @@ namespace ViewModels
 
       #endregion
 
+      #region Polymer Icon Button and Badge
+
+      public ICommand IconUpCommand => new Command(() => Badge++);
+
+      public ICommand IconDownCommand => new Command(() => Badge--);
+
+      public int Badge
+      {
+         get { return Get<int>(); }
+         set { Set(value); }
+      }
+
+      #endregion
+
       /// <summary>
       /// Constructor.
       /// </summary>

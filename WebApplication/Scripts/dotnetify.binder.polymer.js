@@ -41,16 +41,12 @@ limitations under the License.
             bind += bind.length > 0 ? ", " : "";
 
             var tagName = elem.tagName.toLowerCase();
-            if (tagName == "paper-button") {
+            if (tagName == "paper-button" || tagName == "paper-icon-button" || tagName == "paper-fab" ) {
                bind += "vmCommand: " + id;
                vm[id].$bound = true;
             }
-            if (tagName == "paper-input") {
-               var type = elem.type;
-               if (type == "search")
-                  bind += "textInput: " + id;
-               else
-                  bind += "value: " + id;
+            else if (tagName == "paper-badge") {
+               bind += "attr: { label: " + id + "}";
                vm[id].$bound = true;
             }
             else if (tagName == "paper-checkbox") {
@@ -102,6 +98,14 @@ limitations under the License.
                      item.attr("data-bind", bindItem);
                   }
                }
+               vm[id].$bound = true;
+            }
+            else if (tagName == "paper-input") {
+               var type = elem.type;
+               if (type == "search")
+                  bind += "textInput: " + id;
+               else
+                  bind += "value: " + id;
                vm[id].$bound = true;
             }
             else if (tagName == "paper-radio-group") {

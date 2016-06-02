@@ -11,13 +11,14 @@
    <!-- 1. Load webcomponents-lite.min.js for polyfill support. -->
    <script src="/Scripts/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
    <!-- 2. Use an HTML Import to bring in some elements. -->
+   <link rel="import" href="/Scripts/lib/paper-badge/paper-badge.html">
    <link rel="import" href="/Scripts/lib/paper-button/paper-button.html">
    <link rel="import" href="/Scripts/lib/paper-card/paper-card.html">
    <link rel="import" href="/Scripts/lib/paper-checkbox/paper-checkbox.html">
    <link rel="import" href="/Scripts/lib/paper-dropdown-menu/paper-dropdown-menu.html">
+   <link rel="import" href="/Scripts/lib/paper-icon-button/paper-icon-button.html">
    <link rel="import" href="/Scripts/lib/paper-input/paper-input.html">
    <link rel="import" href="/Scripts/lib/paper-item/paper-item.html">
-   <!--<link rel="import" href="/Scripts/lib/paper-listbox/paper-listbox.html">-->
    <link rel="import" href="/Scripts/lib/paper-radio-button/paper-radio-button.html">
    <link rel="import" href="/Scripts/lib/paper-radio-group/paper-radio-group.html">
    <link rel="import" href="/Scripts/lib/iron-icons/iron-icons.html">
@@ -124,6 +125,24 @@
             <div class="col-md-3" data-bind="if: ClickCount() > 0">
                You clicked me <b><span id="ClickCount" /></b>&nbsp;times!
             </div>
+         </div>
+         <!-- Icon Button and Badge -->
+         <hr />
+         <div class="row">
+            <div class="col-md-3">
+               <label>Icon Button &amp; Badge:</label>
+            </div>
+            <div class="col-md-6">
+               <paper-icon-button id="IconUpCommand" icon="arrow-drop-up"></paper-icon-button>
+               <paper-icon-button id="IconDownCommand" icon="arrow-drop-down"></paper-icon-button>
+               <span>
+                  Inbox
+                  <paper-badge id="Badge" style="margin-left:.8em"></paper-badge>
+               </span>
+            </div>
+            <div class="col-md-3">
+            </div>
+            <hr />
          </div>
       </div>
    </paper-card>
