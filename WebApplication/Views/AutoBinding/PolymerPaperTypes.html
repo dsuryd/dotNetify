@@ -21,6 +21,17 @@
    <link rel="import" href="/Scripts/lib/paper-radio-button/paper-radio-button.html">
    <link rel="import" href="/Scripts/lib/paper-radio-group/paper-radio-group.html">
    <link rel="import" href="/Scripts/lib/iron-icons/iron-icons.html">
+
+   <script>
+      require(['jquery'], function ($) {
+         $(function () {
+            // Import certain Polymer elements after knockout rendering is finished.
+            $("[data-vm]").one("ready", function () {
+               Polymer.Base.importHref('/Scripts/lib/paper-listbox/paper-listbox.html');
+            });
+         });
+      });
+   </script>
 </head>
 <body>
    <paper-card heading="Example: Polymer Paper (Auto-Binding)" style="width: 98%; margin-left: 1%; margin-top: 1%">

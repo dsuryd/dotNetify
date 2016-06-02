@@ -29,10 +29,5 @@
 require(['jquery', 'knockout', 'dotnetify', 'router', 'binder-polymer', 'bootstrap'], function ($) {
    $(function () {
       dotnetify.debug = true;
-
-      // Import certain Polymer elements after knockout rendering is finished.
-      $("[data-vm]").one("ready", function () {
-         Polymer.Base.importHref('/Scripts/lib/paper-listbox/paper-listbox.html');
-      });
    });
 });
