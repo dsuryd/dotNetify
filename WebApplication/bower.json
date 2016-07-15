@@ -2,6 +2,7 @@
    "name": "dotNetify.Polymer",
    "private": true,
    "dependencies": {
+      "iron-collapse": "PolymerElements/iron-collapse#^1.0.0",
       "iron-icon": "PolymerElements/iron-icon#^1.0.0",
       "iron-icons": "PolymerElements/iron-icons#^1.0.0",
       "paper-badge": "PolymerElements/paper-badge#^1.0.0",
@@ -12,6 +13,8 @@
       "paper-input": "PolymerElements/paper-input#^1.0.0",
       "paper-item": "PolymerElements/paper-item#^1.0.0",
       "paper-listbox": "polymerelements/paper-listbox#^1.0.0",
+      "paper-menu": "PolymerElements/paper-menu#^1.0.0",
+      "paper-menu-button": "PolymerElements/paper-menu-button#^1.0.0",
       "paper-radio-button": "PolymerElements/paper-radio-button#^1.0.0",
       "paper-radio-group": "PolymerElements/paper-radio-group#^1.0.0"
    }

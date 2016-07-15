@@ -31,7 +31,7 @@ var dotNetify = {};
    ko.mapping = komapping;
    dotnetify =
    {
-      version: "1.0.5",
+      version: "1.0.6",
       hub: null,
       debug: false,
       debugFn: null,
@@ -85,7 +85,7 @@ var dotNetify = {};
                    dotnetify._connectRetry = 0;
                    $.each($("[data-vm]"), function () { $(this).dotnetify() });
                 })
-                .fail(function (e) { console.log(e); });
+                .fail(function (e) { console.error(e); });
                 return hub;
             }
             dotnetify.hub = startHub();
@@ -143,7 +143,7 @@ var dotNetify = {};
             self.Hub.server.request_VM(self.VMId, vmArg);
          }
          else
-            console.log("ERROR: dotnetify - failed to find 'data-vm' attribute in the element where .dotnetify() was applied.")
+            console.error("ERROR: dotnetify - failed to find 'data-vm' attribute in the element where .dotnetify() was applied.")
       },
 
       // Widget destructor.
@@ -162,7 +162,7 @@ var dotNetify = {};
                self.VM.$destroy();
          }
          catch (e) {
-            console.log(e.stack);
+            console.error(e.stack);
          }
 
          this.Hub.server.dispose_VM(self.VMId);
@@ -231,7 +231,7 @@ var dotNetify = {};
             self._SubscribeObservables(this.VM);
          }
          catch (e) {
-            console.log(e.stack);
+            console.error(e.stack);
          }
 
          if (dotnetify.debug) {

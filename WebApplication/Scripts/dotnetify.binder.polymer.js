@@ -41,7 +41,7 @@ limitations under the License.
             bind += bind.length > 0 ? ", " : "";
 
             var tagName = elem.tagName.toLowerCase();
-            if (tagName == "paper-button" || tagName == "paper-icon-button" || tagName == "paper-fab" ) {
+            if (tagName == "paper-button" || tagName == "paper-icon-button" || tagName == "paper-fab") {
                bind += "vmCommand: " + id;
                vm[id].$bound = true;
             }
@@ -60,20 +60,22 @@ limitations under the License.
                var propText = id + "_optionsText";
                var propValue = id + "_optionsValue";
 
-               if (vm.hasOwnProperty(propCaption))
+               if (vm.hasOwnProperty(propCaption)) {
                   bind += "attr: { label: " + propCaption + " }";
+                  vm[propCaption].$bound = true;
+               }
 
                var listbox = $(elem).find("paper-listbox");
-               if (listbox.length > 0 && vm.hasOwnProperty(propOptions)) {
+               if (listbox.length > 0 && vm.hasOwnProperty(propOptions) && vm.hasOwnProperty(propValue)) {
 
                   // Add a function that returns the list index of the selected item.
                   vm[id].$selected = function (value) {
                      var key = vm[propValue]();
                      if (typeof value === "undefined") {
-                        var match = ko.utils.arrayFirst(vm[propOptions](), function (i) { return i[key]() == vm[id]() });
+                        var match = ko.utils.arrayFirst(vm[propOptions](), function (i) { return typeof i[key] === "function" && i[key]() == vm[id]() });
                         return match != null ? vm[propOptions]().indexOf(match) : null;
                      }
-                     else
+                     else if (typeof vm[propOptions]()[value][key] === "function")
                         vm[id](vm[propOptions]()[value][key]());
                   }.bind(vm);
 
@@ -86,6 +88,8 @@ limitations under the License.
                   bindListbox += ", attr: { selected: " + id + ".$selected() }";
                   listbox.attr("data-bind", bindListbox);
                   listbox.on("iron-select", function () { vm[id].$selected(this.selected) });
+                  vm[propOptions].$bound = true;
+                  vm[propValue].$bound = true;
 
                   var item = listbox.find("paper-item");
                   if (item.length > 0 && vm.hasOwnProperty(propText)) {
@@ -96,6 +100,7 @@ limitations under the License.
                      bindItem += bindItem.length > 0 ? ", " : "";
                      bindItem += "html: " + vm[propText]();
                      item.attr("data-bind", bindItem);
+                     vm[propText].$bound = true;
                   }
                }
                vm[id].$bound = true;
@@ -108,6 +113,32 @@ limitations under the License.
                   bind += "value: " + id;
                vm[id].$bound = true;
             }
+            else if (tagName == "paper-menu") {
+               var propOptions = id + "_options";
+               var propText = id + "_optionsText";
+               var propValue = id + "_optionsValue";
+
+               if (vm.hasOwnProperty(propOptions) && vm.hasOwnProperty(propValue)) {
+                  var key = vm[propValue]();
+
+                  bind += "foreach: " + propOptions;
+                  vm[propOptions].$bound = true;
+                  vm[propValue].$bound = true;
+
+                  var item = $(elem).find("paper-item");
+                  if (item.length > 0 && vm.hasOwnProperty(propText)) {
+                     var bindItem = item.attr("data-bind");
+                     if (typeof bindItem === "undefined")
+                        bindItem = "";
+
+                     bindItem += bindItem.length > 0 ? ", " : "";
+                     bindItem += "html: " + vm[propText]();
+                     bindItem += ", click: function() { $root['" + id + "']($data." + key + "()) }";
+                     item.attr("data-bind", bindItem);
+                     vm[propText].$bound = true;
+                  }
+               }
+            }
             else if (tagName == "paper-radio-group") {
                bind += "attr: { selected: " + id + " }";
                $(elem).on("paper-radio-group-changed", function () { vm[id](this.selected) });
@@ -116,10 +147,6 @@ limitations under the License.
 
             bind = bind.replace(/,\s*$/, "");
             return bind;
-         },
-
-         setDropDownBindings: function (elem, bind) {
-
          }
       }
 }))

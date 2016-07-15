@@ -11,6 +11,8 @@
    <!-- 1. Load webcomponents-lite.min.js for polyfill support. -->
    <script src="/Scripts/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
    <!-- 2. Use an HTML Import to bring in some elements. -->
+   <link rel="import" href="/Scripts/lib/iron-icons/iron-icons.html">
+   <link rel="import" href="/Scripts/lib/iron-collapse/iron-collapse.html">
    <link rel="import" href="/Scripts/lib/paper-badge/paper-badge.html">
    <link rel="import" href="/Scripts/lib/paper-button/paper-button.html">
    <link rel="import" href="/Scripts/lib/paper-card/paper-card.html">
@@ -19,24 +21,13 @@
    <link rel="import" href="/Scripts/lib/paper-icon-button/paper-icon-button.html">
    <link rel="import" href="/Scripts/lib/paper-input/paper-input.html">
    <link rel="import" href="/Scripts/lib/paper-item/paper-item.html">
+   <link rel="import" href="/Scripts/lib/paper-menu-button/paper-menu-button.html">
    <link rel="import" href="/Scripts/lib/paper-radio-button/paper-radio-button.html">
    <link rel="import" href="/Scripts/lib/paper-radio-group/paper-radio-group.html">
-   <link rel="import" href="/Scripts/lib/iron-icons/iron-icons.html">
-
-   <script>
-      require(['jquery'], function ($) {
-         $(function () {
-            // Import certain Polymer elements after knockout rendering is finished.
-            $("[data-vm]").one("ready", function () {
-               Polymer.Base.importHref('/Scripts/lib/paper-listbox/paper-listbox.html');
-            });
-         });
-      });
-   </script>
 </head>
 <body>
    <paper-card heading="Example: Polymer Paper (Auto-Binding)" style="width: 98%; margin-left: 1%; margin-top: 1%">
-      <div class="card-content" data-vm="AutoBindingVM">
+      <div id="PolymerDemo" class="card-content" data-vm="AutoBindingVM">
          <!-- Text Box -->
          <div class="row">
             <div class="col-md-3">
@@ -77,7 +68,7 @@
                <paper-checkbox id="EnableMeCheckBox">Enable me</paper-checkbox>
             </div>
             <div class="col-md-3">
-               <paper-button id="CheckBoxButton" raised><span id="CheckBoxResult" /></paper-button>
+               <paper-button id="CheckBoxButton" raised><span id="CheckBoxResult"></span></paper-button>
             </div>
          </div>
          <hr />
@@ -97,8 +88,8 @@
                <div id="DropDownResult"></div>
             </div>
          </div>
-         <!-- Radio button -->
          <hr />
+         <!-- Radio button -->
          <div class="row">
             <div class="col-md-3">
                <label>Radio button:</label>
@@ -113,8 +104,8 @@
                <label id="RadioButtonStyle" class="alert"></label>
             </div>
          </div>
-         <!-- Button -->
          <hr />
+         <!-- Button -->
          <div class="row">
             <div class="col-md-3">
                <label>Button:</label>
@@ -123,11 +114,11 @@
                <paper-button id="ButtonClickCommand" raised>Click me</paper-button>
             </div>
             <div class="col-md-3" data-bind="if: ClickCount() > 0">
-               You clicked me <b><span id="ClickCount" /></b>&nbsp;times!
+               You clicked me <b><span id="ClickCount"></span></b>&nbsp;times!
             </div>
          </div>
-         <!-- Icon Button and Badge -->
          <hr />
+         <!-- Icon Button and Badge -->
          <div class="row">
             <div class="col-md-3">
                <label>Icon Button &amp; Badge:</label>
@@ -140,10 +131,49 @@
                   <paper-badge id="Badge" style="margin-left:.8em"></paper-badge>
                </span>
             </div>
-            <div class="col-md-3">
-            </div>
-            <hr />
+            <div class="col-md-3"></div>
          </div>
+         <hr />
+         <!-- Popup Menu -->
+         <div class="row">
+            <div class="col-md-3">
+               <label>Popup menu:</label>
+            </div>
+            <div class="col-md-6">
+               <paper-menu-button vertical-align="bottom">
+                  <paper-icon-button icon="menu" class="dropdown-trigger"></paper-icon-button>
+                  <paper-menu id="PopupMenu" class="dropdown-content" style="width: 12em">
+                     <paper-item></paper-item>
+                  </paper-menu>
+               </paper-menu-button>
+            </div>
+            <div class="col-md-3">
+               <div id="PopupMenuResult"></div>
+            </div>
+         </div>
+         <hr />
+         <!-- Nested Menu -->
+         <div class="row">
+            <div class="col-md-3">
+               <label>Nested menu:</label>
+            </div>
+            <div class="col-md-6">
+               <paper-card heading="Menu" style="width: 12em">
+                  <paper-menu id="NestedMenu">
+                     <paper-submenu>
+                        <paper-item class="menu-trigger"></paper-item>
+                        <paper-menu data-bind="foreach: Menu" class="menu-content">
+                           <paper-item></paper-item>
+                        </paper-menu>
+                     </paper-submenu>
+                  </paper-menu>
+               </paper-card>
+            </div>
+            <div class="col-md-3">
+               <div id="NestedMenuResult"></div>
+            </div>
+         </div>
+         <hr />
       </div>
    </paper-card>
 </body>
