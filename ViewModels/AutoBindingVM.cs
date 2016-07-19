@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DotNetify;
 
 namespace ViewModels
@@ -257,6 +258,38 @@ namespace ViewModels
          };
 
       public string NestedMenuResult => NestedMenu > 0 ? "You selected: <b>" + _menuItems.First(i => i.Id == NestedMenu).Text + "</b>" : null;
+
+      #endregion
+
+      #region Progress
+
+      public ICommand StartProgressCommand => new Command(() =>
+      {
+         Progress = 0;
+         Task.Run(async () =>
+         {
+            while ( Progress < 100 )
+            {
+               Progress++;
+               if ( Progress_secondary_progress < 100 )
+                  Progress_secondary_progress += 2;
+               PushUpdates();
+               await Task.Delay(100);
+            }
+         });
+      });
+
+      public int Progress
+      {
+         get { return Get<int>(); }
+         set { Set(value); }
+      }
+
+      public int Progress_secondary_progress
+      {
+         get { return Get<int>(); }
+         set { Set(value); }
+      }
 
       #endregion
 

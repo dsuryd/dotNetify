@@ -24,9 +24,26 @@
    <link rel="import" href="/Scripts/lib/paper-menu-button/paper-menu-button.html">
    <link rel="import" href="/Scripts/lib/paper-radio-button/paper-radio-button.html">
    <link rel="import" href="/Scripts/lib/paper-radio-group/paper-radio-group.html">
+   <link rel="import" href="/Scripts/lib/paper-progress/paper-progress.html">
+   <style>
+      #Example {
+         width: 98%;
+         margin-left: 1%;
+         margin-top: 1%;
+      }
+
+      #Badge {
+         margin-left: .8em;
+      }
+
+      #Progress {
+         width: 90%;
+         margin: -1.3em 6em;
+      }
+   </style>
 </head>
 <body>
-   <paper-card heading="Example: Polymer Paper (Auto-Binding)" style="width: 98%; margin-left: 1%; margin-top: 1%">
+   <paper-card id="Example" heading="Example: Polymer Paper (Auto-Binding)">
       <div id="PolymerDemo" class="card-content" data-vm="AutoBindingVM">
          <!-- Text Box -->
          <div class="row">
@@ -78,7 +95,7 @@
                <label>Drop-down list:</label>
             </div>
             <div class="col-md-6">
-               <paper-dropdown-menu id="DropDown" vertical-align="bottom">
+               <paper-dropdown-menu id="DropDown">
                   <paper-listbox class="dropdown-content" style="width: 12em">
                      <paper-item></paper-item>
                   </paper-listbox>
@@ -128,7 +145,7 @@
                <paper-icon-button id="IconDownCommand" icon="arrow-drop-down"></paper-icon-button>
                <span>
                   Inbox
-                  <paper-badge id="Badge" style="margin-left:.8em"></paper-badge>
+                  <paper-badge id="Badge"></paper-badge>
                </span>
             </div>
             <div class="col-md-3"></div>
@@ -172,6 +189,18 @@
             <div class="col-md-3">
                <div id="NestedMenuResult"></div>
             </div>
+         </div>
+         <hr />
+         <!-- Progress -->
+         <div class="row">
+            <div class="col-md-3">
+               <label>Progress:</label>
+            </div>
+            <div class="col-md-6">
+               <paper-button id="StartProgressCommand" raised>Start</paper-button>
+               <paper-progress id="Progress"></paper-progress>
+            </div>
+            <div class="col-md-3"></div>
          </div>
          <hr />
       </div>

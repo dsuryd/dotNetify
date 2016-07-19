@@ -139,6 +139,10 @@ limitations under the License.
                   }
                }
             }
+            else if (tagName == "paper-progress") {
+               bind += "attr: {value: " + id + "}";
+               vm[id].$bound = true;
+            }
             else if (tagName == "paper-radio-group") {
                bind += "attr: { selected: " + id + " }";
                $(elem).on("paper-radio-group-changed", function () { vm[id](this.selected) });

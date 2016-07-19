@@ -15,6 +15,7 @@
       "paper-listbox": "polymerelements/paper-listbox#^1.0.0",
       "paper-menu": "PolymerElements/paper-menu#^1.0.0",
       "paper-menu-button": "PolymerElements/paper-menu-button#^1.0.0",
+      "paper-progress": "PolymerElements/paper-progress#^1.0.0",
       "paper-radio-button": "PolymerElements/paper-radio-button#^1.0.0",
       "paper-radio-group": "PolymerElements/paper-radio-group#^1.0.0"
    }
