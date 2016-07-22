@@ -148,6 +148,36 @@ limitations under the License.
                $(elem).on("paper-radio-group-changed", function () { vm[id](this.selected) });
                vm[id].$bound = true;
             }
+            else if (tagName == "paper-slider") {
+               bind += "attr: { value: " + id + " }";
+               $(elem).on("value-change", function () { vm[id](this.value) });
+               vm[id].$bound = true;
+            }
+            else if (tagName == "paper-tabs") {
+               bind += "attr: { selected: " + id + " }";
+               $(elem).on("iron-select", function () { vm[id](this.selected) });
+               vm[id].$bound = true;
+            }
+            else if (tagName == "iron-pages") {
+               bind += "attr: { selected: " + id + " }";
+               vm[id].$bound = true;
+            }
+            else if (tagName == "paper-toast") {
+               var funcName = id + "$showToast";
+               vm[funcName] = function () {
+                  if (vm[id]()) {
+                     elem.open();
+                     vm[id](false);
+                  }
+               };
+               bind += "vmOn: { " + id + ": " + funcName + " }";
+               vm[id].$bound = true;
+            }
+            else if (tagName == "paper-toggle-button") {
+               bind += "attr: { checked: " + id + " }";
+               $(elem).on("change", function () { vm[id](!vm[id]()) });
+               vm[id].$bound = true;
+            }
 
             bind = bind.replace(/,\s*$/, "");
             return bind;

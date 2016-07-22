@@ -159,6 +159,22 @@ namespace ViewModels
 
       #endregion
 
+      #region Toggle Button
+
+      public bool ToggleButton
+      {
+         get { return Get<bool>(); }
+         set
+         {
+            Set(value);
+            Changed(() => ToggleButtonStyle_css);
+         }
+      }
+
+      public string ToggleButtonStyle_css => ToggleButton ? "label-primary" : "label-danger";
+
+      #endregion
+
       #region Button
 
       public ICommand ButtonClickCommand => new Command(() => ClickCount++);
@@ -293,6 +309,60 @@ namespace ViewModels
 
       #endregion
 
+      #region Slider
+
+      public int Slider
+      {
+         get { return Get<int>(); }
+         set
+         {
+            Set(value);
+            Changed(() => SliderResult);
+         }
+      }
+
+      public int Slider_min => 1;
+
+      public int Slider_max => 100;
+
+      public string SliderResult => $"Slider value = {Slider}";
+
+      #endregion
+
+      #region Tabs
+
+      public int Tab
+      {
+         get { return Get<int>(); }
+         set
+         {
+            Set(value);
+            TabPage = value;
+         }
+      }
+
+      public int TabPage
+      {
+         get { return Get<int>(); }
+         set { Set(value); }
+      }
+
+      #endregion
+
+      #region Toast
+
+      public ICommand ShowToastCommand => new Command(() => Toast = true );
+
+      public bool Toast
+      {
+         get { return Get<bool>(); }
+         set { Set(value); }
+      }
+
+      public string Toast_text => "This is the toast message.";
+
+      #endregion
+
       /// <summary>
       /// Constructor.
       /// </summary>
@@ -301,6 +371,7 @@ namespace ViewModels
          ShowMeCheckBox = true;
          EnableMeCheckBox = true;
          RadioButtonValue = "green";
+         Slider = 20;
       }
    }
 }
