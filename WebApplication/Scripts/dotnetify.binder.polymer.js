@@ -106,7 +106,7 @@ limitations under the License.
                vm[id].$bound = true;
             }
             else if (tagName == "paper-input") {
-               var type = elem.type;
+               var type =  $(elem).attr("type");
                if (type == "search")
                   bind += "textInput: " + id;
                else
