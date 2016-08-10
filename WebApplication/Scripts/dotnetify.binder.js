@@ -36,7 +36,12 @@ limitations under the License.
          // Called by dotNetify before binding is applied.
          $init: function () {
             this.$binder.init();
-         }
+         },
+
+         // Called by dotNetify after binding is applied.
+         $ready: function() {
+            this.$binder.ready();
+   }
       }
 
    // Inject a view model with functions.
@@ -211,6 +216,18 @@ limitations under the License.
 
                   // Set the binding.
                   $(elem).attr("data-bind", bind);
+               });
+
+            }.bind(iScope),
+
+            // Allow post-processing after bindings are applied.
+            ready: function () {
+               var vm = this;
+
+               // Find all elements that have id attribute.
+               $.each(vm.$element.find("[id]"), function (idx, elem) {
+                  for (ext in dotnetify.binder.extensions)
+                     dotnetify.binder.extensions[ext].postBindings.apply(vm, [elem]);
                });
 
             }.bind(iScope),

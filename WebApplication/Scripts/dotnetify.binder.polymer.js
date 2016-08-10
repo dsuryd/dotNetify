@@ -40,7 +40,18 @@ limitations under the License.
 
             bind += bind.length > 0 ? ", " : "";
 
+            // Util function to rename tag.
+            var renameTag = function (tag, newTagName) {
+               var html = tag.parent().html();
+               html = html.replace(new RegExp(tag[0].tagName.toLowerCase(), 'g'), newTagName);
+               var newTag = tag.parent().prepend(html).find(newTagName);
+               tag.remove();
+               return newTag;
+            }
+
+            // Process the Polymer tags.
             var tagName = elem.tagName.toLowerCase();
+
             if (tagName == "paper-button" || tagName == "paper-icon-button" || tagName == "paper-fab") {
                bind += "vmCommand: " + id;
                vm[id].$bound = true;
@@ -68,6 +79,11 @@ limitations under the License.
                var listbox = $(elem).find("paper-listbox");
                if (listbox.length > 0 && vm.hasOwnProperty(propOptions) && vm.hasOwnProperty(propValue)) {
 
+                  // *** This is a workaround to overcome the issue where paper-listbox reverts its content to the initial
+                  // state when selection is changed and overrides the dynamic content that knockout has added. 
+                  // The paper-listbox is renamed to prevent triggering Polymer rendering, then renamed back post-binding.
+                  listbox = renameTag(listbox, "ko-paper-listbox");
+
                   // Add a function that returns the list index of the selected item.
                   vm[id].$selected = function (value) {
                      var key = vm[propValue]();
@@ -86,8 +102,8 @@ limitations under the License.
                   bindListbox += bindListbox.length > 0 ? ", " : "";
                   bindListbox += "foreach: " + propOptions;
                   bindListbox += ", attr: { selected: " + id + ".$selected() }";
+                  listbox.attr("data-id", id);
                   listbox.attr("data-bind", bindListbox);
-                  listbox.on("iron-select", function () { vm[id].$selected(this.selected) });
                   vm[propOptions].$bound = true;
                   vm[propValue].$bound = true;
 
@@ -106,7 +122,7 @@ limitations under the License.
                vm[id].$bound = true;
             }
             else if (tagName == "paper-input") {
-               var type =  $(elem).attr("type");
+               var type = $(elem).attr("type");
                if (type == "search")
                   bind += "textInput: " + id;
                else
@@ -125,7 +141,8 @@ limitations under the License.
                   vm[propOptions].$bound = true;
                   vm[propValue].$bound = true;
 
-                  var item = $(elem).find("paper-item");
+                  var menu = $(elem);
+                  var item = menu.find("paper-item");
                   if (item.length > 0 && vm.hasOwnProperty(propText)) {
                      var bindItem = item.attr("data-bind");
                      if (typeof bindItem === "undefined")
@@ -135,6 +152,34 @@ limitations under the License.
                      bindItem += "html: " + vm[propText]();
                      bindItem += ", click: function() { $root['" + id + "']($data." + key + "()) }";
                      item.attr("data-bind", bindItem);
+                     vm[propText].$bound = true;
+                  }
+               }
+            }
+            else if (tagName == "paper-menu-button") {
+               var propOptions = id + "_options";
+               var propText = id + "_optionsText";
+               var propValue = id + "_optionsValue";
+
+               var menu = $(elem).find("paper-menu");
+               if (menu.length > 0 && vm.hasOwnProperty(propOptions) && vm.hasOwnProperty(propValue)) {
+                  var key = vm[propValue]();
+                  vm[propOptions].$bound = true;
+                  vm[propValue].$bound = true;
+
+                  menu.attr("data-bind", "foreach: " + propOptions);
+
+                  var item = menu.find("paper-item");
+                  if (item.length > 0 && vm.hasOwnProperty(propText)) {
+                     var bindItem = item.attr("data-bind");
+                     if (typeof bindItem === "undefined")
+                        bindItem = "";
+
+                     bindItem += bindItem.length > 0 ? ", " : "";
+                     bindItem += "html: " + vm[propText]();
+                     bindItem += ", click: function() { $root['" + id + "']($data." + key + "()) }";
+                     item.attr("data-bind", bindItem);
+                     item.on("iron-select", function () { alert('test') });
                      vm[propText].$bound = true;
                   }
                }
@@ -181,6 +226,30 @@ limitations under the License.
 
             bind = bind.replace(/,\s*$/, "");
             return bind;
+         },
+
+         // Post-processing after bindings are applied.
+         postBindings: function (elem, bind) {
+            var vm = this;
+            var id = elem.id;
+            var tagName = elem.tagName.toLowerCase();
+
+            // Util function to rename tag.
+            var renameTag = function (tag, newTagName) {
+               var html = tag.parent().html();
+               html = html.replace(new RegExp(tag[0].tagName.toLowerCase(), 'g'), newTagName);
+               var newTag = tag.parent().prepend(html).find(newTagName);
+               tag.remove();
+               return newTag;
+            }
+            if (tagName == "paper-dropdown-menu") {
+               // *** This is a workaround to overcome the issue where paper-listbox reverts its content to the initial
+               // state when selection is changed and overrides the dynamic content that knockout has added. 
+               $.each($(elem).find("ko-paper-listbox"), function () {
+                  var newListbox = renameTag($(this), "paper-listbox");
+                  newListbox.on("iron-select", function () { vm[id].$selected(this.selected) });
+               });
+            }
          }
       }
 }))

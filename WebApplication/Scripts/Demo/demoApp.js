@@ -26,16 +26,8 @@
    }
 });
 
-require(['jquery', 'knockout', 'dotnetify', 'router', 'binder-polymer', 'bootstrap'], function ($) {
+require(['jquery', 'knockout', 'dotnetify', 'router', 'binder-polymer', 'bootstrap'], function ($, ko) {
    $(function () {
       dotnetify.debug = true;
-
-      // Import certain Polymer elements after knockout rendering is finished
-      // to ensure the elements dynamically added by the binding get initialized.
-      $("[id^=Polymer][data-vm]").one("ready", function () {
-         Polymer.Base.importHref('/Scripts/lib/paper-listbox/paper-listbox.html');
-         Polymer.Base.importHref('/Scripts/lib/paper-menu/paper-menu.html');
-         Polymer.Base.importHref('/Scripts/lib/paper-menu/paper-submenu.html');
-      });
    });
 });

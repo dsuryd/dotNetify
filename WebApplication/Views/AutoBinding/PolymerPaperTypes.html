@@ -22,14 +22,19 @@
    <link rel="import" href="/Scripts/lib/paper-icon-button/paper-icon-button.html">
    <link rel="import" href="/Scripts/lib/paper-input/paper-input.html">
    <link rel="import" href="/Scripts/lib/paper-item/paper-item.html">
+   <link rel="import" href="/Scripts/lib/paper-listbox/paper-listbox.html">
+   <link rel="import" href="/Scripts/lib/paper-menu/paper-menu.html">
+   <link rel="import" href="/Scripts/lib/paper-menu/paper-submenu.html">
    <link rel="import" href="/Scripts/lib/paper-menu-button/paper-menu-button.html">
    <link rel="import" href="/Scripts/lib/paper-progress/paper-progress.html">
    <link rel="import" href="/Scripts/lib/paper-radio-button/paper-radio-button.html">
    <link rel="import" href="/Scripts/lib/paper-radio-group/paper-radio-group.html">
    <link rel="import" href="/Scripts/lib/paper-slider/paper-slider.html">
+   <link rel="import" href="/Scripts/lib/paper-styles/paper-styles.html" />
    <link rel="import" href="/Scripts/lib/paper-tabs/paper-tabs.html">
    <link rel="import" href="/Scripts/lib/paper-toast/paper-toast.html">
    <link rel="import" href="/Scripts/lib/paper-toggle-button/paper-toggle-button.html">
+
    <style>
       #Example {
          width: 98%;
@@ -84,7 +89,7 @@
 </head>
 <body>
    <paper-card id="Example" heading="Example: Polymer Paper (Auto-Binding)">
-      <div id="PolymerDemo" class="card-content" data-vm="AutoBindingVM">
+      <div class="polymer card-content" data-vm="AutoBindingVM">
          <!-- Text Box -->
          <div class="row">
             <div class="col-md-3">
@@ -202,46 +207,6 @@
                </span>
             </div>
             <div class="col-md-3"></div>
-         </div>
-         <hr />
-         <!-- Popup Menu -->
-         <div class="row">
-            <div class="col-md-3">
-               <label>Popup menu:</label>
-            </div>
-            <div class="col-md-6">
-               <paper-menu-button vertical-align="bottom">
-                  <paper-icon-button icon="menu" class="dropdown-trigger"></paper-icon-button>
-                  <paper-menu id="PopupMenu" class="dropdown-content menu-width">
-                     <paper-item></paper-item>
-                  </paper-menu>
-               </paper-menu-button>
-            </div>
-            <div class="col-md-3">
-               <div id="PopupMenuResult"></div>
-            </div>
-         </div>
-         <hr />
-         <!-- Nested Menu -->
-         <div class="row">
-            <div class="col-md-3">
-               <label>Nested menu:</label>
-            </div>
-            <div class="col-md-6">
-               <paper-card heading="Menu" class="menu-width">
-                  <paper-menu id="NestedMenu">
-                     <paper-submenu>
-                        <paper-item class="menu-trigger"></paper-item>
-                        <paper-menu data-bind="foreach: Menu" class="menu-content">
-                           <paper-item></paper-item>
-                        </paper-menu>
-                     </paper-submenu>
-                  </paper-menu>
-               </paper-card>
-            </div>
-            <div class="col-md-3">
-               <div id="NestedMenuResult"></div>
-            </div>
          </div>
          <hr />
          <!-- Progress -->

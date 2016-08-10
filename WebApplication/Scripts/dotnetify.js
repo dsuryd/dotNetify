@@ -81,12 +81,12 @@ var dotNetify = {};
             // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.
             var startHub = function () {
                var hub = $.connection.hub.start();
-                hub.done(function () {
-                   dotnetify._connectRetry = 0;
-                   $.each($("[data-vm]"), function () { $(this).dotnetify() });
-                })
-                .fail(function (e) { console.error(e); });
-                return hub;
+               hub.done(function () {
+                  dotnetify._connectRetry = 0;
+                  $.each($("[data-vm]"), function () { $(this).dotnetify() });
+               })
+               .fail(function (e) { console.error(e); });
+               return hub;
             }
             dotnetify.hub = startHub();
 
@@ -154,7 +154,7 @@ var dotNetify = {};
             // Call any plugin's $destroy function if provided.
             $.each(dotnetify.plugins, function (pluginId, plugin) {
                if (typeof plugin["$destroy"] === "function")
-                  plugin.$init.apply(self.VM);
+                  plugin.$destroy.apply(self.VM);
             });
 
             // Call view model's $destroy function if provided.
@@ -195,7 +195,12 @@ var dotNetify = {};
                   self.VM.$init();
 
                // Apply knockout view model to the HTML element.
-               ko.applyBindings(self.VM, self.element[0]);
+               try {
+                  ko.applyBindings(self.VM, self.element[0]);
+               }
+               catch (e) {
+                  console.error(e.stack);
+               }
 
                // Enable server update so that every changed value goes to server.
                self.VM.$serverUpdate = true;
@@ -221,7 +226,13 @@ var dotNetify = {};
 
                var vmUpdate = JSON.parse(iVMData);
                self._PreProcess(vmUpdate);
-               ko.mapping.fromJS(vmUpdate, self.VM);
+
+               try {
+                  ko.mapping.fromJS(vmUpdate, self.VM);
+               }
+               catch (e) {
+                  console.error(e.stack);
+               }
 
                // Don't forget to re-enable sending changed values to server.
                self.VM.$serverUpdate = true;
@@ -392,8 +403,7 @@ var dotNetify = {};
                else
                   iContext[prop] = iObject[prop];
             }
-            else if (prop.indexOf("_") == 0)
-            {
+            else if (prop.indexOf("_") == 0) {
                iContext[prop] = ko.observable(iObject[prop]);
 
                // Prevent it from being subscribed so it won't get sent to server. 

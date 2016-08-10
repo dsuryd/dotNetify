@@ -187,7 +187,7 @@ namespace ViewModels
 
       #endregion
 
-      #region Polymer Icon Button and Badge
+      #region Icon Button and Badge
 
       public ICommand IconUpCommand => new Command(() => Badge++);
 
@@ -198,82 +198,6 @@ namespace ViewModels
          get { return Get<int>(); }
          set { Set(value); }
       }
-
-      #endregion
-
-      #region Popup Menu
-
-      public class MenuItem
-      {
-         public int Id { get; set; }
-         public string Text { get; set; }
-      }
-
-      public int PopupMenu
-      {
-         get { return Get<int>(); }
-         set
-         {
-            Set(value);
-            Changed(() => PopupMenuResult);
-         }
-      }
-
-      public string PopupMenu_optionsText => nameof(MenuItem.Text);
-
-      public string PopupMenu_optionsValue => nameof(MenuItem.Id);
-
-      public List<MenuItem> PopupMenu_options => new List<MenuItem>
-         {
-            new MenuItem { Id = 1, Text = "Menu Item 1" },
-            new MenuItem { Id = 2, Text = "Menu Item 2" },
-            new MenuItem { Id = 3, Text = "Menu Item 3" },
-            new MenuItem { Id = 4, Text = "Menu Item 4" }
-         };
-
-      public string PopupMenuResult => PopupMenu > 0 ? "You selected: <b>" + PopupMenu_options.First(i => i.Id == PopupMenu).Text + "</b>" : null;
-
-
-
-      #endregion
-
-      #region Nested Menu
-
-      public class SubMenu : MenuItem
-      {
-         public IEnumerable<MenuItem> Menu { get; set; }
-      }
-
-      private List<MenuItem> _menuItems = new List<MenuItem>
-      {
-         new MenuItem { Id = 1, Text = "Apple" },
-         new MenuItem { Id = 2, Text = "Orange" },
-         new MenuItem { Id = 3, Text = "Almond" },
-         new MenuItem { Id = 4, Text = "Cashew" },
-         new MenuItem { Id = 5, Text = "Pecan" },
-      };
-
-      public int NestedMenu
-      {
-         get { return Get<int>(); }
-         set
-         {
-            Set(value);
-            Changed(() => NestedMenuResult);
-         }
-      }
-
-      public string NestedMenu_optionsText => nameof(MenuItem.Text);
-
-      public string NestedMenu_optionsValue => nameof(MenuItem.Id);
-
-      public List<SubMenu> NestedMenu_options => new List<SubMenu>
-         {
-            new SubMenu { Text = "Fruits", Menu = _menuItems.Where( i => i.Id <= 2 ) },
-            new SubMenu { Text = "Nuts", Menu = _menuItems.Where( i => i.Id > 2 ) }
-         };
-
-      public string NestedMenuResult => NestedMenu > 0 ? "You selected: <b>" + _menuItems.First(i => i.Id == NestedMenu).Text + "</b>" : null;
 
       #endregion
 
