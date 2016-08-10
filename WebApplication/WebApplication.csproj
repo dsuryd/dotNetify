@@ -245,7 +245,6 @@
     <TypeScriptCompile Include="Scripts\Demo\GridView.ts" />
     <TypeScriptCompile Include="Scripts\Demo\JobQueue.ts" />
     <TypeScriptCompile Include="Scripts\Demo\LiveChart.ts" />
-    <TypeScriptCompile Include="Scripts\Demo\MobileApp.ts" />
     <TypeScriptCompile Include="Scripts\Demo\TreeView.ts" />
     <TypeScriptCompile Include="Scripts\typings\chartjs\chart.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
