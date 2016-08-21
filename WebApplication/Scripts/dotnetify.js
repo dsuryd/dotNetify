@@ -205,7 +205,8 @@ var dotNetify = {};
                // Enable server update so that every changed value goes to server.
                self.VM.$serverUpdate = true;
 
-               // Signal ready asynchronously to allow knockout completes its processing.
+               // Do the following after a fraction of second to allow knockout completes its component rendering.
+               // This is a workaround until knockout issue #1533 is closed.
                setTimeout(function () {
 
                   // Call any plugin's $ready function if provided to give a chance to do
@@ -220,8 +221,12 @@ var dotNetify = {};
                      self.VM.$ready();
 
                   // Send 'ready' event after a new view model was received.
-                  this.element.trigger("ready", { VMId: self.VMId, VM: self.VM });
-               }, 100);
+                  self.element.trigger("ready", { VMId: self.VMId, VM: self.VM });
+
+                  // Subscribe to change events to allow sending updates back to server.
+                  self._SubscribeObservables(self.VM);
+
+               }, 250);
             }
             else {
                // Disable server update because we're going to update the value in the knockout VM
@@ -240,10 +245,10 @@ var dotNetify = {};
 
                // Don't forget to re-enable sending changed values to server.
                self.VM.$serverUpdate = true;
-            }
 
-            // Subscribe to change events to allow sending updates back to server.
-            self._SubscribeObservables(this.VM);
+               // Subscribe to change events to allow sending updates back to server.
+               self._SubscribeObservables(this.VM);
+            }
          }
          catch (e) {
             console.error(e.stack);
@@ -528,12 +533,17 @@ var dotNetify = {};
          return value.charAt(0) != "'" ? "'" + value + "'" : value;
       },
       update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-
-         // Store the item key in a special property '$vmKey' in the element's view model.
          var value = valueAccessor();
          var items = allBindings.get("foreach");
+
+         // Test whether the foreach value is object literal where items is set to 'data' property.
+         if (!ko.isObservable(items) && items.hasOwnProperty("data"))
+            items = items.data;
+
+         // Store the item key in a special property '$vmKey' in the element's view model.
          if (ko.isObservable(items) && items() != null && value != null)
             items()['$vmKey'] = value;
+
       }
    };
 
