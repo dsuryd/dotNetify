@@ -163,6 +163,7 @@ namespace DotNetify.Routing
          {
             viewData.Root = viewData.Root + "/" + routingState.Root;
             var bestMatch = MatchTemplate(routingState.Templates, viewData.UrlPath, viewData.Root);
+            Trace.WriteLine($"[DEBUG] Matched route {viewData.UrlPath}: {bestMatch?.Value}");
             if (bestMatch != null)
             {
                viewData.ActiveTemplate = bestMatch.Value.Key;

@@ -205,19 +205,23 @@ var dotNetify = {};
                // Enable server update so that every changed value goes to server.
                self.VM.$serverUpdate = true;
 
-               // Call any plugin's $ready function if provided to give a chance to do
-               // things when the view model is ready.
-               $.each(dotnetify.plugins, function (pluginId, plugin) {
-                  if (typeof plugin["$ready"] === "function")
-                     plugin.$ready.apply(self.VM);
-               });
+               // Signal ready asynchronously to allow knockout completes its processing.
+               setTimeout(function () {
 
-               // Call view model's $ready function if provided.
-               if (typeof self.VM["$ready"] === "function")
-                  self.VM.$ready();
+                  // Call any plugin's $ready function if provided to give a chance to do
+                  // things when the view model is ready.
+                  $.each(dotnetify.plugins, function (pluginId, plugin) {
+                     if (typeof plugin["$ready"] === "function")
+                        plugin.$ready.apply(self.VM);
+                  });
 
-               // Send 'ready' event after a new view model was received.
-               this.element.trigger("ready", { VMId: self.VMId, VM: self.VM });
+                  // Call view model's $ready function if provided.
+                  if (typeof self.VM["$ready"] === "function")
+                     self.VM.$ready();
+
+                  // Send 'ready' event after a new view model was received.
+                  this.element.trigger("ready", { VMId: self.VMId, VM: self.VM });
+               }, 100);
             }
             else {
                // Disable server update because we're going to update the value in the knockout VM

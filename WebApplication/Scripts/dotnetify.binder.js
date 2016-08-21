@@ -111,6 +111,8 @@ limitations under the License.
                   }
                   else if (tagName == "button")
                      bind += "vmCommand: " + id;
+                  else if ( tagName == "a" )
+                     bind += "vmRoute: " + id;
                   else if (tagName == "select" || tagName == "textarea")
                      bind += "value: " + id;
                   else if (vm.hasOwnProperty(id) && 'push' in vm[id])    // If property is an observable array.
