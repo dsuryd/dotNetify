@@ -37,17 +37,19 @@ namespace DotNetify
       /// <summary>
       /// Provides access to our hub.
       /// </summary>
-      private static IHubContext HubContext
-      {
-         get { return GlobalHost.ConnectionManager.GetHubContext<DotNetifyHub>(); }
-      }
+      private static IHubContext HubContext => GlobalHost.ConnectionManager.GetHubContext<DotNetifyHub>();
 
       /// <summary>
       /// View model controller associated with the current connection.
       /// </summary>
       private VMController VMController
       {
-         get { return _vmControllerFactory.GetInstance(Context.ConnectionId); }
+         get
+         {
+            var vmController = _vmControllerFactory.GetInstance(Context.ConnectionId);
+            vmController.Principal = Context.User;
+            return vmController;
+         }
       }
 
       /// <summary>
@@ -94,6 +96,10 @@ namespace DotNetify
             Debug.WriteLine(String.Format("[DEBUG] Request_VM: {0} {1}", vmId, Context.ConnectionId));
             VMController.OnRequestVM(Context.ConnectionId, vmId, vmArg);
          }
+         catch (UnauthorizedAccessException)
+         {
+            Response_VM(Context.ConnectionId, vmId, "403");
+         }
          catch (Exception ex)
          {
             Debug.Fail(ex.ToString());
@@ -111,6 +117,10 @@ namespace DotNetify
          {
             Debug.WriteLine(String.Format("[DEBUG] Update_VM: {0} {1} {2}", vmId, Context.ConnectionId, JsonConvert.SerializeObject(vmData)));
             VMController.OnUpdateVM(Context.ConnectionId, vmId, vmData);
+         }
+         catch (UnauthorizedAccessException)
+         {
+            Response_VM(Context.ConnectionId, vmId, "403");
          }
          catch (Exception ex)
          {

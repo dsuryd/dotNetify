@@ -42,6 +42,13 @@ var dotNetify = {};
             var hub = $.connection.dotNetifyHub;
             hub.client.response_VM = function (iVMId, iVMData) {
 
+               // Report unauthorized access.
+               if (iVMData == "403")
+               {
+                  console.error("Unauthorized access to " + iVMId);
+                  return;
+               }
+
                // Construct a selector from iVMId to find the associated widget.
                // First parse the instance Id out of the string, if present.
                var vmType = iVMId;

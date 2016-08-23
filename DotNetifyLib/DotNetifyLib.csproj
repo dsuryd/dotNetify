@@ -81,6 +81,7 @@
     <Compile Include="Routing\RoutableExtension.cs" />
     <Compile Include="Routing\RouteTemplate.cs" />
     <Compile Include="Routing\Route.cs" />
+    <Compile Include="Security\AuthorizeAttribute.cs" />
     <Compile Include="VMController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VMContractResolver.cs" />
