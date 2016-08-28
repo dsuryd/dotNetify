@@ -339,18 +339,18 @@ var dotNetify = {};
          self.VM.$loadView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
             var vm = this;
 
-            if (typeof iJsModuleUrl === "object") {
-               iCallbackFn = iVMArg;
-               iVMArg = iJsModuleUrl;
-               iJsModuleUrl = null;
+            if (typeof iJsModuleUrl === "object" && iJsModuleUrl != null) {
+                iCallbackFn = iVmArg;
+                iVmArg = iJsModuleUrl;
+                iJsModuleUrl = null;
             }
             else if (typeof iJsModuleUrl === "function") {
-               iCallbackFn = iJsModuleUrl;
-               iJsModuleUrl = null;
+                iCallbackFn = iJsModuleUrl;
+                iJsModuleUrl = null;
             }
             else if (typeof iVmArg === "function") {
-               iCallbackFn = iVmArg;
-               iVMArg = null;
+                iCallbackFn = iVmArg;
+                iVmArg = null;
             }
 
             // If no view URL is given, empty the target DOM element.
