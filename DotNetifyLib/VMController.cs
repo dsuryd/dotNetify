@@ -247,9 +247,11 @@ namespace DotNetify
          if (_activeVMs.ContainsKey(vmId))
          {
             VMInfo vmInfo;
-            _activeVMs.TryRemove(vmId, out vmInfo);
-            vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
-            vmInfo.Instance.Dispose();
+            if (_activeVMs.TryRemove(vmId, out vmInfo))
+            {
+               vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
+               vmInfo.Instance.Dispose();
+            }
          }
       }
 
