@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2015 Dicky Suryadi
+Copyright 2016 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,8 +43,7 @@ var dotNetify = {};
             hub.client.response_VM = function (iVMId, iVMData) {
 
                // Report unauthorized access.
-               if (iVMData == "403")
-               {
+               if (iVMData == "403") {
                   console.error("Unauthorized access to " + iVMId);
                   return;
                }
@@ -212,9 +211,8 @@ var dotNetify = {};
                // Enable server update so that every changed value goes to server.
                self.VM.$serverUpdate = true;
 
-               // Do the following after a fraction of second to allow knockout completes its component rendering.
-               // This is a workaround until knockout issue #1533 is closed.
-               setTimeout(function () {
+               // Raise the ready event after all knockout components are ready.
+               self._OnComponentReady(function () {
 
                   // Call any plugin's $ready function if provided to give a chance to do
                   // things when the view model is ready.
@@ -223,17 +221,16 @@ var dotNetify = {};
                         plugin.$ready.apply(self.VM);
                   });
 
+                  // Subscribe to change events to allow sending updates back to server.
+                  self._SubscribeObservables(self.VM);
+
                   // Call view model's $ready function if provided.
                   if (typeof self.VM["$ready"] === "function")
                      self.VM.$ready();
 
                   // Send 'ready' event after a new view model was received.
                   self.element.trigger("ready", { VMId: self.VMId, VM: self.VM });
-
-                  // Subscribe to change events to allow sending updates back to server.
-                  self._SubscribeObservables(self.VM);
-
-               }, 250);
+               });
             }
             else {
                // Disable server update because we're going to update the value in the knockout VM
@@ -253,8 +250,11 @@ var dotNetify = {};
                // Don't forget to re-enable sending changed values to server.
                self.VM.$serverUpdate = true;
 
-               // Subscribe to change events to allow sending updates back to server.
-               self._SubscribeObservables(this.VM);
+               // Subscribe to change events to allow sending updates back to server,
+               // but do it after all the knockout components are ready.
+               self._OnComponentReady(function () {
+                  self._SubscribeObservables(self.VM);
+               });
             }
          }
          catch (e) {
@@ -340,17 +340,17 @@ var dotNetify = {};
             var vm = this;
 
             if (typeof iJsModuleUrl === "object" && iJsModuleUrl != null) {
-                iCallbackFn = iVmArg;
-                iVmArg = iJsModuleUrl;
-                iJsModuleUrl = null;
+               iCallbackFn = iVmArg;
+               iVmArg = iJsModuleUrl;
+               iJsModuleUrl = null;
             }
             else if (typeof iJsModuleUrl === "function") {
-                iCallbackFn = iJsModuleUrl;
-                iJsModuleUrl = null;
+               iCallbackFn = iJsModuleUrl;
+               iJsModuleUrl = null;
             }
             else if (typeof iVmArg === "function") {
-                iCallbackFn = iVmArg;
-                iVmArg = null;
+               iCallbackFn = iVmArg;
+               iVmArg = null;
             }
 
             // If no view URL is given, empty the target DOM element.
@@ -426,6 +426,31 @@ var dotNetify = {};
                iContext[prop].$subscribe = true;
             }
          }
+      },
+
+      // Calls the callback function only if all the knockout components are ready.
+      // This is a workaround until knockout issue #1533 is closed.
+      _OnComponentReady: function( iCallbackFn )
+      {
+         var self = this;
+         var retry = 0;
+         var checkComponentReadyFn = function () {
+
+            var isReady = true;
+
+            // Assume the knockout components are those with 'params' attribute, 
+            // and that it's ready if it has at least one child element.
+            var components = self.element.find("[params]");
+            if (components.length > 0)
+               isReady = $.grep(components, function (i) { return i.childElementCount == 0 }).length == 0;
+
+            if (isReady || retry++ > 3)
+               iCallbackFn();
+            else
+               setTimeout(checkComponentReadyFn, 250);
+         }
+
+         checkComponentReadyFn();
       },
 
       // Preprocess view model update from the server before we map it to knockout view model.
