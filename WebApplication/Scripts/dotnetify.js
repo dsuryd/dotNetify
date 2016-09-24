@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2016 Dicky Suryadi
+Copyright 2015 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -304,10 +304,15 @@ var dotNetify = {};
             // Check if the list already has an item with the same key. If so, update it.
             var key = iList()['$vmKey'];
             if (key != null) {
+               if (!newItem.hasOwnProperty(key)) {
+                  console.error("ERROR: object requires property '" + key + "'");
+                  return;
+               }
                var match = ko.utils.arrayFirst(iList(), function (i) { return i[key]() == newItem[key]() });
                if (match != null) {
                   for (prop in newItem)
-                     match[prop](newItem[prop]());
+                     if (ko.isObservable(newItem[prop]))
+                        match[prop](newItem[prop]());
                   return;
                }
             }
@@ -430,8 +435,7 @@ var dotNetify = {};
 
       // Calls the callback function only if all the knockout components are ready.
       // This is a workaround until knockout issue #1533 is closed.
-      _OnComponentReady: function( iCallbackFn )
-      {
+      _OnComponentReady: function (iCallbackFn) {
          var self = this;
          var retry = 0;
          var checkComponentReadyFn = function () {
