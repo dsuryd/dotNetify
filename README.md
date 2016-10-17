@@ -8,6 +8,8 @@ This project offers those developers the architecture and tools to write single-
 Written in both Javascript and C# .NET, dotNetify builds on popular open-source libraries like 
 [jQuery](http://jquery.com), [Knockout](http://knockoutjs.com) and [SignalR](http://asp.net/signalr). It does not attempt to get away from the current open web standards, but rather complement and enhance them in such a way that brings the most benefit to you!
 
+*** Still work in progress, but please checkout [dotNetify App Template](https://github.com/dsuryd/dotNetify-app-template)
+
 ##Features
 
 * Streamlined Architecture
