@@ -13,11 +13,11 @@ Written in both Javascript and C# .NET, dotNetify builds on popular open-source 
 ##Features
 
 * Back-End MVVM Architecture
-* Real-Time Web Out-Of-The-Box
+* Real-Time Web Out-of-the-Box
 * Clean & Lean Code
 * Leverage Full Power of .NET
 * Deep Routing
-* Doesn't require ASP.NET.  Can be [hosted with Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).   
+* Support both ASP.NET and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).   
 
 
 ##Documentation
