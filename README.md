@@ -8,8 +8,6 @@ This project offers developers the architecture and tools to write single-page w
 Written in both Javascript and C# .NET, dotNetify builds on popular open-source libraries like 
 [jQuery](http://jquery.com), [Knockout](http://knockoutjs.com) and [SignalR](http://asp.net/signalr). It does not attempt to get away from the current open web standards, but rather complement and enhance them in such a way that brings the most benefit to you!
 
-###*** Work in progress: [dotNetify App Template](https://github.com/dsuryd/dotNetify-app-template)
-
 ##Features
 
 * Back-End MVVM Architecture
@@ -26,6 +24,8 @@ All the documentation and live examples can be found in the [official website](h
 
 Want a super simple example to try out?  Use this [basic template](https://github.com/dsuryd/dotNetify-example-livechart).  
 Read all about it in the CodeProject article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
+
+###*** Work in progress: [dotNetify App Template](https://github.com/dsuryd/dotNetify-app-template)
 
 ##NuGet
 
