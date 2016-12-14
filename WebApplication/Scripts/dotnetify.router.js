@@ -28,7 +28,7 @@ limitations under the License.
    // Add plugin functions.
    dotnetify.router =
       {
-         version: "1.0.5",
+         version: "1.0.6",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -383,8 +383,8 @@ limitations under the License.
 
          // If the path has a redirect root, the path doesn't belong to the current root and needs to be
          // redirected to a different one.  Set the absolute path to the HREF attribute, and prevent the
-         // default behavior of the anchor click event and instead do push to HTML5 history state and 
-         // call redirect, which would attempt to resolve the path first before resorting to hard browser redirect.
+         // default behavior of the anchor click event and instead do push to HTML5 history state, which 
+         // would attempt to resolve the path first before resorting to hard browser redirect.
          if (route.RedirectRoot() != null) {
 
             // Combine the redirect root with the view model's root.
@@ -410,7 +410,6 @@ limitations under the License.
                .click(function (iEvent) {
                   iEvent.preventDefault();
                   dotnetify.router.pushState({}, "", $(this).attr("href"));
-                  dotnetify.router.redirect(url);
                })
             return;
          }
