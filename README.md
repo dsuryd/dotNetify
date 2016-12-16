@@ -1,7 +1,7 @@
 #&nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 
-DotNetify is a free, open source project that implements the .NET back-end view model architecture for modern web applications. 
+DotNetify is a free, open source project that provides HTML5/C# framework for developing modern web applications. 
 
 This project offers developers the architecture and tools to write single-page web applications on .NET platform (including Mono) that are sophisticated, richly interactive, bandwidth efficient, and support real-time push notification out-of-the-box.
 
@@ -10,7 +10,7 @@ Written in both Javascript and C# .NET, dotNetify builds on popular open-source 
 
 ##Features
 
-* Back-End MVVM Architecture
+* Back-End MVVM Architecture (HTML5 View/C# View Model)
 * Real-Time Web Out-of-the-Box
 * Clean & Lean Code
 * Leverage Full Power of .NET
