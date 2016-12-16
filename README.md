@@ -1,7 +1,7 @@
 #&nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 
-DotNetify is a free, open source project that provides HTML5/C# framework for developing modern web applications. 
+DotNetify is a free, open source project that lets you create modern web applications using HTML5 and C#. 
 
 This project offers developers the architecture and tools to write single-page web applications on .NET platform (including Mono) that are sophisticated, richly interactive, bandwidth efficient, and support real-time push notification out-of-the-box.
 
@@ -25,7 +25,7 @@ All the documentation and live examples can be found in the [official website](h
 Want a super simple example to try out?  Use this [basic template](https://github.com/dsuryd/dotNetify-example-livechart).  
 Read all about it in the CodeProject article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
 
-###*** Work in progress: [dotNetify App Template](https://github.com/dsuryd/dotNetify-app-template)
+*** Work in progress: [dotNetify App Template](https://github.com/dsuryd/dotNetify-app-template)
 
 ##NuGet
 
