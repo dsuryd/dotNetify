@@ -9,6 +9,7 @@
       "iron-pages": "PolymerElements/iron-pages#^1.0.0",
       "paper-badge": "PolymerElements/paper-badge#^1.0.0",
       "paper-card": "PolymerElements/paper-card#^1.0.0",
+      "paper-button": "PolymerElements/paper-button#^1.0.0",
       "paper-checkbox": "PolymerElements/paper-checkbox#^1.0.0",
       "paper-drawer-panel": "PolymerElements/paper-drawer-panel#^1.0.0",
       "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.0.0",

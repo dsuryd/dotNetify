@@ -3,3 +3,27 @@
 ################################################################################
 
 /.vs
+/DotNetifyLib.Core/bin/Debug/netstandard1.6
+/DotNetifyLib.Core/obj/Debug/netstandard1.6
+/DotNetifyLib/obj/Debug
+/DotNetifyLib/bin
+/DotNetifyLib.Core/DotNetifyLib.Core.xproj.user
+/DotNetifyLib.Core/project.lock.json
+/DotNetifyLib.SignalR/bin/Debug/netstandard1.6
+/DotNetifyLib.SignalR/obj/Debug/netstandard1.6
+/DotNetifyLib.SignalR/DotNetifyLib.SignalR.xproj.user
+/DotNetifyLib.SignalR/project.lock.json
+/packages
+/UnitTest/obj/Debug
+/ViewModels/obj/Debug
+/ViewModels.Examples/bin/Debug/netstandard1.6
+/ViewModels.Examples/obj/Debug/netstandard1.6
+/ViewModels.Examples/project.lock.json
+/ViewModels.Examples/ViewModels.Examples.xproj.user
+/WebApplication/obj/Debug
+/WebApplication.Core/bin/Debug/netcoreapp1.0
+/WebApplication/WebApplication.csproj.user
+/WebApplication.Core/obj/Debug/netcoreapp1.0
+/WebApplication.Core/project.lock.json
+/WebApplication.Core/WebApplication.Core.xproj.user
+/WebApplication/Scripts/lib

@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0-*",
+
+   "dependencies": {
+      "DotNetifyLib.Core": "1.0.0-*",
+      "NETStandard.Library": "1.6.1",
+      "Microsoft.AspNetCore.SignalR.Server": "0.2.0-*"
+   },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}
