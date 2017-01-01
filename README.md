@@ -12,11 +12,10 @@ Written in both Javascript and C# .NET, dotNetify builds on popular open-source 
 
 * Back-End MVVM Architecture (HTML5 View/C# View Model)
 * Real-Time Web Out-of-the-Box
+* Support ASP.NET Core, ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).  
 * Clean & Lean Code
 * Leverage Full Power of .NET
 * Deep Routing
-* Support both ASP.NET Core, ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).   
-
 
 ##Documentation
 
