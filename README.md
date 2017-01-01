@@ -1,4 +1,5 @@
 #&nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
+![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 
 DotNetify is a free, open source project that lets you create modern web applications using HTML5 and C#. 
 
