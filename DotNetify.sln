@@ -22,6 +22,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET 4.5", "ASP.NET 4.5", "{982511E3-DC01-4324-BF95-740B332FC8F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET Core", "ASP.NET Core", "{4D24F814-2737-4143-8FC7-308D12F67719}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet.Config = NuGet.Config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
