@@ -28,3 +28,12 @@
 /WebApplication.Core/WebApplication.Core.xproj.user
 /WebApplication/Scripts/lib
 /WebApplication/bin
+/UnitTest/bin/Debug
+/ViewModels/bin/Debug
+/WebApplication/Scripts/Demo/TreeView.js
+/WebApplication/Scripts/Demo/LiveChart.js
+/WebApplication/Scripts/Demo/JobQueue.js
+/WebApplication/Scripts/Demo/GridView.js
+/WebApplication/Scripts/Demo/Dashboard.js
+/WebApplication/Scripts/Demo/CompositeView.js
+/WebApplication/Scripts/Demo/BetterList.js
