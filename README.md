@@ -3,7 +3,7 @@
 
 DotNetify is a free, open source project that lets you create modern web applications using HTML5 and C#. 
 
-This project offers developers the architecture and tools to write single-page web applications on .NET platform (including Mono) that are sophisticated, richly interactive, bandwidth efficient, and support real-time push notification out-of-the-box.
+This project offers developers the architecture and tools to write single-page web applications on .NET platform (including [ASP.NET Core](https://asp.net/core) and [Mono](http://www.mono-project.com)) that are sophisticated, richly interactive, bandwidth efficient, and support real-time push notification out-of-the-box.
 
 Written in both Javascript and C# .NET, dotNetify builds on popular open-source libraries like 
 [jQuery](http://jquery.com), [Knockout](http://knockoutjs.com) and [SignalR](http://asp.net/signalr). It does not attempt to get away from the current open web standards, but rather complement and enhance them in such a way that brings the most benefit to you!
