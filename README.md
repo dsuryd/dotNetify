@@ -12,16 +12,16 @@ Written in both Javascript and C# .NET, dotNetify builds on popular open-source 
 
 * Back-End MVVM Architecture (HTML5 View/C# View Model)
 * Real-Time Web Out-of-the-Box
-* Support ASP.NET Core, ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).  
+* Support ASP.NET Core, ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo) 
 * Clean & Lean Code
 * Leverage Full Power of .NET
 * Deep Routing
 
 ##Documentation
 
-Documentation and live demo can be found in the [official website](http://dotnetify.net).
+Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
 
-Read the basic concept in the CodeProject article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
+Introductory article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
 
 ##Code Examples
 
