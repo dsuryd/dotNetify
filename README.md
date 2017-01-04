@@ -19,12 +19,13 @@ Written in both Javascript and C# .NET, dotNetify builds on popular open-source 
 
 ##Documentation
 
-All the documentation and live examples can be found in the [official website](http://dotnetify.net).
+Documentation and live demo can be found in the [official website](http://dotnetify.net).
+Read the basic concept in the CodeProject article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
 
-Want a super simple example to try out?  Use this [basic template](https://github.com/dsuryd/dotNetify-example-livechart).  
-Read all about it in the CodeProject article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
+##Code Examples
 
-*** Work in progress: [dotNetify App Template](https://github.com/dsuryd/dotNetify-app-template)
+Want a super simple example to try out?  See the [live chart example](https://github.com/dsuryd/dotNetify-example-livechart).  
+For more sophisticated example, see the [dotNetify app template](https://github.com/dsuryd/dotNetify-app-template).
 
 ##NuGet
 
