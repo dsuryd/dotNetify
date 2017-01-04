@@ -20,6 +20,7 @@ Written in both Javascript and C# .NET, dotNetify builds on popular open-source 
 ##Documentation
 
 Documentation and live demo can be found in the [official website](http://dotnetify.net).
+
 Read the basic concept in the CodeProject article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
 
 ##Code Examples
