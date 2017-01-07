@@ -63,6 +63,9 @@ limitations under the License.
             return false;
          },
 
+         // Optional callback to override a URL before performing routing.
+         overrideUrl: function (iUrl) { return iUrl },
+
          // Push state to HTML history.
          pushState: function (iState, iTitle, iPath) {
             dotnetify.router.urlPath = "";
@@ -224,6 +227,9 @@ limitations under the License.
                      iCallbackFn.apply(this);
                };
 
+               // Provide the opportunity to override the URL.
+               iViewUrl = dotnetify.router.overrideUrl(iViewUrl);
+
                vm.$loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn);
 
             }.bind(iScope),
@@ -377,7 +383,7 @@ limitations under the License.
                   route.Path(path);
                }
             }
-            else if(route.RedirectRoot() == null)
+            else if (route.RedirectRoot() == null)
                throw new Error("vmRoute cannot find route template '" + route.TemplateId() + "' at " + element.outerHTML);
          }
 
