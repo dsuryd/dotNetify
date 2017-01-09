@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2015 Dicky Suryadi
+Copyright 2015-2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,9 +33,19 @@ var dotNetify = {};
    {
       version: "1.0.6",
       hub: null,
+
+      // Debug mode.
       debug: false,
       debugFn: null,
+
+      // Offline mode.
+      offline: false,
+      isOffline: false,
+      offlineTimeout: 5000,
+      offlineCacheFn: null,
+
       init: function () {
+         var applyWidget = function () { $.each($("[data-vm]"), function () { $(this).dotnetify() }); };
 
          if (dotnetify.hub === null) {
             // Setup SignalR server method handler.
@@ -89,9 +99,21 @@ var dotNetify = {};
                var hub = $.connection.hub.start();
                hub.done(function () {
                   dotnetify._connectRetry = 0;
-                  $.each($("[data-vm]"), function () { $(this).dotnetify() });
+                  applyWidget();
                })
-               .fail(function (e) { console.error(e); });
+               .fail(function (e) {
+                  console.error(e);
+               });
+
+               // If offline mode is enabled, apply the widget anyway when there's no connection.
+               setTimeout(function () {
+                  if (dotnetify.offline && !dotnetify.isOffline && !dotnetify.isConnected()) {
+                     applyWidget();
+                     dotnetify.isOffline = true;
+                     $(document).trigger("offline", dotnetify.isOffline);
+                  }
+               }, dotnetify.offlineTimeout);
+
                return hub;
             }
             dotnetify.hub = startHub();
@@ -105,10 +127,29 @@ var dotNetify = {};
                if (dotnetify._connectRetry < 3)
                   dotnetify._connectRetry++;
             });
+
+            // Use SignalR event to raise the offline event with true/false argument.
+            $.connection.hub.stateChanged(function (state) {
+               var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
+               console.log("SignalR: " + stateText[state.newState]);
+
+               var isOffline = state.newState != 1;
+               if (dotnetify.isOffline != isOffline) {
+                  dotnetify.isOffline = isOffline;
+                  $(document).trigger("offline", dotnetify.isOffline);
+               }
+            });
          }
-         else
-            dotnetify.hub.done(function () { $.each($("[data-vm]"), function () { $(this).dotnetify() }) });
+         else if (dotnetify.isConnected())
+            dotnetify.hub.done(applyWidget);
+         else if (dotnetify.offline)
+            applyWidget();
       },
+
+      isConnected: function () {
+         return $.connection.hub.state == $.signalR.connectionState.connected
+      },
+
       widget: function (iElement) {
          return $(iElement).data("ko-dotnetify");
       },
@@ -142,11 +183,16 @@ var dotNetify = {};
             self.VMId = $(this).attr("data-master-vm") + "." + self.VMId;
          });
 
+         // Handle offline mode.
+         if (dotnetify.offline)
+            self._ListenToOfflineEvent();
+
          // Request the server VM. 
          if (self.VMId != null) {
-            var vmArg = self.element.attr("data-vm-arg");
-            vmArg = vmArg != null ? $.parseJSON(vmArg.replace(/'/g, "\"")) : null;
-            self.Hub.server.request_VM(self.VMId, vmArg);
+            if (dotnetify.isConnected())
+               self._RequestVM();
+            else if (dotnetify.offline)
+               self._GetOfflineVM();
          }
          else
             console.error("ERROR: dotnetify - failed to find 'data-vm' attribute in the element where .dotnetify() was applied.")
@@ -156,6 +202,10 @@ var dotNetify = {};
       _destroy: function () {
          try {
             var self = this;
+
+            // Stop listening to offline event.
+            if (typeof self.OfflineFn === "function")
+               $(document).off("offline", self.OfflineFn);
 
             // Call any plugin's $destroy function if provided.
             $.each(dotnetify.plugins, function (pluginId, plugin) {
@@ -185,6 +235,10 @@ var dotNetify = {};
                // Set essential info to the view model.
                self.VM.$vmId = self.VMId;
                self.VM.$element = self.element;
+
+               // Add an observable to carry the offline state.
+               if (dotnetify.offline)
+                  self.VM.$vmOffline = ko.observable(self.IsOffline);
 
                // Add built-in functions to the view model.
                this._AddBuiltInFunctions();
@@ -231,6 +285,10 @@ var dotNetify = {};
                   // Send 'ready' event after a new view model was received.
                   self.element.trigger("ready", { VMId: self.VMId, VM: self.VM });
                });
+
+               // Cache the VM data in case of offline mode.
+               if (dotnetify.offline && dotnetify.isConnected() && typeof dotnetify.offlineCacheFn === "function")
+                  dotnetify.offlineCacheFn(self.VMId + self.element.attr("data-vm-arg"), iVMData);
             }
             else {
                // Disable server update because we're going to update the value in the knockout VM
@@ -408,6 +466,46 @@ var dotNetify = {};
          });
       },
 
+      // Gets offline view model data from the local cache.
+      _GetOfflineVM: function () {
+         var self = this;
+
+         if (typeof dotnetify.offlineCacheFn === "function") {
+            // SignalR connection isn't available; use cached VM data for offline mode.
+            var cachedData = dotnetify.offlineCacheFn(self.VMId + self.element.attr("data-vm-arg"));
+            if (cachedData == null)
+               cachedData = dotnetify.offlineCacheFn(self.VMId);
+
+            if (cachedData != null) {
+               if (dotnetify.debug)
+                  console.warn("[" + self.VMId + "] using offline data");
+
+               self.IsOffline = true;
+               self.UpdateVM(cachedData);
+            }
+         }
+      },
+
+      // Initializes offline mode handling.
+      _ListenToOfflineEvent: function () {
+         var self = this;
+
+         self.IsOffline = false;
+         self.OfflineFn = function (event, isOffline) {
+
+            if (self.VM != null && self.VM.hasOwnProperty("$vmOffline"))
+               self.VM.$vmOffline(isOffline);
+
+            self.IsOffline = isOffline;
+            if (!isOffline)
+               self._RequestVM();
+            else if (self.VM == null)
+               self._GetOfflineVM();
+         };
+
+         $(document).one("offline", self.OfflineFn.bind(self));
+      },
+
       // Inject the context with observables mapped from an object.
       // Properties that start with underscore are mapped to observables.
       // Functions that start with underscore are mapped to pure computed observables.
@@ -455,6 +553,29 @@ var dotNetify = {};
          }
 
          checkComponentReadyFn();
+      },
+
+      // On value changed from a knockout VM's observable, update the server VM.
+      _OnValueChanged: function (iVMPath, iNewValue) {
+         var update = {};
+         update[iVMPath] = iNewValue instanceof Object ? $.extend({}, iNewValue) : iNewValue;
+
+         if (dotnetify.isConnected()) {
+            try {
+               this.Hub.server.update_VM(this.VMId, update);
+
+               if (dotnetify.debug) {
+                  console.log("[" + this.VMId + "] sent> ");
+                  console.log(update);
+
+                  if (dotnetify.debugFn != null)
+                     dotnetify.debugFn(this.VMId, "sent", update);
+               }
+            }
+            catch (e) {
+               console.error(e);
+            }
+         }
       },
 
       // Preprocess view model update from the server before we map it to knockout view model.
@@ -506,6 +627,22 @@ var dotNetify = {};
          }
       },
 
+      // Requests view model data from the server.
+      _RequestVM: function () {
+         var self = this;
+         var vmArg = self.element.attr("data-vm-arg");
+         vmArg = vmArg != null ? $.parseJSON(vmArg.replace(/'/g, "\"")) : null;
+
+         if (dotnetify.isConnected()) {
+            try {
+               self.Hub.server.request_VM(self.VMId, vmArg);
+            }
+            catch (e) {
+               console.error(e);
+            }
+         }
+      },
+
       // Subscribe to value change events raised by knockout VM's observables.
       _SubscribeObservables: function (iParam, iVMPath) {
          var self = this;
@@ -543,21 +680,6 @@ var dotNetify = {};
                path = "$" + index;
                this._SubscribeObservables(iParam[index], iVMPath == null ? path : iVMPath + "." + path);
             }
-         }
-      },
-
-      // On value changed from a knockout VM's observable, update the server VM.
-      _OnValueChanged: function (iVMPath, iNewValue) {
-         var update = {};
-         update[iVMPath] = iNewValue instanceof Object ? $.extend({}, iNewValue) : iNewValue;
-         this.Hub.server.update_VM(this.VMId, update);
-
-         if (dotnetify.debug) {
-            console.log("[" + this.VMId + "] sent> ");
-            console.log(update);
-
-            if (dotnetify.debugFn != null)
-               dotnetify.debugFn(this.VMId, "sent", update);
          }
       }
    });
