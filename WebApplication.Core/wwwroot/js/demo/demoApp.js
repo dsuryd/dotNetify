@@ -26,6 +26,11 @@
    }
 });
 
+// Specify specific transports for SignalR.
+require(['signalr-hub'], function () {
+   dotnetify.hubOptions = { "transport": ["webSockets", "longPolling"] };
+});
+
 require(['jquery', 'knockout', 'dotnetify', 'router', 'bootstrap'], function ($, ko) {
    $(function () {
       dotnetify.debug = true;

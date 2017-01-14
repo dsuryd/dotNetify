@@ -15,7 +15,7 @@ limitations under the License.
  */
 
 // Our namespace.
-var dotnetify = {};
+var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 var dotNetify = {};
 
 // Support using RequireJS that loads our app.js, or being placed in <script> tag.
@@ -29,9 +29,9 @@ var dotNetify = {};
 }
 (function ($, ko, komapping) {
    ko.mapping = komapping;
-   dotnetify =
+   dotnetify = $.extend(dotnetify,
    {
-      version: "1.0.6",
+      version: "1.1.0",
       hub: null,
 
       // Debug mode.
@@ -96,7 +96,7 @@ var dotNetify = {};
 
             // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.
             var startHub = function () {
-               var hub = $.connection.hub.start();
+               var hub = typeof dotnetify.hubOptions === "undefined" ? $.connection.hub.start() : $.connection.hub.start(dotnetify.hubOptions);
                hub.done(function () {
                   dotnetify._connectRetry = 0;
                   applyWidget();
@@ -155,7 +155,7 @@ var dotNetify = {};
       },
       plugins: {},
       _connectRetry: 0
-   };
+   });
 
    dotNetify = dotnetify;
 
