@@ -1,7 +1,7 @@
 #&nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 
-DotNetify is a free, open source project that lets you create modern web and mobile hybrid applications using HTML5 and C#. 
+DotNetify is a free, open source project that lets you create real-time web and mobile hybrid single-page applications using HTML5 and C#. 
 
 This project offers developers the architecture and tools to write single-page web applications on .NET platform (including [ASP.NET Core](https://asp.net/core) and [Mono](http://www.mono-project.com)) that are sophisticated, richly interactive, bandwidth efficient, and support real-time push notification out-of-the-box.
 
@@ -13,7 +13,7 @@ Written in both Javascript and C# .NET, dotNetify builds on popular open-source 
 * Back-End MVVM Architecture (HTML5 View/C# View Model)
 * Real-Time Web Out-of-the-Box
 * Support ASP.NET Core, ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo) 
-* Clean & Lean Code
+* Clean & Lean Code (No need for complicated client-side framework, no fat server-side controllers)
 * Leverage Full Power of .NET
 * Deep Routing
 
