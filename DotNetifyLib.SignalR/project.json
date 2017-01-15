@@ -4,7 +4,7 @@
    "dependencies": {
       "DotNetifyLib.Core": "1.0.0-*",
       "NETStandard.Library": "1.6.1",
-      "Microsoft.AspNetCore.SignalR.Server": "0.2.0-*"
+      "Gray.Microsoft.AspNetCore.SignalR.Server": "0.2.0-alpha1"
    },
 
   "frameworks": {
