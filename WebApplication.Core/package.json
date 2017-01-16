@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "name": "DotNetify.AspNetCore",
+  "private": true,
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "jquery.ui.widget": "^1.10.3",
+    "knockout": "^3.4.1",
+    "knockout-mapping": "^2.6.0",
+    "requirejs": "^2.3.2",
+    "signalr": "^2.2.1"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0"
+  }
+}

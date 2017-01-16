@@ -28,8 +28,10 @@ namespace WebApplication.Core.Controllers
          if (id.EndsWith("_cshtml"))
             return View("/Views/" + id.Replace("_cshtml", ".cshtml"));
 
-         var htmlFilePath = Path.Combine(_hostingEnvironment.ContentRootPath, "Views\\" + (id.EndsWith(".html") ? id : id + ".html"));
-         return File(System.IO.File.OpenRead(htmlFilePath), "text/html");
+         // If not ending with .js or .map, assume it's a request for static html file.
+         if (!id.EndsWith(".js") && !id.EndsWith(".map"))
+            id = Path.Combine(_hostingEnvironment.ContentRootPath, "Views\\" + (id.EndsWith(".html") ? id : id + ".html"));
+         return File(id);
       }
 
       [Route("WebStore/{*id}")]
@@ -37,6 +39,16 @@ namespace WebApplication.Core.Controllers
       {
          var initialRoutingData = new RoutingViewData("/webstore/" + id, "WebStore/Index_cshtml", typeof(ViewModels.WebStore.NavBarVM));
          return ViewComponent("Routing", new { iViewData = initialRoutingData });
+      }
+
+      private FileStreamResult File(string path)
+      {
+         var mimeType = "text/plain";
+         if (path.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
+            mimeType = "text/js";
+         else if (path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+            mimeType = "text/html";
+         return File(System.IO.File.OpenRead(path), mimeType);
       }
    }
 
