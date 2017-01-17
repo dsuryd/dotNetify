@@ -28,7 +28,7 @@ limitations under the License.
    // Add extension for binding to Google polymer elements.
    dotnetify.binder.extensions["polymer-paper"] =
       {
-         version: "1.0.5",
+         version: "1.1.0",
 
          // Called by dotNetify before binding is applied.
          setBindings: function (elem, bind) {

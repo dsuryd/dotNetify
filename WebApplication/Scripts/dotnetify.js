@@ -18,10 +18,13 @@ limitations under the License.
 var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 var dotNetify = {};
 
-// Support using RequireJS that loads our app.js, or being placed in <script> tag.
+// Support using either AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
    if (typeof define === "function" && define["amd"]) {
       define(['jquery', 'knockout', 'ko-mapping', 'jquery-ui', 'signalr-hub'], factory);
+   }
+   else if (typeof exports === "object" && exports) {
+      module.exports = factory(require('jquery'), require('knockout'), require('knockout-mapping'), require('jquery-ui'), require('signalr'), require('signalr-hub'));
    }
    else {
       factory(jQuery, ko, ko.mapping);

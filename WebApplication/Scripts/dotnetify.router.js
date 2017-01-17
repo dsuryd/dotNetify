@@ -14,10 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-// Support using RequireJS that loads our app.js, or being placed in <script> tag.
+// Support using AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
    if (typeof define === "function" && define["amd"]) {
       define(['jquery', 'knockout', 'dotnetify', 'path'], factory);
+   }
+   else if (typeof exports === "object" && exports) {
+      module.exports = factory(require('jquery'), require('knockout'), require('dotnetify'), require('path'));
    }
    else {
       factory(jQuery, ko, dotnetify);
@@ -28,7 +31,7 @@ limitations under the License.
    // Add plugin functions.
    dotnetify.router =
       {
-         version: "1.0.6",
+         version: "1.1.0",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -291,7 +294,7 @@ limitations under the License.
                   return false;
 
                // Get the URL path to route.
-               var urlPath = dotNetify.router.urlPath;
+               var urlPath = dotnetify.router.urlPath;
 
                if (dotnetify.debug)
                   console.log("router> routing " + urlPath);
@@ -325,8 +328,8 @@ limitations under the License.
                      var template = vm.$router.hasOwnProperty("pathToRoute") && vm.$router.pathToRoute.hasOwnProperty(path) ? vm.$router.pathToRoute[path].$template : null;
                      if (template != null) {
                         // If the URL path is completely routed, clear it.
-                        if (utils.equal(dotNetify.router.urlPath, vm.$router.toUrl(path)))
-                           dotNetify.router.urlPath = "";
+                        if (utils.equal(dotnetify.router.urlPath, vm.$router.toUrl(path)))
+                           dotnetify.router.urlPath = "";
 
                         // If route's not already active, route to it.
                         if (!utils.equal(vm.RoutingState.Active(), path))
@@ -337,7 +340,7 @@ limitations under the License.
                   }
                   else if (dotnetify.router.match(urlPath)) {
                      // If no vmRoute binding matches, try to match with any template's URL pattern.
-                     dotNetify.router.urlPath = "";
+                     dotnetify.router.urlPath = "";
                      return true;
                   }
                }
