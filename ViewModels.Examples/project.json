@@ -6,7 +6,7 @@
    },
 
    "dependencies": {
-      "DotNetifyLib.Core": "1.0.0-*",
+      "DotNetifyLib.Core": "2.0.0-*",
       "NETStandard.Library": "1.6.1",
       "System.Collections.Specialized": "4.3.0",
       "System.Linq.Dynamic.Core": "1.0.6.9",
