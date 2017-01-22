@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2015 Dicky Suryadi
+Copyright 2015-2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@ limitations under the License.
    if (typeof define === "function" && define["amd"]) {
       define(['jquery', 'knockout', 'dotnetify', 'path'], factory);
    }
-   else if (typeof exports === "object" && exports) {
-      module.exports = factory(require('jquery'), require('knockout'), require('dotnetify'), require('path'));
+   else if (typeof exports === "object" && typeof module === "object") {
+      window.Path = require("path");
+      module.exports = factory(require('jquery'), require('knockout'), require('dotnetify'));
    }
    else {
       factory(jQuery, ko, dotnetify);

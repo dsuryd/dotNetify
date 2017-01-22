@@ -21,10 +21,10 @@ var dotNetify = {};
 // Support using either AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
    if (typeof define === "function" && define["amd"]) {
-      define(['jquery', 'knockout', 'ko-mapping', 'jquery-ui', 'signalr-hub'], factory);
+      define(['jquery', 'knockout', 'ko-mapping', 'jquery-ui', 'signalr', 'signalr-hub'], factory);
    }
-   else if (typeof exports === "object" && exports) {
-      module.exports = factory(require('jquery'), require('knockout'), require('knockout-mapping'), require('jquery-ui'), require('signalr'), require('signalr-hub'));
+   else if (typeof exports === "object" && typeof module === "object") {
+      module.exports = factory(require('jquery'), require('knockout'), require('ko-mapping'), require('jquery-ui'), require('signalr'), require('signalr-hub'));
    }
    else {
       factory(jQuery, ko, ko.mapping);
@@ -403,7 +403,6 @@ var dotNetify = {};
          // Loads a view into a target element.
          // Method parameters: TargetSelector, ViewUrl, [iJsModuleUrl], [iVmArg], iCallbackFn
          self.VM.$loadView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
-            var vm = this;
 
             if (typeof iJsModuleUrl === "object" && iJsModuleUrl != null) {
                iCallbackFn = iVmArg;
@@ -653,10 +652,10 @@ var dotNetify = {};
          if (iParam == null)
             return;
          else if (ko.isObservable(iParam)) {
-            if ('$subscribe' in iParam == false) {
+            if ('$subscribe' in iParam === false) {
                iParam.subscribe(function (iNewValue) {
                   // Handle value change event from observables.
-                  if (self.VM.$serverUpdate == true)
+                  if (self.VM.$serverUpdate === true)
                      self._OnValueChanged(iVMPath, iNewValue);
                });
                iParam['$subscribe'] = true;
@@ -757,7 +756,7 @@ var dotNetify = {};
                if (ko.isObservable(fn)) {
 
                   // Reset the value locally first to ensure that setting the value will raise change events.
-                  vm.$preventBinding(function () { fn(fnArg == true ? false : null) });
+                  vm.$preventBinding(function () { fn(fnArg === true ? false : null) });
 
                   fn(fnArg);
                }

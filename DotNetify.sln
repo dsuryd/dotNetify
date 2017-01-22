@@ -23,6 +23,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET 4.5", "ASP.NET 4.5"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET Core", "ASP.NET Core", "{4D24F814-2737-4143-8FC7-308D12F67719}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E1EC-4006-B6D5-EB9E54EA6883}"
+	ProjectSection(SolutionItems) = preProject
+		dist\dotnetify-hub.js = dist\dotnetify-hub.js
+		dist\dotnetify-hub.min.js = dist\dotnetify-hub.min.js
+		dist\dotnetify.js = dist\dotnetify.js
+		dist\dotnetify.min.js = dist\dotnetify.min.js
+		dist\dotnetify.router.js = dist\dotnetify.router.js
+		dist\dotnetify.router.min.js = dist\dotnetify.router.min.js
+		dist\knockout.mapping-latest.js = dist\knockout.mapping-latest.js
+		package.json = package.json
+		dist\path.min.js = dist\path.min.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Android = Debug|Android

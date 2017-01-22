@@ -6,7 +6,6 @@
     "jquery": "^3.1.1",
     "jquery.ui.widget": "^1.10.3",
     "knockout": "^3.4.1",
-    "knockout-mapping": "^2.6.0",
     "requirejs": "^2.3.2",
     "signalr": "^2.2.1"
   },

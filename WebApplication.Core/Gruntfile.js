@@ -4,9 +4,9 @@ Click here to learn more. http://go.microsoft.com/fwlink/?LinkID=513275&clcid=0x
 */
 module.exports = function (grunt) {
    grunt.initConfig({
-      clean: ["wwwroot/lib/jquery.*", "wwwroot/lib/knockout*.*", "wwwroot/lib/require.*"],
+      clean: ["wwwroot/lib/jquery.*", "wwwroot/lib/knockout-latest.*", "wwwroot/lib/require.*"],
       copy: {
-         main: {
+         build: {
             files: [
                 {
                    src: "node_modules/jquery/dist/jquery.min.js",
@@ -30,13 +30,6 @@ module.exports = function (grunt) {
                   flatten: true
                },
                {
-                  src: "node_modules/knockout-mapping/dist/knockout.mapping.min.js",
-                  dest: "wwwroot/lib",
-                  expand: true,
-                  filter: "isFile",
-                  flatten: true
-               },
-               {
                   src: "node_modules/signalr/jquery.signalr.js",
                   dest: "wwwroot/lib",
                   expand: true,
@@ -50,6 +43,30 @@ module.exports = function (grunt) {
                   filter: "isFile",
                   flatten: true
                },
+            ]
+         },
+         dist: {
+            files: [
+               {
+                  src: "wwwroot/lib/dotnetify.js",
+                  dest: "../dist/dotnetify.js"
+               },
+               {
+                  src: "wwwroot/lib/dotnetify-hub.js",
+                  dest: "../dist/dotnetify-hub.js"
+               },
+               {
+                  src: "wwwroot/lib/dotnetify.router.js",
+                  dest: "../dist/dotnetify.router.js"
+               },
+               {
+                  src: "wwwroot/lib/path.min.js",
+                  dest: "../dist/path.min.js"
+               },
+               {
+                  src: "wwwroot/lib/knockout.mapping-latest.js",
+                  dest: "../dist/knockout.mapping-latest.js"
+               }
             ]
          }
       },
@@ -65,11 +82,29 @@ module.exports = function (grunt) {
                   dest: "wwwroot/lib/jquery.ui.widget.min.js"
                }
             ]
+         },
+         dist: {
+            files: [
+               {
+                  src: "wwwroot/lib/dotnetify.js",
+                  dest: "../dist/dotnetify.min.js"
+               },
+               {
+                  src: "wwwroot/lib/dotnetify-hub.js",
+                  dest: "../dist/dotnetify-hub.min.js"
+               },
+               {
+                  src: "wwwroot/lib/dotnetify.router.js",
+                  dest: "../dist/dotnetify.router.min.js"
+               }
+            ]
+
          }
       }
    });
    grunt.loadNpmTasks("grunt-contrib-clean");
    grunt.loadNpmTasks("grunt-contrib-copy");
    grunt.loadNpmTasks("grunt-contrib-uglify");
-   grunt.registerTask("all", ["clean", "copy", "uglify"]);
+   grunt.registerTask("build", ["clean", "copy:build", "uglify:build"]);
+   grunt.registerTask("dist", ["copy:dist", "uglify:dist"]);
 };

@@ -3,7 +3,7 @@
    paths: {
       "jquery": "jquery-1.11.3.min",
       "jquery-ui": "jquery-ui-widget-1.11.4.min",
-      "knockout": "knockout-3.3.0",
+      "knockout": "knockout-3.4.1",
       "ko-mapping": "knockout.mapping-latest",
       "dotnetify": "dotnetify",
       "router": "dotnetify.router",

@@ -4,7 +4,7 @@
       "jquery": "jquery.min",
       "jquery-ui": "jquery.ui.widget",
       "knockout": "knockout-latest",
-      "ko-mapping": "knockout.mapping.min",
+      "ko-mapping": "knockout.mapping-latest",
       "dotnetify": "dotnetify",
       "router": "dotnetify.router",
       "binder": "dotnetify.binder",

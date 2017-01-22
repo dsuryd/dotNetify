@@ -1,0 +1,35 @@
+{
+   "name": "dotNetify",
+   "version": "1.1.0",
+   "description": "Simple, lightweight, yet powerful way to build HTML5/C# .NET web and mobile hybrid apps.",
+   "main": "dist/dotnetify.js",
+   "files": [
+      "dist/*.js",
+      "README.*",
+      "LICENSE.*"
+   ],
+   "dependencies": {
+      "jquery": "^3.1.1",
+      "jquery.ui.widget": "^1.10.3",
+      "knockout": "^3.4.1",
+      "signalr": "^2.2.1"
+   },
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/dsuryd/dotNetify.git"
+   },
+   "keywords": [
+      "dotnetify",
+      "signalr",
+      "knockout",
+      "mvvm",
+      "hybrid",
+      "realtime"
+   ],
+   "author": "Dicky Suryadi",
+   "license": "Apache 2.0",
+   "bugs": {
+      "url": "https://github.com/dsuryd/dotNetify/issues"
+   },
+   "homepage": "https://github.com/dsuryd/dotNetify"
+}

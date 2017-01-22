@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using DotNetify.Security;
 
 namespace DotNetify
 {
@@ -32,6 +33,7 @@ namespace DotNetify
       /// Factory of view model controllers.
       /// </summary>
       private readonly IVMControllerFactory _vmControllerFactory;
+      private readonly IPrincipalAccessor _principalAccessor;
 
       /// <summary>
       /// View model controller associated with the current connection.
@@ -40,8 +42,11 @@ namespace DotNetify
       {
          get
          {
+            if (_principalAccessor is HubPrincipalAccessor)
+               (_principalAccessor as HubPrincipalAccessor).Principal = Context.User;
+
             var vmController = _vmControllerFactory.GetInstance(Context.ConnectionId);
-            vmController.Principal = Context.User;
+            vmController.Principal = _principalAccessor.Principal;
             return vmController;
          }
       }
@@ -50,10 +55,13 @@ namespace DotNetify
       /// Constructor for dependency injection.
       /// </summary>
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
-      public DotNetifyHub(IVMControllerFactory vmControllerFactory)
+      /// <param name="principalAccessor">Allow to pass the hub principal.</param>
+      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor)
       {
          _vmControllerFactory = vmControllerFactory;
          _vmControllerFactory.ResponseDelegate = Response_VM;
+
+         _principalAccessor = principalAccessor;
       }
 
       /// <summary>

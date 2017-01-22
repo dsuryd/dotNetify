@@ -176,7 +176,7 @@
     <Content Include="Scripts\jquery-ui-widget-1.11.4.min.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
-    <Content Include="Scripts\knockout-3.3.0.js" />
+    <Content Include="Scripts\knockout-3.4.1.js" />
     <Content Include="Scripts\knockout.mapping-latest.js" />
     <Content Include="Scripts\path.min.js" />
     <Content Include="Scripts\require.min.js" />

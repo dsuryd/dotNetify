@@ -1,10 +1,10 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using DotNetify;
 using ViewModels;
 
 namespace WebApplication.Core
@@ -32,28 +32,13 @@ namespace WebApplication.Core
          // SignalR and Memory Cache are required by dotNetify.
          services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
          services.AddMemoryCache();
+         services.AddDotNetify();
 
          // Find the assembly "ViewModels.Examples" and register it to DotNetify.VMController.
          // This will cause all the classes inside the assembly that inherits from DotNetify.BaseVM to be known as view models.
          var vmAssembly = Assembly.Load(new AssemblyName("ViewModels.Examples"));
          if (vmAssembly != null)
-            DotNetify.VMController.RegisterAssembly(vmAssembly);
-
-         // Use ASP.NET Core DI to inject the dotNetify's view model controller factory to the dotNetify's SignalR hub.
-         services.AddSingleton<DotNetify.IVMControllerFactory, DotNetify.VMControllerFactory>();
-
-         // Use ASP.NET Core DI to provide view model instances, but you can always use your favorite IoC container.
-         DotNetify.VMController.CreateInstance = (type, args) =>
-         {
-            if (type == typeof(SimpleListVM) || type == typeof(BetterListVM))
-               args = new object[] { new EmployeeModel(7) };
-            else if (type == typeof(TreeViewVM) || type == typeof(GridViewVM) || type == typeof(CompositeViewVM))
-               args = new object[] { new EmployeeModel() };
-            else if (type == typeof(AFITop100VM))
-               args = new object[] { new AFITop100Model() };
-
-            return ActivatorUtilities.CreateInstance(services.BuildServiceProvider(), type, args ?? new object[] { });
-         };
+            VMController.RegisterAssembly(vmAssembly);
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,16 +46,6 @@ namespace WebApplication.Core
       {
          loggerFactory.AddConsole(Configuration.GetSection("Logging"));
          loggerFactory.AddDebug();
-
-         if (env.IsDevelopment())
-         {
-            app.UseDeveloperExceptionPage();
-            //app.UseBrowserLink();
-         }
-         else
-         {
-            app.UseExceptionHandler("/Home/Error");
-         }
 
          app.UseStaticFiles();
 
@@ -84,6 +59,20 @@ namespace WebApplication.Core
          // Required by dotNetify.
          app.UseWebSockets();
          app.UseSignalR();
+
+         // Use ASP.NET Core DI to provide view model instances, but you can always use your favorite IoC container.
+         var provider = app.ApplicationServices;
+         VMController.CreateInstance = (type, args) =>
+         {
+            if (type == typeof(SimpleListVM) || type == typeof(BetterListVM))
+               args = new object[] { new EmployeeModel(7) };
+            else if (type == typeof(TreeViewVM) || type == typeof(GridViewVM) || type == typeof(CompositeViewVM))
+               args = new object[] { new EmployeeModel() };
+            else if (type == typeof(AFITop100VM))
+               args = new object[] { new AFITop100Model() };
+
+            return ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
+         };
       }
    }
 }
