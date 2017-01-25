@@ -34,7 +34,7 @@ On .NET Core class library projects:
 
 On ASP.NET Core web projects:  
 *PM> Install-Package DotNetify.SignalR -pre*  
-*npm install dotnetify* (on web application project)
+*npm install dotnetify*
 
 See the [Configuring Your Project](http://dotnetify.net/index/Installing) section.
 
