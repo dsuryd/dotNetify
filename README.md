@@ -25,15 +25,21 @@ Introductory article: [Real-Time Web App Made Simple with MVVM Pattern over Sign
 
 ##Code Examples
 
-Want a super simple example to try out?  See the [live chart example](https://github.com/dsuryd/dotNetify-example-livechart).  
-
+Want a super simple example to try out?  See the [live chart example](https://github.com/dsuryd/dotNetify-example-livechart).    
 For more sophisticated example, see the [web/mobile hybrid app template](https://github.com/dsuryd/dotNetify-app-template).
 
 ##NuGet
 
+ASP.NET 4.5:  
 *PM> Install-Package DotNetify*
 
-After installing, see this [Configuring Your Project](http://dotnetify.net/index/Installing) section.
+ASP.NET Core:  
+*PM> Install-Package DotNetify.Core -pre* (on view model project)  
+*PM> Install-Package DotNetify.SignalR -pre* (on web application project)  
+
+*npm install dotnetify* (on web application project)
+
+See the [Configuring Your Project](http://dotnetify.net/index/Installing) section.
 
 ##License
 Licensed under the Apache License, Version 2.0.
