@@ -22,7 +22,7 @@ Want a super simple example to try out?  See the [Live Chart Example](https://gi
 
 For close-to-real-world example, see the [Web/Mobile App Template](https://github.com/dsuryd/dotNetify-app-template).
 
-##NuGet
+##NuGet / NPM
 
 ASP.NET 4.5:  
 *PM> Install-Package DotNetify*
