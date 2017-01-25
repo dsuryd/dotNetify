@@ -29,11 +29,11 @@ ASP.NET 4.5:
 
 ASP.NET Core:  
 
-.NET Core Class Libraries:
+On .NET Core class library projects:  
 *PM> Install-Package DotNetify.Core -pre* 
 
-ASP.NET Core Web Projects:
-*PM> Install-Package DotNetify.SignalR -pre* 
+On ASP.NET Core web projects:  
+*PM> Install-Package DotNetify.SignalR -pre*  
 *npm install dotnetify* (on web application project)
 
 See the [Configuring Your Project](http://dotnetify.net/index/Installing) section.
