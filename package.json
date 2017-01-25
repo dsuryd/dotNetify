@@ -1,6 +1,6 @@
 {
    "name": "dotnetify",
-   "version": "1.1.0",
+   "version": "1.1.1",
    "description": "Simple, lightweight, yet powerful way to build HTML5/C# .NET web and mobile hybrid apps.",
    "main": "dist/dotnetify.js",
    "files": [
