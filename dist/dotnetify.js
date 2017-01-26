@@ -34,7 +34,7 @@ var dotNetify = {};
    ko.mapping = komapping;
    dotnetify = $.extend(dotnetify,
    {
-      version: "1.1.1",
+      version: "1.1.2",
       hub: null,
 
       // Debug mode.
@@ -503,6 +503,8 @@ var dotNetify = {};
                self._RequestVM();
             else if (self.VM == null)
                self._GetOfflineVM();
+
+            $(document).one("offline", self.OfflineFn.bind(self));
          };
 
          $(document).one("offline", self.OfflineFn.bind(self));

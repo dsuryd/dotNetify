@@ -1,7 +1,7 @@
 {
    "name": "dotnetify",
-   "version": "1.1.1",
-   "description": "Simple, lightweight, yet powerful way to build HTML5/C# .NET web and mobile hybrid apps.",
+   "version": "1.1.2",
+   "description": "Simple, lightweight, yet powerful way to build realtime HTML5/C# .NET web and mobile apps.",
    "main": "dist/dotnetify.js",
    "files": [
       "dist/*.js",
@@ -23,7 +23,8 @@
       "signalr",
       "knockout",
       "mvvm",
-      "hybrid",
+      "web",
+      "mobile",
       "realtime"
    ],
    "author": "Dicky Suryadi",
