@@ -34,7 +34,7 @@ var dotNetify = {};
    ko.mapping = komapping;
    dotnetify = $.extend(dotnetify,
    {
-      version: "1.1.0",
+      version: "1.1.2",
       hub: null,
 
       // Debug mode.
@@ -43,7 +43,7 @@ var dotNetify = {};
 
       // Offline mode.
       offline: false,
-      isOffline: false,
+      isOffline: true,
       offlineTimeout: 5000,
       offlineCacheFn: null,
 
@@ -110,7 +110,7 @@ var dotNetify = {};
 
                // If offline mode is enabled, apply the widget anyway when there's no connection.
                setTimeout(function () {
-                  if (dotnetify.offline && !dotnetify.isOffline && !dotnetify.isConnected()) {
+                  if (dotnetify.offline && !dotnetify.isConnected()) {
                      applyWidget();
                      dotnetify.isOffline = true;
                      $(document).trigger("offline", dotnetify.isOffline);
@@ -503,6 +503,8 @@ var dotNetify = {};
                self._RequestVM();
             else if (self.VM == null)
                self._GetOfflineVM();
+
+            $(document).one("offline", self.OfflineFn.bind(self));
          };
 
          $(document).one("offline", self.OfflineFn.bind(self));
