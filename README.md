@@ -1,43 +1,40 @@
 #&nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 
-DotNetify is a free, open source project that lets you create real-time web and mobile hybrid single-page applications using HTML5 and C#. 
-
-This project offers developers the architecture and tools to write single-page web applications on .NET platform (including [ASP.NET Core](https://asp.net/core) and [Mono](http://www.mono-project.com)) that are sophisticated, richly interactive, bandwidth efficient, and support real-time push notification out-of-the-box.
-
-Written in both Javascript and C# .NET, dotNetify builds on popular open-source libraries like 
-[jQuery](http://jquery.com), [Knockout](http://knockoutjs.com) and [SignalR](http://asp.net/signalr). It does not attempt to get away from the current open web standards, but rather complement and enhance them in such a way that brings the most benefit to you!
+DotNetify is a free, open source project that lets you create amazing real-time web and mobile apps using HTML5 and C# on cross-platform .NET Core backend. 
 
 ##Features
 
-* Back-End MVVM Architecture (HTML5 View/C# View Model)
-* Real-Time Web Out-of-the-Box
-* Support ASP.NET Core, ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo) 
-* Clean & Lean Code (No need for complicated client-side framework, no fat server-side controllers)
-* Leverage Full Power of .NET
-* Deep Routing
+* Simple and lightweight - no JS client-side framework, no REST API controllers.
+* Integrate SignalR and KnockoutJS to support .NET back-end MVVM architecture.
+* Built-in real-time across WebSockets, perfect for IoT consumer apps.
+* Full support for single-page apps, including client-side and server-side deep routing.
+* Run on [ASP.NET Core](http://asp.net/core), ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
+* Modern tooling: Visual Studio 2015,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
 
 ##Documentation
 
 Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
 
-Introductory article: [Real-Time Web App Made Simple with MVVM Pattern over SignalR](http://www.codeproject.com/Tips/1063346/Real-Time-Web-App-Made-Simple-with-MVVM-Pattern).
-
 ##Code Examples
 
-Want a super simple example to try out?  See the [live chart example](https://github.com/dsuryd/dotNetify-example-livechart).    
-For more sophisticated example, see the [web/mobile hybrid app template](https://github.com/dsuryd/dotNetify-app-template).
+Want a super simple example to try out?  See the [Live Chart Example](https://github.com/dsuryd/dotNetify-example-livechart).    
 
-##NuGet
+For close-to-real-world example, see the [Web/Mobile App Template](https://github.com/dsuryd/dotNetify-app-template).
+
+##NuGet / NPM
 
 ASP.NET 4.5:  
 *PM> Install-Package DotNetify*
 
 ASP.NET Core:  
-*PM> Install-Package DotNetify.Core -pre* (on view model project)  
-*PM> Install-Package DotNetify.SignalR -pre* (on web application project)  
 
-*npm install dotnetify* (on web application project)
+On .NET Core class library projects:  
+*PM> Install-Package DotNetify.Core -pre* 
+
+On ASP.NET Core web projects:  
+*PM> Install-Package DotNetify.SignalR -pre*  
+*npm install dotnetify*
 
 See the [Configuring Your Project](http://dotnetify.net/index/Installing) section.
 
