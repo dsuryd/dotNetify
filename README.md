@@ -28,15 +28,11 @@ ASP.NET 4.5:
 *PM> Install-Package DotNetify*
 
 ASP.NET Core:  
-
-On .NET Core class library projects:  
 *PM> Install-Package DotNetify.Core -pre* 
-
-On ASP.NET Core web projects:  
 *PM> Install-Package DotNetify.SignalR -pre*  
-*npm install dotnetify*
+*$ npm install dotnetify*
 
-See the [Configuring Your Project](http://dotnetify.net/index/Installing) section.
+Read on how to [configure your project](http://dotnetify.net/index/Installing).
 
 ##License
 Licensed under the Apache License, Version 2.0.
