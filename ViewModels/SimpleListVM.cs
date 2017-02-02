@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using System.Windows.Input;
 using DotNetify;
 
 namespace ViewModels
@@ -62,36 +62,32 @@ namespace ViewModels
          set { Set(value); }
       }
 
-      public bool Add
-      {
-         get { return false; }
-         set
-         {
-            var record = new EmployeeRecord { FirstName = FirstName, LastName = LastName };
-            _model.AddRecord(ref record);
+      /// <summary>
+      /// Adds a new employee.
+      /// </summary>
+      public ICommand Add => new Command(() =>
+        {
+           var record = new EmployeeRecord { FirstName = FirstName, LastName = LastName };
+           _model.AddRecord(ref record);
 
-            // Call this base method to send the new employee info back to the client.
-            this.AddList(() => Employees, new EmployeeInfo { Id = record.Id, FirstName = record.FirstName, LastName = record.LastName });
+           // Call this base method to send the new employee info back to the client.
+           this.AddList(() => Employees, new EmployeeInfo { Id = record.Id, FirstName = record.FirstName, LastName = record.LastName });
 
-            // Clear the inputs.
-            FirstName = LastName = "";
-         }
-      }
+           // Clear the inputs.
+           FirstName = LastName = "";
+        });
 
       /// <summary>
       /// When the Remove button is clicked, this property will receive the employee Id to remove.
       /// </summary>
-      public int RemoveId
-      {
-         get { return 0; }
-         set
-         {
-            _model.RemoveRecord(value);
+      public ICommand Remove => new Command<string>(arg =>
+        {
+           var id = int.Parse(arg);
+           _model.RemoveRecord(id);
 
-            // Call this base method to tell the client to remove the employee from the list it holds.
-            this.RemoveList(() => Employees, value);
-         }
-      }
+           // Call this base method to tell the client to remove the employee from the list it holds.
+           this.RemoveList(() => Employees, id);
+        });
 
       /// <summary>
       /// List of employees.

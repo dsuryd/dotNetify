@@ -39,6 +39,6 @@
    remove(iItem) {
       var vm: any = this;
       vm.$removeList(vm.Employees, i => i.Id() == iItem.Id());
-      vm.RemoveId(iItem.Id());
+      vm.Remove(iItem.Id());
    }
 }

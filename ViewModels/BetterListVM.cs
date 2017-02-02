@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Globalization;
-using System.Threading;
+using System.Windows.Input;
+using Newtonsoft.Json;
 using DotNetify;
 
 namespace ViewModels
@@ -45,18 +44,15 @@ namespace ViewModels
       /// <summary>
       /// When the Add button is clicked, this property will receive the new employee name input.
       /// </summary>
-      public EmployeeInfo Add
+      public ICommand Add => new Command<string>(arg =>
       {
-         get { return Get<EmployeeInfo>(); }
-         set
-         {
-            var record = new EmployeeRecord { FirstName = value.FirstName, LastName = value.LastName };
-            _model.AddRecord(ref record);
+         var newEmployee = (EmployeeInfo)JsonConvert.DeserializeObject(arg, typeof(EmployeeInfo));
+         var record = new EmployeeRecord { FirstName = newEmployee.FirstName, LastName = newEmployee.LastName };
+         _model.AddRecord(ref record);
 
-            // Set only the Id back to optimize bandwidth usage.
-            NewId = record.Id;
-         }
-      }
+         // Set only the Id back to optimize bandwidth usage.
+         NewId = record.Id;
+      });
 
       /// <summary>
       /// Use this property to send new employee Id right after receiving Add command.
@@ -70,11 +66,7 @@ namespace ViewModels
       /// <summary>
       /// When the Remove button is clicked, this property will receive the employee Id to remove.
       /// </summary>
-      public int RemoveId
-      {
-         get { return 0; }
-         set { _model.RemoveRecord(value); }
-      }
+      public ICommand Remove => new Command<string>(id => _model.RemoveRecord(int.Parse(id)));
 
       /// <summary>
       /// List of employees.

@@ -33,7 +33,7 @@ var BetterListVM = (function () {
     BetterListVM.prototype.remove = function (iItem) {
         var vm = this;
         vm.$removeList(vm.Employees, function (i) { return i.Id() == iItem.Id(); });
-        vm.RemoveId(iItem.Id());
+        vm.Remove(iItem.Id());
     };
     return BetterListVM;
 }());
