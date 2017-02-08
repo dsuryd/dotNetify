@@ -12,6 +12,8 @@ DotNetify is a free, open source project that lets you create amazing real-time 
 * Run on [ASP.NET Core](http://asp.net/core), ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
 * Modern tooling: Visual Studio 2015,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
 
+_*** Coming soon: integration w/ ReactJS. Get updates on twitter [@dotnetify](https://twitter.com/dotnetify) ***_
+
 ##Documentation
 
 Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
@@ -28,7 +30,7 @@ ASP.NET 4.5:
 *PM> Install-Package DotNetify*
 
 ASP.NET Core:  
-*PM> Install-Package DotNetify.Core -pre* 
+*PM> Install-Package DotNetify.Core -pre*  
 *PM> Install-Package DotNetify.SignalR -pre*  
 *$ npm install dotnetify*
 
