@@ -124,7 +124,7 @@ namespace UnitTest.ViewModelsTest
          Assert.AreEqual(3, employees.Count);
          Assert.IsTrue(employees.Exists(i => i.Id == 2));
 
-         var update = new Dictionary<string, object>() { { "RemoveId", "2" } };
+         var update = new Dictionary<string, object>() { { "Remove", "2" } };
          vmController.OnUpdateVM("conn1", typeof(BetterListVM).Name, update);
 
          Assert.AreEqual(2, employees.Count);
