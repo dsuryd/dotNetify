@@ -62,3 +62,11 @@
 /WebApplication/Scripts/Demo/BetterList.js.map
 /WebApplication.Core/bin
 /WebApplication.Core/obj/Release/netcoreapp1.0
+/WebApplication.Core.ReactJS/node_modules
+/WebApplication.Core.ReactJS/obj/Debug/netcoreapp1.0
+/WebApplication.Core.ReactJS/bin/Debug/netcoreapp1.0
+/WebApplication.Core.ReactJS/WebApplication.Core.ReactJS.xproj.user
+/WebApplication.Core.React/bin/Debug/netcoreapp1.0
+/WebApplication.Core.React/node_modules
+/WebApplication.Core.React/obj/Debug/netcoreapp1.0
+/WebApplication.Core.React/WebApplication.Core.React.xproj.user

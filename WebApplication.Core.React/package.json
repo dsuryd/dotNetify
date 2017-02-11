@@ -1,0 +1,18 @@
+{
+   "version": "1.0.0",
+   "name": "reactwebapp.core",
+   "private": true,
+   "dependencies": {
+      "jquery": "^3.1.1",
+      "bootstrap": "^3.3.7",
+      "react": "^15.4.2",
+      "react-dom": "^15.4.2",
+      "signalr": "^2.2.1",
+      "material-ui": "^0.16.7",
+      "react-tap-event-plugin": "^2.0.1"
+   },
+   "devDependencies": {
+      "webpack": "^2.2.1",
+      "webpack-uglify-js-plugin": "^1.1.9"
+   }
+}

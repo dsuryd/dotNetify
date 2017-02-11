@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <title></title>
+   <meta charset="utf-8" />
+   <meta charset="utf-8" />
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+   <link href="/css/demo.css" rel="stylesheet">
+</head>
+<body>
+   <div class="well">
+      <h1><span class="circle"></span>&nbsp;dotNetify + <span><img src="/images/reactLogo.svg" width="28" />React</span></h1>
+      <p>Simple, lighweight, yet powerful way to build real-time .NET web apps.</p>
+   </div>
+   <div class="container-fluid" data-vm="IndexVM">
+      <div class="row">
+         <div class="col-md-2 nav-menu">
+            <a href="http://dotnetify.net">Website</a>
+            <div id="NavMenu"></div>
+
+            <div class="copyright-notice">
+               <br />
+               <small>
+                  © 2015-2017 Dicky Suryadi.&nbsp;
+                  All code licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license version 2.0</a>
+               </small>
+               <br><br>
+            </div>
+         </div>
+         <div class="col-md-10">
+            <div id="Content"></div>
+         </div>
+      </div>
+   </div>
+
+   <script src="/lib/bundle.min.js"></script>
+   <script src="/lib/dotnetify-hub.js"></script>
+   <script src="/lib/dotnetify-react.js"></script>
+   <script src="/lib/dotnetify-react.router.js"></script>
+   <script src="/js/index.jsx"></script>
+</body>
+</html>
