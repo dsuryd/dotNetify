@@ -10,9 +10,10 @@
    "Microsoft.Extensions.Logging.Console": "1.0.0",
    "Microsoft.AspNetCore.StaticFiles": "1.1.0",
    "React.AspNet": "3.0.0",
-   "DotNetify.SignalR": "2.0.0-pre",
    "Microsoft.Extensions.Caching.Memory": "1.1.0",
-   "Microsoft.AspNetCore.Mvc": "1.1.1"
+   "Microsoft.AspNetCore.Mvc": "1.1.1",
+   "DotNetifyLib.SignalR": "2.0.0-*",
+   "Microsoft.AspNetCore.WebSockets": "1.0.0"
   },
 
   "tools": {

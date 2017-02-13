@@ -109,11 +109,16 @@ namespace DotNetify
       /// </summary>
       public IPrincipal Principal;
 
+      // Default constructor.
+      public VMController()
+      {
+      }
+
       /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="vmResponse">Function invoked by the view model to provide response back to the client.</param>
-      public VMController(VMResponseDelegate vmResponse)
+      public VMController(VMResponseDelegate vmResponse) : this()
       {
          _vmResponse = vmResponse;
          if (_vmResponse == null)
@@ -130,6 +135,23 @@ namespace DotNetify
             kvp.Value.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
             kvp.Value.Instance.Dispose();
          }
+      }
+
+      /// <summary>
+      /// Returns initial serialized state of a view model.
+      /// </summary>
+      /// <param name="iVMTypeName">View model type name.</param>
+      /// <returns>Serialized view model state.</returns>
+      public string GetInitialState(string iVMTypeName, object[] iArgs = null)
+      {
+         var vmType = _vmTypes.FirstOrDefault(i => i.Name == iVMTypeName);
+         if (vmType != null)
+         {
+            var vmInstance = CreateInstance(vmType, iArgs);
+            if (vmInstance != null)
+               return Serialize(vmInstance);
+         }
+         return string.Empty;
       }
 
       /// <summary>

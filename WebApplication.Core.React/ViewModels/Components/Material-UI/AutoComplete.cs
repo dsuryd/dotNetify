@@ -1,9 +1,9 @@
 ﻿namespace ViewModels.Components.MaterialUI
 {
-   public class RadioButton
+   public class AutoComplete
    {
-      public string label { get; set; }
+      public string floatingLabelText { get; set; }
 
-      public string value { get; set; }
+      public string hintText { get; set; }
    }
 }

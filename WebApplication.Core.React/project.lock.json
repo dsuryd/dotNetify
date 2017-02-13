@@ -3,39 +3,6 @@
   "version": 2,
   "targets": {
     ".NETCoreApp,Version=v1.0": {
-      "DotNetify.Core/2.0.0-pre": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "1.1.0",
-          "NETStandard.Library": "1.6.1",
-          "Newtonsoft.Json": "9.0.1",
-          "System.ComponentModel": "4.3.0",
-          "System.ComponentModel.TypeConverter": "4.3.0",
-          "System.Diagnostics.TraceSource": "4.0.0",
-          "System.Security.Claims": "4.3.0"
-        },
-        "compile": {
-          "lib/netstandard1.6/DotNetifyLib.Core.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.6/DotNetifyLib.Core.dll": {}
-        }
-      },
-      "DotNetify.SignalR/2.0.0-pre": {
-        "type": "package",
-        "dependencies": {
-          "DotNetify.Core": "2.0.0-pre",
-          "Gray.Microsoft.AspNetCore.SignalR.Server": "0.2.0-alpha1",
-          "Microsoft.AspNetCore.WebSockets": "1.0.0",
-          "Microsoft.Extensions.DependencyInjection": "1.0.0"
-        },
-        "compile": {
-          "lib/netstandard1.6/DotNetifyLib.SignalR.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.6/DotNetifyLib.SignalR.dll": {}
-        }
-      },
       "Gray.Microsoft.AspNetCore.SignalR.Messaging/0.2.0": {
         "type": "package",
         "dependencies": {
@@ -1231,12 +1198,12 @@
           "lib/netstandard1.0/Microsoft.Extensions.Localization.Abstractions.dll": {}
         }
       },
-      "Microsoft.Extensions.Logging/1.1.0-preview1-final": {
+      "Microsoft.Extensions.Logging/1.1.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0-preview1-final",
-          "Microsoft.Extensions.Logging.Abstractions": "1.1.0-preview1-final",
-          "NETStandard.Library": "1.6.1-preview1-24530-04"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
+          "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
+          "NETStandard.Library": "1.6.1"
         },
         "compile": {
           "lib/netstandard1.1/Microsoft.Extensions.Logging.dll": {}
@@ -3780,30 +3747,46 @@
         "runtime": {
           "lib/netstandard1.6/VroomJs.dll": {}
         }
+      },
+      "DotNetifyLib.Core/2.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.6",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Memory": "1.0.0",
+          "NETStandard.Library": "1.6.1",
+          "Newtonsoft.Json": "9.0.1",
+          "System.ComponentModel": "4.3.0",
+          "System.ComponentModel.TypeConverter": "4.3.0",
+          "System.Diagnostics.TraceSource": "4.0.0",
+          "System.Security.Claims": "4.3.0"
+        },
+        "compile": {
+          "netstandard1.6/DotNetifyLib.Core.dll": {}
+        },
+        "runtime": {
+          "netstandard1.6/DotNetifyLib.Core.dll": {}
+        }
+      },
+      "DotNetifyLib.SignalR/2.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.6",
+        "dependencies": {
+          "DotNetifyLib.Core": "2.0.0",
+          "Gray.Microsoft.AspNetCore.SignalR.Server": "0.2.0-alpha1",
+          "Microsoft.Extensions.DependencyInjection": "1.0.0",
+          "Microsoft.Extensions.Logging": "1.1.0",
+          "NETStandard.Library": "1.6.1"
+        },
+        "compile": {
+          "netstandard1.6/DotNetifyLib.SignalR.dll": {}
+        },
+        "runtime": {
+          "netstandard1.6/DotNetifyLib.SignalR.dll": {}
+        }
       }
     }
   },
   "libraries": {
-    "DotNetify.Core/2.0.0-pre": {
-      "sha512": "6ZWeRPe+EkFUih6b/RA9eSojYwDN139EUYLRP4gc9GO1i9u9EY3S7oKoqPPWBWZERKFcfo+DeCYmb1EX0zyIFA==",
-      "type": "package",
-      "path": "DotNetify.Core/2.0.0-pre",
-      "files": [
-        "DotNetify.Core.2.0.0-pre.nupkg.sha512",
-        "DotNetify.Core.nuspec",
-        "lib/netstandard1.6/DotNetifyLib.Core.dll"
-      ]
-    },
-    "DotNetify.SignalR/2.0.0-pre": {
-      "sha512": "vvIYXQJxqbJ6cGLxH9gpGcklih/w9vOLAM53Nr8a8UQztjC4Ip0ANnM/g4ZD00q+2klsUHFL48+TIhKQPHeGmA==",
-      "type": "package",
-      "path": "DotNetify.SignalR/2.0.0-pre",
-      "files": [
-        "DotNetify.SignalR.2.0.0-pre.nupkg.sha512",
-        "DotNetify.SignalR.nuspec",
-        "lib/netstandard1.6/DotNetifyLib.SignalR.dll"
-      ]
-    },
     "Gray.Microsoft.AspNetCore.SignalR.Messaging/0.2.0": {
       "sha512": "f6ADNhKb2bJEIOL8kCR9ypGfKjiUa21KtIAa2mM2zjDNbddBgLRYE5k05aqTB7KqivFwp1MqhrJwiMrGsqNF8w==",
       "type": "package",
@@ -4756,12 +4739,12 @@
         "lib/netstandard1.0/Microsoft.Extensions.Localization.Abstractions.xml"
       ]
     },
-    "Microsoft.Extensions.Logging/1.1.0-preview1-final": {
-      "sha512": "j88qIQQZBaE6b0b5siT4XypLc6ahEsFTe+GqlaqwOLV8vN3p/IU0XYOXqMwySoEDCJQClWvIyhJ6GAYaJMCfBA==",
+    "Microsoft.Extensions.Logging/1.1.0": {
+      "sha512": "IbNogJJE3NRtc5/DAtKEkhXaUQK9N7I6A5G2+ZfyBzWMvAgLKSimESpNMp+gnzUYsW3YbHkeT8jLk9m/3vGY5A==",
       "type": "package",
-      "path": "Microsoft.Extensions.Logging/1.1.0-preview1-final",
+      "path": "Microsoft.Extensions.Logging/1.1.0",
       "files": [
-        "Microsoft.Extensions.Logging.1.1.0-preview1-final.nupkg.sha512",
+        "Microsoft.Extensions.Logging.1.1.0.nupkg.sha512",
         "Microsoft.Extensions.Logging.nuspec",
         "lib/netstandard1.1/Microsoft.Extensions.Logging.dll",
         "lib/netstandard1.1/Microsoft.Extensions.Logging.xml"
@@ -9989,16 +9972,27 @@
         "lib/net45/VroomJs.xml",
         "lib/netstandard1.6/VroomJs.dll"
       ]
+    },
+    "DotNetifyLib.Core/2.0.0": {
+      "type": "project",
+      "path": "../DotNetifyLib.Core/project.json",
+      "msbuildProject": "../DotNetifyLib.Core/DotNetifyLib.Core.xproj"
+    },
+    "DotNetifyLib.SignalR/2.0.0": {
+      "type": "project",
+      "path": "../DotNetifyLib.SignalR/project.json",
+      "msbuildProject": "../DotNetifyLib.SignalR/DotNetifyLib.SignalR.xproj"
     }
   },
   "projectFileDependencyGroups": {
     "": [
-      "DotNetify.SignalR >= 2.0.0-pre",
+      "DotNetifyLib.SignalR >= 2.0.0-*",
       "Microsoft.AspNetCore.Diagnostics >= 1.0.0",
       "Microsoft.AspNetCore.Mvc >= 1.1.1",
       "Microsoft.AspNetCore.Server.IISIntegration >= 1.0.0",
       "Microsoft.AspNetCore.Server.Kestrel >= 1.0.1",
       "Microsoft.AspNetCore.StaticFiles >= 1.1.0",
+      "Microsoft.AspNetCore.WebSockets >= 1.0.0",
       "Microsoft.Extensions.Caching.Memory >= 1.1.0",
       "Microsoft.Extensions.Logging.Console >= 1.0.0",
       "Microsoft.NETCore.App >= 1.0.1",

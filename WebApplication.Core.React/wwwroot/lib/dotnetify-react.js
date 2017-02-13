@@ -216,8 +216,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
    // Dispatches a state value to the server view model.
    // iValue - State value to dispatch.
    dotnetifyVM.prototype.$dispatchListState = function (iValue) {
-      for (var listName in iValue)
-      {
+      for (var listName in iValue) {
          var key = this.$itemKey[listName];
          if (!key) {
             console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; use $setItemKey to set its prop name.");
@@ -241,7 +240,10 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
    // Loads a view.
    dotnetifyVM.prototype.$loadView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
 
-      $.getScript(iJsModuleUrl, function () {
+      var getScripts = iJsModuleUrl.split(",").map(function (i) { return $.getScript(i); });
+      getScripts.push($.Deferred(function (deferred) { $(deferred.resolve); }));
+
+      $.when.apply($, getScripts).done(function () {
          ReactDOM.render(React.createElement(window[iViewUrl], null), document.querySelector(iTargetSelector));
          if (typeof callbackFn === "function")
             callbackFn.call(this);
@@ -354,7 +356,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             console.error("[" + this.$vmId + "] couldn't add item to '" + iListName + "' due to missing property '" + key + "'");
             return;
          }
-         var match = this.State()[iListName].filter(i => i[key] == iNewItem[key]);
+         var match = this.State()[iListName].filter(function (i) { return i[key] == iNewItem[key] });
          if (match.length > 0) {
             console.error("[" + this.$vmId + "] couldn't add item to '" + listName + "' because the key already exists");
             return;
@@ -368,7 +370,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
    // Removes an item from a state array.
    dotnetifyVM.prototype.$removeList = function (iListName, iFilter) {
-      var items = this.State()[iListName].filter(i => !iFilter(i));
+      var items = this.State()[iListName].filter(function (i) { return !iFilter(i) });
       this.State({ [iListName]: items });
    }
 
@@ -382,7 +384,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             console.error("[" + this.$vmId + "] couldn't add item to '" + iListName + "' due to missing property '" + key + "'");
             return;
          }
-         var items = this.State()[iListName].map(i => i[key] == iNewItem[key] ? $.extend( i, iNewItem ) : i);
+         var items = this.State()[iListName].map(function (i) { return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i });
          this.State({ [iListName]: items });
       }
    }

@@ -5,10 +5,8 @@
       this.vm = dotnetify.react.connect("HelloWorldVM", () => this.state, state => this.setState(state));
       this.dispatchState = this.vm.$dispatchState.bind(this.vm);
 
-      return {
-         FirstName: "",
-         LastName: ""
-      }
+      // This component's JSX was loaded along with the VM's initial state for faster rendering.
+      return window.vmStates.HelloWorldVM;
    },
    componentWillUnmount() {
       this.vm.$destroy();

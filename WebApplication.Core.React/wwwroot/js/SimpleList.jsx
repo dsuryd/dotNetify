@@ -13,11 +13,8 @@
       this.vm.$setItemKey({ "Employees": "Id" });
       this.dispatchListState = this.vm.$dispatchListState.bind(this.vm);
 
-      return {
-         FullName: "",
-         Headers: [],
-         Employees: []
-      }
+      // This component's JSX was loaded along with the VM's initial state for faster rendering.
+      return window.vmStates.SimpleListVM;
    },
    componentWillUnmount() {
       this.vm.$destroy();

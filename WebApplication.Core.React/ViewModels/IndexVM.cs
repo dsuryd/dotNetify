@@ -28,10 +28,10 @@ namespace ViewModels
       {
          this.RegisterRoutes("demo", new List<RouteTemplate>
          {
-            new RouteTemplate { Id = "Home", UrlPattern = "", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/js/HelloWorld.jsx" },
-            new RouteTemplate { Id = "HelloWorld", UrlPattern = "helloworld", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/js/HelloWorld.jsx" },
-            new RouteTemplate { Id = "ControlTypes", UrlPattern = "controltypes", Target = "Content", ViewUrl = "ControlTypes", JSModuleUrl = "/js/ControlTypes.jsx" },
-            new RouteTemplate { Id = "SimpleList", UrlPattern = "simplelist", Target = "Content", ViewUrl = "SimpleList", JSModuleUrl = "/js/SimpleList.jsx" },
+            new RouteTemplate { Id = "Home", UrlPattern = "", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.jsx" },
+            new RouteTemplate { Id = "HelloWorld", UrlPattern = "helloworld", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.jsx" },
+            new RouteTemplate { Id = "ControlTypes", UrlPattern = "controltypes", Target = "Content", ViewUrl = "ControlTypes", JSModuleUrl = "/state/get/ControlTypesVM, /js/ControlTypes.jsx" },
+            new RouteTemplate { Id = "SimpleList", UrlPattern = "simplelist", Target = "Content", ViewUrl = "SimpleList", JSModuleUrl = "/state/get/SimpleListVM, /js/SimpleList.jsx" },
          });
       }
    }

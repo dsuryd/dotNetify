@@ -6,20 +6,8 @@ var ControlTypes = React.createClass({
       this.vm = dotnetify.react.connect("ControlTypesVM", () => this.state, state => this.setState(state));
       this.dispatchState = this.vm.$dispatchState.bind(this.vm);
 
-      return {
-         AutoCompleteValue: "",
-         AutoCompleteResults: [],
-         Checked: false,
-         CheckboxResult: " ",
-         Chips: [],
-         RadioButtons: [],
-         RadioResult: " ",
-         SelectFieldMenu: [],
-         Toggled: false,
-         TextFieldValue: "",
-         TextFieldErrorText: "",
-         TextFieldProps: {}
-      }
+      // This component's JSX was loaded along with the VM's initial state for faster rendering.
+      return window.vmStates.ControlTypesVM;
    },
    componentWillUnmount() {
       this.vm.$destroy();
