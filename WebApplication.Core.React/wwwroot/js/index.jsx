@@ -1,17 +1,13 @@
-﻿var Index = React.createClass( {
+﻿var Index = React.createClass({
 
-   getInitialState()
-   {
+   getInitialState() {
       // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect( "IndexVM", () => this.state, state => this.setState( state ) );
+      this.vm = dotnetify.react.connect("IndexVM", () => this.state, state => this.setState(state));
 
-      return {
-         Links: []
-      }
+      return window.vmStates.IndexVM;
    },
-   render()
-   {
-      const links = this.state.Links.map( link =>
+   render() {
+      const showLinks = links => links.map(link =>
          <li key={link.Id}>
             <a href={this.vm.$route(link.Route)} onClick={this.vm.$handleRoute}>{link.Caption}</a>
             <div>{link.Description}</div>
@@ -22,14 +18,18 @@
          <div>
             <h3>Basic Examples</h3>
             <ul id="BasicExamples">
-               {links}
+               {showLinks(this.state.BasicExampleLinks)}
+            </ul>
+            <h3>Further Examples</h3>
+            <ul id="BasicExamples">
+               {showLinks(this.state.FurtherExampleLinks)}
             </ul>
          </div>
       );
    }
-} );
+});
 
 ReactDOM.render(
   <Index />,
-  document.querySelector( "#NavMenu" )
+  document.querySelector("#NavMenu")
 );

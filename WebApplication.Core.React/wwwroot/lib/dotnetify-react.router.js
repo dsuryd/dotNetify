@@ -325,7 +325,7 @@ limitations under the License.
                   if (match.length > 0) {
                      // If more than one match, find the best match.
                      for (i = 0; i < match.length; i++)
-                        if (routeElem == null || routeElem.Url.length < $(match[i]).Url.length)
+                        if (routeElem == null || routeElem.Url.length < $(match[i]).get(0).Url.length)
                            routeElem = match[i];
                   }
 
