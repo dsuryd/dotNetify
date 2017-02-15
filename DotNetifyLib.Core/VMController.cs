@@ -326,7 +326,7 @@ namespace DotNetify
          {
             var vmType = _vmTypes.FirstOrDefault(i => i.Name == vmTypeName);
             if (vmType == null)
-               throw new Exception($"ERROR: '{vmId}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.");
+               throw new Exception($"[dotNetify] ERROR: '{vmId}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.");
 
             try
             {
@@ -335,7 +335,7 @@ namespace DotNetify
             }
             catch (MissingMethodException)
             {
-               Debug.Fail($"ERROR: '{vmTypeName}' has no constructor accepting instance ID.");
+               Trace.Fail($"[dotNetify] ERROR: '{vmTypeName}' has no constructor accepting instance ID.");
             }
 
             try
@@ -345,7 +345,7 @@ namespace DotNetify
             }
             catch (MissingMethodException)
             {
-               Debug.Fail($"ERROR: '{vmTypeName}' has no parameterless constructor.");
+               Trace.Fail($"[dotNetify] ERROR: '{vmTypeName}' has no parameterless constructor.");
             }
          }
 

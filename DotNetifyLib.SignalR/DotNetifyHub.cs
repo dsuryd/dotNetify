@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2016 Dicky Suryadi
+Copyright 2016-2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ namespace DotNetify
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Request_VM: {0} {1}", vmId, Context.ConnectionId));
+            Trace.WriteLine($"[dotNetify] Request_VM: {vmId} {Context.ConnectionId}");
             VMController.OnRequestVM(Context.ConnectionId, vmId, vmArg);
          }
          catch (UnauthorizedAccessException)
@@ -97,7 +97,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -110,7 +110,7 @@ namespace DotNetify
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Update_VM: {0} {1} {2}", vmId, Context.ConnectionId, JsonConvert.SerializeObject(vmData)));
+            Trace.WriteLine($"[dotNetify] Update_VM: {vmId} {Context.ConnectionId} {JsonConvert.SerializeObject(vmData)}");
             VMController.OnUpdateVM(Context.ConnectionId, vmId, vmData);
          }
          catch (UnauthorizedAccessException)
@@ -119,7 +119,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -135,7 +135,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -151,6 +151,7 @@ namespace DotNetify
       /// <param name="vmData">View model data in serialized JSON.</param>
       public void Response_VM(string connectionId, string vmId, string vmData)
       {
+         Trace.WriteLine($"[dotNetify] Response_VM: {vmId} {connectionId} {vmData}");
          Clients.Client(connectionId).Response_VM(vmId, vmData);
       }
 
