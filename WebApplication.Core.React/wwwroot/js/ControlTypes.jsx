@@ -41,11 +41,11 @@ var ControlTypes = React.createClass({
                   <div className="row">
                      <div className="col-md-6">
                         <TextField id="TextField" fullWidth={true}
-                        {...this.state.TextFieldProps}
-                        value={this.state.TextFieldValue}
-                        errorText={this.state.TextFieldErrorText}
-                        onChange={event => this.setState({ TextFieldValue: event.target.value })}
-                        onBlur={event => this.dispatchState({ TextFieldValue: this.state.TextFieldValue })} />
+                                   {...this.state.TextFieldProps}
+                                   value={this.state.TextFieldValue}
+                                   errorText={this.state.TextFieldErrorText}
+                                   onChange={event => this.setState({ TextFieldValue: event.target.value })}
+                                   onBlur={event => this.dispatchState({ TextFieldValue: this.state.TextFieldValue })} />
 
                      </div>
                      <div className="col-md-6">
@@ -56,11 +56,10 @@ var ControlTypes = React.createClass({
                   <div className="row">
                      <div className="col-md-6">
                         <AutoComplete id="AutoComplete" fullWidth={true}
-                        {...this.state.AutoCompleteProps}
-                        filter={AutoComplete.caseInsensitiveFilter}
-                        value={this.state.AutoCompleteValue}
-                        dataSource={this.state.AutoCompleteResults}
-                        onUpdateInput={value => this.dispatchState({ AutoCompleteValue: value })} />
+                                      {...this.state.AutoCompleteProps}
+                                      filter={AutoComplete.caseInsensitiveFilter}
+                                      dataSource={this.state.AutoCompleteResults}
+                                      onUpdateInput={value => this.dispatchState({ AutoCompleteValue: value })} />
                      </div>
                   </div>
                   <br />
@@ -68,8 +67,8 @@ var ControlTypes = React.createClass({
                   <div className="row">
                      <div className="col-md-6">
                         <Checkbox label={this.state.CheckboxLabel}
-                        checked={this.state.Checked}
-                        onCheck={(event, value) => this.dispatchState({ Checked: value })} />
+                                  checked={this.state.Checked}
+                                  onCheck={(event, value) => this.dispatchState({ Checked: value })} />
                      </div>
                      <div className="col-md-6">
                         <RaisedButton label={this.state.CheckboxResult} disabled={!this.state.Checked} />
@@ -80,9 +79,9 @@ var ControlTypes = React.createClass({
                   <div className="row">
                      <div className="col-md-6">
                         <RadioButtonGroup name="Radio"
-                        valueSelected={this.state.RadioValue}
-                        onChange={(event, value) =>this.dispatchState({ RadioValue: value })}>
-                        {radioButtons}
+                                          valueSelected={this.state.RadioValue}
+                                          onChange={(event, value) =>this.dispatchState({ RadioValue: value })}>
+                           {radioButtons}
                         </RadioButtonGroup>
                      </div>
                      <div className="col-md-6">
@@ -96,19 +95,19 @@ var ControlTypes = React.createClass({
                   <div className="row">
                      <div className="col-md-6">
                         <Toggle labelPosition="right"
-                        label={this.state.ToggleLabel}
-                        toggled={this.state.Toggled}
-                        onToggle={(event, value) => this.dispatchState({ Toggled: value })} />
+                                label={this.state.ToggleLabel}
+                                toggled={this.state.Toggled}
+                                onToggle={(event, value) => this.dispatchState({ Toggled: value })} />
                      </div>
                   </div>
                   {/* Select Field */}
                   <div className="row">
                      <div className="col-md-6">
                         <SelectField id="SelectField"
-                        floatingLabelText={this.state.SelectFieldLabel}
-                        value={this.state.SelectFieldValue}
-                        onChange={(event, idx, value) => this.dispatchState({ SelectFieldValue: value })}>
-                        {selectFieldMenu}
+                                     floatingLabelText={this.state.SelectFieldLabel}
+                                     value={this.state.SelectFieldValue}
+                                     onChange={(event, idx, value) => this.dispatchState({ SelectFieldValue: value })}>
+                           {selectFieldMenu}
                         </SelectField>
                      </div>
                      <div className="col-md-6">

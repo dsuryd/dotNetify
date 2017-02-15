@@ -8,11 +8,6 @@
       // This is for dispatching to the back-end without updating the component state.
       this.dispatch = this.vm.$dispatch.bind(this.vm);
 
-      // This is for dispatching a list item to the back-end and update the component state.
-      // Use $setItemKey to register the property name of the item key.
-      this.vm.$setItemKey({ Employees: "Id" });
-      this.dispatchListState = this.vm.$dispatchListState.bind(this.vm);
-
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
       return window.vmStates.SimpleListVM;
    },

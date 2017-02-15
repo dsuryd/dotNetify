@@ -8,11 +8,6 @@
       // This is for dispatching to the back-end without updating the component state.
       this.dispatch = this.vm.$dispatch.bind(this.vm);
 
-      // This is for dispatching a list item to the back-end and update the component state.
-      // Use $setItemKey to register the property name of the item key.
-      this.vm.$setItemKey({ Employees: "Id" });
-      this.dispatchListState = this.vm.$dispatchListState.bind(this.vm);
-
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
       return Object.assign({ openWizard: false }, window.vmStates.GridViewVM);
    },
@@ -26,7 +21,12 @@
       }
       const wizard = (isOpen) => {
          if (isOpen)
-            return <EditWizard open={true} data={this.state.EmployeeDetails}
+            return <EditWizard open={true}
+                               employeeDetails={this.state.Details}
+                               reportToName={this.state.ReportToName}
+                               reportToAutoComplete={this.state.ReportToAutoComplete}
+                               reportToErrorText={this.state.ReportToErrorText}
+                               onReportToChange={value => this.dispatchState({ReportToName: value})}
                                onFinish={handleFinish}
                                onCancel={() => this.setState({ openWizard: false })} />
       }
@@ -41,8 +41,7 @@
                   <SearchBox label="Type a name" />
                   <EmployeeTable data={this.state.Employees} defaultSelection={this.state.SelectedId}
                                  onSelect={id => this.dispatchState({ SelectedId: id })}
-                                 onEdit={() => this.setState({ openWizard: true })}
-                                 onRemove={id => this.dispatch({ Remove: id })} />
+                                 onEdit={() => this.setState({ openWizard: true })} />
                   {wizard(this.state.openWizard)}
 
                </div>
@@ -55,7 +54,7 @@
 var EditWizard = React.createClass({
    getInitialState() {
       return {
-         employee: this.props.data,
+         details: this.props.employeeDetails,
          step: 0,
          maxStep: 2,
       }
@@ -75,21 +74,33 @@ var EditWizard = React.createClass({
       const content = (step) => {
          switch (step) {
             case 0:
-               return <TextField id="FirstName" floatingLabelText="First Name" value={this.state.employee.FirstName}></TextField>
-
+               return (
+                  <div>
+                     <TextField id="FirstName" floatingLabelText="First Name" value={this.state.details.FirstName } />
+                     <TextField id="LastName" floatingLabelText="Last Name" value={this.state.details.LastName } />
+                  </div>
+               );
             case 1:
-               return <TextField id="LastName" floatingLabelText="Last Name" value={this.state.employee.LastName}></TextField>
-
+               const reportToAutoComplete = this.props.reportToAutoComplete.map(i => i.Name);
+               return (
+                  <AutoComplete id="AutoComplete"
+                                floatingLabelText="Report To"
+                                hintText="Type the manager name here"
+                                filter={AutoComplete.caseInsensitiveFilter}
+                                searchText={this.props.reportToName}
+                                dataSource={reportToAutoComplete}
+                                onUpdateInput={value => this.props.onReportToChange(value)} />
+               );
             case 2:
-               return <div>{this.state.employee.FirstName} {this.state.employee.LastName}</div>
+               return <div>{this.state.details.FirstName} {this.state.details.LastName}</div>
          }
       }
 
       return (
          <Dialog open={this.props.open} actions={actions}>
             <Stepper activeStep={this.state.step}>
-               <Step><StepLabel>First Name</StepLabel></Step>
-               <Step><StepLabel>Last Name</StepLabel></Step>
+               <Step><StepLabel>Name</StepLabel></Step>
+               <Step><StepLabel>Manager</StepLabel></Step>
                <Step><StepLabel>Confirm</StepLabel></Step>
             </Stepper>
             {content(this.state.step)}
@@ -105,7 +116,7 @@ var EmployeeTable = React.createClass({
       }
    },
    render() {
-      const lastColWidth = { width: "16.5em" }
+      const lastColWidth = { width: "10em" }
       const fontStyle = { fontSize: "8pt" };
       const iconEdit = <IconEdit style={{ width: 20, height: 20 }} color='#8B8C8D' />
       const iconDelete = <IconDelete style={{ width: 20, height: 20 }} color='#8B8C8D' />
@@ -128,7 +139,6 @@ var EmployeeTable = React.createClass({
             <TableRowColumn><div>{employee.LastName}</div></TableRowColumn>
             <TableRowColumn style={lastColWidth}>
                <FlatButton label="Edit" labelStyle={fontStyle} icon={iconEdit} onClick={() => this.props.onEdit(employee.Id)} />
-               <FlatButton label="Remove" labelStyle={fontStyle} icon={iconDelete} onClick={() => this.props.onRemove(employee.Id)} />
             </TableRowColumn>
          </TableRow>
       );
