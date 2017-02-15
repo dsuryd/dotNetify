@@ -20,6 +20,12 @@
       this.vm.$destroy();
    },
    render() {
+      const handleUpdate = (value) => {
+         var update = this.state.Employees.map(employee => employee.Id == value.Id ? Object.assign(employee, value) : employee);
+         this.setState({ Employee: update });
+         this.dispatch({ Update: value });
+      }
+
       return (
          <div className="container-fluid">
             <div className="header clearfix">
@@ -29,8 +35,10 @@
                <div>
                   <AddNameBox onAdd={value => this.dispatch({ Add: value })} />
                   <EmployeeTable data={this.state.Employees}
-                                 onUpdate={value => this.dispatchListState({ Employees: value })}
+                                 onUpdate={handleUpdate}
                                  onRemove={id => this.dispatch({ Remove: id })} />
+                  <Snackbar open={this.state.ShowNotification} message="Changes saved" autoHideDuration={1000}
+                            onRequestClose={() => this.setState({ ShowNotification: false })} />
                </div>
             </MuiThemeProvider>
          </div>
@@ -48,7 +56,7 @@ var EmployeeTable = React.createClass({
             <TableRowColumn><InlineEdit text={employee.FirstName} onChange={value => this.props.onUpdate({ Id: employee.Id, FirstName:value })} /></TableRowColumn>
             <TableRowColumn><InlineEdit text={employee.LastName} onChange={value => this.props.onUpdate({ Id: employee.Id, LastName: value })} /></TableRowColumn>
             <TableRowColumn style={lastColWidth}>
-               <FlatButton label="Remove" labelStyle={{fontSize: "8pt"}} icon={iconDelete} onClick={() => this.props.onRemove(employee.Id)}  />
+               <FlatButton label="Remove" labelStyle={{fontSize: "8pt"}} icon={iconDelete} onClick={() => this.props.onRemove(employee.Id)} />
             </TableRowColumn>
          </TableRow>
       );

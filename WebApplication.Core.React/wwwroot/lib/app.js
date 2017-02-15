@@ -19,6 +19,7 @@ RadioButtonGroup = require( "material-ui/RadioButton" ).RadioButtonGroup;
 RadioButton = require("material-ui/RadioButton").RadioButton;
 RaisedButton = require( "material-ui/RaisedButton" ).default;
 SelectField = require("material-ui/SelectField").default;
+Snackbar = require("material-ui/Snackbar").default;
 Step = require( "material-ui/Stepper" ).Step;
 Stepper = require("material-ui/Stepper").Stepper;
 StepLabel = require( "material-ui/Stepper" ).StepLabel;
