@@ -219,7 +219,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       for (var listName in iValue) {
          var key = this.$itemKey[listName];
          if (!key) {
-            console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; use $setItemKey to set its prop name.");
+            console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
             return;
          }
          var item = iValue[listName];
@@ -291,10 +291,20 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                if (key != null)
                   vm.$removeList(listName, function (i) { return i[key] == iVMUpdate[prop] });
                else
-                  console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; use $setItemKey to set its prop name.");
+                  console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
             }
             else
                console.error("[" + this.$vmId + "] '" + listName + "' is not found or not an array.");
+            delete iVMUpdate[prop];
+            continue;
+         }
+
+         // Look for property that end with '_itemKey'. Interpret the value as the property name that will
+         // uniquely identify items in the list.
+         var match = /(.*)_itemKey/.exec(prop);
+         if (match != null) {
+            var listName = match[1];
+            vm.$setItemKey({ [listName]: iVMUpdate[prop] });
             delete iVMUpdate[prop];
             continue;
          }
@@ -381,12 +391,14 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       var key = this.$itemKey[iListName];
       if (key != null) {
          if (!iNewItem.hasOwnProperty(key)) {
-            console.error("[" + this.$vmId + "] couldn't add item to '" + iListName + "' due to missing property '" + key + "'");
+            console.error("[" + this.$vmId + "] couldn't update item to '" + iListName + "' due to missing property '" + key + "'");
             return;
          }
          var items = this.State()[iListName].map(function (i) { return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i });
          this.State({ [iListName]: items });
       }
+      else
+         console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
    }
 
    return dotnetify.react;

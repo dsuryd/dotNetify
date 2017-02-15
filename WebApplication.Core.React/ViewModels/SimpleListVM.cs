@@ -33,6 +33,12 @@ namespace ViewModels
       });
 
       /// <summary>
+      /// If you use CRUD methods on a list, you must set the item key prop name of that list
+      /// by defining a string property that starts with that list's prop name, followed by "_itemKey".
+      /// </summary>
+      public string Employees_itemKey => nameof(EmployeeInfo.Id);
+
+      /// <summary>
       /// When the Add button is clicked, this property will receive the new employee full name input.
       /// </summary>
       public ICommand Add => new Command<string>(fullName =>
@@ -46,7 +52,7 @@ namespace ViewModels
 
          // Call special base method to add the new employee info back to the list on the client-side.
          // This will be handled by dotNetify client-side library; no custom JSX needed.
-         this.AddList(() => Employees, new EmployeeInfo
+         this.AddList(nameof(Employees), new EmployeeInfo
          {
             Id = _employeeService.Add(newRecord),
             FirstName = newRecord.FirstName,
@@ -80,7 +86,7 @@ namespace ViewModels
 
          // Call special base method to remove an item from the list on the client-side.
          // This will be handled by dotNetify client-side library; no custom JSX needed.
-         this.RemoveList(() => Employees, id);
+         this.RemoveList(nameof(Employees), id);
       });
 
       /// <summary>

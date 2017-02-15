@@ -57,18 +57,21 @@ var EmployeeTable = React.createClass({
       );
 
       return (
-      <Table selectable={false}>
-         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-            <TableRow>
-               <TableHeaderColumn>First Name</TableHeaderColumn>
-               <TableHeaderColumn>Last Name</TableHeaderColumn>
-               <TableHeaderColumn style={lastColWidth}></TableHeaderColumn>
-            </TableRow>
-         </TableHeader>
-         <TableBody displayRowCheckbox={false} showRowHover={true}>
-            {employees}
-         </TableBody>
-      </Table>
+         <div>
+            <Table selectable={false}>
+               <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                  <TableRow>
+                     <TableHeaderColumn>First Name</TableHeaderColumn>
+                     <TableHeaderColumn>Last Name</TableHeaderColumn>
+                     <TableHeaderColumn style={lastColWidth}></TableHeaderColumn>
+                  </TableRow>
+               </TableHeader>
+               <TableBody displayRowCheckbox={false} showRowHover={true}>
+                  {employees}
+               </TableBody>
+            </Table>
+            <Paper style={{width:"11em", marginTop: "1em", backgroundColor: "#e0e0e0"}}><i>* Click a name to edit</i></Paper>
+         </div>
       );
    }
 });
