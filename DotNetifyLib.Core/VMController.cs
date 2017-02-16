@@ -64,7 +64,7 @@ namespace DotNetify
       /// <summary>
       /// This class encapsulates a view model information.
       /// </summary>
-      protected class VMInfo
+      protected internal class VMInfo
       {
          /// <summary>
          /// Instance of a view model.
@@ -80,22 +80,22 @@ namespace DotNetify
       /// <summary>
       /// List of known view model classes.
       /// </summary>
-      protected static List<Type> _vmTypes = new List<Type>();
+      protected internal static List<Type> _vmTypes = new List<Type>();
 
       /// <summary>
       /// List of registered assemblies.
       /// </summary>
-      protected static List<string> _registeredAssemblies = new List<string>();
+      protected internal static List<string> _registeredAssemblies = new List<string>();
 
       /// <summary>
       /// Active instances of view models.
       /// </summary>
-      protected ConcurrentDictionary<string, VMInfo> _activeVMs = new ConcurrentDictionary<string, VMInfo>();
+      protected internal ConcurrentDictionary<string, VMInfo> _activeVMs = new ConcurrentDictionary<string, VMInfo>();
 
       /// <summary>
       /// Function invoked by the view model to provide response back to the client.
       /// </summary>
-      protected readonly VMResponseDelegate _vmResponse;
+      protected internal readonly VMResponseDelegate _vmResponse;
 
       #endregion
 

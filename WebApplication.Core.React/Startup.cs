@@ -20,13 +20,14 @@ namespace ReactWebApp
       public void ConfigureServices( IServiceCollection services )
       {
          services.AddMvc();
-         services.AddMemoryCache();
-         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-         services.AddReact();
-         services.AddSignalR();
-         services.AddDotNetify();
+         services.AddLocalization();
 
-         VMController.RegisterAssembly( GetType().GetTypeInfo().Assembly );
+         services.AddMemoryCache(); // Required by dotNetify and ReactJS.NET.
+         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();  // Required by ReactJS.NET.
+         services.AddSignalR();  // Required by dotNetify.
+
+         services.AddReact();
+         services.AddDotNetify(); 
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,7 +37,7 @@ namespace ReactWebApp
          app.UseStaticFiles();
 
          app.UseWebSockets();
-         app.UseSignalR();
+         app.UseSignalR(); // Required by dotNetify.
          app.UseDotNetify();
 
          app.UseMvc(routes =>

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using DotNetify;
+using Microsoft.Extensions.Localization;
 using ViewModels.Components.MaterialUI;
+using DotNetify;
 
 namespace ViewModels
 {
@@ -50,10 +51,20 @@ namespace ViewModels
       /// <summary>
       /// List of employees.
       /// </summary>
-      public IEnumerable<EmployeeMaster> Employees => _employeeService
-         .GetAll()
-         .Where(i => string.IsNullOrEmpty(EmployeeSearch) || i.FullName.ToLower().Contains(EmployeeSearch))
-         .Select(record => new EmployeeMaster(record));
+      public IEnumerable<EmployeeMaster> Employees
+      {
+         get
+         {
+            var result = _employeeService.GetAll()
+               .Where(i => string.IsNullOrEmpty(EmployeeSearch) || i.FullName.ToLower().Contains(EmployeeSearch))
+               .Select(record => new EmployeeMaster(record));
+
+            if (!result.Any(i => i.Id == SelectedId))
+               SelectedId = result.Count() > 0 ? result.First().Id : -1;
+
+            return result;
+         }
+      }
 
       /// <summary>
       /// If you use CRUD methods on a list, you must set the item key prop name of that list
@@ -68,11 +79,6 @@ namespace ViewModels
          {
             Set(value.ToLower());
             Changed(nameof(Employees));
-
-            // Update current selection if it's not valid anymore.
-            var employees = Employees;
-            if (!employees.Any(i => i.Id == SelectedId))
-               SelectedId = employees.Count() > 0 ? employees.First().Id : -1;
          }
       }
 
@@ -157,12 +163,12 @@ namespace ViewModels
       /// Constructor.
       /// </summary>
       /// <param name="model">Employee model.</param>
-      public GridViewVM()
+      public GridViewVM( IStringLocalizer<GridViewVM> localizer)
       {
          // Normally this will be constructor-injected.
          _employeeService = new EmployeeService();
 
-         SelectedId = _employeeService.GetAll().First().Id;
+         var test = localizer.GetAllStrings();
       }
    }
 }

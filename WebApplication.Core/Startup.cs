@@ -33,12 +33,6 @@ namespace WebApplication.Core
          services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
          services.AddMemoryCache();
          services.AddDotNetify();
-
-         // Find the assembly "ViewModels.Examples" and register it to DotNetify.VMController.
-         // This will cause all the classes inside the assembly that inherits from DotNetify.BaseVM to be known as view models.
-         var vmAssembly = Assembly.Load(new AssemblyName("ViewModels.Examples"));
-         if (vmAssembly != null)
-            VMController.RegisterAssembly(vmAssembly);
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,19 +54,27 @@ namespace WebApplication.Core
          app.UseWebSockets();
          app.UseSignalR();
 
-         // Use ASP.NET Core DI to provide view model instances, but you can always use your favorite IoC container.
-         var provider = app.ApplicationServices;
-         VMController.CreateInstance = (type, args) =>
-         {
-            if (type == typeof(SimpleListVM) || type == typeof(BetterListVM))
-               args = new object[] { new EmployeeModel(7) };
-            else if (type == typeof(TreeViewVM) || type == typeof(GridViewVM) || type == typeof(CompositeViewVM))
-               args = new object[] { new EmployeeModel() };
-            else if (type == typeof(AFITop100VM))
-               args = new object[] { new AFITop100Model() };
+         app.UseDotNetify(config => {
 
-            return ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
-         };
+            // Find the assembly "ViewModels.Examples" and register it to DotNetify.VMController.
+            // This will cause all the classes inside the assembly that inherits from DotNetify.BaseVM to be known as view models.
+            config.RegisterAssembly("ViewModels.Examples");
+
+            // Set the factory method to provide view model instances, where you can use your favorite IoC container.
+            // If this isn't set, it will default to using ASP.NET Core DI container.
+            var provider = app.ApplicationServices;
+            config.SetFactoryMethod( (type, args) =>
+            {
+               if (type == typeof(SimpleListVM) || type == typeof(BetterListVM))
+                  args = new object[] { new EmployeeModel(7) };
+               else if (type == typeof(TreeViewVM) || type == typeof(GridViewVM) || type == typeof(CompositeViewVM))
+                  args = new object[] { new EmployeeModel() };
+               else if (type == typeof(AFITop100VM))
+                  args = new object[] { new AFITop100Model() };
+
+               return ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
+            });
+         });
       }
    }
 }
