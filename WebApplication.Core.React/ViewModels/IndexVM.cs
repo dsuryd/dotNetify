@@ -26,7 +26,7 @@ namespace ViewModels
 
       public List<Link> FurtherExampleLinks => new List<Link>
       {
-         new Link { Route = this.GetRoute("GridView"), Caption = "Grid View", Description = "More complex list with master-detail view, search, sorting and localization"  },
+         new Link { Route = this.GetRoute("GridView"), Caption = "Grid View", Description = "Master-detail view with search and editing wizard"  },
       };
 
       public IndexVM()

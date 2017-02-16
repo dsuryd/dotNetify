@@ -7,7 +7,11 @@ ReactDOM = require( "react-dom" );
 
 // Material-UI components.
 MuiThemeProvider = require( "material-ui/styles/MuiThemeProvider" ).default;
-AutoComplete = require( "material-ui/AutoComplete" ).default;
+AutoComplete = require("material-ui/AutoComplete").default;
+Card = require("material-ui/Card").Card;
+CardActions = require("material-ui/Card").CardActions;
+CardHeader = require("material-ui/Card").CardHeader;
+CardText = require("material-ui/Card").CardText;
 Checkbox = require( "material-ui/Checkbox" ).default;
 Chip = require("material-ui/Chip").default;
 Dialog = require("material-ui/Dialog").default;
@@ -36,6 +40,7 @@ TableRowColumn = require("material-ui/Table").TableRowColumn;
 IconDelete = require("material-ui/svg-icons/action/delete").default;
 IconEdit = require("material-ui/svg-icons/content/create").default;
 IconSearch = require("material-ui/svg-icons/action/search").default;
+IconPhone = require("material-ui/svg-icons/communication/phone").default;
 
 // Used by Material-UI.
 injectTapEventPlugin = require( "react-tap-event-plugin" );

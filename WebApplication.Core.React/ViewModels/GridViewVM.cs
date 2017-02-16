@@ -13,6 +13,8 @@ namespace ViewModels
    public class GridViewVM : BaseVM
    {
       private readonly EmployeeService _employeeService;
+      private readonly IEnumerable<object> _emptyList = new List<object>();
+      private readonly EmployeeDetails _emptyDetails = new EmployeeDetails();
 
       /// <summary>
       /// The class that holds employee info for the master list to send to the browser. 
@@ -22,6 +24,13 @@ namespace ViewModels
          public int Id { get; set; }
          public string FirstName { get; set; }
          public string LastName { get; set; }
+
+         public EmployeeMaster(EmployeeModel record)
+         {
+            Id = record.Id;
+            FirstName = record.FirstName;
+            LastName = record.LastName;
+         }
       }
 
       /// <summary>
@@ -41,12 +50,31 @@ namespace ViewModels
       /// <summary>
       /// List of employees.
       /// </summary>
-      public IEnumerable<EmployeeMaster> Employees => _employeeService.GetAll().Select(i => new EmployeeMaster
+      public IEnumerable<EmployeeMaster> Employees => _employeeService
+         .GetAll()
+         .Where(i => string.IsNullOrEmpty(EmployeeSearch) || i.FullName.ToLower().Contains(EmployeeSearch))
+         .Select(record => new EmployeeMaster(record));
+
+      /// <summary>
+      /// If you use CRUD methods on a list, you must set the item key prop name of that list
+      /// by defining a string property that starts with that list's prop name, followed by "_itemKey".
+      /// </summary>
+      public string Employees_itemKey => nameof(EmployeeMaster.Id);
+
+      public string EmployeeSearch
       {
-         Id = i.Id,
-         FirstName = i.FirstName,
-         LastName = i.LastName
-      });
+         get { return Get<string>(); }
+         set
+         {
+            Set(value.ToLower());
+            Changed(nameof(Employees));
+
+            // Update current selection if it's not valid anymore.
+            var employees = Employees;
+            if (!employees.Any(i => i.Id == SelectedId))
+               SelectedId = employees.Count() > 0 ? employees.First().Id : -1;
+         }
+      }
 
       /// <summary>
       /// This property receives the ID of the selected list item.
@@ -69,46 +97,18 @@ namespace ViewModels
          get
          {
             var record = _employeeService.GetById(SelectedId);
-            ReportToName = _employeeService.GetById(record.ReportTo)?.FullName;
-            return new EmployeeDetails
+            return record != null ? new EmployeeDetails
             {
+               Id = record.Id,
                FirstName = record.FirstName,
                LastName = record.LastName,
                FullName = record.FullName,
                Phone = record.Phone,
                ReportTo = record.ReportTo,
-               ReportToName = ReportToName
-            };
+               ReportToName = _employeeService.GetById(record.ReportTo)?.FullName
+            } : _emptyDetails;
          }
       }
-
-      public string ReportToName
-      {
-         get { return Get<string>() ?? ""; }
-         set
-         {
-            Set(value);
-            Changed(nameof(ReportToAutoComplete));
-            ReportToErrorText = ReportToAutoComplete.Count() == 0 ? "No one by that name works here" : "";
-         }
-      }
-
-      public IEnumerable<object> ReportToAutoComplete => _employeeService.GetAll()
-         .Where(i => i.FullName.StartsWith(ReportToName, StringComparison.OrdinalIgnoreCase))
-         .Select(i => new { Id = i.Id, Name = i.FullName });
-
-      public AutoComplete ReportToAutoCompleteProps => new AutoComplete
-      {
-         floatingLabelText = "Report To",
-         hintText = "Type the full name of the direct report here"
-      };
-
-      public string ReportToErrorText
-      {
-         get { return Get<string>(); }
-         set { Set(value); }
-      }
-
 
       /// <summary>
       /// When a list item is edited, this property will receive the edited item.
@@ -123,8 +123,35 @@ namespace ViewModels
             record.LastName = changes.LastName ?? record.LastName;
             record.ReportTo = changes.ReportTo;
             _employeeService.Update(record);
+
+            this.UpdateList(nameof(Employees), new EmployeeMaster(record));
+            Changed(nameof(Details));
          }
       });
+
+      public string ReportToSearch
+      {
+         get { return Get<string>(); }
+         set
+         {
+            Set(value);
+            Changed(nameof(ReportToSearchResult));
+            Changed(nameof(ReportToErrorText));
+         }
+      }
+
+      public IEnumerable<object> ReportToSearchResult => !string.IsNullOrEmpty(ReportToSearch) ?
+         _employeeService.GetAll()
+            .Where(i => i.Id != Details.Id && i.FullName.StartsWith(ReportToSearch, StringComparison.OrdinalIgnoreCase))
+            .Select(i => new { Id = i.Id, Name = i.FullName }) : _emptyList;
+
+      public AutoComplete ReportToAutoCompleteProps => new AutoComplete
+      {
+         floatingLabelText = "Report To",
+         hintText = "Type the full name of the direct report here"
+      };
+
+      public string ReportToErrorText => !string.IsNullOrEmpty(ReportToSearch) && ReportToSearchResult.Count() == 0 ? "No one by that name works here" : "";
 
       /// <summary>
       /// Constructor.
