@@ -208,13 +208,6 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
    // Dispatches a state value to the server view model.
    // iValue - State value to dispatch.
-   dotnetifyVM.prototype.$dispatchState = function (iValue) {
-      this.State(iValue);
-      this.$dispatch(iValue);
-   }
-
-   // Dispatches a state value to the server view model.
-   // iValue - State value to dispatch.
    dotnetifyVM.prototype.$dispatchListState = function (iValue) {
       for (var listName in iValue) {
          var key = this.$itemKey[listName];

@@ -1,10 +1,14 @@
-﻿
-var ControlTypes = React.createClass({
+﻿var ControlTypes = React.createClass({
 
    getInitialState() {
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("ControlTypesVM", () => this.state, state => this.setState(state));
-      this.dispatchState = this.vm.$dispatchState.bind(this.vm);
+
+      // Set up function to dispatch state to the back-end.
+      this.dispatchState = state => {
+         this.setState(state);
+         this.vm.$dispatch(state); 
+      }
 
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
       return window.vmStates.ControlTypesVM;
