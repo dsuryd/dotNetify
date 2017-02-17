@@ -33,7 +33,15 @@ label {
 
 .nav-menu {
    padding-top: 20px;
-   background-color: white;
+   color: rgb(125,135,140);
+   background-color:rgb(40,50,55);
+}
+
+.nav-menu h3 {
+   color: rgba(146,208,80,.8);
+}
+.nav-menu a {
+   color: #b8c7ce;
 }
 
 .copyright-notice {
