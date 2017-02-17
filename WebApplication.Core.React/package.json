@@ -1,6 +1,6 @@
 {
    "version": "1.0.0",
-   "name": "reactwebapp.core",
+   "name": "webapplication.core.react",
    "private": true,
    "dependencies": {
       "jquery": "^3.1.1",

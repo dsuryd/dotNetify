@@ -6,7 +6,8 @@ React = require( "react" );
 ReactDOM = require( "react-dom" );
 
 // Material-UI components.
-MuiThemeProvider = require( "material-ui/styles/MuiThemeProvider" ).default;
+MuiThemeProvider = require("material-ui/styles/MuiThemeProvider").default;
+AppBar = require("material-ui/AppBar").default;
 AutoComplete = require("material-ui/AutoComplete").default;
 Card = require("material-ui/Card").Card;
 CardActions = require("material-ui/Card").CardActions;

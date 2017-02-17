@@ -23,9 +23,10 @@
       const wizard = (isOpen) => {
          if (isOpen)
             return <EditWizard open={true}
+                               strings={this.state.LocalizedStrings}
                                employeeDetails={this.state.Details}
                                reportToSearchResult={this.state.ReportToSearchResult}
-                               reportToErrorText={this.state.ReportToErrorText}
+                               reportToError={this.state.ReportToError}
                                onReportToChange={value => this.dispatch({ ReportToSearch: value })}
                                onFinish={handleFinish}
                                onCancel={() => this.setState({ openWizard: false })} />
@@ -39,17 +40,23 @@
             <MuiThemeProvider>
                <div>
                   <div className="row">
-                     <div className="col-md-8">
-                        <SearchBox label="Type a name" onChange={value => this.dispatch({ EmployeeSearch: value })} />
+
+                     <div className="col-md-12">
+                        <AppBar style={{marginBottom: "1em"}}
+                                iconElementLeft={<SearchBox strings={this.state.LocalizedStrings} onChange={value => this.dispatch({ EmployeeSearch: value })} />}
+                                iconElementRight={<LanguageToggle onToggle={code => this.dispatch({CultureCode: code})} />} />
                      </div>
                   </div>
                   <div className="row">
                      <div className="col-md-8">
-                        <EmployeeTable data={this.state.Employees} select={this.state.SelectedId}
+                        <EmployeeTable data={this.state.Employees}
+                                       strings={this.state.LocalizedStrings}
+                                       select={this.state.SelectedId}
                                        onSelect={id => this.dispatchState({ SelectedId: id })} />
                      </div>
                      <div className="col-md-4">
                         <EmployeeDetails data={this.state.Details}
+                                         strings={this.state.LocalizedStrings}
                                          onEdit={() => this.setState({ openWizard: true })} />
                      </div>
                   </div>
@@ -74,11 +81,38 @@ var SearchBox = React.createClass({
       }
 
       return (
-         <div>
-            <IconSearch style={{ width: 20, height: 20 }} color='#8B8C8D' />
-            <TextField id="SearchBox" floatingLabelText={this.props.label}
+         <div style={{padding: "0 1em", borderRadius: "4px", backgroundColor: "#11cde5"}}>
+            <IconSearch style={{ width: 20, height: 20 }} />
+            <TextField id="SearchBox" hintText={this.props.strings.SearchLabel}
                        value={this.state.searchText} onChange={handleChange} />
          </div>
+      );
+   }
+});
+
+var LanguageToggle = React.createClass({
+   getInitialState() {
+      return {
+         code: "en-US",
+         language: "English"
+      }
+   },
+   render() {
+      const handleToggle = (event, checked) => {
+         var code = !checked? "en-US" : "fr-FR";
+         this.setState({code: code});
+         this.setState({language: !checked? "English" : "Français"});
+         this.props.onToggle(code);
+      }
+
+      return (
+         <Toggle style={{marginTop: "1em", width: "7em"}}
+                 trackSwitchedStyle={{backgroundColor: "#e0e0e0"}}
+                 thumbSwitchedStyle={{backgroundColor: "#11cde5"}}
+                 onToggle={handleToggle}
+                 label={this.state.language}
+                 labelStyle={{color: "white", fontSize: "medium"}}
+                  />
       );
    }
 });
@@ -106,8 +140,8 @@ var EmployeeTable = React.createClass({
          <Table selectable={true} onRowSelection={handleRowSelection}>
             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                <TableRow>
-                  <TableHeaderColumn>First Name</TableHeaderColumn>
-                  <TableHeaderColumn>Last Name</TableHeaderColumn>
+                  <TableHeaderColumn>{this.props.strings.FirstName}</TableHeaderColumn>
+                  <TableHeaderColumn>{this.props.strings.LastName}</TableHeaderColumn>
                </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false} showRowHover={true}>
@@ -124,11 +158,11 @@ var EmployeeDetails = React.createClass({
       const iconEdit = <IconEdit style={{ width: 20, height: 20 }} color="#8b8c8d" />
       const iconPhone = <IconPhone style={{ width: 24, height: 24 }} />
 
-      const reportsTo = name => name != null ? "reports to: " + name : "";
+      const reportsTo = name => name != null ? this.props.strings.ReportTo + " " + name : "";
 
       const editButton = () => {
          if (this.props.data.Id > 0)
-            return <FlatButton label="Edit" icon={iconEdit} onClick={this.props.onEdit } />
+            return <FlatButton label={this.props.strings.EditLabel} icon={iconEdit} onClick={this.props.onEdit } />
       }
 
       return (
@@ -169,10 +203,10 @@ var EditWizard = React.createClass({
       });
 
       const actions = [
-         <FlatButton label="Back" onClick={handleBack} disabled={this.state.step == 0} />,
-         <FlatButton label="Next" onClick={handleNext} disabled={this.state.step == this.state.maxStep || this.state.disableNext} />,
-         <FlatButton label="Finish" primary={true} onClick={handleFinish} disabled={this.state.step != this.state.maxStep} />,
-         <FlatButton label="Cancel" onClick={() => this.props.onCancel()} />
+         <FlatButton label={this.props.strings.Back} onClick={handleBack} disabled={this.state.step == 0} />,
+         <FlatButton label={this.props.strings.Next} onClick={handleNext} disabled={this.state.step == this.state.maxStep || this.state.disableNext} />,
+         <FlatButton label={this.props.strings.Finish} primary={true} onClick={handleFinish} disabled={this.state.step != this.state.maxStep} />,
+         <FlatButton label={this.props.strings.Cancel} onClick={() => this.props.onCancel()} />
       ];
 
       const handleUpdateReportTo = value => {
@@ -185,10 +219,10 @@ var EditWizard = React.createClass({
             case 0:
                return (
                   <div>
-                     <TextField id="FirstName" floatingLabelText="First Name"
+                     <TextField id="FirstName" floatingLabelText={this.props.strings.FirstName}
                                 value={this.state.firstName}
                                 onChange={event => this.setState({ firstName: event.target.value })} />
-                     <TextField id="LastName" floatingLabelText="Last Name"
+                     <TextField id="LastName" floatingLabelText={this.props.strings.LastName}
                                 value={this.state.lastName}
                                 onChange={event => this.setState({ lastName: event.target.value })} />
                   </div>
@@ -210,21 +244,21 @@ var EditWizard = React.createClass({
 
                return (
                   <AutoComplete id="AutoComplete"
-                                floatingLabelText="Report To"
-                                hintText="Type the manager name here"
+                                floatingLabelText={this.props.strings.ReportTo}
+                                hintText={this.props.strings.ReportToHintText}
                                 filter={AutoComplete.caseInsensitiveFilter}
                                 searchText={initialText}
-                                errorText={this.props.reportToErrorText}
+                                errorText={this.props.strings[this.props.reportToError]}
                                 dataSource={reportToSearchResult}
                                 onUpdateInput={handleUpdate} />
                );
             case 2:
                const paperStyle = { display: "inline", padding: ".5em 1em", backgroundColor: "#e6e6e6" }
-               const reportToName = this.state.reportToName.length > 0 ? this.state.reportToName : "no one";
+               const reportToName = this.state.reportToName != null ? this.state.reportToName : this.props.strings.NoOne;
                return (
                   <div style={{paddingTop: "2.2em"}}>
                      <Paper style={paperStyle}>{this.state.firstName} {this.state.lastName}</Paper>
-                     <span style={{margin: "0 1em"}}>reports to </span>
+                     <span style={{margin: "0 1em"}}>{this.props.strings.ReportTo} </span>
                      <Paper style={paperStyle}>{reportToName}</Paper>
                   </div>
                );
@@ -234,9 +268,9 @@ var EditWizard = React.createClass({
       return (
          <Dialog open={this.props.open} actions={actions }>
             <Stepper activeStep={this.state.step}>
-               <Step><StepLabel>Name</StepLabel></Step>
-               <Step><StepLabel>Manager</StepLabel></Step>
-               <Step><StepLabel>Confirm</StepLabel></Step>
+               <Step><StepLabel>{this.props.strings.Name}</StepLabel></Step>
+               <Step><StepLabel>{this.props.strings.Manager}</StepLabel></Step>
+               <Step><StepLabel>{this.props.strings.Confirm}</StepLabel></Step>
             </Stepper>
             <div style={{height: "4em"}}>
                {content(this.state.step)}

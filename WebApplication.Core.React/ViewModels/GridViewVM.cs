@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using Microsoft.Extensions.Localization;
-using ViewModels.Components.MaterialUI;
+using WebApplication.Core.React.Resources;
 using DotNetify;
 
 namespace ViewModels
@@ -14,6 +15,7 @@ namespace ViewModels
    public class GridViewVM : BaseVM
    {
       private readonly EmployeeService _employeeService;
+      private readonly IStringLocalizer _localizer;
       private readonly IEnumerable<object> _emptyList = new List<object>();
       private readonly EmployeeDetails _emptyDetails = new EmployeeDetails();
 
@@ -142,7 +144,7 @@ namespace ViewModels
          {
             Set(value);
             Changed(nameof(ReportToSearchResult));
-            Changed(nameof(ReportToErrorText));
+            Changed(nameof(ReportToError));
          }
       }
 
@@ -151,24 +153,33 @@ namespace ViewModels
             .Where(i => i.Id != Details.Id && i.FullName.StartsWith(ReportToSearch, StringComparison.OrdinalIgnoreCase))
             .Select(i => new { Id = i.Id, Name = i.FullName }) : _emptyList;
 
-      public AutoComplete ReportToAutoCompleteProps => new AutoComplete
-      {
-         floatingLabelText = "Report To",
-         hintText = "Type the full name of the direct report here"
-      };
+      public string ReportToError => !string.IsNullOrEmpty(ReportToSearch)
+         && ReportToSearchResult.Count() == 0 ? nameof(GridViewResource.ReportToNotFound) : "";
 
-      public string ReportToErrorText => !string.IsNullOrEmpty(ReportToSearch) && ReportToSearchResult.Count() == 0 ? "No one by that name works here" : "";
+
+      public string CultureCode
+      {
+         get { return Get<string>(); }
+         set
+         {
+            Set(value);
+            Changed(nameof(LocalizedStrings));
+         }
+      }
+
+      public Dictionary<string, string> LocalizedStrings => Localizer.GetAllStrings().ToDictionary(i => i.Name, i => i.Value);
+
+      private IStringLocalizer Localizer => string.IsNullOrEmpty(CultureCode) || CultureCode == "en-US" ? _localizer : _localizer.WithCulture(new CultureInfo(CultureCode));
 
       /// <summary>
       /// Constructor.
       /// </summary>
-      /// <param name="model">Employee model.</param>
-      public GridViewVM( IStringLocalizer<GridViewVM> localizer)
+      public GridViewVM(IStringLocalizer<GridViewResource> localizer)
       {
          // Normally this will be constructor-injected.
          _employeeService = new EmployeeService();
 
-         var test = localizer.GetAllStrings();
+         _localizer = localizer;
       }
    }
 }
