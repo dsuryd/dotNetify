@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ReactWebApp.Properties {
+namespace WebApplication.Core.React.Properties {
     using System;
     using System.Reflection;
     
@@ -121,42 +121,6 @@ namespace ReactWebApp.Properties {
         public static string employees_json {
             get {
                 return ResourceManager.GetString("employees_json", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to First Name.
-        /// </summary>
-        public static string GridViewVM_FirstName {
-            get {
-                return ResourceManager.GetString("GridViewVM_FirstName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Last Name.
-        /// </summary>
-        public static string GridViewVM_LastName {
-            get {
-                return ResourceManager.GetString("GridViewVM_LastName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to ACME Employees Directory.
-        /// </summary>
-        public static string GridViewVM_ListTitle {
-            get {
-                return ResourceManager.GetString("GridViewVM_ListTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Type an employee name.
-        /// </summary>
-        public static string GridViewVM_SearchPlaceHolder {
-            get {
-                return ResourceManager.GetString("GridViewVM_SearchPlaceHolder", resourceCulture);
             }
         }
         

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using DotNetify;
 using DotNetify.Routing;
 
-namespace ReactWebApp.Controllers
+namespace WebApplication.Core.React.Controllers
 {
    public class HomeController : Controller
    {

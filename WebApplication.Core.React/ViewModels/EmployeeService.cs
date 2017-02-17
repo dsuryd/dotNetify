@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using ReactWebApp.Properties;
+using WebApplication.Core.React.Properties;
 
 namespace ViewModels
 {

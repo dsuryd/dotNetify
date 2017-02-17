@@ -4,7 +4,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ReactWebApp.Controllers
+namespace WebApplication.Core.React.Controllers
 {
    public static class ControllerExtensions
    {

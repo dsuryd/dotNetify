@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "ReactWebApp": {
+    "WebApplication.Core.React": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "http://localhost:52000",

@@ -945,18 +945,6 @@
     }
 ]</value>
   </data>
-  <data name="GridViewVM_FirstName" xml:space="preserve">
-    <value>First Name</value>
-  </data>
-  <data name="GridViewVM_LastName" xml:space="preserve">
-    <value>Last Name</value>
-  </data>
-  <data name="GridViewVM_ListTitle" xml:space="preserve">
-    <value>ACME Employees Directory</value>
-  </data>
-  <data name="GridViewVM_SearchPlaceHolder" xml:space="preserve">
-    <value>Type an employee name</value>
-  </data>
   <data name="webstore_json" xml:space="preserve">
     <value>[
    {
