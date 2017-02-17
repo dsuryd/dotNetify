@@ -21,12 +21,12 @@ namespace ViewModels
       {
          new Link { Route = this.GetRoute("HelloWorld"), Caption = "Hello World", Description = "Getting familiar with the basics"  },
          new Link { Route = this.GetRoute("ControlTypes"), Caption = "Control Types", Description = "Using various HTML control types"  },
-         new Link { Route = this.GetRoute("SimpleList"), Caption = "Simple List", Description = "Simple CRUD List"  }
+         new Link { Route = this.GetRoute("SimpleList"), Caption = "Simple List", Description = "Simple CRUD list"  }
       };
 
       public List<Link> FurtherExampleLinks => new List<Link>
       {
-         new Link { Route = this.GetRoute("GridView"), Caption = "Grid View", Description = "Master-detail view with search, editing wizard and localization" },
+         new Link { Route = this.GetRoute("GridView"), Caption = "Grid View", Description = "Master-detail view with search, pagination, wizard and localization" },
       };
 
       public IndexVM()

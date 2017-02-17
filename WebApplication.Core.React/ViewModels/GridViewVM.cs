@@ -18,6 +18,7 @@ namespace ViewModels
       private readonly IStringLocalizer _localizer;
       private readonly IEnumerable<object> _emptyList = new List<object>();
       private readonly EmployeeDetails _emptyDetails = new EmployeeDetails();
+      private readonly int _recordsPerPage = 10;
 
       /// <summary>
       /// The class that holds employee info for the master list to send to the browser. 
@@ -64,7 +65,7 @@ namespace ViewModels
             if (!result.Any(i => i.Id == SelectedId))
                SelectedId = result.Count() > 0 ? result.First().Id : -1;
 
-            return result;
+            return Paginate(result);
          }
       }
 
@@ -137,6 +138,10 @@ namespace ViewModels
          }
       });
 
+      /// <summary>
+      /// This property receives text input from the Report To auto complete field in the editing wizard.
+      /// For every keystroke, it forces the search result to update and sent to the client.
+      /// </summary>
       public string ReportToSearch
       {
          get { return Get<string>(); }
@@ -157,6 +162,9 @@ namespace ViewModels
          && ReportToSearchResult.Count() == 0 ? nameof(GridViewResource.ReportToNotFound) : "";
 
 
+      /// <summary>
+      /// Receives culture code, and forces all localized strings to update and sent to the client.
+      /// </summary>
       public string CultureCode
       {
          get { return Get<string>(); }
@@ -169,7 +177,31 @@ namespace ViewModels
 
       public Dictionary<string, string> LocalizedStrings => Localizer.GetAllStrings().ToDictionary(i => i.Name, i => i.Value);
 
+      /// <summary>
+      /// New ASP.NET abstraction to help manage string localization. It pulls the strings from the .resx file.  
+      /// See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization.
+      /// </summary>
       private IStringLocalizer Localizer => string.IsNullOrEmpty(CultureCode) || CultureCode == "en-US" ? _localizer : _localizer.WithCulture(new CultureInfo(CultureCode));
+
+      public int[] Pagination
+      {
+         get { return Get<int[]>(); }
+         set
+         {
+            Set(value);
+            SelectedPage = 1;
+         }
+      }
+
+      public int SelectedPage
+      {
+         get { return Get<int>(); }
+         set
+         {
+            Set(value);
+            Changed(() => Employees);
+         }
+      }
 
       /// <summary>
       /// Constructor.
@@ -180,6 +212,23 @@ namespace ViewModels
          _employeeService = new EmployeeService();
 
          _localizer = localizer;
+      }
+
+      /// <summary>
+      /// Paginates the query results.
+      /// </summary>
+      private IEnumerable<EmployeeMaster> Paginate(IEnumerable<EmployeeMaster> employees)
+      {
+         // ChangedProperties is a base class property that contains a list of changed properties.
+         // Here it's used to check whether user has changed the SelectedPage property value by clicking a pagination button.
+         if (this.ChangedProperties.ContainsKey(nameof(SelectedPage)))
+            return employees.Skip(_recordsPerPage * (SelectedPage - 1)).Take(_recordsPerPage);
+         else
+         {
+            var pageCount = (int)Math.Ceiling(employees.Count() / (double)_recordsPerPage);
+            Pagination = Enumerable.Range(1, pageCount).ToArray();
+            return employees.Take(_recordsPerPage);
+         }
       }
    }
 }
