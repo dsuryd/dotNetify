@@ -23,6 +23,6 @@ namespace WebApplication.Core.React.Controllers
 
       // Provides initial view model states for faster client-side rendering.
       [Route("state/get/{*id}")]
-      public IActionResult State(string id) => Content( $"window.vmStates = window.vmStates || {{}}; window.vmStates.{id} = {new VMController().GetInitialState(id)};", "text/js" );
+      public IActionResult State(string id) => Content( $"window.vmStates = window.vmStates || {{}}; window.vmStates['{id}'] = {new VMController().GetInitialState(id)};", "text/js" );
    }
 }

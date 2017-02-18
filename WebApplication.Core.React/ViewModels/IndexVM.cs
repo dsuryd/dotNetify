@@ -40,7 +40,7 @@ namespace ViewModels
             new RouteTemplate { Id = "SimpleList", UrlPattern = "simplelist", Target = "Content", ViewUrl = "SimpleList", JSModuleUrl = "/state/get/SimpleListVM, /js/SimpleList.jsx" },
             new RouteTemplate { Id = "GridView", UrlPattern = "gridview", Target = "Content", ViewUrl = "GridView", JSModuleUrl = "/state/get/GridViewVM, /js/GridView.jsx" },
             new RouteTemplate { Id = "AFITop100", UrlPattern = "afitop100", Target = "Content", ViewUrl = "AFITop100",
-               JSModuleUrl = "/state/get/AFITop100VM, /js/CompositeView/PaginatedTable.jsx, /js/CompositeView/AFITop100.jsx" },
+               JSModuleUrl = "/state/get/AFITop100VM, /state/get/AFITop100VM.MovieTableVM, /js/CompositeView/PaginatedTable.jsx, /js/CompositeView/AFITop100.jsx" },
          });
       }
    }

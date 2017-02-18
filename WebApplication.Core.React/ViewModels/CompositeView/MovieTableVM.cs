@@ -6,7 +6,7 @@ using ViewModels.Components;
 
 namespace ViewModels.CompositeView
 {
-   public class MovieTableVM: BaseVM, IPaginatedTable<MovieRecord>
+   public class MovieTableVM : BaseVM, IPaginatedTable<MovieRecord>
    {
       private int _recordsPerPage = 10;
       private Func<IEnumerable<MovieRecord>> _dataSourceFunc;
@@ -20,7 +20,11 @@ namespace ViewModels.CompositeView
       public int SelectedKey
       {
          get { return Get<int>(); }
-         set { Set(value); }
+         set
+         {
+            Set(value);
+            Selected?.Invoke(this, value);
+         }
       }
       public int[] Pagination
       {
@@ -41,6 +45,8 @@ namespace ViewModels.CompositeView
             Changed(nameof(Data));
          }
       }
+
+      public event EventHandler<int> Selected;
 
       public void SetDataSource(Func<IEnumerable<MovieRecord>> dataSourceFunc) => _dataSourceFunc = dataSourceFunc;
 

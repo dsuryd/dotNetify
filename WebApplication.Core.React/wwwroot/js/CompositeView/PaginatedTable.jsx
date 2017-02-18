@@ -1,32 +1,23 @@
 ﻿var PaginatedTable = React.createClass({
+   render() {
+      return (
+         <div>
+            <DataTable {...this.props}
+                       onSelect={key => this.props.onSelect(key)} />
+            <Pagination style={{marginTop: "1em", float: "right"}}
+                        pagination={this.props.pagination}
+                        select={this.props.selectedPage}
+                        onSelect={page => this.props.onSelectPage(page)} />
+         </div>
+      );
+   }
+});
 
-   getInitialState() {
-
-      // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect(this.props.vm, () => this.state, state => this.setState(state));
-
-      // Functions to dispatch state to the back-end.
-      this.dispatch = state => this.vm.$dispatch(state);
-      this.dispatchState = state => {
-         this.setState(state);
-         this.vm.$dispatch(state);
-      }
-
-      // This component's JSX was loaded along with the VM's initial state for faster rendering.
-      return window.vmStates[this.props.vm] || {
-         Data: [],
-         Headers: [],
-         Pagination: []
-      };
-   },
-   componentWillUnmount() {
-      this.vm.$destroy();
-   },
-
+var DataTable = React.createClass({
    render() {
       const handleRowSelection = rows => {
          if (rows.length > 0)
-            handleSelect(this.props.data[rows[0]].Id);
+            handleSelect(this.props.data[rows[0]][this.props.itemKey]);
       }
 
       const handleSelect = id => {
@@ -36,22 +27,21 @@
 
       const colWidth = i => { return { width: this.props.colWidths[i] }; }
 
-      const columns = data => this.state.Headers.map((header, index) =>
+      const columns = data => this.props.headers.map((header, index) =>
          <TableRowColumn key={header} style={colWidth(index)}>{data[header]}</TableRowColumn>
       );
 
-      const rows = this.state.Data.map((data, index) =>
-         <TableRow key={data[this.state.ItemKey]} selected={this.state.SelectedKey == data[this.state.ItemKey]}>
+      const rows = this.props.data.map((data, index) =>
+         <TableRow key={data[this.props.itemKey]} selected={this.props.select == data[this.props.itemKey]}>
             {columns(data)}
          </TableRow>
       );
 
-      const headers = this.state.Headers.map((header, index) =>
+      const headers = this.props.headers.map((header, index) =>
          <TableHeaderColumn key={header} style={colWidth(index)}>{header}</TableHeaderColumn>
       );
 
       return (
-         <div>
          <Table selectable={true} onRowSelection={handleRowSelection}>
             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                <TableRow>
@@ -62,18 +52,13 @@
                {rows}
             </TableBody>
          </Table>
-         <Pagination style={{marginTop: "1em", float: "right"}}
-                     pages={this.state.Pagination}
-                     select={this.state.SelectedPage}
-                     onSelect={page => this.dispatchState({SelectedPage: page})} />
-         </div>
       );
    }
 });
 
 var Pagination = React.createClass({
    render() {
-      const pageButtons = this.props.pages.map(page =>
+      const pageButtons = this.props.pagination.map(page =>
          <Paper key={page} style={{display: "inline", padding: ".5em 0"}}>
             <FlatButton style={{minWidth: "1em"}}
                         label={page}
