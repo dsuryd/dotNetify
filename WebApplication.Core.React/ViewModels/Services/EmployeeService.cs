@@ -17,7 +17,7 @@ namespace ViewModels
 
       public string Phone => $"716-555-34{Id.ToString().PadLeft(2, '0')}";
 
-      public string FullName => $"{FirstName } {LastName }";
+      public string FullName => $"{FirstName} {LastName}";
    }
 
    public class EmployeeService
@@ -50,6 +50,6 @@ namespace ViewModels
             _employees[idx] = record;
       }
 
-      public void Delete(int id) =>_employees.Remove(_employees.FirstOrDefault(i => i.Id == id));
+      public void Delete(int id) => _employees.Remove(_employees.FirstOrDefault(i => i.Id == id));
    }
 }

@@ -27,6 +27,7 @@ namespace ViewModels
       public List<Link> FurtherExampleLinks => new List<Link>
       {
          new Link { Route = this.GetRoute("GridView"), Caption = "Grid View", Description = "Master-detail view with search, pagination, wizard and localization" },
+         new Link { Route = this.GetRoute("AFITop100"), Caption = "Composite View", Description = "" },
       };
 
       public IndexVM()
@@ -38,6 +39,8 @@ namespace ViewModels
             new RouteTemplate { Id = "ControlTypes", UrlPattern = "controltypes", Target = "Content", ViewUrl = "ControlTypes", JSModuleUrl = "/state/get/ControlTypesVM, /js/ControlTypes.jsx" },
             new RouteTemplate { Id = "SimpleList", UrlPattern = "simplelist", Target = "Content", ViewUrl = "SimpleList", JSModuleUrl = "/state/get/SimpleListVM, /js/SimpleList.jsx" },
             new RouteTemplate { Id = "GridView", UrlPattern = "gridview", Target = "Content", ViewUrl = "GridView", JSModuleUrl = "/state/get/GridViewVM, /js/GridView.jsx" },
+            new RouteTemplate { Id = "AFITop100", UrlPattern = "afitop100", Target = "Content", ViewUrl = "AFITop100",
+               JSModuleUrl = "/state/get/AFITop100VM, /js/CompositeView/PaginatedTable.jsx, /js/CompositeView/AFITop100.jsx" },
          });
       }
    }

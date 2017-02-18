@@ -105,6 +105,11 @@ namespace DotNetify
       public static CreateInstanceDelegate CreateInstance { get; set; } = (type, args) => Activator.CreateInstance(type, args);
 
       /// <summary>
+      /// Creates a view model instance of type T.
+      /// </summary>
+      public static T Create<T>(object[] args = null) where T : class => CreateInstance(typeof(T), args) as T;
+
+      /// <summary>
       /// Security context.
       /// </summary>
       public IPrincipal Principal;
