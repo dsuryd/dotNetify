@@ -52,8 +52,10 @@ namespace ViewModels.CompositeView
 
       private IEnumerable<MovieRecord> GetData()
       {
-         var data = _dataSourceFunc();
+         if (_dataSourceFunc == null)
+            return null;
 
+         var data = _dataSourceFunc();
          if (!data.Any(i => i.Rank == SelectedKey))
             SelectedKey = data.Count() > 0 ? data.First().Rank : -1;
 
