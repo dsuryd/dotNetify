@@ -74,7 +74,7 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overrides this method if the derived type is a master view model.  The VMController
+      /// Override this method if the derived type is a master view model.  The VMController
       /// will call this method to get instances of any view model whose view falls within
       /// this master view in the HTML markup.  The master view model can use this opportunity
       /// to do its own initialization of those subordinate view models, and/or arranging 
@@ -91,7 +91,7 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overload of GetSubVM that only acceptes view model type name.
+      /// Overload of GetSubVM that only accepts view model type name.
       /// </summary>
       /// <param name="vmTypeName">View model type name.</param>
       /// <returns>View model instance.</returns>
@@ -113,7 +113,15 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overrides this method to handle a value update from a property path that cannot
+      /// Override this method to access new instances of subordinates view models as soon as they're created.
+      /// </summary>
+      /// <param name="subVM">Sub-view model instance.</param>
+      public virtual void OnSubVMCreated(BaseVM subVM)
+      {
+      }
+
+      /// <summary>
+      /// Override this method to handle a value update from a property path that cannot
       /// be resolved by the VMController.
       /// </summary>
       /// <param name="vmPath">View model property path.</param>

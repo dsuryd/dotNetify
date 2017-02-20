@@ -150,7 +150,7 @@ namespace DotNetify
       public string GetInitialState(string iVMTypeName, object iArgs = null)
       {
          var vm = CreateVM(iVMTypeName, iArgs);
-         return vm != null ? Serialize(vm) : string.Empty;
+         return vm != null ? Serialize(vm) : "null";
       }
 
       /// <summary>
@@ -265,13 +265,18 @@ namespace DotNetify
       /// <param name="vmId">Identifies the view model.</param>
       public virtual void OnDisposeVM(string connectionId, string vmId)
       {
-         if (_activeVMs.ContainsKey(vmId))
+         lock (_activeVMs)
          {
-            VMInfo vmInfo;
-            if (_activeVMs.TryRemove(vmId, out vmInfo))
+            // Dispose not only the view model, but all view models within its scope.
+            var vmIds = _activeVMs.Keys.Where( i => i == vmId || i.StartsWith(vmId + "."));
+            foreach( var id in vmIds)
             {
-               vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
-               vmInfo.Instance.Dispose();
+               VMInfo vmInfo;
+               if (_activeVMs.TryRemove(id, out vmInfo))
+               {
+                  vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
+                  vmInfo.Instance.Dispose();
+               }
             }
          }
       }
@@ -356,6 +361,9 @@ namespace DotNetify
                UpdateVM(vmInstance, prop.Name, prop.Value.ToString());
          }
 
+         // Pass the view model instance to the master view model.
+         masterVM?.OnSubVMCreated(vmInstance);
+
          return vmInstance;
       }
 
@@ -437,7 +445,7 @@ namespace DotNetify
                   // unless the value is changed internally, so that we don't send the same value back to the client
                   // during PushUpdates call by this VMController.
                   var changedProperties = vmInstance.ChangedProperties;
-                  if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? String.Empty).ToString() == newValue)
+                  if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? string.Empty).ToString() == newValue)
                   {
                      object value;
                      changedProperties.TryRemove(vmPath, out value);
