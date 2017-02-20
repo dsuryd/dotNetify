@@ -3,7 +3,7 @@
    getInitialState() {
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("IndexVM", () => this.state, state => this.setState(state));
-      return window.vmStates.IndexVM;
+      return window.vmStates.IndexVM || { BasicExampleLinks: [], FurtherExampleLinks: []};
    },
    render() {
       const showLinks = links => links.map(link =>

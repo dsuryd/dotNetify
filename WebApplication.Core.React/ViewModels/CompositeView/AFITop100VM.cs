@@ -6,8 +6,7 @@ namespace ViewModels.CompositeView
    public class AFITop100VM : BaseVM
    {
       private readonly MovieService _movieService;
-      private readonly MovieTableVM _movieTableVM;
-      private readonly MovieDetailsVM _movieDetailsVM;
+      private event EventHandler<int> SelectedRank;
 
       /// <summary>
       /// Constructor.
@@ -16,21 +15,22 @@ namespace ViewModels.CompositeView
       {
          // Normally this will be constructor-injected.
          _movieService = new MovieService();
-         _movieTableVM = new MovieTableVM();
-         _movieDetailsVM = new MovieDetailsVM(_movieService);
-
-         _movieTableVM.SetDataSource(() => _movieService.GetAFITop100());
-         _movieTableVM.Selected += (sender, rank) => _movieDetailsVM.SetByAFIRank(rank);
       }
 
-      public override BaseVM GetSubVM(string vmTypeName)
+      public override void OnSubVMCreated(BaseVM subVM)
       {
-         if (vmTypeName == nameof(MovieTableVM))
-            return _movieTableVM;
-         else if (vmTypeName == nameof(MovieDetailsVM))
-            return _movieDetailsVM;
-
-         return base.GetSubVM(vmTypeName);
+         if (subVM is FilterableMovieTableVM)
+         {
+            var vm = subVM as FilterableMovieTableVM;
+            vm.DataSource = () => _movieService.GetAFITop100();
+            vm.Selected += (sender, rank) => SelectedRank?.Invoke(this, rank);
+         }
+         else if (subVM is MovieDetailsVM)
+         {
+            var vm = subVM as MovieDetailsVM;
+            vm.SetByAFIRank(1);
+            SelectedRank += (sender, rank) => vm.SetByAFIRank(rank); 
+         }
       }
    }
 }

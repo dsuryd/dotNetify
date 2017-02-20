@@ -13,6 +13,15 @@ namespace ViewModels.CompositeView
 
       public IEnumerable<string> Headers => new string[] { "Rank", "Movie", "Year", "Cast", "Director" };
 
+      public Func<IEnumerable<MovieRecord>> DataSource
+      {
+         set
+         {
+            _dataSourceFunc = value;
+            Changed(nameof(Data));
+         }
+      }
+
       public IEnumerable<MovieRecord> Data => GetData();
 
       public string ItemKey => nameof(MovieRecord.Rank);
@@ -47,8 +56,6 @@ namespace ViewModels.CompositeView
       }
 
       public event EventHandler<int> Selected;
-
-      public void SetDataSource(Func<IEnumerable<MovieRecord>> dataSourceFunc) => _dataSourceFunc = dataSourceFunc;
 
       private IEnumerable<MovieRecord> GetData()
       {

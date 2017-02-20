@@ -40,7 +40,9 @@ TableRowColumn = require("material-ui/Table").TableRowColumn;
 // Material-UI icons.
 IconDelete = require("material-ui/svg-icons/action/delete").default;
 IconEdit = require("material-ui/svg-icons/content/create").default;
+IconFilter = require("material-ui/svg-icons/content/filter-list").default;
 IconSearch = require("material-ui/svg-icons/action/search").default;
+IconMovie = require("material-ui/svg-icons/AV/movie").default;
 IconPhone = require("material-ui/svg-icons/communication/phone").default;
 
 // Used by Material-UI.

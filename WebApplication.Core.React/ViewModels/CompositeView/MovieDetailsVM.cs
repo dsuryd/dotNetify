@@ -5,7 +5,7 @@ namespace ViewModels.CompositeView
 {
    public class MovieDetailsVM : BaseVM
    {
-      private MovieService _movieService;
+      private readonly MovieService _movieService;
 
       public MovieRecord Movie
       {
@@ -16,9 +16,10 @@ namespace ViewModels.CompositeView
       /// <summary>
       /// Constructor.
       /// </summary>
-      public MovieDetailsVM(MovieService moviceService)
+      public MovieDetailsVM()
       {
-         _movieService = moviceService;
+         // Normally this will be constructor-injected.
+         _movieService = new MovieService();
       }
 
       public void SetByAFIRank(int rank) => Movie = _movieService.GetMovieByAFIRank(rank);
