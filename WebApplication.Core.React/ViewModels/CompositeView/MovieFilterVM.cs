@@ -20,7 +20,11 @@ namespace ViewModels.CompositeView
       private string BuildQuery(Criteria criteria)
       {
          if (criteria.Operation == "has")
-            return $"{criteria.Property}.contains(\"{criteria.Text}\")";
+         {
+            if (criteria.Property == "Any")
+               return $"( Movie + Cast + Director ).toLower().contains(\"{criteria.Text.ToLower()}\")";
+            return $"{criteria.Property}.toLower().contains(\"{criteria.Text.ToLower()}\")";
+         }
          else if (criteria.Operation == "equals")
             return $"{criteria.Property} == {criteria.Text}";
          else

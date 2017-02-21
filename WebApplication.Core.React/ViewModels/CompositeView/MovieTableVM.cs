@@ -11,8 +11,14 @@ namespace ViewModels.CompositeView
       private int _recordsPerPage = 10;
       private Func<IEnumerable<MovieRecord>> _dataSourceFunc;
 
+      /// <summary>
+      /// Movie table headers.
+      /// </summary>
       public IEnumerable<string> Headers => new string[] { "Rank", "Movie", "Year", "Cast", "Director" };
 
+      /// <summary>
+      /// Function that provides data to the movie table.
+      /// </summary>
       public Func<IEnumerable<MovieRecord>> DataSource
       {
          set
@@ -22,10 +28,19 @@ namespace ViewModels.CompositeView
          }
       }
 
+      /// <summary>
+      /// Data for the movie table.
+      /// </summary>
       public IEnumerable<MovieRecord> Data => GetData();
 
+      /// <summary>
+      /// Key property to identify items in the movie table.
+      /// </summary>
       public string ItemKey => nameof(MovieRecord.Rank);
 
+      /// <summary>
+      /// Key value of the current movie table selection.
+      /// </summary>
       public int SelectedKey
       {
          get { return Get<int>(); }
@@ -35,6 +50,10 @@ namespace ViewModels.CompositeView
             Selected?.Invoke(this, value);
          }
       }
+
+      /// <summary>
+      /// Pagination count.
+      /// </summary>
       public int[] Pagination
       {
          get { return Get<int[]>(); }
@@ -45,6 +64,9 @@ namespace ViewModels.CompositeView
          }
       }
 
+      /// <summary>
+      /// Selected pagination page.
+      /// </summary>
       public int SelectedPage
       {
          get { return Get<int>(); }
@@ -55,8 +77,14 @@ namespace ViewModels.CompositeView
          }
       }
 
+      /// <summary>
+      /// Occurs when the selection changes.
+      /// </summary>
       public event EventHandler<int> Selected;
 
+      /// <summary>
+      /// Returns paginated movie data.
+      /// </summary>
       private IEnumerable<MovieRecord> GetData()
       {
          if (_dataSourceFunc == null)
@@ -70,7 +98,7 @@ namespace ViewModels.CompositeView
       }
 
       /// <summary>
-      /// Paginates the query results.
+      /// Paginates the given data.
       /// </summary>
       private IEnumerable<MovieRecord> Paginate(IEnumerable<MovieRecord> data)
       {

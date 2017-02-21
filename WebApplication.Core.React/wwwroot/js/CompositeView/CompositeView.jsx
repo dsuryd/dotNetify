@@ -3,7 +3,7 @@
       return (
          <div className="container-fluid">
             <div className="header clearfix">
-               <h3>Example: Composite View *** UNDER CONSTRUCTION ***</h3>
+               <h3>Example: Composite View</h3>
             </div>
             <MuiThemeProvider>
                <Scope>
@@ -130,6 +130,10 @@ var MovieFilter = React.createClass({
    },
    render() {
       const movieProps = ["Any", "Rank", "Movie", "Year", "Cast", "Director"];
+      const iconApply = <IconFilter />
+
+      const filterProps = movieProps.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)
+      const filterOperations = this.state.operations.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)
 
       const handleChangeFilter = (event, idx, value) => {
          this.setState({ filter: value });
@@ -138,6 +142,9 @@ var MovieFilter = React.createClass({
          else
             this.setState({ operations: ["has"], operation: "has" });
       }
+
+      const handleApply = () => this.dispatch({Filter: {property: this.state.filter, operation: this.state.operation, text: this.state.text}})
+
       return (
          <Card>
             <CardHeader title="Filters" style={{borderBottom: "solid 1px #e6e6e6"}} />
@@ -147,14 +154,14 @@ var MovieFilter = React.createClass({
                      <SelectField fullWidth={true}
                                   value={this.state.filter}
                                   onChange={handleChangeFilter}>
-                        {movieProps.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)}
+                        {filterProps}
                      </SelectField>
                   </div>
                   <div className="col-md-4">
                      <SelectField fullWidth={true}
                                   value={this.state.operation}
                                   onChange={(event, index, value) => this.setState({ operation: value })}>
-                        {this.state.operations.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)}
+                        {filterOperations}
                      </SelectField>
                   </div>
                    <div className="col-md-4">
@@ -165,8 +172,7 @@ var MovieFilter = React.createClass({
                </div>
             </CardText>
             <CardActions>
-               <FlatButton label="Apply" icon={<IconFilter />} 
-                           onClick={() => this.dispatch({Filter: {property: this.state.filter, operation: this.state.operation, text: this.state.text}})} />
+               <FlatButton label="Apply" onClick={handleApply} icon={iconApply} />
             </CardActions>
          </Card>
       );

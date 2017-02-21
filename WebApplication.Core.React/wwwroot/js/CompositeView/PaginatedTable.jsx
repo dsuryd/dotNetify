@@ -6,7 +6,7 @@
                        onSelect={key => this.props.onSelect(key)} />
             <Pagination style={{marginTop: "1em", float: "right"}}
                         pagination={this.props.pagination}
-                        select={this.props.selectedPage}
+                        select={this.props.page}
                         onSelect={page => this.props.onSelectPage(page)} />
          </div>
       );
