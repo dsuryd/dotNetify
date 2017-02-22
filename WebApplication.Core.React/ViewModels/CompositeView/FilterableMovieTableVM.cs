@@ -55,7 +55,7 @@ namespace ViewModels.CompositeView
       private void InitMovieFilterVM(MovieFilterVM vm)
       {
          // If a filter is added, set the filter query and update the movie table data.
-         vm.FilterAdded += (sender, query) =>
+         vm.FilterChanged += (sender, query) =>
          {
             _query = query;
             _updateData?.Invoke();

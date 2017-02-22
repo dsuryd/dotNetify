@@ -118,12 +118,14 @@ var MovieDetails = React.createClass({
 var MovieFilter = React.createClass({
    contextTypes: { connect: React.PropTypes.func },
    getInitialState() {
-      return this.context.connect(this, "MovieFilterVM") || {
+      return Object.assign(this.context.connect(this, "MovieFilterVM") || {}, {
+         filters: [],
+         filterId: 0,
          filter: "Any",
          operation: "has",
          operations: ["has"],
          text: ""
-      };
+      });
    },
    componentWillUnmount() {
       this.vm.$destroy();
@@ -135,15 +137,33 @@ var MovieFilter = React.createClass({
       const filterProps = movieProps.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)
       const filterOperations = this.state.operations.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)
 
-      const handleChangeFilter = (event, idx, value) => {
+      const updateFilterDropdown = value => {
          this.setState({ filter: value });
          if (value == "Rank" || value == "Year")
-            this.setState({ operations: ["equals", ">=", "<="], operation: "equals" });
+            this.setState({ filter: value, operations: ["equals", ">=", "<="], operation: "equals" });
          else
-            this.setState({ operations: ["has"], operation: "has" });
+            this.setState({ filter: value, operations: ["has"], operation: "has" });
       }
 
-      const handleApply = () => this.dispatch({Filter: {property: this.state.filter, operation: this.state.operation, text: this.state.text}})
+      const handleApply = () => {
+         let newId = this.state.filterId + 1;
+         let filter = { id: newId, property: this.state.filter, operation: this.state.operation, text: this.state.text };
+         this.setState({ filterId: newId, filters: [filter, ...this.state.filters], text: "" });
+         this.dispatch({ Apply: filter });
+
+         updateFilterDropdown("Any");  // Reset filter dropdown.
+      }
+
+      const handleDelete = id => {
+         this.dispatch({ Delete: id });
+         this.setState({ filters: this.state.filters.filter(filter => filter.id != id) });
+      }
+
+      const filters = this.state.filters.map(filter =>
+         <Chip key={filter.id} style={{ margin: 4 }} onRequestDelete={() => handleDelete(filter.id)}>
+            {filter.property} {filter.operation} {filter.text}
+         </Chip>
+      );
 
       return (
          <Card>
@@ -153,7 +173,7 @@ var MovieFilter = React.createClass({
                   <div className="col-md-4">
                      <SelectField fullWidth={true}
                                   value={this.state.filter}
-                                  onChange={handleChangeFilter}>
+                                  onChange={(event, idx, value) => updateFilterDropdown(value)}>
                         {filterProps}
                      </SelectField>
                   </div>
@@ -165,14 +185,21 @@ var MovieFilter = React.createClass({
                      </SelectField>
                   </div>
                    <div className="col-md-4">
-                      <TextField id="TextField" fullWidth={true}
+                      <TextField id="FilterText" fullWidth={true}
                                  value={this.state.text}
                                  onChange={event => this.setState({ text: event.target.value })} />
+                   </div>
+               </div>
+               <div className="row">
+                  <div className="col-md-12" style={{display: 'flex', flexWrap: 'wrap'}}>
+                     {filters}
                   </div>
                </div>
             </CardText>
             <CardActions>
-               <FlatButton label="Apply" onClick={handleApply} icon={iconApply} />
+               <FlatButton label="Apply" icon={iconApply}
+                           onClick={handleApply}
+                           disabled={this.state.text.length == 0} />
             </CardActions>
          </Card>
       );

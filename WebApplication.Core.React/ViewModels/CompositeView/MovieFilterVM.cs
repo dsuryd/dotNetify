@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using DotNetify;
 
@@ -6,29 +8,43 @@ namespace ViewModels.CompositeView
 {
    public class MovieFilterVM : BaseVM
    {
-      public class Criteria
+      private List<MovieFilter> _filters = new List<MovieFilter>();
+
+      public class MovieFilter
       {
+         public int Id { get; set; }
          public string Property { get; set; }
          public string Operation { get; set; }
          public string Text { get; set; }
-      }
 
-      public ICommand Filter => new Command<Criteria>(arg => FilterAdded?.Invoke( this, BuildQuery(arg)));
+         public override string ToString() => $"{Property} {Operation} {Text}";
 
-      public event EventHandler<string> FilterAdded;
-
-      private string BuildQuery(Criteria criteria)
-      {
-         if (criteria.Operation == "has")
+         public string ToQuery()
          {
-            if (criteria.Property == "Any")
-               return $"( Movie + Cast + Director ).toLower().contains(\"{criteria.Text.ToLower()}\")";
-            return $"{criteria.Property}.toLower().contains(\"{criteria.Text.ToLower()}\")";
+            if (Operation == "has")
+               return Property == "Any" ? $"( Movie + Cast + Director ).toLower().contains(\"{Text.ToLower()}\")"
+                  : $"{Property}.toLower().contains(\"{Text.ToLower()}\")";
+            else if (Operation == "equals")
+               return $"{Property} == {Text}";
+            else
+               return $"{Property} {Operation} {Text}";
          }
-         else if (criteria.Operation == "equals")
-            return $"{criteria.Property} == {criteria.Text}";
-         else
-            return $"{criteria.Property} {criteria.Operation} {criteria.Text}";
+
+         public static string BuildQuery(IEnumerable<MovieFilter> filters) => string.Join(" and ", filters.Select(i => i.ToQuery()));
       }
+
+      public ICommand Apply => new Command<MovieFilter>(arg =>
+      {
+         _filters.Add(arg);
+         FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
+      });
+
+      public ICommand Delete => new Command<int>(id =>
+      {
+         _filters = _filters.Where(i => i.Id != id).ToList();
+         FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
+      });
+
+      public event EventHandler<string> FilterChanged;
    }
 }
