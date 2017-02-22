@@ -1,3 +1,4 @@
+var $;
 var DashboardPanelVM = (function () {
     function DashboardPanelVM() {
     }
@@ -17,7 +18,10 @@ var DashboardPanelVM = (function () {
             $.each($(this).find("[data-vm]"), function (index, element) {
                 // Since there can be multiple widgets of the same type, we're going to use the widget id 
                 // to make a unique identification by setting it on the data-vm-id attribute.
-                return $(element).attr("data-vm-id", widgetId);
+                return 
+                // Since there can be multiple widgets of the same type, we're going to use the widget id 
+                // to make a unique identification by setting it on the data-vm-id attribute.
+                $(element).attr("data-vm-id", widgetId);
             });
             // Scroll to bottom.
             $(".panel-main").animate({ scrollTop: $("#DisplayArea div:last").offset().top }, 500);

@@ -1,3 +1,4 @@
+var Chart;
 var LiveChartVM = (function () {
     function LiveChartVM() {
     }

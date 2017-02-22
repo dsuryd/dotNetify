@@ -1,4 +1,5 @@
-﻿class LiveChartVM {
+﻿var Chart: any;
+class LiveChartVM {
 
    updateChart(iItem, iElement) {
       var vm: any = this;

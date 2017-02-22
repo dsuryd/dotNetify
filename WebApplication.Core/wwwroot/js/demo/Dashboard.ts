@@ -1,4 +1,5 @@
-﻿class DashboardPanelVM {
+﻿var $: any;
+class DashboardPanelVM {
 
    clearAll() { $("#DisplayArea").empty(); }
 

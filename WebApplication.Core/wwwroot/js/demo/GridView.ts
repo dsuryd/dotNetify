@@ -1,4 +1,5 @@
-﻿class GridViewVM {
+﻿var $: any;
+class GridViewVM {
 
    // Inject local observables into each ListHeader's item to implement sorting.
    _injectSortOrders() {

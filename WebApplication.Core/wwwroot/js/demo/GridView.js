@@ -1,3 +1,4 @@
+var $;
 var GridViewVM = (function () {
     function GridViewVM() {
     }
