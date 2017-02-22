@@ -13,7 +13,7 @@ DotNetify is a free, open source project that lets you create amazing real-time 
 * Modern tooling: Visual Studio 2015,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
 
 _*** Coming soon: integration w/ ReactJS. Get updates on twitter [@dotnetify](https://twitter.com/dotnetify) ***_  
-_*** 2/22/17: live preview at [dotnetify.azurewebsites.net](dotnetify.azurewebsites.net) ***_
+_*** 2/22/17: live preview at [dotnetify.azurewebsites.net](http://dotnetify.azurewebsites.net) ***_
 
 ##Documentation
 
