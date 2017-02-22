@@ -1,0 +1,34 @@
+﻿[
+  {
+    "outputFile": "wwwroot/js/ControlTypes.js",
+    "inputFile": "wwwroot/js/ControlTypes.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/GridView.js",
+    "inputFile": "wwwroot/js/GridView.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/HelloWorld.js",
+    "inputFile": "wwwroot/js/HelloWorld.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/index.js",
+    "inputFile": "wwwroot/js/index.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/Scope.js",
+    "inputFile": "wwwroot/js/Scope.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/SimpleList.js",
+    "inputFile": "wwwroot/js/SimpleList.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/CompositeView/PaginatedTable.js",
+    "inputFile": "wwwroot/js/CompositeView/PaginatedTable.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/CompositeView/CompositeView.js",
+    "inputFile": "wwwroot/js/CompositeView/CompositeView.jsx"
+  }
+]

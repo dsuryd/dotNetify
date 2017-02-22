@@ -71,3 +71,13 @@
 /WebApplication.Core.React/obj/Debug/netcoreapp1.0
 /WebApplication.Core.React/WebApplication.Core.React.xproj.user
 /WebApplication.Core.React/bin
+/WebApplication.Core.React/obj/Release/netcoreapp1.0
+/WebApplication.Core.React/Properties/PublishProfiles
+/WebApplication.Core.React/wwwroot/js/SimpleList.min.js
+/WebApplication.Core.React/wwwroot/js/Scope.min.js
+/WebApplication.Core.React/wwwroot/js/index.min.js
+/WebApplication.Core.React/wwwroot/js/HelloWorld.min.js
+/WebApplication.Core.React/wwwroot/js/ControlTypes.min.js
+/WebApplication.Core.React/wwwroot/js/CompositeView/CompositeView.min.js
+/WebApplication.Core.React/wwwroot/js/GridView.min.js
+/WebApplication.Core.React/wwwroot/js/CompositeView/PaginatedTable.min.js

@@ -34,13 +34,13 @@ namespace ViewModels
       {
          this.RegisterRoutes("demo", new List<RouteTemplate>
          {
-            new RouteTemplate { Id = "Home", UrlPattern = "", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.jsx" },
-            new RouteTemplate { Id = "HelloWorld", UrlPattern = "helloworld", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.jsx" },
-            new RouteTemplate { Id = "ControlTypes", UrlPattern = "controltypes", Target = "Content", ViewUrl = "ControlTypes", JSModuleUrl = "/state/get/ControlTypesVM, /js/ControlTypes.jsx" },
-            new RouteTemplate { Id = "SimpleList", UrlPattern = "simplelist", Target = "Content", ViewUrl = "SimpleList", JSModuleUrl = "/state/get/SimpleListVM, /js/SimpleList.jsx" },
-            new RouteTemplate { Id = "GridView", UrlPattern = "gridview", Target = "Content", ViewUrl = "GridView", JSModuleUrl = "/state/get/GridViewVM, /js/GridView.jsx" },
+            new RouteTemplate { Id = "Home", UrlPattern = "", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.js" },
+            new RouteTemplate { Id = "HelloWorld", UrlPattern = "helloworld", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.js" },
+            new RouteTemplate { Id = "ControlTypes", UrlPattern = "controltypes", Target = "Content", ViewUrl = "ControlTypes", JSModuleUrl = "/state/get/ControlTypesVM, /js/ControlTypes.js" },
+            new RouteTemplate { Id = "SimpleList", UrlPattern = "simplelist", Target = "Content", ViewUrl = "SimpleList", JSModuleUrl = "/state/get/SimpleListVM, /js/SimpleList.js" },
+            new RouteTemplate { Id = "GridView", UrlPattern = "gridview", Target = "Content", ViewUrl = "GridView", JSModuleUrl = "/state/get/GridViewVM, /js/GridView.js" },
             new RouteTemplate { Id = "CompositeView", UrlPattern = "compositeview", Target = "Content", ViewUrl = "CompositeView",
-               JSModuleUrl = "/state/get/AFITop100VM, /state/get/AFITop100VM.FilterableMovieTableVM.MovieTableVM, /js/CompositeView/PaginatedTable.jsx, /js/CompositeView/CompositeView.jsx" },
+               JSModuleUrl = "/state/get/AFITop100VM, /state/get/AFITop100VM.FilterableMovieTableVM.MovieTableVM, /js/CompositeView/PaginatedTable.js, /js/CompositeView/CompositeView.js" },
          });
       }
    }
