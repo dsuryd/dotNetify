@@ -1,5 +1,4 @@
-﻿
-body {
+﻿body {
    background-color: #eef0f0;
    font-family: 'roboto', sans-serif;
 }
@@ -14,99 +13,17 @@ body {
    background-color: #f6f6f6;
 }
 
-h3 {
-   font-size: large;
-}
-
-ul {
-   padding-left: 20px;
-}
-
-li > a ~ div {
-   font-size: 9pt;
-   margin-bottom: .5em;
-}
-
 label {
    font-weight: normal;
 }
 
 .nav-menu {
-   padding-top: 20px;
-   color: rgb(125,135,140);
+   padding: 0;
    background-color: rgb(40,50,55);
 }
 
-   .nav-menu h3 {
-      color: rgba(146,208,80,.8);
-      font-size: medium;
-   }
-
-   .nav-menu a {
-      color: #b8c7ce;
-   }
-
-.copyright-notice {
-   font-size: 8pt;
-}
-
-.nav-menu ul {
-   list-style-type: none;
-   margin: 0 -16px;
-}
-
-.nav-menu li > a ~ div {
-   padding-left: 15px;
-}
-
-.section-bullet {
-   color: rgba(255,205,0,.8);
-   transform: scale(.5);
-}
-
-span.tree-indent {
-   display: inline-block;
-   width: 32px;
-}
-
-span.canExpand {
-   color: #31b0d5;
-}
-
-span.tree-btn.btn-lg {
-   padding: 8px 8px;
-}
-
-span.indent {
-   display: inline-block;
-   width: 24px;
-}
-
-span.canExpand {
-   color: #31b0d5;
-}
-
-span.btn-lg {
-   padding: 8px 4px;
-}
-
-.btn-md {
-   padding: 4px;
-   border-radius: 4px;
-}
-
-.noselect {
-   -webkit-touch-callout: none;
-   -webkit-user-select: none;
-   -moz-user-select: none;
-   -ms-user-select: none;
-   user-select: none;
-   cursor: pointer;
-}
-
-.bigfont {
-   font-weight: bold;
-   font-size: x-large;
+a.example-link:hover {
+   background-color: black;
 }
 
 .circle {
