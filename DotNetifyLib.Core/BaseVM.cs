@@ -121,6 +121,14 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Override this method to access instances of subordinates view models before they're disposed.
+      /// </summary>
+      /// <param name="subVM">Sub-view model instance.</param>
+      public virtual void OnSubVMDisposing(BaseVM subVM)
+      {
+      }
+
+      /// <summary>
       /// Override this method to handle a value update from a property path that cannot
       /// be resolved by the VMController.
       /// </summary>

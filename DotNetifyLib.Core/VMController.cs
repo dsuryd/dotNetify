@@ -269,11 +269,20 @@ namespace DotNetify
          {
             // Dispose not only the view model, but all view models within its scope.
             var vmIds = _activeVMs.Keys.Where( i => i == vmId || i.StartsWith(vmId + "."));
-            foreach( var id in vmIds)
+            foreach( var id in vmIds.OrderByDescending( i => i.Length ) )
             {
                VMInfo vmInfo;
                if (_activeVMs.TryRemove(id, out vmInfo))
                {
+                  // If the view model is within a master view model's scope, notify the 
+                  // master view model that the view model is being disposed.
+                  if (id.Contains('.'))
+                  {
+                     var masterVMId = id.Remove(id.LastIndexOf('.'));
+                     if (_activeVMs.ContainsKey(masterVMId))
+                        _activeVMs[masterVMId].Instance.OnSubVMDisposing(vmInfo.Instance);
+                  }
+
                   vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
                   vmInfo.Instance.Dispose();
                }
