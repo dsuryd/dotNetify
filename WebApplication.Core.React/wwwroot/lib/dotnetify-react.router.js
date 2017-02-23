@@ -148,7 +148,7 @@ limitations under the License.
             initRouting: function () {
                var vm = this;
                var state = vm.State();
-               if (!state.hasOwnProperty("RoutingState"))
+               if (state == null || !state.hasOwnProperty("RoutingState"))
                   return;
 
                var templates = state.RoutingState.Templates;

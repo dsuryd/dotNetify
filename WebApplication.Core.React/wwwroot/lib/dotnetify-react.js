@@ -63,7 +63,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          var self = dotnetify.react;
          var getInitialStates = function () {
             for (var vmId in self.viewModels) {
-               if (!self.viewModels[vmId].$loaded)
+               if (!self.viewModels[vmId].$requested)
                   self.viewModels[vmId].$request();
             }
          };
@@ -159,6 +159,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
       this.$vmId = iVMId;
       this.$vmArg = iVMArg;
+      this.$requested = false;
       this.$loaded = false;
       this.$itemKey = {};
       this.State = function (state) { return typeof state === "undefined" ? iGetState() : iSetState(state) };
@@ -222,8 +223,11 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             return;
          }
          for (var prop in item) {
-            if (prop != key)
-               this.$dispatch({ [listName + ".$" +item[key]+ "." +prop]: item[prop] });
+            if (prop != key) {
+               var state = {};
+               state[listName + ".$" + item[key] + "." + prop] = item[prop];
+               this.$dispatch(state);
+            }
          }
 
          this.$updateList(listName, item);
@@ -297,7 +301,9 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          var match = /(.*)_itemKey/.exec(prop);
          if (match != null) {
             var listName = match[1];
-            vm.$setItemKey({ [listName]: iVMUpdate[prop] });
+            var itemKey = {};
+            itemKey[listName] = iVMUpdate[prop];
+            vm.$setItemKey(itemKey);
             delete iVMUpdate[prop];
             continue;
          }
@@ -306,8 +312,10 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
    // Requests state from the server view model.
    dotnetifyVM.prototype.$request = function () {
-      if (dotnetify.isConnected())
+      if (dotnetify.isConnected()) {
          dotnetify.hubServer.request_VM(this.$vmId, this.$vmArg);
+         this.$requested = true;
+      }
    }
 
    // Updates state from the server view model to the view.
@@ -368,13 +376,17 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
       var items = this.State()[iListName];
       items.push(iNewItem);
-      this.State({ [iListName]: items });
+
+      var state = {};
+      state[iListName] = items;
+      this.State(state);
    }
 
    // Removes an item from a state array.
    dotnetifyVM.prototype.$removeList = function (iListName, iFilter) {
-      var items = this.State()[iListName].filter(function (i) { return !iFilter(i) });
-      this.State({ [iListName]: items });
+      var state = {};
+      state[iListName] = this.State()[iListName].filter(function (i) { return !iFilter(i) });
+      this.State(state);
    }
 
    //// Updates existing item to an observable array.
@@ -387,8 +399,9 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             console.error("[" + this.$vmId + "] couldn't update item to '" + iListName + "' due to missing property '" + key + "'");
             return;
          }
-         var items = this.State()[iListName].map(function (i) { return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i });
-         this.State({ [iListName]: items });
+         var state = {};
+         state[iListName] = this.State()[iListName].map(function (i) { return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i });
+         this.State(state);
       }
       else
          console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");

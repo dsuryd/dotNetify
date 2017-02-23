@@ -118,14 +118,19 @@ var MovieDetails = React.createClass({
 var MovieFilter = React.createClass({
    contextTypes: { connect: React.PropTypes.func },
    getInitialState() {
-      return Object.assign(this.context.connect(this, "MovieFilterVM") || {}, {
+      // Combine state from back-end with local state.
+      // This can be more concise using Object.assign if not for IE 11 support.
+      var state = this.context.connect(this, "MovieFilterVM") || {};
+      var localState = {
          filters: [],
          filterId: 0,
          filter: "Any",
          operation: "has",
          operations: ["has"],
-         text: ""
-      });
+         text: "" };
+      for (var prop in localState)
+         state[prop] = localState[prop];
+      return state;
    },
    componentWillUnmount() {
       this.vm.$destroy();

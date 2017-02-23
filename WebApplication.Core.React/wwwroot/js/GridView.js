@@ -23,7 +23,9 @@ var GridView = React.createClass({
       };
 
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
-      return Object.assign({ openWizard: false }, window.vmStates.GridViewVM);
+      var state = window.vmStates.GridViewVM || {};
+      state["openWizard"] = false;
+      return state;
    },
    componentWillUnmount: function componentWillUnmount() {
       this.vm.$destroy();

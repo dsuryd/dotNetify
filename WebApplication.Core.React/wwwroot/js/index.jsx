@@ -3,9 +3,9 @@
    getInitialState() {
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("IndexVM", () => this.state, state => this.setState(state));
-      return Object.assign(window.vmStates.IndexVM || {}, {
-         selectedLink: ""
-      });
+      var state = window.vmStates.IndexVM || {};
+      state["selectedLink"] = "";
+      return state;
    },
    render() {
       const styles = {

@@ -17,17 +17,19 @@ namespace ViewModels.CompositeView
          public string Operation { get; set; }
          public string Text { get; set; }
 
-         public override string ToString() => $"{Property} {Operation} {Text}";
-
          public string ToQuery()
          {
             if (Operation == "has")
                return Property == "Any" ? $"( Movie + Cast + Director ).toLower().contains(\"{Text.ToLower()}\")"
                   : $"{Property}.toLower().contains(\"{Text.ToLower()}\")";
-            else if (Operation == "equals")
-               return $"{Property} == {Text}";
             else
-               return $"{Property} {Operation} {Text}";
+            {
+               int intValue = int.Parse(Text);
+               if (Operation == "equals")
+                  return $"{Property} == {intValue}";
+               else
+                  return $"{Property} {Operation} {intValue}";
+            }
          }
 
          public static string BuildQuery(IEnumerable<MovieFilter> filters) => string.Join(" and ", filters.Select(i => i.ToQuery()));

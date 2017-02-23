@@ -12,9 +12,9 @@ var Index = React.createClass({
       }, function (state) {
          return _this.setState(state);
       });
-      return Object.assign(window.vmStates.IndexVM || {}, {
-         selectedLink: ""
-      });
+      var state = window.vmStates.IndexVM || {};
+      state["selectedLink"] = "";
+      return state;
    },
    render: function render() {
       var _this2 = this;
