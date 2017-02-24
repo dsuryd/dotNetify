@@ -3,7 +3,10 @@ require( "bootstrap" );
 require( "signalr" );
 Path = require( "pathjs" );
 React = require( "react" );
-ReactDOM = require( "react-dom" );
+ReactDOM = require("react-dom");
+
+// ChartJS.
+LineChart = require("react-chartjs").Line;
 
 // Material-UI components.
 MuiThemeProvider = require("material-ui/styles/MuiThemeProvider").default;

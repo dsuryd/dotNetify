@@ -28,6 +28,7 @@ namespace ViewModels
       {
          new Link { Route = this.GetRoute("GridView"), Caption = "Grid View", Description = "Master-detail view with search, pagination, wizard and localization" },
          new Link { Route = this.GetRoute("CompositeView"), Caption = "Composite View", Description = "Making app functionally scalable through front-end/back-end composition" },
+         new Link { Route = this.GetRoute("LiveChart"), Caption = "Live Chart", Description = "Real-time made easy"  }
       };
 
       public IndexVM()
@@ -41,6 +42,7 @@ namespace ViewModels
             new RouteTemplate { Id = "GridView", UrlPattern = "gridview", Target = "Content", ViewUrl = "GridView", JSModuleUrl = "/state/get/GridViewVM, /js/GridView.js" },
             new RouteTemplate { Id = "CompositeView", UrlPattern = "compositeview", Target = "Content", ViewUrl = "CompositeView",
                JSModuleUrl = "/state/get/AFITop100VM, /state/get/AFITop100VM.FilterableMovieTableVM.MovieTableVM, /js/CompositeView/PaginatedTable.js, /js/CompositeView/CompositeView.js" },
+            new RouteTemplate { Id = "LiveChart", UrlPattern = "livechart", Target = "Content", ViewUrl = "LiveChart", JSModuleUrl = "/state/get/LiveChartVM, /js/LiveChart.js" },
          });
       }
    }

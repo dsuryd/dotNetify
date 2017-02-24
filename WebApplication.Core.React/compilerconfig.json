@@ -30,5 +30,9 @@
   {
     "outputFile": "wwwroot/js/CompositeView/CompositeView.js",
     "inputFile": "wwwroot/js/CompositeView/CompositeView.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/LiveChart.js",
+    "inputFile": "wwwroot/js/LiveChart.jsx"
   }
 ]
