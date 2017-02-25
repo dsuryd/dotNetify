@@ -92,6 +92,11 @@ namespace DotNetify
       {
          if ( typeof(ICommand).IsAssignableFrom(objectType) )
             return new CommandConverter();
+         else
+         {
+            if ( objectType.IsSubclassOf(typeof(MulticastDelegate)) && objectType.GetMethod(nameof(Action.Invoke)).ReturnType == typeof(void) )
+               return new CommandConverter();
+         }
          return base.ResolveContractConverter(objectType);
       }
    }

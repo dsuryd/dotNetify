@@ -93,7 +93,7 @@ namespace DotNetify
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Request_VM: {0} {1}", vmId, Context.ConnectionId));
+            Trace.WriteLine(String.Format("[DEBUG] Request_VM: {0} {1}", vmId, Context.ConnectionId));
             VMController.OnRequestVM(Context.ConnectionId, vmId, vmArg);
          }
          catch (UnauthorizedAccessException)
@@ -102,7 +102,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -115,7 +115,7 @@ namespace DotNetify
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Update_VM: {0} {1} {2}", vmId, Context.ConnectionId, JsonConvert.SerializeObject(vmData)));
+            Trace.WriteLine(String.Format("[DEBUG] Update_VM: {0} {1} {2}", vmId, Context.ConnectionId, JsonConvert.SerializeObject(vmData)));
             VMController.OnUpdateVM(Context.ConnectionId, vmId, vmData);
          }
          catch (UnauthorizedAccessException)
@@ -124,7 +124,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -140,7 +140,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 

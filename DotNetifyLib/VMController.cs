@@ -115,10 +115,17 @@ namespace DotNetify
       public IPrincipal Principal;
 
       /// <summary>
+      ///  Default constructor.
+      /// </summary>
+      public VMController()
+      {
+      }
+
+      /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="vmResponse">Function invoked by the view model to provide response back to the client.</param>
-      public VMController(VMResponseDelegate vmResponse)
+      public VMController(VMResponseDelegate vmResponse) : this()
       {
          _vmResponse = vmResponse;
          if (_vmResponse == null)
