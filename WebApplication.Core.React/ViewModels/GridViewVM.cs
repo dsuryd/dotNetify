@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Input;
 using Microsoft.Extensions.Localization;
 using WebApplication.Core.React.Resources;
 using DotNetify;
@@ -122,7 +121,7 @@ namespace ViewModels
       /// <summary>
       /// When a list item is edited, this property will receive the edited item.
       /// </summary>
-      public ICommand Update => new Command<EmployeeDetails>(changes =>
+      public Action<EmployeeDetails> Update => changes =>
       {
          /// Real world app would do database update operation here.
          var record = _employeeService.GetById(changes.Id);
@@ -136,7 +135,7 @@ namespace ViewModels
             this.UpdateList(nameof(Employees), new EmployeeMaster(record));
             Changed(nameof(Details));
          }
-      });
+      };
 
       /// <summary>
       /// This property receives text input from the Report To auto complete field in the editing wizard.

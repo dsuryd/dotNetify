@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using DotNetify;
 
 namespace ViewModels
@@ -41,7 +41,7 @@ namespace ViewModels
       /// <summary>
       /// When the Add button is clicked, this property will receive the new employee full name input.
       /// </summary>
-      public ICommand Add => new Command<string>(fullName =>
+      public Action<string> Add => fullName =>
       {
          var names = fullName.Split(new char[] { ' ' }, 2);
          var newRecord = new EmployeeModel
@@ -58,12 +58,12 @@ namespace ViewModels
             FirstName = newRecord.FirstName,
             LastName = newRecord.LastName
          });
-      });
+      };
 
       /// <summary>
       /// When a list item is edited, this property will receive the edited item.
       /// </summary>
-      public ICommand Update => new Command<EmployeeInfo>(changes =>
+      public Action<EmployeeInfo> Update => changes =>
       {
          /// Real world app would do database update operation here.
          var record = _employeeService.GetById(changes.Id);
@@ -75,19 +75,19 @@ namespace ViewModels
 
             ShowNotification = true;
          }
-      });
+      };
 
       /// <summary>
       /// When the Remove button is clicked, this property will receive the employee Id to remove.
       /// </summary>
-      public ICommand Remove => new Command<int>(id =>
+      public Action<int> Remove => id =>
       {
          _employeeService.Delete(id);
 
          // Call special base method to remove an item from the list on the client-side.
          // This will be handled by dotNetify client-side library; no custom JSX needed.
          this.RemoveList(nameof(Employees), id);
-      });
+      };
 
       /// <summary>
       /// Whether to show notification that changes have been saved.

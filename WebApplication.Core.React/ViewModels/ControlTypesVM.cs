@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using DotNetify;
 using ViewModels.Components.MaterialUI;
 
@@ -181,9 +180,9 @@ namespace ViewModels
          set { Set(value); }
       }
 
-      public ICommand DeleteChip => new Command<string>(key => Chips = Chips.Where(i => i.key != key));
+      public Action<string> DeleteChip => key => Chips = Chips.Where(i => i.key != key);
 
-      public ICommand ResetChips => new Command(() => Chips = new List<Chip>(_chips));
+      public Action ResetChips => () => Chips = new List<Chip>(_chips);
 
       #endregion
    }

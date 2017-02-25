@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using DotNetify;
 
 namespace ViewModels.CompositeView
@@ -35,17 +34,17 @@ namespace ViewModels.CompositeView
          public static string BuildQuery(IEnumerable<MovieFilter> filters) => string.Join(" and ", filters.Select(i => i.ToQuery()));
       }
 
-      public ICommand Apply => new Command<MovieFilter>(arg =>
+      public Action<MovieFilter> Apply => arg =>
       {
          _filters.Add(arg);
          FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
-      });
+      };
 
-      public ICommand Delete => new Command<int>(id =>
+      public Action<int> Delete => id =>
       {
          _filters = _filters.Where(i => i.Id != id).ToList();
          FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
-      });
+      };
 
       public event EventHandler<string> FilterChanged;
    }

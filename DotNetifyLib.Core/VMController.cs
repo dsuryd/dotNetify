@@ -268,8 +268,8 @@ namespace DotNetify
          lock (_activeVMs)
          {
             // Dispose not only the view model, but all view models within its scope.
-            var vmIds = _activeVMs.Keys.Where( i => i == vmId || i.StartsWith(vmId + "."));
-            foreach( var id in vmIds.OrderByDescending( i => i.Length ) )
+            var vmIds = _activeVMs.Keys.Where(i => i == vmId || i.StartsWith(vmId + "."));
+            foreach (var id in vmIds.OrderByDescending(i => i.Length))
             {
                VMInfo vmInfo;
                if (_activeVMs.TryRemove(id, out vmInfo))
@@ -407,6 +407,8 @@ namespace DotNetify
                if (propInfo == null)
                   throw new UnresolvedVMUpdateException();
 
+               var propType = propInfo.PropertyType.GetTypeInfo();
+
                if (i < path.Length - 1)
                {
                   // Path that starts with $ sign means it is a key to an IEnumerable property.
@@ -438,10 +440,17 @@ namespace DotNetify
                   // If the property type is ICommand, execute the command.
                   (propInfo.GetValue(vmObject) as ICommand)?.Execute(newValue);
                }
+               else if (propType.IsSubclassOf(typeof(MulticastDelegate)) && propType.GetMethod(nameof(Action.Invoke)).ReturnType == typeof(void))
+               {
+                  // If the property type is Action, wrap the action in a Command object and execute it.
+                  var argTypes = propType.GetGenericArguments();
+                  var cmdType = argTypes.Length > 0 ? typeof(Command<>).MakeGenericType(argTypes) : typeof(Command);
+                  (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(vmObject) }) as ICommand)?.Execute(newValue);
+               }
                else if (propInfo.SetMethod != null && vmObject != null)
                {
                   // Update the new value to the property.
-                  if (propInfo.PropertyType.GetTypeInfo().IsClass && propInfo.PropertyType != typeof(string))
+                  if (propType.IsClass && propInfo.PropertyType != typeof(string))
                      propInfo.SetValue(vmObject, JsonConvert.DeserializeObject(newValue, propInfo.PropertyType));
                   else
                   {
@@ -500,8 +509,16 @@ namespace DotNetify
       /// <returns>Serialized string.</returns>
       protected virtual string Serialize(object data)
       {
-         List<string> ignoredPropertyNames = data is BaseVM ? (data as BaseVM).IgnoredProperties : null;
-         return JsonConvert.SerializeObject(data, new JsonSerializerSettings { ContractResolver = new VMContractResolver(ignoredPropertyNames) });
+         try
+         {
+            List<string> ignoredPropertyNames = data is BaseVM ? (data as BaseVM).IgnoredProperties : null;
+            return JsonConvert.SerializeObject(data, new JsonSerializerSettings { ContractResolver = new VMContractResolver(ignoredPropertyNames) });
+         }
+         catch (Exception ex)
+         {
+            Trace.Fail(ex.ToString());
+            return string.Empty;
+         }
       }
 
       /// <summary>
