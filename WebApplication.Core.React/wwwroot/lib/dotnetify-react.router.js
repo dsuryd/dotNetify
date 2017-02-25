@@ -306,7 +306,7 @@ limitations under the License.
                   console.log("router> routing " + urlPath);
 
                // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
-               if (utils.equal(urlPath, root)) {
+               if (utils.equal(urlPath, root) || utils.equal(urlPath, root + "/")) {
                   var match = $.grep(state.RoutingState.Templates, function (iTemplate) { return iTemplate.UrlPattern === "" });
                   if (match.length > 0)
                      vm.$router.routeTo("", match[0]);
