@@ -15,7 +15,23 @@
             <div className="header clearfix">
                <h3>Example: Live Chart</h3>
             </div>
-            <LiveLineChart data={this.state.InitialData} nextData={this.state.NextData} />
+            <MuiThemeProvider>
+            <div className="row">
+               <div className="col-md-8">
+                  <Paper style={{padding: "2em"}}>
+                     <LiveLineChart data={this.state.InitialLineData} nextData={this.state.NextLineData} />
+                  </Paper>
+               </div>
+               <div className="col-md-4">
+                  <Paper style={{padding: "2em"}}>
+                     <LiveDoughnutChart data={this.state.InitialDoughnutData} nextData={this.state.NextDoughnutData} />
+                  </Paper>
+                  <Paper style={{padding: "2em", marginTop: "1em"}}>
+                     <LiveBarChart data={this.state.InitialBarData} nextData={this.state.NextBarData} />
+                  </Paper>
+               </div>
+            </div>
+            </MuiThemeProvider>
          </div>
      );
    }
@@ -59,6 +75,76 @@ const LiveLineChart = React.createClass({
 
       return (
          <LineChart data={chartData} options={chartOptions}>{updateData(this.props.nextData)}</LineChart>
+     );
+   }
+});
+
+const LiveBarChart = React.createClass({
+   getInitialState() {
+      // Build the ChartJS data parameter with initial data.
+      var initialData = {
+         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+         datasets: [{
+            label: "",
+            data: [],
+            fillColor: "#4caf50",
+            strokeColor: "#4caf50",
+         }]
+      };
+      initialData.datasets[0].data = this.props.data;
+      return { chartData: initialData };
+   },
+
+   render() {
+      var chartData = this.state.chartData;
+      const chartOptions = { responsive: true, animation: true };
+
+      const updateData = data => {
+         if (data)
+            chartData.datasets[0].data = data;
+      }
+
+      return (
+         <BarChart data={chartData} options={chartOptions}>{updateData(this.props.nextData)}</BarChart>
+     );
+}
+});
+
+const LiveDoughnutChart = React.createClass({
+   getInitialState() {
+      // Build the ChartJS data parameter with initial data.
+      var initialData = [
+         {
+            color: "#FF6384",
+            highlight: "#FF6384",
+            label: "Red"
+         },
+         {
+            color: "#36A2EB",
+            highlight: "#36A2EB",
+            label: "Blue"
+         },
+         {
+            color: "#FFCE56",
+            highlight: "#FFCE56",
+            label: "Yellow"
+         }];
+
+      this.props.data.map((val, idx) => initialData[idx].value = val);
+      return { chartData: initialData };
+   },
+
+   render() {
+      var chartData = this.state.chartData;
+      const chartOptions = { responsive: true, animation: true };
+
+      const updateData = data => {
+         if (data)
+            data.map((val, idx) => chartData[idx].value = val);
+      }
+
+      return (
+         <DoughnutChart data={chartData} options={chartOptions}>{updateData(this.props.nextData)}</DoughnutChart>
      );
    }
 });

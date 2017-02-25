@@ -32,7 +32,37 @@ var LiveChart = React.createClass({
                "Example: Live Chart"
             )
          ),
-         React.createElement(LiveLineChart, { data: this.state.InitialData, nextData: this.state.NextData })
+         React.createElement(
+            MuiThemeProvider,
+            null,
+            React.createElement(
+               "div",
+               { className: "row" },
+               React.createElement(
+                  "div",
+                  { className: "col-md-8" },
+                  React.createElement(
+                     Paper,
+                     { style: { padding: "2em" } },
+                     React.createElement(LiveLineChart, { data: this.state.InitialLineData, nextData: this.state.NextLineData })
+                  )
+               ),
+               React.createElement(
+                  "div",
+                  { className: "col-md-4" },
+                  React.createElement(
+                     Paper,
+                     { style: { padding: "2em" } },
+                     React.createElement(LiveDoughnutChart, { data: this.state.InitialDoughnutData, nextData: this.state.NextDoughnutData })
+                  ),
+                  React.createElement(
+                     Paper,
+                     { style: { padding: "2em", marginTop: "1em" } },
+                     React.createElement(LiveBarChart, { data: this.state.InitialBarData, nextData: this.state.NextBarData })
+                  )
+               )
+            )
+         )
       );
    }
 });
@@ -77,6 +107,83 @@ var LiveLineChart = React.createClass({
 
       return React.createElement(
          LineChart,
+         { data: chartData, options: chartOptions },
+         updateData(this.props.nextData)
+      );
+   }
+});
+
+var LiveBarChart = React.createClass({
+   displayName: "LiveBarChart",
+
+   getInitialState: function getInitialState() {
+      // Build the ChartJS data parameter with initial data.
+      var initialData = {
+         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+         datasets: [{
+            label: "",
+            data: [],
+            fillColor: "#4caf50",
+            strokeColor: "#4caf50"
+         }]
+      };
+      initialData.datasets[0].data = this.props.data;
+      return { chartData: initialData };
+   },
+
+   render: function render() {
+      var chartData = this.state.chartData;
+      var chartOptions = { responsive: true, animation: true };
+
+      var updateData = function updateData(data) {
+         if (data) chartData.datasets[0].data = data;
+      };
+
+      return React.createElement(
+         BarChart,
+         { data: chartData, options: chartOptions },
+         updateData(this.props.nextData)
+      );
+   }
+});
+
+var LiveDoughnutChart = React.createClass({
+   displayName: "LiveDoughnutChart",
+
+   getInitialState: function getInitialState() {
+      // Build the ChartJS data parameter with initial data.
+      var initialData = [{
+         color: "#FF6384",
+         highlight: "#FF6384",
+         label: "Red"
+      }, {
+         color: "#36A2EB",
+         highlight: "#36A2EB",
+         label: "Blue"
+      }, {
+         color: "#FFCE56",
+         highlight: "#FFCE56",
+         label: "Yellow"
+      }];
+
+      this.props.data.map(function (val, idx) {
+         return initialData[idx].value = val;
+      });
+      return { chartData: initialData };
+   },
+
+   render: function render() {
+      var chartData = this.state.chartData;
+      var chartOptions = { responsive: true, animation: true };
+
+      var updateData = function updateData(data) {
+         if (data) data.map(function (val, idx) {
+            return chartData[idx].value = val;
+         });
+      };
+
+      return React.createElement(
+         DoughnutChart,
          { data: chartData, options: chartOptions },
          updateData(this.props.nextData)
       );

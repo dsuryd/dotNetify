@@ -15,11 +15,27 @@ namespace ViewModels
       private const int _timeInterval = 1000;
       private Random _random = new Random();
 
-      public int[][] InitialData => Enumerable
+      public int[][] InitialLineData => Enumerable
          .Range(0, _count)
          .Select(x => Enumerable.Range(0, 2).Select(y => y == 0 ? x : _random.Next(1, 50)).ToArray()).ToArray();
 
-      public int[] NextData
+      public int[] InitialBarData => Enumerable.Range(0, 6).Select(x => _random.Next(1, 100)).ToArray();
+
+      public int[] InitialDoughnutData => Enumerable.Range(0, 3).Select(x => _random.Next(1, 50)).ToArray();
+
+      public int[] NextLineData
+      {
+         get { return Get<int[]>(); }
+         set { Set(value); }
+      }
+
+      public int[] NextBarData
+      {
+         get { return Get<int[]>(); }
+         set { Set(value); }
+      }
+
+      public int[] NextDoughnutData
       {
          get { return Get<int[]>(); }
          set { Set(value); }
@@ -29,8 +45,12 @@ namespace ViewModels
       {
          _timer = new Timer(state =>
          {
-            NextData = new int[] { _count++, _random.Next(1, 50) };
+            NextLineData = new int[] { _count++, _random.Next(1, 50) };
+            NextBarData = Enumerable.Range(0, 6).Select(x => _random.Next(1, 50)).ToArray();
+            NextDoughnutData = Enumerable.Range(0, 3).Select(x => _random.Next(1, 100)).ToArray();
+            
             PushUpdates(); // Base method to push changed properties from all active view models to the browser.
+
          }, null, _timeInterval, _timeInterval);
       }
 

@@ -7,6 +7,8 @@ ReactDOM = require("react-dom");
 
 // ChartJS.
 LineChart = require("react-chartjs").Line;
+BarChart = require("react-chartjs").Bar;
+DoughnutChart = require("react-chartjs").Doughnut;
 
 // Material-UI components.
 MuiThemeProvider = require("material-ui/styles/MuiThemeProvider").default;
