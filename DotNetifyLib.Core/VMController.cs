@@ -199,7 +199,7 @@ namespace DotNetify
          var vmData = Serialize(vmInstance);
 
          // Send the view model data back to the browser client.
-         _vmResponse(connectionId, vmId, vmData);
+         _vmResponse?.Invoke(connectionId, vmId, vmData);
 
          // Reset the changed property states.
          vmInstance.AcceptChangedProperties();
@@ -298,7 +298,10 @@ namespace DotNetify
       /// <returns>View model instance.</returns>
       protected virtual BaseVM CreateVM(string vmId, object vmArg = null)
       {
-         BaseVM vmInstance = null;
+         string vmNamespace = null;
+         JToken namespaceToken;
+         if (vmArg is JObject && (vmArg as JObject).TryGetValue("namespace", StringComparison.OrdinalIgnoreCase, out namespaceToken))
+            vmNamespace = namespaceToken.ToString();
 
          // If the view model Id is in the form of a delimited path, it has a master view model.
          BaseVM masterVM = null;
@@ -311,7 +314,8 @@ namespace DotNetify
             {
                if (!_activeVMs.ContainsKey(masterVMId))
                {
-                  masterVM = CreateVM(masterVMId);
+                  var arg = !string.IsNullOrEmpty(vmNamespace) ? JObject.Parse($"{{namespace: '{vmNamespace}'}}") : null;
+                  masterVM = CreateVM(masterVMId, arg);
                   _activeVMs.TryAdd(masterVMId, new VMInfo { Instance = masterVM });
                }
                else
@@ -331,13 +335,16 @@ namespace DotNetify
          }
 
          // Get the view model instance from the master view model.
-         if (masterVM != null)
-            vmInstance = masterVM.GetSubVM(vmTypeName, vmInstanceId);
+         var vmInstance = masterVM?.GetSubVM(vmTypeName, vmInstanceId);
 
          // If still no view model instance, create it ourselves here.
          if (vmInstance == null)
          {
-            var vmType = _vmTypes.FirstOrDefault(i => i.Name == vmTypeName);
+            Type vmType = null;
+            if (vmNamespace != null)
+               vmType = _vmTypes.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}");
+
+            vmType = vmType ?? _vmTypes.FirstOrDefault(i => i.Name == vmTypeName);
             if (vmType == null)
                throw new Exception($"[dotNetify] ERROR: '{vmId}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.");
 
@@ -363,7 +370,7 @@ namespace DotNetify
          }
 
          // If there are view model arguments, set them into the instance.
-         if (vmArg != null)
+         if (vmArg is JObject)
          {
             var vmJsonArg = (JObject)vmArg;
             foreach (var prop in vmJsonArg.Properties())
