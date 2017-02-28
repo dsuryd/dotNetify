@@ -298,10 +298,15 @@ namespace DotNetify
       /// <returns>View model instance.</returns>
       protected virtual BaseVM CreateVM(string vmId, object vmArg = null)
       {
+         // If the namespace argument is given, try to resolve the view model type to that namespace.
+         const string NAMESPACE = "namespace";
          string vmNamespace = null;
          JToken namespaceToken;
-         if (vmArg is JObject && (vmArg as JObject).TryGetValue("namespace", StringComparison.OrdinalIgnoreCase, out namespaceToken))
+         if (vmArg is JObject && (vmArg as JObject).TryGetValue(NAMESPACE, StringComparison.OrdinalIgnoreCase, out namespaceToken))
+         { 
             vmNamespace = namespaceToken.ToString();
+            (vmArg as JObject).Remove(NAMESPACE);
+         }
 
          // If the view model Id is in the form of a delimited path, it has a master view model.
          BaseVM masterVM = null;
@@ -314,7 +319,7 @@ namespace DotNetify
             {
                if (!_activeVMs.ContainsKey(masterVMId))
                {
-                  var arg = !string.IsNullOrEmpty(vmNamespace) ? JObject.Parse($"{{namespace: '{vmNamespace}'}}") : null;
+                  var arg = !string.IsNullOrEmpty(vmNamespace) ? JObject.Parse($"{{{NAMESPACE}: '{vmNamespace}'}}") : null;
                   masterVM = CreateVM(masterVMId, arg);
                   _activeVMs.TryAdd(masterVMId, new VMInfo { Instance = masterVM });
                }
