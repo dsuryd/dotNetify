@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
+using Newtonsoft.Json;
 
 namespace DotNetify
 {
@@ -69,6 +71,19 @@ namespace DotNetify
       /// <param name="parameter">command parameter.</param>
       public void Execute( object parameter )
       {
+         // Convert the parameter to the expected type.
+         if ( parameter != null )
+         {
+            if ( typeof(T).IsClass && typeof(T) != typeof(string) )
+               parameter = JsonConvert.DeserializeObject<T>(parameter.ToString());
+            else
+            {
+               var typeConverter = TypeDescriptor.GetConverter(typeof(T));
+               if ( typeConverter != null )
+                  parameter = typeConverter.ConvertFromString(parameter.ToString());
+            }
+         }
+
          _executeAction?.Invoke((T) parameter);
       }
 

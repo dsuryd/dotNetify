@@ -64,7 +64,7 @@ namespace DotNetify
       /// Constructor for dependency injection.
       /// </summary>
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
-      public DotNetifyHub(IVMControllerFactory vmControllerFactory)
+      public DotNetifyHub( IVMControllerFactory vmControllerFactory )
       {
          _vmControllerFactory = vmControllerFactory;
       }
@@ -75,7 +75,7 @@ namespace DotNetify
       /// <param name="stopCalled">True, if stop was called on the client closing the connection gracefully;
       /// false, if the connection has been lost for longer than the timeout.</param>
       /// <returns></returns>
-      public override Task OnDisconnected(bool stopCalled)
+      public override Task OnDisconnected( bool stopCalled )
       {
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(Context.ConnectionId);
@@ -89,20 +89,20 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional view model's initialization argument.</param>
-      public void Request_VM(string vmId, object vmArg)
+      public void Request_VM( string vmId, object vmArg )
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Request_VM: {0} {1}", vmId, Context.ConnectionId));
+            Trace.WriteLine(String.Format("[dotNetify] Request_VM: {0} {1}", vmId, Context.ConnectionId));
             VMController.OnRequestVM(Context.ConnectionId, vmId, vmArg);
          }
-         catch (UnauthorizedAccessException)
+         catch ( UnauthorizedAccessException )
          {
             Response_VM(Context.ConnectionId, vmId, "403");
          }
-         catch (Exception ex)
+         catch ( Exception ex )
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -111,20 +111,20 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
-      public void Update_VM(string vmId, Dictionary<string, object> vmData)
+      public void Update_VM( string vmId, Dictionary<string, object> vmData )
       {
          try
          {
-            Debug.WriteLine(String.Format("[DEBUG] Update_VM: {0} {1} {2}", vmId, Context.ConnectionId, JsonConvert.SerializeObject(vmData)));
+            Trace.WriteLine(String.Format("[dotNetify] Update_VM: {0} {1} {2}", vmId, Context.ConnectionId, JsonConvert.SerializeObject(vmData)));
             VMController.OnUpdateVM(Context.ConnectionId, vmId, vmData);
          }
-         catch (UnauthorizedAccessException)
+         catch ( UnauthorizedAccessException )
          {
             Response_VM(Context.ConnectionId, vmId, "403");
          }
-         catch (Exception ex)
+         catch ( Exception ex )
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -132,15 +132,15 @@ namespace DotNetify
       /// This method is called by browser clients to remove its view model as it's no longer used.
       /// </summary>
       /// <param name="vmId">Identifies the view model.  By convention, this should match a view model class name.</param>
-      public void Dispose_VM(string vmId)
+      public void Dispose_VM( string vmId )
       {
          try
          {
             VMController.OnDisposeVM(Context.ConnectionId, vmId);
          }
-         catch (Exception ex)
+         catch ( Exception ex )
          {
-            Debug.Fail(ex.ToString());
+            Trace.Fail(ex.ToString());
          }
       }
 
@@ -154,8 +154,12 @@ namespace DotNetify
       /// <param name="connectionId">Identifies the browser client making prior request.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data in serialized JSON.</param>
-      public static void Response_VM(string connectionId, string vmId, string vmData)
+      public static void Response_VM( string connectionId, string vmId, string vmData )
       {
+         if ( connectionId == null )
+            return;
+
+         Trace.WriteLine(String.Format("[dotNetify] Response_VM: {0} {1} {2}", vmId, connectionId, JsonConvert.SerializeObject(vmData)));
          HubContext.Clients.Client(connectionId).Response_VM(vmId, vmData);
       }
 

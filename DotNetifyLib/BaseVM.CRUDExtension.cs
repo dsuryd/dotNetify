@@ -30,8 +30,10 @@ namespace DotNetify
       public static void AddList<T>(this BaseVM vm, Expression<Func<T>> expression, object item)
       {
          var propName = ((MemberExpression)expression.Body).Member.Name;
-         vm.ChangedProperties[propName + "_add"] = item;
+         vm.AddList( propName, item );
       }
+
+      public static void AddList<T>(this BaseVM vm, string propName, T item) => vm.ChangedProperties[propName + "_add"] = item;
 
       /// <summary>
       /// Used in CRUD operations to update an existing item on the list.
@@ -42,8 +44,10 @@ namespace DotNetify
       public static void UpdateList<T>(this BaseVM vm, Expression<Func<T>> expression, object item)
       {
          var propName = ((MemberExpression)expression.Body).Member.Name;
-         vm.ChangedProperties[propName + "_update"] = item;
+         vm.UpdateList(propName, item);
       }
+
+      public static void UpdateList<T>(this BaseVM vm, string propName, T item) => vm.ChangedProperties[propName + "_update"] = item;
 
       /// <summary>
       /// Used in CRUD operations to remove an item from a list.
@@ -54,7 +58,9 @@ namespace DotNetify
       public static void RemoveList<T>(this BaseVM vm, Expression<Func<T>> expression, object itemKey)
       {
          var propName = ((MemberExpression)expression.Body).Member.Name;
-         vm.ChangedProperties[propName + "_remove"] = itemKey;
+         vm.RemoveList(propName, itemKey);
       }
+
+      public static void RemoveList<T>(this BaseVM vm, string propName, T itemKey) => vm.ChangedProperties[propName + "_remove"] = itemKey;
    }
 }
