@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using WebApplication.Core.React.Properties;
+using WebApplication.Core.React;
 
 namespace ViewModels
 {
@@ -16,7 +16,7 @@ namespace ViewModels
 
    public class MovieService
    {
-      public IEnumerable<MovieRecord> GetAFITop100() => JsonConvert.DeserializeObject<List<MovieRecord>>(Resources.AFITop100_json);
+      public IEnumerable<MovieRecord> GetAFITop100() => JsonConvert.DeserializeObject<List<MovieRecord>>(this.GetEmbeddedResource("AFITop100.json"));
 
       public MovieRecord GetMovieByAFIRank(int rank) => GetAFITop100().FirstOrDefault(i => i.Rank == rank);
    }

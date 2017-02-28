@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using WebApplication.Core.React.Properties;
+using WebApplication.Core.React;
 
 namespace ViewModels
 {
@@ -25,7 +25,7 @@ namespace ViewModels
       private List<EmployeeModel> _employees;
       private int _newId = 100;
 
-      private List<EmployeeModel> MockupData => JsonConvert.DeserializeObject<List<EmployeeModel>>(Resources.employees_json);
+      private List<EmployeeModel> MockupData => JsonConvert.DeserializeObject<List<EmployeeModel>>(this.GetEmbeddedResource("employees.json"));
 
       public EmployeeService(int? numRecords = null)
       {

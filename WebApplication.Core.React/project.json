@@ -32,7 +32,12 @@
 
   "buildOptions": {
     "emitEntryPoint": true,
-    "preserveCompilationContext": true
+    "preserveCompilationContext": true,
+    "embed": {
+      "include": [
+        "Resources/*.json"
+      ]
+    }
   },
 
   "runtimeOptions": {
