@@ -324,6 +324,9 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       if (dotnetify.debug) {
          console.log("[" + this.$vmId + "] received> ");
          console.log(JSON.parse(iVMData));
+
+         if (dotnetify.debugFn != null)
+            dotnetify.debugFn(this.$vmId, "received", JSON.parse(iVMData));
       }
 
       var vmData = JSON.parse(iVMData);
