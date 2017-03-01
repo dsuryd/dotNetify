@@ -26,8 +26,7 @@
       "DotNetifyLib.Core": "2.0.0-*",
       "ViewModels.Examples": "1.0.0-*",
       "jquery.TypeScript.DefinitelyTyped": "3.1.2",
-      "chartjs.TypeScript.DefinitelyTyped": "2.2.7",
-      "Microsoft.AspNetCore.WebSockets": "1.0.0"
+      "chartjs.TypeScript.DefinitelyTyped": "2.2.7"
    },
 
    "tools": {

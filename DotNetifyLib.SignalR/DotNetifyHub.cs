@@ -152,7 +152,8 @@ namespace DotNetify
       public void Response_VM(string connectionId, string vmId, string vmData)
       {
          Trace.WriteLine($"[dotNetify] Response_VM: {vmId} {connectionId} {vmData}");
-         Clients.Client(connectionId).Response_VM(vmId, vmData);
+         if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
+            Clients.Client(connectionId).Response_VM(vmId, vmData);
       }
 
       #endregion

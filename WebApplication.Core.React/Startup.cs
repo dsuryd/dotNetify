@@ -17,12 +17,11 @@ namespace WebApplication.Core.React
          services.AddMvc();
          services.AddLocalization();
 
-         services.AddMemoryCache(); // Required by dotNetify and ReactJS.NET.
          services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();  // Required by ReactJS.NET.
          services.AddSignalR();  // Required by dotNetify.
 
          services.AddReact();
-         services.AddDotNetify(); 
+         services.AddDotNetify();
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

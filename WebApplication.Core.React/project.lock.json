@@ -3775,7 +3775,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.6",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "1.0.0",
+          "Microsoft.Extensions.Caching.Memory": "1.1.0",
           "NETStandard.Library": "1.6.1",
           "Newtonsoft.Json": "9.0.1",
           "System.ComponentModel": "4.3.0",
@@ -3796,6 +3796,7 @@
         "dependencies": {
           "DotNetifyLib.Core": "2.0.0",
           "Gray.Microsoft.AspNetCore.SignalR.Server": "0.2.0-alpha1",
+          "Microsoft.AspNetCore.WebSockets": "1.0.0",
           "Microsoft.Extensions.DependencyInjection": "1.0.0",
           "Microsoft.Extensions.Logging": "1.1.0",
           "NETStandard.Library": "1.6.1"
@@ -10050,8 +10051,6 @@
       "Microsoft.AspNetCore.Server.IISIntegration >= 1.0.0",
       "Microsoft.AspNetCore.Server.Kestrel >= 1.0.1",
       "Microsoft.AspNetCore.StaticFiles >= 1.1.0",
-      "Microsoft.AspNetCore.WebSockets >= 1.0.0",
-      "Microsoft.Extensions.Caching.Memory >= 1.1.0",
       "Microsoft.Extensions.Logging.Console >= 1.0.0",
       "Microsoft.NETCore.App >= 1.0.1",
       "React.AspNet >= 3.0.0",

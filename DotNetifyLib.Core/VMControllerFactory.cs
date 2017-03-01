@@ -41,6 +41,9 @@ namespace DotNetify
 
       public VMControllerFactory(IMemoryCache memoryCache)
       {
+         if (memoryCache == null)
+            throw new ArgumentNullException("No service of type IMemoryCache has been registered.");
+
          _controllersCache = memoryCache;
       }
 
