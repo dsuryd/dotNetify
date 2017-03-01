@@ -70,7 +70,8 @@ namespace DotNetify.Routing
       /// Contructor that accepts the identity key and JS module to load.
       /// </summary>
       /// <param name="id">Identifies this template; also used for the View name and the URL pattern by default.</param>
-      public RouteTemplate(string id, string jsModuleUrl) : this()
+      /// <param name="jsModuleUrl">URL of Javascript module.</param>
+      public RouteTemplate(string id, string jsModuleUrl = null) : this()
       {
          Id = id;
          JSModuleUrl = jsModuleUrl;

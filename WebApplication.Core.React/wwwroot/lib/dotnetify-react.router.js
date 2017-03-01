@@ -207,12 +207,6 @@ limitations under the License.
                var vm = this;
                var state = vm.State();
 
-               // If no React component URL is given, empty the target DOM element.
-               if (iJsModuleUrl == null || iJsModuleUrl == "") {
-                  $(iTargetSelector).empty();
-                  return;
-               }
-
                var callbackFn = function () {
 
                   // If the view model supports routing, add the root path to the view, to be used
@@ -284,7 +278,7 @@ limitations under the License.
                vm.$router.loadView(target, view, iTemplate.JSModuleUrl, { "RoutingState.Origin": iPath }, function () {
                   // If load is successful, update the active route.
                   state.RoutingState.Active = iPath;
-                  vm.$dispatch({"RoutingState.Active": iPath});
+                  vm.$dispatch({ "RoutingState.Active": iPath });
 
                   // Support exit interception.
                   if (iDisableEvent != true && vm.hasOwnProperty("onRouteExit"))
@@ -311,7 +305,7 @@ limitations under the License.
                   console.log("router> routing " + urlPath);
 
                // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
-               if (utils.equal(urlPath, root) || utils.equal(urlPath, root + "/") || urlPath === "/" ) {
+               if (utils.equal(urlPath, root) || utils.equal(urlPath, root + "/") || urlPath === "/") {
                   var match = $.grep(state.RoutingState.Templates, function (iTemplate) { return iTemplate.UrlPattern === "" });
                   if (match.length > 0)
                      vm.$router.routeTo("", match[0]);
@@ -390,7 +384,7 @@ limitations under the License.
             if (match.length > 0) {
                template = match[0];
 
-               if ( typeof iTarget === "string")
+               if (typeof iTarget === "string")
                   template.Target = iTarget;
 
                if (path == null) {
@@ -425,7 +419,7 @@ limitations under the License.
                }
             }
             url += redirectRoot + "/" + path;
-            vm.$router.routes.push({ Path: path, Url: url});
+            vm.$router.routes.push({ Path: path, Url: url });
             return url;
          }
 
@@ -447,7 +441,7 @@ limitations under the License.
 
       iVM.$handleRoute = function (iEvent) {
          iEvent.preventDefault();
-         dotnetify.react.router.pushState( {}, "", iEvent.target.pathname );
+         dotnetify.react.router.pushState({}, "", iEvent.target.pathname);
       }.bind(iVM);
 
       iVM.$setRouteTarget = function (iTarget) {

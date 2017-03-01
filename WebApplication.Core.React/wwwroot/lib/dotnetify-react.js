@@ -236,14 +236,29 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
    // Loads a view.
    dotnetifyVM.prototype.$loadView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
-
-      var getScripts = iJsModuleUrl.split(",").map(function (i) { return $.getScript(i); });
-      getScripts.push($.Deferred(function (deferred) { $(deferred.resolve); }));
+      var getScripts = [];
+      if (iJsModuleUrl == null)
+         iJsModuleUrl = "";
+      else {
+         // Load all javascripts first. Multiple files can be specified with comma delimiter.
+         getScripts = iJsModuleUrl.split(",").map(function (i) { return $.getScript(i); });
+         getScripts.push($.Deferred(function (deferred) { $(deferred.resolve); }));
+      }
 
       $.when.apply($, getScripts).done(function () {
-         ReactDOM.render(React.createElement(window[iViewUrl], null), document.querySelector(iTargetSelector));
-         if (typeof callbackFn === "function")
-            callbackFn.call(this);
+
+         // If the view URL is an HTML, load it normally, otherwise assume it's a React component.
+         if (iViewUrl.endsWith("html")) {
+            $(iTargetSelector).load(iViewUrl, null, function () {
+               if (typeof callbackFn === "function")
+                  callbackFn.call(this);
+            });
+         }
+         else {
+            ReactDOM.render(React.createElement(window[iViewUrl], null), document.querySelector(iTargetSelector));
+            if (typeof callbackFn === "function")
+               callbackFn.call(this);
+         }
       });
    }
 

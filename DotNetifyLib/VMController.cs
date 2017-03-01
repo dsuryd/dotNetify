@@ -149,10 +149,11 @@ namespace DotNetify
       /// </summary>
       /// <param name="iVMTypeName">View model type name.</param>
       /// <returns>Serialized view model state.</returns>
-      public string GetInitialState(string iVMTypeName, object iArgs = null)
+      public static string GetInitialState(string iVMTypeName, object iArgs = null)
       {
-         var vm = CreateVM(iVMTypeName, iArgs);
-         return vm != null ? Serialize(vm) : "null";
+         var vmController = new VMController();
+         var vm = vmController.CreateVM(iVMTypeName, iArgs);
+         return vm != null ? vmController.Serialize(vm) : null;
       }
 
       /// Registers all view model types in an assembly.
