@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Reflection;
@@ -10,7 +11,7 @@ namespace WebApplication.Core.React
       public static string GetEmbeddedResource(this object caller, string resourceName)
       {
          var assembly = caller.GetType().GetTypeInfo().Assembly;
-         var name = assembly.GetManifestResourceNames().Where(i => i.EndsWith(resourceName)).FirstOrDefault();
+         var name = assembly.GetManifestResourceNames().Where(i => i.EndsWith(resourceName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
          if (string.IsNullOrEmpty(name))
             throw new FileNotFoundException();
 

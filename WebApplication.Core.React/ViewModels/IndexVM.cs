@@ -33,16 +33,15 @@ namespace ViewModels
 
       public IndexVM()
       {
-         this.RegisterRoutes("demo", new List<RouteTemplate>
+         this.RegisterRoutes("index", new List<RouteTemplate>
          {
-            new RouteTemplate { Id = "Home", UrlPattern = "", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.js" },
-            new RouteTemplate { Id = "HelloWorld", UrlPattern = "helloworld", Target = "Content", ViewUrl = "HelloWorld", JSModuleUrl = "/state/get/HelloWorldVM, /js/HelloWorld.js" },
-            new RouteTemplate { Id = "ControlTypes", UrlPattern = "controltypes", Target = "Content", ViewUrl = "ControlTypes", JSModuleUrl = "/state/get/ControlTypesVM, /js/ControlTypes.js" },
-            new RouteTemplate { Id = "SimpleList", UrlPattern = "simplelist", Target = "Content", ViewUrl = "SimpleList", JSModuleUrl = "/state/get/SimpleListVM, /js/SimpleList.js" },
-            new RouteTemplate { Id = "GridView", UrlPattern = "gridview", Target = "Content", ViewUrl = "GridView", JSModuleUrl = "/state/get/GridViewVM, /js/GridView.js" },
-            new RouteTemplate { Id = "CompositeView", UrlPattern = "compositeview", Target = "Content", ViewUrl = "CompositeView",
-               JSModuleUrl = "/state/get/AFITop100VM, /state/get/AFITop100VM.FilterableMovieTableVM.MovieTableVM, /js/CompositeView/PaginatedTable.js, /js/CompositeView/CompositeView.js" },
-            new RouteTemplate { Id = "LiveChart", UrlPattern = "livechart", Target = "Content", ViewUrl = "LiveChart", JSModuleUrl = "/state/get/LiveChartVM, /js/LiveChart.js" },
+            new RouteTemplate("Home",           "/module/get/HelloWorld/HelloWorldVM") { UrlPattern = "", ViewUrl = "HelloWorld" },
+            new RouteTemplate("HelloWorld",     "/module/get/HelloWorld/HelloWorldVM"),
+            new RouteTemplate("ControlTypes",   "/module/get/ControlTypes/ControlTypesVM"),
+            new RouteTemplate("SimpleList",     "/module/get/SimpleList/SimpleListVM" ),
+            new RouteTemplate("GridView",       "/module/get/GridView/GridViewVM" ),
+            new RouteTemplate("CompositeView",  "/module/get/CompositeView" ),
+            new RouteTemplate("LiveChart",      "/module/get/LiveChart/LiveChartVM"),
          });
       }
    }

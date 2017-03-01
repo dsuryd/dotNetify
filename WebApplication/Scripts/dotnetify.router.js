@@ -264,8 +264,8 @@ limitations under the License.
                }
 
                // Support enter interception.
-               if (iDisableEvent != true && vm.hasOwnProperty("onRouteEnter"))
-                  if (vm.onRouteEnter(iPath, iTemplate) == false)
+               if (iDisableEvent != true && vm.hasOwnProperty("$onRouteEnter"))
+                  if (vm.$onRouteEnter(iPath, iTemplate) == false)
                      return;
 
                // If target DOM element isn't found, redirect URL to the path.
@@ -278,8 +278,8 @@ limitations under the License.
                   vm.RoutingState.Active(iPath);
 
                   // Support exit interception.
-                  if (iDisableEvent != true && vm.hasOwnProperty("onRouteExit"))
-                     vm.onRouteExit(iPath, iTemplate);
+                  if (iDisableEvent != true && vm.hasOwnProperty("$onRouteExit"))
+                     vm.$onRouteExit(iPath, iTemplate);
                }.bind(vm));
             }.bind(iScope),
 

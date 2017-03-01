@@ -3,6 +3,8 @@
    getInitialState() {
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("IndexVM", () => this.state, state => this.setState(state));
+      this.vm.$setRouteTarget("Content");
+
       var state = window.vmStates.IndexVM || {};
       state["selectedLink"] = "";
       return state;

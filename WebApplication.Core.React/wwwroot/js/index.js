@@ -12,6 +12,8 @@ var Index = React.createClass({
       }, function (state) {
          return _this.setState(state);
       });
+      this.vm.$setRouteTarget("Content");
+
       var state = window.vmStates.IndexVM || {};
       state["selectedLink"] = "";
       return state;

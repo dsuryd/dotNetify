@@ -33,7 +33,9 @@
     "preserveCompilationContext": true,
     "embed": {
       "include": [
-        "Resources/*.json"
+         "Resources/*.json",
+         "wwwroot/js/*.js",
+         "wwwroot/js/CompositeView/*.js"
       ]
     }
   },

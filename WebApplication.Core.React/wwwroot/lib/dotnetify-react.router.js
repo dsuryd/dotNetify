@@ -82,10 +82,9 @@ limitations under the License.
             // Check first whether existing views can handle routing this URL.
             // Otherwise, do a hard browser redirect.
             dotnetify.react.router.urlPath = iUrl;
-            var vmElements = $("[data-vm]");
-            for (j = 0; j < vmElements.length; j++) {
-               var widget = dotnetify.widget(vmElements[j]);
-               if (widget != null && widget.VM.$router.routeUrl())
+            for (var vmId in dotnetify.react.viewModels) {
+               var vm = dotnetify.react.viewModels[vmId];
+               if (vm != null && vm.$router.routeUrl())
                   return;
             }
             window.location.replace(iUrl);
@@ -165,7 +164,9 @@ limitations under the License.
                vm.$router.initRoot();
 
                $.each(templates, function (idx, template) {
-                  var mapUrl = vm.$router.toUrl(template.UrlPattern);
+                  // If url pattern isn't given, consider Id as the pattern.
+                  var urlPattern = template.UrlPattern != null ? template.UrlPattern : template.Id;
+                  var mapUrl = vm.$router.toUrl(urlPattern);
 
                   if (dotnetify.debug)
                      console.log("router> map " + mapUrl + " to template id=" + template.Id);
@@ -175,7 +176,7 @@ limitations under the License.
                      dotnetify.react.router.urlPath = "";
 
                      // Construct the path from the template pattern and the params passed by PathJS.
-                     var path = template.UrlPattern;
+                     var path = urlPattern;
                      for (param in iParams)
                         path = path.replace(":" + param, iParams[param]);
                      path = path.replace(/\(\/:([^)]+)\)/g, "").replace(/\(|\)/g, "");
@@ -258,9 +259,11 @@ limitations under the License.
                if (dotnetify.debug)
                   console.log("router> route '" + iPath + "' to template id=" + iTemplate.Id);
 
+               var target = "#" + (iTemplate.Target ? iTemplate.Target : vm.$router.target);
+
                // We can determine whether the view has already been loaded by matching the 'RoutingState.Origin' argument
                // on the existing view model inside that target selector with the path.
-               var vmArg = $("#" + iTemplate.Target + " [data-vm-arg]").attr("data-vm-arg");
+               var vmArg = $(target + " [data-vm-arg]").attr("data-vm-arg");
                if (vmArg != null) {
                   vmArg = $.parseJSON(vmArg.replace(/'/g, "\""));
                   if (typeof vmArg["RoutingState.Origin"] === "string" && utils.equal(vmArg["RoutingState.Origin"], iPath))
@@ -273,13 +276,15 @@ limitations under the License.
                      return;
 
                // If target DOM element isn't found, redirect URL to the path.
-               if ($("#" + iTemplate.Target).length == 0)
+               if ($(target).length == 0)
                   return dotnetify.react.router.redirect(vm.$router.toUrl(iPath));
 
                // Load the view associated with the route asynchronously.
-               vm.$router.loadView("#" + iTemplate.Target, iTemplate.ViewUrl, iTemplate.JSModuleUrl, { "RoutingState.Origin": iPath }, function () {
+               var view = iTemplate.ViewUrl ? iTemplate.ViewUrl : iTemplate.Id;
+               vm.$router.loadView(target, view, iTemplate.JSModuleUrl, { "RoutingState.Origin": iPath }, function () {
                   // If load is successful, update the active route.
                   state.RoutingState.Active = iPath;
+                  vm.$dispatch({"RoutingState.Active": iPath});
 
                   // Support exit interception.
                   if (iDisableEvent != true && vm.hasOwnProperty("onRouteExit"))
@@ -306,7 +311,7 @@ limitations under the License.
                   console.log("router> routing " + urlPath);
 
                // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
-               if (utils.equal(urlPath, root) || utils.equal(urlPath, root + "/")) {
+               if (utils.equal(urlPath, root) || utils.equal(urlPath, root + "/") || urlPath === "/" ) {
                   var match = $.grep(state.RoutingState.Templates, function (iTemplate) { return iTemplate.UrlPattern === "" });
                   if (match.length > 0)
                      vm.$router.routeTo("", match[0]);
@@ -366,7 +371,7 @@ limitations under the License.
          }
       })(iVM);
 
-      iVM.$route = function (iRoute) {
+      iVM.$route = function (iRoute, iTarget) {
          var vm = this;
          var state = vm.State();
 
@@ -384,8 +389,12 @@ limitations under the License.
             var match = $.grep(state.RoutingState.Templates, function (iTemplate) { return iTemplate.Id == iRoute.TemplateId });
             if (match.length > 0) {
                template = match[0];
+
+               if ( typeof iTarget === "string")
+                  template.Target = iTarget;
+
                if (path == null) {
-                  path = template.UrlPattern;
+                  path = template.UrlPattern != null ? template.UrlPattern : template.Id;
                   iRoute.Path = path;
                }
             }
@@ -436,10 +445,14 @@ limitations under the License.
 
       }.bind(iVM);
 
-      iVM.$handleRoute = function ( iEvent ) {
+      iVM.$handleRoute = function (iEvent) {
          iEvent.preventDefault();
          dotnetify.react.router.pushState( {}, "", iEvent.target.pathname );
-      }.bind( iVM );
+      }.bind(iVM);
+
+      iVM.$setRouteTarget = function (iTarget) {
+         this.$router.target = iTarget;
+      }.bind(iVM);
    }
 
    // Register the plugin to dotNetify.
