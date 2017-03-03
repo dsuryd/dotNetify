@@ -70,10 +70,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="BaseVM.CRUDExtension.cs" />
     <Compile Include="BaseVM.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="DotNetifyHub.cs" />
+    <Compile Include="IDotNetifyConfiguration.cs" />
     <Compile Include="IVMControllerFactory.cs" />
     <Compile Include="Routing\RoutingState.cs" />
     <Compile Include="Routing\IRoutable.cs" />
