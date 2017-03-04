@@ -2,7 +2,7 @@
 
    getInitialState() {
       // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect("SimpleListVM", () => this.state, state => this.setState(state));
+      this.vm = dotnetify.react.connect("SimpleListVM", this);
 
       // Set up function to dispatch state to the back-end.
       this.dispatch = state => this.vm.$dispatch(state);

@@ -25,16 +25,17 @@ var Scope = React.createClass({
          scoped: function scoped(vmId) {
             return _this.scoped(vmId);
          },
-         connect: function connect(component, vmId, compGetState, compSetState) {
+         connect: function connect(vmId, component, compGetState, compSetState, vmArg) {
             var getState = typeof compGetState === "function" ? compGetState : function () {
                return component.state;
             };
             var setState = typeof compSetState === "function" ? compSetState : function (state) {
                return component.setState(state);
             };
+            if (typeof compGetState !== "function") vmArg = compGetState;
 
             component.vmId = _this.scoped(vmId);
-            component.vm = dotnetify.react.connect(component.vmId, getState, setState);
+            component.vm = dotnetify.react.connect(component.vmId, component, getState, setState, vmArg);
             component.dispatch = function (state) {
                return component.vm.$dispatch(state);
             };

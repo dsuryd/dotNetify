@@ -126,7 +126,7 @@ limitations under the License.
          return {
             routes: [],
 
-            // Build the absolute root path from the "data-vm-root" attribute.
+            // Build the absolute root path from the "vmRoot" property on React component.
             initRoot: function () {
                var vm = this;
                var state = vm.State();
@@ -134,7 +134,8 @@ limitations under the License.
                   return;
 
                if (vm.$router._absRoot != state.RoutingState.Root) {
-                  var absRoot = utils.trim(vm.VMRoot);
+                  var vmRoot = vm.$component.props["vmRoot"];
+                  var absRoot = utils.trim(vmRoot);
                   if (absRoot != "")
                      absRoot = "/" + absRoot;
                   var root = utils.trim(state.RoutingState.Root);
@@ -202,40 +203,24 @@ limitations under the License.
             }.bind(iScope),
 
             // Loads a view into a target element.
-            // Method parameters: TargetSelector, ViewUrl, iJsModuleUrl, iVmArg, iCallbackFn
             loadView: function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
                var vm = this;
                var state = vm.State();
+               var reactProps;
 
-               var callbackFn = function () {
-
-                  // If the view model supports routing, add the root path to the view, to be used
-                  // to build the absolute route path, and view model argument if provided.
-                  if (state.hasOwnProperty("RoutingState"))
-                     $.each($(this).find("[data-vm]"), function (idx, element) {
-                        var root = $(element).attr("data-vm-root");
-                        root = root != null ? "/" + utils.trim(state.RoutingState.Root) + "/" + utils.trim(root) : state.RoutingState.Root;
-                        $(element).attr("data-vm-root", root);
-
-                        if (iVmArg != null && !$.isEmptyObject(iVmArg)) {
-                           // If there's already a data-vm-arg, combine the values. 
-                           // Take care not to override server-side routing arguments.
-                           var vmArg = $(element).attr("data-vm-arg");
-                           vmArg = vmArg != null ? $.extend(iVmArg, $.parseJSON(vmArg.replace(/'/g, "\""))) : iVmArg;
-
-                           $(element).attr("data-vm-arg", JSON.stringify(vmArg));
-                        }
-                     });
-
-                  // Call the callback function.  
-                  if (typeof iCallbackFn === "function")
-                     iCallbackFn.apply(this);
-               };
+               // If the view model supports routing, add the root path to the view, to be used
+               // to build the absolute route path, and view model argument if provided.
+               if (state.hasOwnProperty("RoutingState")) {
+                  reactProps = { vmRoot: state.RoutingState.Root, vmArg: iVmArg };
+               }
 
                // Provide the opportunity to override the URL.
                iJsModuleUrl = dotnetify.react.router.overrideUrl(iJsModuleUrl);
 
-               vm.$loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn);
+               if (iViewUrl.endsWith("html"))
+                  vm.$loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
+               else
+                  vm.$loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
 
             }.bind(iScope),
 
@@ -257,11 +242,13 @@ limitations under the License.
 
                // We can determine whether the view has already been loaded by matching the 'RoutingState.Origin' argument
                // on the existing view model inside that target selector with the path.
-               var vmArg = $(target + " [data-vm-arg]").attr("data-vm-arg");
-               if (vmArg != null) {
-                  vmArg = $.parseJSON(vmArg.replace(/'/g, "\""));
-                  if (typeof vmArg["RoutingState.Origin"] === "string" && utils.equal(vmArg["RoutingState.Origin"], iPath))
-                     return;
+               for (var vmId in dotnetify.react.viewModels) {
+                  var vm = dotnetify.react.viewModels[vmId];
+                  var vmArg = vm.$component.props["vmArg"];
+                  if (vmArg != null) {
+                     if (typeof vmArg["RoutingState.Origin"] === "string" && utils.equal(vmArg["RoutingState.Origin"], iPath))
+                        return;
+                  }
                }
 
                // Support enter interception.
@@ -369,6 +356,10 @@ limitations under the License.
          var vm = this;
          var state = vm.State();
 
+         // No route to process. Return silently.
+         if (iRoute == null)
+            return;
+
          if (!iRoute.hasOwnProperty("Path") || !iRoute.hasOwnProperty("TemplateId"))
             throw new Error("Not a valid route");
 
@@ -409,7 +400,7 @@ limitations under the License.
             var redirectRootPath = iRoute.RedirectRoot.split("/");
 
             let url = "";
-            var absRoot = vm.$element.attr("data-vm-root");
+            var absRoot = vm.$component.props["vmRoot"];
             if (absRoot != null) {
                var absRootPath = absRoot.split("/");
                for (i = 0; i < absRootPath.length; i++) {

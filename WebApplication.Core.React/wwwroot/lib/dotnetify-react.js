@@ -140,10 +140,10 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       },
 
       // Connects to a server view model.
-      connect: function (iVMId, iGetState, iSetState, iVMArg) {
+      connect: function (iVMId, iReact, iGetState, iSetState, iVMArg) {
          var self = dotnetify.react;
          if (!self.viewModels.hasOwnProperty(iVMId))
-            self.viewModels[iVMId] = new dotnetifyVM(iVMId, iGetState, iSetState, iVMArg);
+            self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg);
 
          dotnetify.react.init();
          return self.viewModels[iVMId];
@@ -152,16 +152,25 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
    // Client-side view model that acts as a proxy of the server view model.
    // iVMId - identifies the view model.
-   // iGetState - React state accessor.
-   // iSetState - React state mutator.
-   // iVMArg - optional view model arguments.
-   function dotnetifyVM(iVMId, iGetState, iSetState, iVMArg) {
+   // iReact - React component.
+   // iGetState - React state accessor (optional).
+   // iSetState - React state mutator (optional).
+   // iVMArg - view model arguments (optional).
+   function dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg) {
 
       this.$vmId = iVMId;
+      this.$component = iReact;
       this.$vmArg = iVMArg;
       this.$requested = false;
       this.$loaded = false;
       this.$itemKey = {};
+
+      if (typeof iGetState !== "function") {
+         this.$vmArg = iGetState;
+         iGetState = () => iReact.state;
+         iSetState = state => iReact.setState(state);
+      }
+
       this.State = function (state) { return typeof state === "undefined" ? iGetState() : iSetState(state) };
 
       // Inject plugin functions into this view model.
@@ -234,8 +243,29 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       }
    }
 
-   // Loads a view.
-   dotnetifyVM.prototype.$loadView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+   // Loads an HTML view.
+   dotnetifyVM.prototype.$loadHtmlView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+
+      // Unmount any React component before replacing with a new DOM. 
+      ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
+
+      // Load the HTML view.
+      $(iTargetSelector).load(iViewUrl, null, function () {
+         if (iJsModuleUrl != null) {
+            $.getScript(iJsModuleUrl, function () {
+               if (typeof callbackFn === "function")
+                  callbackFn.call(this);
+            });
+         }
+         else {
+            if (typeof callbackFn === "function")
+               callbackFn.call(this);
+         }
+      });
+   }
+
+   // Loads a React view.
+   dotnetifyVM.prototype.$loadReactView = function (iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
       var getScripts = [];
       if (iJsModuleUrl == null)
          iJsModuleUrl = "";
@@ -247,18 +277,15 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
       $.when.apply($, getScripts).done(function () {
 
-         // If the view URL is an HTML, load it normally, otherwise assume it's a React component.
-         if (iViewUrl.endsWith("html")) {
-            $(iTargetSelector).load(iViewUrl, null, function () {
-               if (typeof callbackFn === "function")
-                  callbackFn.call(this);
-            });
+         if (!window.hasOwnProperty(iReactClassName)) {
+            console.error("[" + this.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
+            return;
          }
-         else {
-            ReactDOM.render(React.createElement(window[iViewUrl], null), document.querySelector(iTargetSelector));
-            if (typeof callbackFn === "function")
-               callbackFn.call(this);
-         }
+
+         var reactElement = React.createElement(window[iReactClassName], iReactProps);
+         ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
+         if (typeof callbackFn === "function")
+            callbackFn.call(this, reactElement);
       });
    }
 

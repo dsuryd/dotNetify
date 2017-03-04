@@ -2,7 +2,7 @@
 
    getInitialState() {
       // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect("GridViewVM", () => this.state, state => this.setState(state));
+      this.vm = dotnetify.react.connect("GridViewVM", this);
 
       // Functions to dispatch state to the back-end.
       this.dispatch = state => this.vm.$dispatch(state);

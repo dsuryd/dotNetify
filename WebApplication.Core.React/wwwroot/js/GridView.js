@@ -7,11 +7,7 @@ var GridView = React.createClass({
       var _this = this;
 
       // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect("GridViewVM", function () {
-         return _this.state;
-      }, function (state) {
-         return _this.setState(state);
-      });
+      this.vm = dotnetify.react.connect("GridViewVM", this);
 
       // Functions to dispatch state to the back-end.
       this.dispatch = function (state) {

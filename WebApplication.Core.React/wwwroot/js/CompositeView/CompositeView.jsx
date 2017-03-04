@@ -20,7 +20,7 @@ var AFITop100 = React.createClass({
    contextTypes: { connect: React.PropTypes.func },
 
    getInitialState() {
-      return this.context.connect(this, "AFITop100VM") || {};
+      return this.context.connect("AFITop100VM", this) || {};
    },
    componentWillUnmount() {
       this.vm.$destroy();
@@ -62,7 +62,7 @@ var MovieTable = React.createClass({
    contextTypes: { connect: React.PropTypes.func },
 
    getInitialState() {
-      return this.context.connect(this, "MovieTableVM") || {};
+      return this.context.connect("MovieTableVM", this) || {};
    },
    componentWillUnmount() {
       this.vm.$destroy();
@@ -86,7 +86,7 @@ var MovieDetails = React.createClass({
    contextTypes: { connect: React.PropTypes.func },
 
    getInitialState() {
-      return this.context.connect(this, "MovieDetailsVM") || { Movie: {} };
+      return this.context.connect("MovieDetailsVM", this) || { Movie: {} };
    },
    componentWillUnmount() {
       this.vm.$destroy();
@@ -120,7 +120,7 @@ var MovieFilter = React.createClass({
    getInitialState() {
       // Combine state from back-end with local state.
       // This can be more concise using Object.assign if not for IE 11 support.
-      var state = this.context.connect(this, "MovieFilterVM") || {};
+      var state = this.context.connect("MovieFilterVM", this) || {};
       var localState = {
          filters: [],
          filterId: 0,

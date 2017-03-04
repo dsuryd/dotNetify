@@ -4,14 +4,8 @@ var LiveChart = React.createClass({
    displayName: "LiveChart",
 
    getInitialState: function getInitialState() {
-      var _this = this;
-
       // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect("LiveChartVM", function () {
-         return _this.state;
-      }, function (state) {
-         return _this.setState(state);
-      });
+      this.vm = dotnetify.react.connect("LiveChartVM", this);
 
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
       return window.vmStates.LiveChartVM;

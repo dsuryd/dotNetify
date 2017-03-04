@@ -4,14 +4,8 @@ var Index = React.createClass({
    displayName: "Index",
 
    getInitialState: function getInitialState() {
-      var _this = this;
-
       // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect("IndexVM", function () {
-         return _this.state;
-      }, function (state) {
-         return _this.setState(state);
-      });
+      this.vm = dotnetify.react.connect("IndexVM", this);
       this.vm.$setRouteTarget("Content");
 
       var state = window.vmStates.IndexVM || {};
@@ -19,7 +13,7 @@ var Index = React.createClass({
       return state;
    },
    render: function render() {
-      var _this2 = this;
+      var _this = this;
 
       var styles = {
          navMenu: { padding: "15px", color: "rgb(125,135,140)", backgroundColor: "rgb(40,50,55)" },
@@ -35,8 +29,8 @@ var Index = React.createClass({
       };
 
       var handleRoute = function handleRoute(event, linkId) {
-         _this2.setState({ selectedLink: linkId });
-         _this2.vm.$handleRoute(event);
+         _this.setState({ selectedLink: linkId });
+         _this.vm.$handleRoute(event);
       };
 
       var showLinks = function showLinks(links) {
@@ -46,8 +40,8 @@ var Index = React.createClass({
                { key: link.Id },
                React.createElement(
                   "a",
-                  { style: link.Id == _this2.state.selectedLink ? styles.activeExampleLink : styles.exampleLink, className: "example-link",
-                     href: _this2.vm.$route(link.Route),
+                  { style: link.Id == _this.state.selectedLink ? styles.activeExampleLink : styles.exampleLink, className: "example-link",
+                     href: _this.vm.$route(link.Route),
                      onClick: function (event) {
                         return handleRoute(event, link.Id);
                      } },

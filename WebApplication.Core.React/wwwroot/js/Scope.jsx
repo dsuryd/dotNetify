@@ -18,12 +18,14 @@ var Scope = React.createClass({
    getChildContext() {
       return {
          scoped: vmId => this.scoped(vmId),
-         connect: (component, vmId, compGetState, compSetState) => {
+         connect: (vmId, component, compGetState, compSetState, vmArg) => {
             var getState = typeof compGetState === "function" ? compGetState : () => component.state;
             var setState = typeof compSetState === "function" ? compSetState : state => component.setState(state);
+            if (typeof compGetState !== "function")
+               vmArg = compGetState;
 
             component.vmId = this.scoped(vmId);
-            component.vm = dotnetify.react.connect(component.vmId, getState, setState);
+            component.vm = dotnetify.react.connect(component.vmId, component, getState, setState, vmArg);
             component.dispatch = state => component.vm.$dispatch(state);
             component.dispatchState = state => {
                setState(state);

@@ -7,11 +7,7 @@ var SimpleList = React.createClass({
       var _this = this;
 
       // Connect this component to the back-end view model.
-      this.vm = dotnetify.react.connect("SimpleListVM", function () {
-         return _this.state;
-      }, function (state) {
-         return _this.setState(state);
-      });
+      this.vm = dotnetify.react.connect("SimpleListVM", this);
 
       // Set up function to dispatch state to the back-end.
       this.dispatch = function (state) {
