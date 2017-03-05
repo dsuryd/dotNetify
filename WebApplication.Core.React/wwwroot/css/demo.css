@@ -7,7 +7,18 @@
    background-color: #ced0d0;
    padding: 0 1em;
    margin-bottom: 0px;
+   font-family: Ubuntu, 'Helvetica Neue', sans-serif;
+   text-shadow: 0px 0px 10px white;
 }
+
+   .well h1 {
+      margin: 12px 0 4px 4px;
+      font-size: x-large;
+   }
+
+   .well img {
+      margin-top: -5px;
+   }
 
 .jumbotron {
    background-color: #f6f6f6;
@@ -20,6 +31,7 @@ label {
 .nav-menu {
    padding: 0;
    background-color: rgb(40,50,55);
+   max-width: 24rem;
 }
 
 a.example-link:hover {
