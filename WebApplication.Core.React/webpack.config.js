@@ -6,8 +6,7 @@ module.exports = {
       filename: "wwwroot/lib/bundle.min.js"
    },
    resolve: {
-      modules: ["wwwroot/lib", "node_modules"],
-      alias: { "pathjs": "path.min"}
+      modules: ["wwwroot/lib", "node_modules"]
    },
    plugins: [
     new webpack.optimize.UglifyJsPlugin( { minimize: true } )
