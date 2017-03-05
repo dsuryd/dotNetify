@@ -144,6 +144,8 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          var self = dotnetify.react;
          if (!self.viewModels.hasOwnProperty(iVMId))
             self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg);
+         else
+            console.error("Component is attempting to connect to an already active '" + iVMId + "'.  If it's from a dismounted component, you must add vm.$destroy to componentWillUnmount().");
 
          dotnetify.react.init();
          return self.viewModels[iVMId];
@@ -170,6 +172,9 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          iGetState = () => iReact.state;
          iSetState = state => iReact.setState(state);
       }
+
+      if (iReact.props.hasOwnProperty("vmArg"))
+         this.$vmArg = $.extend(this.$vmArg, iReact.props.vmArg);
 
       this.State = function (state) { return typeof state === "undefined" ? iGetState() : iSetState(state) };
 

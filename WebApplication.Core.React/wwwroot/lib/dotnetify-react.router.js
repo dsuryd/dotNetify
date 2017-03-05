@@ -130,7 +130,7 @@ limitations under the License.
             initRoot: function () {
                var vm = this;
                var state = vm.State();
-               if (!state.hasOwnProperty("RoutingState") || state.RoutingState.Root === null)
+               if (!state.hasOwnProperty("RoutingState") || state.RoutingState === null || state.RoutingState.Root === null)
                   return;
 
                if (vm.$router._absRoot != state.RoutingState.Root) {
@@ -150,6 +150,11 @@ limitations under the License.
                var state = vm.State();
                if (state == null || !state.hasOwnProperty("RoutingState"))
                   return;
+
+               if (state.RoutingState === null) {
+                  console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
+                  return;
+               }
 
                var templates = state.RoutingState.Templates;
                if (templates == null || templates.length == 0)
@@ -171,6 +176,13 @@ limitations under the License.
 
                   if (dotnetify.debug)
                      console.log("router> map " + mapUrl + " to template id=" + template.Id);
+
+                  if (template.Target == null) {
+                     if (vm.$router.target != null)
+                        template.Target = vm.$router.target;
+                     else
+                        console.error("router> the Target for template '" + template.Id + "' was not initialized.");
+                  }
 
                   dotnetify.react.router.mapTo(mapUrl, function (iParams) {
 
@@ -211,7 +223,16 @@ limitations under the License.
                // If the view model supports routing, add the root path to the view, to be used
                // to build the absolute route path, and view model argument if provided.
                if (state.hasOwnProperty("RoutingState")) {
-                  reactProps = { vmRoot: state.RoutingState.Root, vmArg: iVmArg };
+
+                  if (state.RoutingState === null) {
+                     console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
+                     return;
+                  }
+
+                  var root = vm.$component.props.vmRoot;
+                  root = root != null ? "/" + utils.trim(state.RoutingState.Root) + "/" + utils.trim(root) : state.RoutingState.Root;
+
+                  reactProps = { vmRoot: root, vmArg: iVmArg };
                }
 
                // Provide the opportunity to override the URL.
@@ -238,13 +259,11 @@ limitations under the License.
                if (dotnetify.debug)
                   console.log("router> route '" + iPath + "' to template id=" + iTemplate.Id);
 
-               var target = "#" + (iTemplate.Target ? iTemplate.Target : vm.$router.target);
-
                // We can determine whether the view has already been loaded by matching the 'RoutingState.Origin' argument
                // on the existing view model inside that target selector with the path.
                for (var vmId in dotnetify.react.viewModels) {
-                  var vm = dotnetify.react.viewModels[vmId];
-                  var vmArg = vm.$component.props["vmArg"];
+                  var vmOther = dotnetify.react.viewModels[vmId];
+                  var vmArg = vmOther.$component.props["vmArg"];
                   if (vmArg != null) {
                      if (typeof vmArg["RoutingState.Origin"] === "string" && utils.equal(vmArg["RoutingState.Origin"], iPath))
                         return;
@@ -256,9 +275,16 @@ limitations under the License.
                   if (vm.onRouteEnter(iPath, iTemplate) == false)
                      return;
 
+               // Get the target DOM element.
+               var target = "#" + (iTemplate.Target !== null ? iTemplate.Target : vm.$router.target);
+
                // If target DOM element isn't found, redirect URL to the path.
-               if ($(target).length == 0)
+               if ($(target).length == 0) {
+                  if (dotnetify.debug)
+                     console.log("router> target '" + target + "' not found in DOM, use redirect instead");
+
                   return dotnetify.react.router.redirect(vm.$router.toUrl(iPath));
+               }
 
                // Load the view associated with the route asynchronously.
                var view = iTemplate.ViewUrl ? iTemplate.ViewUrl : iTemplate.Id;
@@ -432,7 +458,11 @@ limitations under the License.
 
       iVM.$handleRoute = function (iEvent) {
          iEvent.preventDefault();
-         dotnetify.react.router.pushState({}, "", iEvent.target.pathname);
+         var path = iEvent.currentTarget.pathname;
+         if (path == null || path == "")
+            throw new Error("The event passed to $handleRoute has no path name.");
+
+         dotnetify.react.router.pushState({}, "", path);
       }.bind(iVM);
 
       iVM.$setRouteTarget = function (iTarget) {
