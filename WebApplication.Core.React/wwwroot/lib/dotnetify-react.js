@@ -20,16 +20,111 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 // Support using either AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
    if (typeof define === "function" && define["amd"]) {
-      define(['jquery', 'signalr', 'signalr-hub'], factory);
+      define(['react', 'jquery', 'signalr'], factory);
    }
    else if (typeof exports === "object" && typeof module === "object") {
-      module.exports = factory(require('jquery'), require('signalr'), require('signalr-hub'));
+      module.exports = factory(require('react'), require('jquery'), require('signalr'));
    }
    else {
-      factory(jQuery);
+      factory(React, jQuery);
    }
 }
-(function ($) {
+(function (_React, $) {
+
+   // SignalR hub auto-generated from /signalr/hubs.
+   /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
+   /// <reference path="jquery.signalR.js" />
+   (function ($, window, undefined) {
+      /// <param name="$" type="jQuery" />
+      "use strict";
+
+      if (typeof ($.signalR) !== "function") {
+         throw new Error("SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.");
+      }
+
+      var signalR = $.signalR;
+
+      function makeProxyCallback(hub, callback) {
+         return function () {
+            // Call the client hub method
+            callback.apply(hub, $.makeArray(arguments));
+         };
+      }
+
+      function registerHubProxies(instance, shouldSubscribe) {
+         var key, hub, memberKey, memberValue, subscriptionMethod;
+
+         for (key in instance) {
+            if (instance.hasOwnProperty(key)) {
+               hub = instance[key];
+
+               if (!(hub.hubName)) {
+                  // Not a client hub
+                  continue;
+               }
+
+               if (shouldSubscribe) {
+                  // We want to subscribe to the hub events
+                  subscriptionMethod = hub.on;
+               } else {
+                  // We want to unsubscribe from the hub events
+                  subscriptionMethod = hub.off;
+               }
+
+               // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
+               for (memberKey in hub.client) {
+                  if (hub.client.hasOwnProperty(memberKey)) {
+                     memberValue = hub.client[memberKey];
+
+                     if (!$.isFunction(memberValue)) {
+                        // Not a client hub function
+                        continue;
+                     }
+
+                     subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
+                  }
+               }
+            }
+         }
+      }
+
+      $.hubConnection.prototype.createHubProxies = function () {
+         var proxies = {};
+         this.starting(function () {
+            // Register the hub proxies as subscribed
+            // (instance, shouldSubscribe)
+            registerHubProxies(proxies, true);
+
+            this._registerSubscribedHubs();
+         }).disconnected(function () {
+            // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
+            // (instance, shouldSubscribe)
+            registerHubProxies(proxies, false);
+         });
+
+         proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
+         proxies['dotNetifyHub'].client = {};
+         proxies['dotNetifyHub'].server = {
+            dispose_VM: function (vmId) {
+               return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Dispose_VM"], $.makeArray(arguments)));
+            },
+
+            request_VM: function (vmId, vmArg) {
+               return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Request_VM"], $.makeArray(arguments)));
+            },
+
+            update_VM: function (vmId, vmData) {
+               return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Update_VM"], $.makeArray(arguments)));
+            }
+         };
+
+         return proxies;
+      };
+
+      signalR.hub = $.hubConnection("/signalr", { useDefaultPath: false });
+      $.extend(signalR, signalR.hub.createHubProxies());
+
+   }($, window));
 
    dotnetify = $.extend(dotnetify, {
       // SignalR hub.
@@ -456,6 +551,58 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       else
          console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
    }
+
+   // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
+   // of the parent component, so that when the child component connects to its back-end view model, the child view model
+   // instance is created within the scope of the parent view model.
+   // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
+   // injects properties and dispatch functions into the component.
+   dotnetify.react.Scope = _React.createClass({
+      displayName: "Scope",
+
+      propTypes: { vm: _React.PropTypes.string },
+      contextTypes: { scoped: _React.PropTypes.func },
+      childContextTypes: {
+         scoped: _React.PropTypes.func.isRequired,
+         connect: _React.PropTypes.func.isRequired
+      },
+      scoped: function scoped(vmId) {
+         var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
+         return scope ? scope + "." + vmId : vmId;
+      },
+      getChildContext: function getChildContext() {
+         var _this = this;
+
+         return {
+            scoped: function scoped(vmId) {
+               return _this.scoped(vmId);
+            },
+            connect: function connect(vmId, component, compGetState, compSetState, vmArg) {
+               var getState = typeof compGetState === "function" ? compGetState : function () {
+                  return component.state;
+               };
+               var setState = typeof compSetState === "function" ? compSetState : function (state) {
+                  return component.setState(state);
+               };
+               if (typeof compGetState !== "function") vmArg = compGetState;
+
+               component.vmId = _this.scoped(vmId);
+               component.vm = dotnetify.react.connect(component.vmId, component, getState, setState, vmArg);
+               component.dispatch = function (state) {
+                  return component.vm.$dispatch(state);
+               };
+               component.dispatchState = function (state) {
+                  setState(state);
+                  component.vm.$dispatch(state);
+               };
+               return window.vmStates ? window.vmStates[component.vmId] : null;
+            }
+         };
+      },
+      render: function render() {
+         return this.props.children;
+      }
+   });
 
    return dotnetify.react;
 }))

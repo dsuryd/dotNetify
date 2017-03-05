@@ -1,7 +1,6 @@
-﻿$ = jQuery = require( "jquery" );
+﻿$ = jQuery = require( "jquery" ); // Add jQuery to global window for Bootstrap and SignalR.
 require( "bootstrap" );
 require( "signalr" );
-Path = require( "pathjs" );
 React = require( "react" );
 ReactDOM = require("react-dom");
 
