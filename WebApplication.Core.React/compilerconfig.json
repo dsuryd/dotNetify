@@ -24,15 +24,23 @@
     "inputFile": "wwwroot/js/SimpleList.jsx"
   },
   {
-    "outputFile": "wwwroot/js/CompositeView/PaginatedTable.js",
-    "inputFile": "wwwroot/js/CompositeView/PaginatedTable.jsx"
+    "outputFile": "wwwroot/js/PaginatedTable.js",
+    "inputFile": "wwwroot/js/PaginatedTable.jsx"
   },
   {
-    "outputFile": "wwwroot/js/CompositeView/CompositeView.js",
-    "inputFile": "wwwroot/js/CompositeView/CompositeView.jsx"
+    "outputFile": "wwwroot/js/CompositeView.js",
+    "inputFile": "wwwroot/js/CompositeView.jsx"
   },
   {
     "outputFile": "wwwroot/js/LiveChart.js",
     "inputFile": "wwwroot/js/LiveChart.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/BookStore.js",
+    "inputFile": "wwwroot/js/BookStore.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/BookStoreFront.js",
+    "inputFile": "wwwroot/js/BookStoreFront.jsx"
   }
 ]

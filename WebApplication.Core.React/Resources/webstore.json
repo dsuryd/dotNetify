@@ -7,7 +7,7 @@
       "Title": "The Martian",
       "Author": "Andy Weir",
       "Rating": 4.5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -17,7 +17,7 @@
       "Title": "Life Of Pi",
       "Author": "Yann Martel",
       "Rating": 4.5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -27,7 +27,7 @@
       "Title": "Wayward Pines",
       "Author": "Blake Crouch",
       "Rating": 4,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -38,7 +38,7 @@
       "Title": "The 5 Love Languages Of Children",
       "Author": "Gary D Chapman and Ross Campbell",
       "Rating": 4.5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -49,7 +49,7 @@
       "Title": "Storyteller",
       "Author": "Carrie Underwood",
       "Rating": 4.5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -59,7 +59,7 @@
       "Title": "Cinema",
       "Author": "Andrea Bocelli",
       "Rating": 5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -70,7 +70,7 @@
       "Title": "The C# Player's Guide",
       "Author": "RB Whitaker",
       "Rating": 5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -80,7 +80,7 @@
       "Title": "Beginning ASP.NET for Visual Studio 2015",
       "Author": "Wiliam Penberthy",
       "Rating": 0,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -90,7 +90,7 @@
       "Title": "Learning Web App Development",
       "Author": "Semmy Purewal",
       "Rating": 4.5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -100,7 +100,7 @@
       "Title": "Go Set A Watchman",
       "Author": "Harper Lee",
       "Rating": 5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -111,7 +111,7 @@
       "Title": "25",
       "Author": "Adele",
       "Rating": 5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -121,7 +121,7 @@
       "Title": "In The Lonely Hour",
       "Author": "Sam Smith",
       "Rating": 5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -131,7 +131,7 @@
       "Title": "Stages",
       "Author": "Josh Groban",
       "Rating": 5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    },
    {
@@ -141,7 +141,7 @@
       "Title": "Traveller",
       "Author": "Chris Stapleton",
       "Rating": 5,
-      "ImageUrl": "/Content/Images/placeholder.png",
+      "ImageUrl": "/images/placeholder.png",
       "ItemUrl": ""
    }
 ]

@@ -11,18 +11,16 @@ namespace WebApplication.Core.React.Controllers
       /// <summary>
       /// Returns the content of a static file.
       /// </summary>
-      public static FileStreamResult File(this Controller controller, IHostingEnvironment hostingEnv, string fileName)
+      public static FileStreamResult FileResult(this Controller controller, IHostingEnvironment hostingEnv, string fileName)
       {
          string path = fileName;
+         path = Path.Combine(hostingEnv.ContentRootPath, "wwwroot\\" + fileName);
+
          var mimeType = "text/plain";
          if (fileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
             mimeType = "text/js";
-         else if (fileName.EndsWith(".html", StringComparison.OrdinalIgnoreCase) || !fileName.Contains("."))
-         {
-            fileName = fileName.EndsWith(".html") ? fileName : fileName + ".html";
-            path = Path.Combine(hostingEnv.ContentRootPath, "wwwroot\\" + fileName);
+         else if (fileName.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
             mimeType = "text/html";
-         }
 
          try
          {
@@ -33,6 +31,13 @@ namespace WebApplication.Core.React.Controllers
             Trace.WriteLine($"{path} not found");
             return null;
          }
+      }
+
+      public static string File( this Controller controller, IHostingEnvironment hostingEnv, string fileName )
+      {
+         var stream = controller.FileResult(hostingEnv, fileName).FileStream;
+         using ( var streamReader = new StreamReader(stream) )
+            return streamReader.ReadToEnd();
       }
    }
 }
