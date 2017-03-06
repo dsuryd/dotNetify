@@ -1,9 +1,11 @@
-﻿var Index = React.createClass({
+﻿var RouteLink = dotnetify.react.router.RouteLink;
+
+var Index = React.createClass({
 
    getInitialState() {
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("IndexVM", this);
-      this.vm.$setRouteTarget("Content");
+      this.vm.onRouteEnter = (path, template) => template.Target = "Content";
 
       var state = window.vmStates.IndexVM || {};
       state["selectedLink"] = "";
@@ -23,19 +25,17 @@
          copyright: { color: "rgb(125,135,140)", fontSize: "8pt" }
       }
 
-      const handleRoute = (event, linkId) => {
-         this.setState({selectedLink: linkId});
-         this.vm.$handleRoute(event);
-      }
+      const setSelectedLink = (linkId) =>  this.setState({selectedLink: linkId});
 
       const showLinks = links => links.map(link =>
          <li key={link.Id}>
-            <a style={link.Id == this.state.selectedLink ? styles.activeExampleLink : styles.exampleLink} className="example-link"
-               href={this.vm.$route(link.Route)}
-               onClick={event => handleRoute(event, link.Id)}>
+            <RouteLink vm={this.vm} route={link.Route}
+                       style={link.Id == this.state.selectedLink ? styles.activeExampleLink : styles.exampleLink} 
+                       className="example-link"
+                       onClick={() => setSelectedLink(link.Id)}>
                <span style={styles.bullet} className="glyphicon glyphicon-asterisk"></span>
                {link.Caption}
-            </a>
+            </RouteLink>
             <div style={styles.desc}>{link.Description}</div>
          </li>
       );

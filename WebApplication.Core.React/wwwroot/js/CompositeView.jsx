@@ -1,4 +1,6 @@
-﻿var CompositeView = React.createClass({
+﻿var Scope = dotnetify.react.Scope;
+
+var CompositeView = React.createClass({
    render() {
       return (
          <div className="container-fluid">

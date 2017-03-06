@@ -34,7 +34,7 @@ limitations under the License.
    // Add plugin functions.
    dotnetify.react.router =
       {
-         version: "0.1.0",
+         version: "1.0.0",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -179,13 +179,7 @@ limitations under the License.
                   if (dotnetify.debug)
                      console.log("router> map " + mapUrl + " to template id=" + template.Id);
 
-                  if (template.Target == null) {
-                     if (vm.$router.target != null)
-                        template.Target = vm.$router.target;
-                  }
-
                   dotnetify.react.router.mapTo(mapUrl, function (iParams) {
-
                      dotnetify.react.router.urlPath = "";
 
                      // Construct the path from the template pattern and the params passed by PathJS.
@@ -276,25 +270,22 @@ limitations under the License.
                      return;
 
                // Check if the route has valid target.
-               if (iTemplate.Target === null && vm.$router.target === null) {
-                  console.error("router> the Target for template '" + template.Id + "' was not initialized.");
+               if (iTemplate.Target === null) {
+                  console.error("router> the Target for template '" + template.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
                   return;
                }
 
-               // Get the target DOM element.
-               var target = "#" + (iTemplate.Target !== null ? iTemplate.Target : vm.$router.target);
-
                // If target DOM element isn't found, redirect URL to the path.
-               if ($(target).length == 0) {
+               if (document.getElementById(iTemplate.Target) == null) {
                   if (dotnetify.debug)
-                     console.log("router> target '" + target + "' not found in DOM, use redirect instead");
+                     console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
 
                   return dotnetify.react.router.redirect(vm.$router.toUrl(iPath));
                }
 
                // Load the view associated with the route asynchronously.
                var view = iTemplate.ViewUrl ? iTemplate.ViewUrl : iTemplate.Id;
-               vm.$router.loadView(target, view, iTemplate.JSModuleUrl, { "RoutingState.Origin": iPath }, function () {
+               vm.$router.loadView("#" + iTemplate.Target, view, iTemplate.JSModuleUrl, { "RoutingState.Origin": iPath }, function () {
                   // If load is successful, update the active route.
                   state.RoutingState.Active = iPath;
                   vm.$dispatch({ "RoutingState.Active": iPath });
@@ -415,7 +406,7 @@ limitations under the License.
                   iRoute.Path = path;
                }
             }
-            else if (iRoute.RedirectRoot() == null)
+            else if (iRoute.RedirectRoot == null)
                throw new Error("vmRoute cannot find route template '" + iRoute.TemplateId);
          }
 
@@ -470,17 +461,18 @@ limitations under the License.
 
          dotnetify.react.router.pushState({}, "", path);
       }.bind(iVM);
-
-      iVM.$setRouteTarget = function (iTarget) {
-         this.$router.target = iTarget;
-      }.bind(iVM);
    }
 
    // Register the plugin to dotNetify.
    dotnetify.react.plugins["router"] = dotnetify.react.router;
 
-   // Helper component to set anchor tags for routes.
-   dotnetify.react.router.RouteLink = function(props) {
+   // <RouteLink> is a helper component to set anchor tags for routes.
+   dotnetify.react.router.RouteLink = function (props) {
+      if (props.vm == null)
+         console.error("RouteLink requires 'vm' property.");
+      else if (props.route == null)
+         console.error("RouteLink requires 'route' property.")
+
       return React.createElement(
          "a", {
             style: props.style,

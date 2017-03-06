@@ -29,7 +29,7 @@ namespace ViewModels
          new Link { Route = this.GetRoute("GridView"), Caption = "Grid View", Description = "Master-detail view with search, pagination, wizard and localization" },
          new Link { Route = this.GetRoute("CompositeView"), Caption = "Composite View", Description = "Building modular app through composition" },
          new Link { Route = this.GetRoute("LiveChart"), Caption = "Live Chart", Description = "Real-time made easy"  },
-         new Link { Route = this.GetRoute("BookStore"), Caption = "Book Store", Description = "SPA routing with deep-linking"  }
+         new Link { Route = this.GetRoute("BookStore"), Caption = "Web Store", Description = "SPA routing with deep-linking"  }
       };
 
       public IndexVM()
@@ -43,7 +43,7 @@ namespace ViewModels
             new RouteTemplate("GridView",       "/module/get/GridView/GridViewVM" ),
             new RouteTemplate("CompositeView",  "/module/get/CompositeView" ),
             new RouteTemplate("LiveChart",      "/module/get/LiveChart/LiveChartVM"),
-            new RouteTemplate("BookStore",      "/module/get/BookStore/BookStoreVM"),
+            new RouteTemplate("BookStore",       "/module/get/BookStore/BookStoreVM"),
          });
       }
    }

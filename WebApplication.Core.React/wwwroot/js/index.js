@@ -1,12 +1,16 @@
 ﻿"use strict";
 
+var RouteLink = dotnetify.react.router.RouteLink;
+
 var Index = React.createClass({
    displayName: "Index",
 
    getInitialState: function getInitialState() {
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("IndexVM", this);
-      this.vm.$setRouteTarget("Content");
+      this.vm.onRouteEnter = function (path, template) {
+         return template.Target = "Content";
+      };
 
       var state = window.vmStates.IndexVM || {};
       state["selectedLink"] = "";
@@ -28,9 +32,8 @@ var Index = React.createClass({
          copyright: { color: "rgb(125,135,140)", fontSize: "8pt" }
       };
 
-      var handleRoute = function handleRoute(event, linkId) {
-         _this.setState({ selectedLink: linkId });
-         _this.vm.$handleRoute(event);
+      var setSelectedLink = function setSelectedLink(linkId) {
+         return _this.setState({ selectedLink: linkId });
       };
 
       var showLinks = function showLinks(links) {
@@ -39,11 +42,12 @@ var Index = React.createClass({
                "li",
                { key: link.Id },
                React.createElement(
-                  "a",
-                  { style: link.Id == _this.state.selectedLink ? styles.activeExampleLink : styles.exampleLink, className: "example-link",
-                     href: _this.vm.$route(link.Route),
-                     onClick: function (event) {
-                        return handleRoute(event, link.Id);
+                  RouteLink,
+                  { vm: _this.vm, route: link.Route,
+                     style: link.Id == _this.state.selectedLink ? styles.activeExampleLink : styles.exampleLink,
+                     className: "example-link",
+                     onClick: function () {
+                        return setSelectedLink(link.Id);
                      } },
                   React.createElement("span", { style: styles.bullet, className: "glyphicon glyphicon-asterisk" }),
                   link.Caption

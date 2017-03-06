@@ -149,7 +149,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
    });
 
    dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-      version: "0.1.0",
+      version: "1.0.0",
       viewModels: {},
       plugins: {},
 

@@ -1,31 +1,45 @@
 ﻿"use strict";
 
+var RouteLink = dotnetify.react.router.RouteLink;
+
 var BookStore = React.createClass({
    displayName: "BookStore",
 
    getInitialState: function getInitialState() {
       this.vm = dotnetify.react.connect("BookStoreVM", this);
-      this.vm.$setRouteTarget("BookPanel");
+      this.vm.onRouteEnter = function (path, template) {
+         return template.Target = "BookPanel";
+      };
+
       return window.vmStates.BookStoreVM;
    },
    componentWillUnmount: function componentWillUnmount() {
       this.vm.$destroy();
-      ReactDOM.unmountComponentAtNode(document.getElementById("BookPanel"));
    },
    render: function render() {
       return React.createElement(
-         "div",
-         { className: "container-fluid" },
+         MuiThemeProvider,
+         null,
          React.createElement(
             "div",
-            { className: "header clearfix" },
+            { className: "container-fluid" },
             React.createElement(
-               "h3",
-               null,
-               "Example: Book Store"
-            )
-         ),
-         React.createElement("div", { id: "BookPanel" })
+               "div",
+               { className: "header clearfix" },
+               React.createElement(
+                  "h3",
+                  null,
+                  "Example: Web Store"
+               )
+            ),
+            React.createElement(
+               Paper,
+               { style: { padding: "1em", marginBottom: "1em" } },
+               "Each product here is represented by a unique URL that can be entered into the address bar to go directly to that specific product page."
+            ),
+            React.createElement(BookStoreFront, { vm: this.vm, books: this.state.Books }),
+            React.createElement("div", { id: "BookPanel" })
+         )
       );
    }
 });
@@ -33,17 +47,12 @@ var BookStore = React.createClass({
 var BookStoreFront = React.createClass({
    displayName: "BookStoreFront",
 
-   getInitialState: function getInitialState() {
-      this.vm = dotnetify.react.connect("BookStoreFrontVM", this);
-      return { Books: [] };
-   },
-   componentWillUnmount: function componentWillUnmount() {
-      this.vm.$destroy();
-   },
    render: function render() {
       var _this = this;
 
-      var books = this.state.Books.map(function (book) {
+      if (this.props.books == null) return React.createElement("div", null);
+
+      var books = this.props.books.map(function (book) {
          return React.createElement(
             "div",
             { key: book.Info.Id, className: "book col-md-3" },
@@ -51,10 +60,8 @@ var BookStoreFront = React.createClass({
                "center",
                null,
                React.createElement(
-                  "a",
-                  { href: _this.vm.$route(book.Route), onClick: function (event) {
-                        return _this.vm.$handleRoute(event);
-                     } },
+                  RouteLink,
+                  { vm: _this.props.vm, route: book.Route },
                   React.createElement("img", { className: "thumbnail", src: book.Info.ImageUrl })
                ),
                React.createElement(
@@ -84,68 +91,64 @@ var BookStoreFront = React.createClass({
    }
 });
 
+var BookDefault = function BookDefault(props) {
+   return React.createElement("div", null);
+};
+
 var Book = React.createClass({
    displayName: "Book",
 
    getInitialState: function getInitialState() {
       this.vm = dotnetify.react.connect("BookDetailsVM", this);
-      return { Book: {} };
+      return { Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" }, open: true };
    },
    componentWillUnmount: function componentWillUnmount() {
       this.vm.$destroy();
    },
    render: function render() {
+      var _this2 = this;
+
       var book = this.state.Book;
-      if (book === null) return React.createElement("div", null);
+
+      var handleClose = function handleClose() {
+         _this2.setState({ open: false });
+         window.history.back();
+      };
+
+      var actions = [React.createElement(FlatButton, { label: "Back", primary: true, onTouchTap: handleClose })];
 
       return React.createElement(
-         "div",
+         MuiThemeProvider,
          null,
          React.createElement(
-            "div",
-            { className: "page-header" },
-            React.createElement(
-               "h3",
-               null,
-               book.Title
-            )
-         ),
-         React.createElement(
-            "div",
-            { className: "container" },
+            Dialog,
+            { open: this.state.open, actions: actions },
             React.createElement(
                "div",
                { className: "row" },
                React.createElement(
                   "div",
                   { className: "col-md-4" },
-                  React.createElement("img", { src: book.ImageUrl })
+                  React.createElement("img", { className: "thumbnail", src: book.ImageUrl })
                ),
                React.createElement(
                   "div",
                   { className: "col-md-8" },
                   React.createElement(
-                     "div",
-                     { className: "page-header" },
-                     React.createElement(
-                        "h2",
-                        null,
-                        book.Title
-                     )
+                     "h3",
+                     null,
+                     book.Title
                   ),
                   React.createElement(
-                     "h3",
+                     "h5",
                      null,
                      book.Author
                   ),
+                  React.createElement("br", null),
                   React.createElement(
-                     "a",
-                     { href: book.ItemUrl },
-                     React.createElement(
-                        "button",
-                        { className: "btn btn-lg btn-default" },
-                        "Buy"
-                     )
+                     RaisedButton,
+                     { primary: true },
+                     "Buy"
                   )
                )
             )

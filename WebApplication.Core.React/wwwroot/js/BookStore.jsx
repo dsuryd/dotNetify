@@ -1,40 +1,45 @@
-﻿var BookStore = React.createClass({
+﻿var RouteLink = dotnetify.react.router.RouteLink;
+
+var BookStore = React.createClass({
    getInitialState() {
       this.vm = dotnetify.react.connect("BookStoreVM", this);
-      this.vm.$setRouteTarget("BookPanel");
+      this.vm.onRouteEnter = (path, template) => template.Target = "BookPanel";
+
       return window.vmStates.BookStoreVM;
    },
    componentWillUnmount() {
       this.vm.$destroy();
-      ReactDOM.unmountComponentAtNode(document.getElementById("BookPanel"));
    },
    render() {
       return (
-         <div className="container-fluid">
-            <div className="header clearfix">
-               <h3>Example: Book Store</h3>
+         <MuiThemeProvider>
+            <div className="container-fluid">
+               <div className="header clearfix">
+                  <h3>Example: Web Store</h3>
+               </div>
+               <Paper style={{padding: "1em", marginBottom: "1em"}}>
+                  Each product here is represented by a unique URL that can be entered into the address bar to go directly to that specific product page.
+               </Paper>
+
+               <BookStoreFront vm={this.vm} books={this.state.Books} />
+               <div id="BookPanel" />
             </div>
-            <div id="BookPanel" />
-         </div>
+         </MuiThemeProvider>
       )
    }
 });
 
 var BookStoreFront = React.createClass({
-   getInitialState() {
-      this.vm = dotnetify.react.connect("BookStoreFrontVM", this);
-      return { Books: [] };
-   },
-   componentWillUnmount() {
-      this.vm.$destroy();
-   },
    render() {
-      const books = this.state.Books.map(book =>
+      if (this.props.books == null)
+         return <div></div>
+
+      const books = this.props.books.map(book =>
          <div key={book.Info.Id} className="book col-md-3">
             <center>
-               <a href={this.vm.$route(book.Route)} onClick={event => this.vm.$handleRoute(event)}>
+               <RouteLink vm={this.props.vm} route={book.Route}>
                   <img className="thumbnail" src={book.Info.ImageUrl} />
-               </a>
+               </RouteLink>
                <strong>{book.Info.Title}</strong>
                <div>by <span>{book.Info.Author}</span></div>
                <br />
@@ -49,39 +54,44 @@ var BookStoreFront = React.createClass({
    }
 });
 
+var BookDefault = function (props) {
+   return <div></div>;
+}
+
 var Book = React.createClass({
    getInitialState() {
       this.vm = dotnetify.react.connect("BookDetailsVM", this);
-      return { Book: {} };
+      return { Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" }, open: true };
    },
    componentWillUnmount() {
       this.vm.$destroy();
    },
    render() {
       var book = this.state.Book;
-      if (book === null)
-         return <div></div>
+
+      const handleClose = () => {
+         this.setState({ open: false });
+         window.history.back();
+      }
+
+      const actions = [<FlatButton label="Back" primary={true} onTouchTap={handleClose} />]
 
       return (
-         <div>
-            <div className="page-header">
-               <h3>{book.Title}</h3>
-            </div>
-            <div className="container">
+         <MuiThemeProvider>
+            <Dialog open={this.state.open} actions={actions}>
                <div className="row">
                   <div className="col-md-4">
-                     <img src={book.ImageUrl} />
+                     <img className="thumbnail" src={book.ImageUrl} />
                   </div>
                   <div className="col-md-8">
-                     <div className="page-header">
-                        <h2>{book.Title}</h2>
-                     </div>
-                     <h3>{book.Author}</h3>
-                     <a href={book.ItemUrl}><button className="btn btn-lg btn-default">Buy</button></a>
+                     <h3>{book.Title}</h3>
+                     <h5>{book.Author}</h5>
+                     <br/>
+                     <RaisedButton primary={true}>Buy</RaisedButton>
                   </div>
                </div>
-            </div>
-         </div>
+            </Dialog>
+         </MuiThemeProvider>
       )
    }
 });
