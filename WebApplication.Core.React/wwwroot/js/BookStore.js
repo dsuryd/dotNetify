@@ -29,7 +29,7 @@ var BookStore = React.createClass({
                React.createElement(
                   "h3",
                   null,
-                  "Example: Web Store"
+                  "Example: Book Store"
                )
             ),
             React.createElement(

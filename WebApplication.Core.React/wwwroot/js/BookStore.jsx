@@ -15,7 +15,7 @@ var BookStore = React.createClass({
          <MuiThemeProvider>
             <div className="container-fluid">
                <div className="header clearfix">
-                  <h3>Example: Web Store</h3>
+                  <h3>Example: Book Store</h3>
                </div>
                <Paper style={{padding: "1em", marginBottom: "1em"}}>
                   Each product here is represented by a unique URL that can be entered into the address bar to go directly to that specific product page.
