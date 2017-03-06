@@ -271,7 +271,7 @@ limitations under the License.
 
                // Check if the route has valid target.
                if (iTemplate.Target === null) {
-                  console.error("router> the Target for template '" + template.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
+                  console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
                   return;
                }
 
