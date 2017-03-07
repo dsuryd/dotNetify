@@ -479,6 +479,7 @@ limitations under the License.
             className: props.className,
             href: props.vm.$route(props.route),
             onClick: function (event) {
+               event.preventDefault();
                if (typeof props.onClick === "function")
                   props.onClick();
                return props.vm.$handleRoute(event);
