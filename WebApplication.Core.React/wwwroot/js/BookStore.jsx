@@ -79,7 +79,7 @@ var Book = React.createClass({
       return (
          <MuiThemeProvider>
             <Dialog open={this.state.open} actions={actions}>
-               <div className="row">
+               <div className="row" style={{minHeight: "380px"}}>
                   <div className="col-md-4">
                      <img className="thumbnail" src={book.ImageUrl} />
                   </div>

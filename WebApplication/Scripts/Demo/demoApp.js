@@ -9,19 +9,14 @@
       "router": "dotnetify.router",
       "binder": "dotnetify.binder",
       "binder-polymer": "dotnetify.binder.polymer",
-      "path": "path.min",
       "signalr": "jquery.signalR-2.2.0.min",
-      "signalr-hub": "/signalr/hubs?",
       "bootstrap": "DemoLibs/bootstrap.min"
    },
    shim: {
       "jquery": { exports: "$" },
       "knockout": { exports: "ko" },
-      "path": { exports: "Path" },
-      "router": ["path"],
       "bootstrap": ["jquery"],
       "signalr": { deps: ["jquery"], exports: "$.connection" },
-      "signalr-hub": ["signalr"],
       "binder-polymer": ["binder"]
    }
 });

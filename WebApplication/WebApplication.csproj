@@ -178,7 +178,6 @@
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
     <Content Include="Scripts\knockout-3.4.1.js" />
     <Content Include="Scripts\knockout.mapping-latest.js" />
-    <Content Include="Scripts\path.min.js" />
     <Content Include="Scripts\require.min.js" />
     <Content Include="Views\AFITop100.html" />
     <Content Include="Views\BetterList.html" />

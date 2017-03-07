@@ -52,16 +52,16 @@ module.exports = function (grunt) {
                   dest: "../dist/dotnetify.js"
                },
                {
-                  src: "wwwroot/lib/dotnetify-hub.js",
-                  dest: "../dist/dotnetify-hub.js"
-               },
-               {
                   src: "wwwroot/lib/dotnetify.router.js",
                   dest: "../dist/dotnetify.router.js"
                },
                {
-                  src: "wwwroot/lib/path.min.js",
-                  dest: "../dist/path.min.js"
+                  src: "../WebApplication.Core.React/wwwroot/lib/dotnetify-react.js",
+                  dest: "../dist/dotnetify.react.js"
+               },
+               {
+                  src: "../WebApplication.Core.React/wwwroot/lib/dotnetify-react.router.js",
+                  dest: "../dist/dotnetify.react.router.js"
                },
                {
                   src: "wwwroot/lib/knockout.mapping-latest.js",
@@ -90,13 +90,17 @@ module.exports = function (grunt) {
                   dest: "../dist/dotnetify.min.js"
                },
                {
-                  src: "wwwroot/lib/dotnetify-hub.js",
-                  dest: "../dist/dotnetify-hub.min.js"
-               },
-               {
                   src: "wwwroot/lib/dotnetify.router.js",
                   dest: "../dist/dotnetify.router.min.js"
-               }
+               },
+               {
+                  src: "../WebApplication.Core.React/wwwroot/lib/dotnetify-react.js",
+                  dest: "../dist/dotnetify.react.min.js"
+               },
+               {
+                  src: "../WebApplication.Core.React/wwwroot/lib/dotnetify-react.router.js",
+                  dest: "../dist/dotnetify.react.router.min.js"
+               },
             ]
 
          }

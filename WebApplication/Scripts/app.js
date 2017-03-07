@@ -7,17 +7,12 @@
       "ko-mapping": "knockout.mapping-latest",
       "dotnetify": "dotnetify",
       "router": "dotnetify.router",
-      "signalr": "jquery.signalR-2.2.0.min",
-      "signalr-hub": "/signalr/hubs?",
-      "path": "path.min",
+      "signalr": "jquery.signalR-2.2.0.min"
    },
    shim: {
       "jquery": { exports: "$" },
       "knockout": { exports: "ko" },
-      "path": { exports: "Path" },
-      "router": ["path"],
-      "signalr": { deps: ["jquery"], exports: "$.connection" },
-      "signalr-hub": ["signalr"]
+      "signalr": { deps: ["jquery"], exports: "$.connection" }
    }
 });
 

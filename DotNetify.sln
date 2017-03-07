@@ -25,15 +25,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET Core", "ASP.NET Cor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E1EC-4006-B6D5-EB9E54EA6883}"
 	ProjectSection(SolutionItems) = preProject
-		dist\dotnetify-hub.js = dist\dotnetify-hub.js
-		dist\dotnetify-hub.min.js = dist\dotnetify-hub.min.js
 		dist\dotnetify.js = dist\dotnetify.js
 		dist\dotnetify.min.js = dist\dotnetify.min.js
+		dist\dotnetify.react.js = dist\dotnetify.react.js
+		dist\dotnetify.react.min.js = dist\dotnetify.react.min.js
+		dist\dotnetify.react.router.js = dist\dotnetify.react.router.js
+		dist\dotnetify.react.router.min.js = dist\dotnetify.react.router.min.js
 		dist\dotnetify.router.js = dist\dotnetify.router.js
 		dist\dotnetify.router.min.js = dist\dotnetify.router.min.js
 		dist\knockout.mapping-latest.js = dist\knockout.mapping-latest.js
 		package.json = package.json
-		dist\path.min.js = dist\path.min.js
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "WebApplication.Core.React", "WebApplication.Core.React\WebApplication.Core.React.xproj", "{958CDC01-6AE9-480F-A12B-49B95C707238}"

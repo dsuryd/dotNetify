@@ -28,7 +28,7 @@ limitations under the License.
    // Add plugin functions.
    dotnetify.binder =
       {
-         version: "1.1.0",
+         version: "1.1.3",
 
          // Placeholder for binder extensions.
          extensions: {},

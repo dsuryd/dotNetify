@@ -125,7 +125,7 @@ var Book = React.createClass({
             { open: this.state.open, actions: actions },
             React.createElement(
                "div",
-               { className: "row" },
+               { className: "row", style: { minHeight: "380px" } },
                React.createElement(
                   "div",
                   { className: "col-md-4" },

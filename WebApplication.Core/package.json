@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "name": "DotNetify.AspNetCore",
+  "name": "webapplication.core",
   "private": true,
   "dependencies": {
     "jquery": "^3.1.1",
