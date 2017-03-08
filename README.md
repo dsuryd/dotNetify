@@ -6,23 +6,19 @@ DotNetify is a free, open source project that lets you create amazing real-time 
 ##Features
 
 * Simple and lightweight - no JS client-side framework, no REST API controllers.
-* Integrate SignalR and KnockoutJS to support .NET back-end MVVM architecture.
+* Integrate SignalR and React / KnockoutJS to support .NET back-end MVVM architecture.
 * Built-in real-time across WebSockets, perfect for IoT consumer apps.
 * Full support for single-page apps, including client-side and server-side deep routing.
 * Run on [ASP.NET Core](http://asp.net/core), ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
 * Modern tooling: Visual Studio 2015,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
 
-_*** Coming soon: integration w/ ReactJS. Get updates on twitter [@dotnetify](https://twitter.com/dotnetify) ***_  
-_*** 2/22/17: live preview at [dotnetify.azurewebsites.net](http://dotnetify.azurewebsites.net) ***_
-
 ##Documentation
 
 Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
 
-##Code Examples
+##KnockoutJS Code Examples
 
 Want a super simple example to try out?  See the [Live Chart Example](https://github.com/dsuryd/dotNetify-example-livechart).    
-
 For close-to-real-world example, see the [Web/Mobile App Template](https://github.com/dsuryd/dotNetify-app-template).
 
 ##NuGet / NPM
