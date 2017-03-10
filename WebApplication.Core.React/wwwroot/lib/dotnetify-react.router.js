@@ -34,7 +34,7 @@ limitations under the License.
    // Add plugin functions.
    dotnetify.react.router =
       {
-         version: "1.0.0-beta",
+         version: "1.0.1-beta",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -232,7 +232,7 @@ limitations under the License.
                // Provide the opportunity to override the URL.
                iJsModuleUrl = dotnetify.react.router.overrideUrl(iJsModuleUrl);
 
-               if (iViewUrl.endsWith("html"))
+               if (utils.endsWith(iViewUrl,"html"))
                   vm.$loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
                else
                   vm.$loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
