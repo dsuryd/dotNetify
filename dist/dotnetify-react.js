@@ -604,5 +604,5 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       }
    });
 
-   return dotnetify.react;
+   return dotnetify;
 }))
