@@ -23,6 +23,8 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       define(['react', 'jquery', 'signalr'], factory);
    }
    else if (typeof exports === "object" && typeof module === "object") {
+      if (typeof window.jQuery === "undefined")
+         window.jQuery = require('jquery');
       module.exports = factory(require('react'), require('jquery'), require('signalr'));
    }
    else {
@@ -149,7 +151,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
    });
 
    dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-      version: "1.0.0-beta",
+      version: "1.0.1-beta",
       viewModels: {},
       plugins: {},
 

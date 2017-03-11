@@ -1,6 +1,6 @@
 {
    "name": "dotnetify",
-   "version": "2.0.2-beta",
+   "version": "2.0.3-beta",
    "description": "Simple, lightweight, yet powerful way to build realtime .NET web apps.",
    "main": "dist/dotnetify-react.js",
    "files": [

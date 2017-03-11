@@ -488,4 +488,6 @@ limitations under the License.
          props.children
       );
    }
+
+   return dotnetify.react.router;
 }))
