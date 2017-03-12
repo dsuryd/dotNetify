@@ -82,3 +82,10 @@
 /WebApplication.Core.React/wwwroot/js/GridView.min.js
 /WebApplication.Core.React/wwwroot/js/CompositeView/PaginatedTable.min.js
 /WebApplication.Core.React/wwwroot/js/LiveChart.min.js
+/Backup
+/DotNetifyLib.Core/obj
+/DotNetifyLib.SignalR/obj
+/ViewModels.Examples/obj
+/WebApplication.Core/obj
+/WebApplication.Core.React/obj
+/UpgradeLog.htm
