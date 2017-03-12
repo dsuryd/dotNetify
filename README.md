@@ -18,14 +18,15 @@ __*** dotNetify-React is in BETA - check out docs and live demo at [http://dotne
 
 Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
 
-##React Code Example
+##React Code Example   
 
-Real-time "Hello World" with create-react-app + Node.js + .NET Core: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).    
+* Real-time "Hello World" with Visual Studio 2017 + WebPack: [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).   
+* Real-time "Hello World" with create-react-app + Node.js + .NET Core: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).  
 
 ##Knockout Code Example
 
-Want a super simple example to try out?  See the [Live Chart Example](https://github.com/dsuryd/dotNetify-example-livechart).    
-For close-to-real-world example, see the [Web/Mobile App Template](https://github.com/dsuryd/dotNetify-app-template).
+* Real-time live chart: [Live Chart Example](https://github.com/dsuryd/dotNetify-example-livechart).    
+* Mobile app example: [Web/Mobile App Template](https://github.com/dsuryd/dotNetify-app-template).
 
 ##Installation
 
