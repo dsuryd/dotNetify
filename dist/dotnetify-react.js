@@ -20,591 +20,620 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 // Support using either AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
    if (typeof define === "function" && define["amd"]) {
-      define(['react', 'jquery', 'signalr'], factory);
+      define(['react', 'react-dom', 'jquery', 'signalr'], factory);
    }
    else if (typeof exports === "object" && typeof module === "object") {
       if (typeof window.jQuery === "undefined")
          window.jQuery = require('jquery');
-      module.exports = factory(require('react'), require('jquery'), require('signalr'));
+      module.exports = factory(require('react'), require('react-dom'), window.jQuery, require('signalr'));
    }
    else {
-      factory(React, jQuery);
+      factory(React, ReactDOM, jQuery);
    }
 }
-(function (_React, $) {
+   (function (_React, _ReactDOM, $) {
 
-   // SignalR hub auto-generated from /signalr/hubs.
-   /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
-   /// <reference path="jquery.signalR.js" />
-   (function ($, window, undefined) {
-      /// <param name="$" type="jQuery" />
-      "use strict";
+      // SignalR hub auto-generated from /signalr/hubs.
+      /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
+      /// <reference path="jquery.signalR.js" />
+      (function ($, window, undefined) {
+         /// <param name="$" type="jQuery" />
+         "use strict";
 
-      if (typeof ($.signalR) !== "function") {
-         throw new Error("SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.");
-      }
+         if (typeof ($.signalR) !== "function") {
+            throw new Error("SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.");
+         }
 
-      var signalR = $.signalR;
+         var signalR = $.signalR;
 
-      function makeProxyCallback(hub, callback) {
-         return function () {
-            // Call the client hub method
-            callback.apply(hub, $.makeArray(arguments));
-         };
-      }
+         function makeProxyCallback(hub, callback) {
+            return function () {
+               // Call the client hub method
+               callback.apply(hub, $.makeArray(arguments));
+            };
+         }
 
-      function registerHubProxies(instance, shouldSubscribe) {
-         var key, hub, memberKey, memberValue, subscriptionMethod;
+         function registerHubProxies(instance, shouldSubscribe) {
+            var key, hub, memberKey, memberValue, subscriptionMethod;
 
-         for (key in instance) {
-            if (instance.hasOwnProperty(key)) {
-               hub = instance[key];
+            for (key in instance) {
+               if (instance.hasOwnProperty(key)) {
+                  hub = instance[key];
 
-               if (!(hub.hubName)) {
-                  // Not a client hub
-                  continue;
-               }
+                  if (!(hub.hubName)) {
+                     // Not a client hub
+                     continue;
+                  }
 
-               if (shouldSubscribe) {
-                  // We want to subscribe to the hub events
-                  subscriptionMethod = hub.on;
-               } else {
-                  // We want to unsubscribe from the hub events
-                  subscriptionMethod = hub.off;
-               }
+                  if (shouldSubscribe) {
+                     // We want to subscribe to the hub events
+                     subscriptionMethod = hub.on;
+                  } else {
+                     // We want to unsubscribe from the hub events
+                     subscriptionMethod = hub.off;
+                  }
 
-               // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
-               for (memberKey in hub.client) {
-                  if (hub.client.hasOwnProperty(memberKey)) {
-                     memberValue = hub.client[memberKey];
+                  // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
+                  for (memberKey in hub.client) {
+                     if (hub.client.hasOwnProperty(memberKey)) {
+                        memberValue = hub.client[memberKey];
 
-                     if (!$.isFunction(memberValue)) {
-                        // Not a client hub function
-                        continue;
+                        if (!$.isFunction(memberValue)) {
+                           // Not a client hub function
+                           continue;
+                        }
+
+                        subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
                      }
-
-                     subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
                   }
                }
             }
          }
-      }
 
-      $.hubConnection.prototype.createHubProxies = function () {
-         var proxies = {};
-         this.starting(function () {
-            // Register the hub proxies as subscribed
-            // (instance, shouldSubscribe)
-            registerHubProxies(proxies, true);
+         $.hubConnection.prototype.createHubProxies = function () {
+            var proxies = {};
+            this.starting(function () {
+               // Register the hub proxies as subscribed
+               // (instance, shouldSubscribe)
+               registerHubProxies(proxies, true);
 
-            this._registerSubscribedHubs();
-         }).disconnected(function () {
-            // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
-            // (instance, shouldSubscribe)
-            registerHubProxies(proxies, false);
-         });
+               this._registerSubscribedHubs();
+            }).disconnected(function () {
+               // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
+               // (instance, shouldSubscribe)
+               registerHubProxies(proxies, false);
+            });
 
-         proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
-         proxies['dotNetifyHub'].client = {};
-         proxies['dotNetifyHub'].server = {
-            dispose_VM: function (vmId) {
-               return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Dispose_VM"], $.makeArray(arguments)));
-            },
+            proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
+            proxies['dotNetifyHub'].client = {};
+            proxies['dotNetifyHub'].server = {
+               dispose_VM: function (vmId) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Dispose_VM"], $.makeArray(arguments)));
+               },
 
-            request_VM: function (vmId, vmArg) {
-               return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Request_VM"], $.makeArray(arguments)));
-            },
+               request_VM: function (vmId, vmArg) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Request_VM"], $.makeArray(arguments)));
+               },
 
-            update_VM: function (vmId, vmData) {
-               return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Update_VM"], $.makeArray(arguments)));
-            }
-         };
-
-         return proxies;
-      };
-
-      signalR.hub = $.hubConnection("/signalr", { useDefaultPath: false });
-      $.extend(signalR, signalR.hub.createHubProxies());
-
-   }($, window));
-
-   dotnetify = $.extend(dotnetify, {
-      // SignalR hub.
-      hub: null,
-      hubServer: $.connection.dotNetifyHub.server,
-      hubOptions: { "transport": ["webSockets", "longPolling"] },
-
-      // Debug mode.
-      debug: true,
-      debugFn: null,
-
-      // Offline mode.
-      offline: false,
-      isOffline: true,
-      offlineTimeout: 5000,
-      offlineCacheFn: null,
-
-      _connectRetry: 0,
-      isConnected: function () {
-         return $.connection.hub.state == $.signalR.connectionState.connected
-      },
-   });
-
-   dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-      version: "1.0.1-beta",
-      viewModels: {},
-      plugins: {},
-
-      // Initializes connection to SignalR server hub.
-      init: function () {
-         var self = dotnetify.react;
-         var getInitialStates = function () {
-            for (var vmId in self.viewModels) {
-               if (!self.viewModels[vmId].$requested)
-                  self.viewModels[vmId].$request();
-            }
-         };
-
-         if (dotnetify.hub === null) {
-            // Setup SignalR server method handler.
-            var hub = $.connection.dotNetifyHub;
-            hub.client.response_VM = function (iVMId, iVMData) {
-
-               // Report unauthorized access.
-               if (iVMData == "403") {
-                  console.error("Unauthorized access to " + iVMId);
-                  return;
+               update_VM: function (vmId, vmData) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Update_VM"], $.makeArray(arguments)));
                }
-
-               if (self.viewModels.hasOwnProperty(iVMId))
-                  self.viewModels[iVMId].$update(iVMData);
-               else
-                  // If we get to this point, that means the server holds a view model instance
-                  // whose view no longer existed.  So, tell the server to dispose the view model.
-                  hub.server.dispose_VM(iVMId);
             };
 
-            // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.
-            var startHub = function () {
-               var hub = typeof dotnetify.hubOptions === "undefined" ? $.connection.hub.start() : $.connection.hub.start(dotnetify.hubOptions);
-               hub.done(function () {
-                  dotnetify._connectRetry = 0;
-                  getInitialStates();
-               })
-               .fail(function (e) {
-                  console.error(e);
+            return proxies;
+         };
+
+         signalR.hub = $.hubConnection("/signalr", { useDefaultPath: false });
+         $.extend(signalR, signalR.hub.createHubProxies());
+
+      }($, window));
+
+      dotnetify = $.extend(dotnetify, {
+         // SignalR hub.
+         hub: null,
+         hubServer: $.connection.dotNetifyHub.server,
+         hubOptions: { "transport": ["webSockets", "longPolling"] },
+
+         // Debug mode.
+         debug: true,
+         debugFn: null,
+
+         // Offline mode.
+         offline: false,
+         isOffline: true,
+         offlineTimeout: 5000,
+         offlineCacheFn: null,
+
+         _connectRetry: 0,
+         isConnected: function () {
+            return $.connection.hub.state == $.signalR.connectionState.connected
+         },
+      });
+
+      dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
+         version: "1.0.2-beta",
+         viewModels: {},
+         plugins: {},
+
+         // Initializes connection to SignalR server hub.
+         init: function () {
+            var self = dotnetify.react;
+            var getInitialStates = function () {
+               for (var vmId in self.viewModels) {
+                  if (!self.viewModels[vmId].$requested)
+                     self.viewModels[vmId].$request();
+               }
+            };
+
+            if (dotnetify.hub === null) {
+               // Setup SignalR server method handler.
+               var hub = $.connection.dotNetifyHub;
+               hub.client.response_VM = function (iVMId, iVMData) {
+
+                  // Report unauthorized access.
+                  if (iVMData == "403") {
+                     console.error("Unauthorized access to " + iVMId);
+                     return;
+                  }
+
+                  if (self.viewModels.hasOwnProperty(iVMId))
+                     self.viewModels[iVMId].$update(iVMData);
+                  else
+                     // If we get to this point, that means the server holds a view model instance
+                     // whose view no longer existed.  So, tell the server to dispose the view model.
+                     hub.server.dispose_VM(iVMId);
+               };
+
+               // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.
+               var startHub = function () {
+                  var hub = typeof dotnetify.hubOptions === "undefined" ? $.connection.hub.start() : $.connection.hub.start(dotnetify.hubOptions);
+                  hub.done(function () {
+                     dotnetify._connectRetry = 0;
+                     getInitialStates();
+                  })
+                     .fail(function (e) {
+                        console.error(e);
+                     });
+
+                  // If offline mode is enabled, apply the widget anyway when there's no connection.
+                  setTimeout(function () {
+                     if (dotnetify.offline && !dotnetify.isConnected()) {
+                        getInitialStates();
+                        dotnetify.isOffline = true;
+                        $(document).trigger("offline", dotnetify.isOffline);
+                     }
+                  }, dotnetify.offlineTimeout);
+
+                  return hub;
+               }
+               dotnetify.hub = startHub();
+
+               // On disconnected, keep attempting to start the connection in increasing interval.
+               $.connection.hub.disconnected(function () {
+                  setTimeout(function () {
+                     dotnetify.hub = startHub();
+                  }, dotnetify._connectRetry * 5000 + 500);
+
+                  if (dotnetify._connectRetry < 3)
+                     dotnetify._connectRetry++;
                });
 
-               // If offline mode is enabled, apply the widget anyway when there's no connection.
-               setTimeout(function () {
-                  if (dotnetify.offline && !dotnetify.isConnected()) {
-                     getInitialStates();
-                     dotnetify.isOffline = true;
+               // Use SignalR event to raise the offline event with true/false argument.
+               $.connection.hub.stateChanged(function (state) {
+                  var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
+                  console.log("SignalR: " + stateText[state.newState]);
+
+                  var isOffline = state.newState != 1;
+                  if (dotnetify.isOffline != isOffline) {
+                     dotnetify.isOffline = isOffline;
                      $(document).trigger("offline", dotnetify.isOffline);
                   }
-               }, dotnetify.offlineTimeout);
-
-               return hub;
+               });
             }
-            dotnetify.hub = startHub();
+            else if (dotnetify.isConnected())
+               dotnetify.hub.done(getInitialStates);
+            else if (dotnetify.offline)
+               getInitialStates();
+         },
 
-            // On disconnected, keep attempting to start the connection in increasing interval.
-            $.connection.hub.disconnected(function () {
-               setTimeout(function () {
-                  dotnetify.hub = startHub();
-               }, dotnetify._connectRetry * 5000 + 500);
+         // Connects to a server view model.
+         connect: function (iVMId, iReact, iGetState, iSetState, iVMArg) {
+            if (dotnetify.ssr)
+               return dotnetify.react.ssrConnect(iVMId, iReact, iVMArg);
 
-               if (dotnetify._connectRetry < 3)
-                  dotnetify._connectRetry++;
-            });
+            var self = dotnetify.react;
+            if (!self.viewModels.hasOwnProperty(iVMId))
+               self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg);
+            else
+               console.error("Component is attempting to connect to an already active '" + iVMId + "'.  If it's from a dismounted component, you must add vm.$destroy to componentWillUnmount().");
 
-            // Use SignalR event to raise the offline event with true/false argument.
-            $.connection.hub.stateChanged(function (state) {
-               var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
-               console.log("SignalR: " + stateText[state.newState]);
+            self.init();
+            return self.viewModels[iVMId];
+         },
 
-               var isOffline = state.newState != 1;
-               if (dotnetify.isOffline != isOffline) {
-                  dotnetify.isOffline = isOffline;
-                  $(document).trigger("offline", dotnetify.isOffline);
-               }
-            });
+         // Used by server-side rendering in lieu of connect method.
+         ssrConnect: function (iVMId, iReact, iVMArg) {
+            if (window.ssr == null || !window.ssr.hasOwnProperty(iVMId))
+               console.error("Server-side rendering requires initial state in 'window.ssr." + iVMId + "'.");
+
+            var self = dotnetify.react;
+            var vmState = window.ssr[iVMId];
+            var getState = function () { return vmState; };
+            var setState = function (state) { vmState = $.extend(vmState, state); };
+            var vm = self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, getState, setState, iVMArg);
+
+            // Need to be asynch to allow initial state to be processed.
+            setTimeout(function () { vm.$update(JSON.stringify(window.ssr[iVMId])); }, 100);
+            return vm;
          }
-         else if (dotnetify.isConnected())
-            dotnetify.hub.done(getInitialStates);
-         else if (dotnetify.offline)
-            getInitialStates();
-      },
+      });
 
-      // Connects to a server view model.
-      connect: function (iVMId, iReact, iGetState, iSetState, iVMArg) {
-         var self = dotnetify.react;
-         if (!self.viewModels.hasOwnProperty(iVMId))
-            self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg);
-         else
-            console.error("Component is attempting to connect to an already active '" + iVMId + "'.  If it's from a dismounted component, you must add vm.$destroy to componentWillUnmount().");
+      // Client-side view model that acts as a proxy of the server view model.
+      // iVMId - identifies the view model.
+      // iReact - React component.
+      // iGetState - React state accessor (optional).
+      // iSetState - React state mutator (optional).
+      // iVMArg - view model arguments (optional).
+      function dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg) {
 
-         dotnetify.react.init();
-         return self.viewModels[iVMId];
-      }
-   });
+         this.$vmId = iVMId;
+         this.$component = iReact;
+         this.$vmArg = iVMArg;
+         this.$requested = false;
+         this.$loaded = false;
+         this.$itemKey = {};
 
-   // Client-side view model that acts as a proxy of the server view model.
-   // iVMId - identifies the view model.
-   // iReact - React component.
-   // iGetState - React state accessor (optional).
-   // iSetState - React state mutator (optional).
-   // iVMArg - view model arguments (optional).
-   function dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg) {
+         if (typeof iGetState !== "function") {
+            this.$vmArg = iGetState;
+            iGetState = function () { return iReact.state; };
+            iSetState = function (state) { iReact.setState(state); };
+         }
 
-      this.$vmId = iVMId;
-      this.$component = iReact;
-      this.$vmArg = iVMArg;
-      this.$requested = false;
-      this.$loaded = false;
-      this.$itemKey = {};
+         if (iReact.props.hasOwnProperty("vmArg"))
+            this.$vmArg = $.extend(this.$vmArg, iReact.props.vmArg);
 
-      if (typeof iGetState !== "function") {
-         this.$vmArg = iGetState;
-         iGetState = function() { return iReact.state; };
-         iSetState = function (state) { iReact.setState(state); };
+         this.State = function (state) { return typeof state === "undefined" ? iGetState() : iSetState(state) };
+
+         // Inject plugin functions into this view model.
+         for (var pluginId in dotnetify.react.plugins) {
+            var plugin = dotnetify.react.plugins[pluginId];
+            if (plugin.hasOwnProperty("$inject"))
+               plugin.$inject(this);
+         }
       }
 
-      if (iReact.props.hasOwnProperty("vmArg"))
-         this.$vmArg = $.extend(this.$vmArg, iReact.props.vmArg);
+      // Disposes the view model, both here and on the server.
+      dotnetifyVM.prototype.$destroy = function () {
 
-      this.State = function (state) { return typeof state === "undefined" ? iGetState() : iSetState(state) };
-
-      // Inject plugin functions into this view model.
-      for (var pluginId in dotnetify.react.plugins) {
-         var plugin = dotnetify.react.plugins[pluginId];
-         if (plugin.hasOwnProperty("$inject"))
-            plugin.$inject(this);
+         // Call any plugin's $destroy function if provided.
+         for (var pluginId in dotnetify.react.plugins) {
+            var plugin = dotnetify.react.plugins[pluginId];
+            if (typeof plugin["$destroy"] === "function")
+               plugin.$destroy.apply(this);
+         }
+         dotnetify.hubServer.dispose_VM(this.$vmId);
+         delete dotnetify.react.viewModels[this.$vmId];
       }
-   }
 
-   // Disposes the view model, both here and on the server.
-   dotnetifyVM.prototype.$destroy = function () {
+      // Dispatches a value to the server view model.
+      // iValue - Vvalue to dispatch.
+      dotnetifyVM.prototype.$dispatch = function (iValue) {
 
-      // Call any plugin's $destroy function if provided.
-      for (var pluginId in dotnetify.react.plugins) {
-         var plugin = dotnetify.react.plugins[pluginId];
-         if (typeof plugin["$destroy"] === "function")
-            plugin.$destroy.apply(this);
-      }
-      dotnetify.hubServer.dispose_VM(this.$vmId);
-      delete dotnetify.react.viewModels[this.$vmId];
-   }
+         if (dotnetify.isConnected()) {
+            try {
+               dotnetify.hubServer.update_VM(this.$vmId, iValue);
 
-   // Dispatches a value to the server view model.
-   // iValue - Vvalue to dispatch.
-   dotnetifyVM.prototype.$dispatch = function (iValue) {
+               if (dotnetify.debug) {
+                  console.log("[" + this.$vmId + "] sent> ");
+                  console.log(iValue);
 
-      if (dotnetify.isConnected()) {
-         try {
-            dotnetify.hubServer.update_VM(this.$vmId, iValue);
-
-            if (dotnetify.debug) {
-               console.log("[" + this.$vmId + "] sent> ");
-               console.log(iValue);
-
-               if (dotnetify.debugFn != null)
-                  dotnetify.debugFn(this.$vmId, "sent", iValue);
+                  if (dotnetify.debugFn != null)
+                     dotnetify.debugFn(this.$vmId, "sent", iValue);
+               }
             }
+            catch (e) {
+               console.error(e);
+            }
+         }
+      }
+
+      // Dispatches a state value to the server view model.
+      // iValue - State value to dispatch.
+      dotnetifyVM.prototype.$dispatchListState = function (iValue) {
+         for (var listName in iValue) {
+            var key = this.$itemKey[listName];
+            if (!key) {
+               console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
+               return;
+            }
+            var item = iValue[listName];
+            if (!item[key]) {
+               console.error("[" + this.$vmId + "] couldn't dispatch data from '" + listName + "' due to missing property '" + key + "'");
+               console.error(item);
+               return;
+            }
+            for (var prop in item) {
+               if (prop != key) {
+                  var state = {};
+                  state[listName + ".$" + item[key] + "." + prop] = item[prop];
+                  this.$dispatch(state);
+               }
+            }
+
+            this.$updateList(listName, item);
+         }
+      }
+
+      // Loads an HTML view.
+      dotnetifyVM.prototype.$loadHtmlView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+         var vm = this;
+
+         try {
+            // Unmount any React component before replacing with a new DOM. 
+            _ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
          }
          catch (e) {
             console.error(e);
          }
-      }
-   }
 
-   // Dispatches a state value to the server view model.
-   // iValue - State value to dispatch.
-   dotnetifyVM.prototype.$dispatchListState = function (iValue) {
-      for (var listName in iValue) {
-         var key = this.$itemKey[listName];
-         if (!key) {
-            console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
-            return;
-         }
-         var item = iValue[listName];
-         if (!item[key]) {
-            console.error("[" + this.$vmId + "] couldn't dispatch data from '" + listName + "' due to missing property '" + key + "'");
-            console.error(item);
-            return;
-         }
-         for (var prop in item) {
-            if (prop != key) {
-               var state = {};
-               state[listName + ".$" + item[key] + "." + prop] = item[prop];
-               this.$dispatch(state);
+         // Load the HTML view.
+         $(iTargetSelector).load(iViewUrl, null, function () {
+            if (iJsModuleUrl != null) {
+               $.getScript(iJsModuleUrl, function () {
+                  if (typeof callbackFn === "function")
+                     callbackFn.call(vm);
+               });
             }
-         }
-
-         this.$updateList(listName, item);
+            else if (typeof callbackFn === "function")
+               callbackFn.call(vm);
+         });
       }
-   }
 
-   // Loads an HTML view.
-   dotnetifyVM.prototype.$loadHtmlView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+      // Loads a React view.
+      dotnetifyVM.prototype.$loadReactView = function (iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
+         var vm = this;
+         var createViewFunc = function () {
+            if (!window.hasOwnProperty(iReactClassName)) {
+               console.error("[" + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
+               return;
+            }
 
-      // Unmount any React component before replacing with a new DOM. 
-      ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
-
-      // Load the HTML view.
-      $(iTargetSelector).load(iViewUrl, null, function () {
-         if (iJsModuleUrl != null) {
-            $.getScript(iJsModuleUrl, function () {
-               if (typeof callbackFn === "function")
-                  callbackFn.call(this);
-            });
-         }
-         else {
+            try {
+               var reactElement = _React.createElement(window[iReactClassName], iReactProps);
+               _ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
+            }
+            catch (e) {
+               console.error(e);
+            }
             if (typeof callbackFn === "function")
-               callbackFn.call(this);
+               callbackFn.call(vm, reactElement);
          }
-      });
-   }
 
-   // Loads a React view.
-   dotnetifyVM.prototype.$loadReactView = function (iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
-      var getScripts = [];
-      if (iJsModuleUrl == null)
-         iJsModuleUrl = "";
-      else {
-         // Load all javascripts first. Multiple files can be specified with comma delimiter.
-         getScripts = iJsModuleUrl.split(",").map(function (i) { return $.getScript(i); });
-         getScripts.push($.Deferred(function (deferred) { $(deferred.resolve); }));
+         if (iJsModuleUrl == null)
+            createViewFunc();
+         else {
+            // Load all javascripts first. Multiple files can be specified with comma delimiter.
+            var getScripts = iJsModuleUrl.split(",").map(function (i) { return $.getScript(i); });
+            getScripts.push($.Deferred(function (deferred) { $(deferred.resolve); }));
+
+            $.when.apply($, getScripts).done(createViewFunc);
+         }
       }
 
-      $.when.apply($, getScripts).done(function () {
+      // Preprocess view model update from the server before we set the state.
+      dotnetifyVM.prototype.$preProcess = function (iVMUpdate) {
+         var vm = this;
 
-         if (!window.hasOwnProperty(iReactClassName)) {
-            console.error("[" + this.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
-            return;
-         }
-
-         var reactElement = React.createElement(window[iReactClassName], iReactProps);
-         ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
-         if (typeof callbackFn === "function")
-            callbackFn.call(this, reactElement);
-      });
-   }
-
-   // Preprocess view model update from the server before we set the state.
-   dotnetifyVM.prototype.$preProcess = function (iVMUpdate) {
-      var vm = this;
-
-      for (var prop in iVMUpdate) {
-         // Look for property that end with '_add'. Interpret the value as a list item to be added 
-         // to an existing list whose property name precedes that suffix.
-         var match = /(.*)_add/.exec(prop);
-         if (match != null) {
-            var listName = match[1];
-            if (Array.isArray(this.State()[listName]))
-               vm.$addList(listName, iVMUpdate[prop]);
-            else
-               console.error("unable to resolve " + prop);
-            delete iVMUpdate[prop];
-            continue;
-         }
-
-         // Look for property that end with '_update'. Interpret the value as a list item to be updated 
-         // to an existing list whose property name precedes that suffix.
-         var match = /(.*)_update/.exec(prop);
-         if (match != null) {
-            var listName = match[1];
-            if (Array.isArray(this.State()[listName]))
-               vm.$updateList(listName, iVMUpdate[prop]);
-            else
-               console.error("[" + this.$vmId + "] '" + listName + "' is not found or not an array.");
-            delete iVMUpdate[prop];
-            continue;
-         }
-
-         // Look for property that end with '_remove'. Interpret the value as a list item key to remove
-         // from an existing list whose property name precedes that suffix.
-         var match = /(.*)_remove/.exec(prop);
-         if (match != null) {
-            var listName = match[1];
-            if (Array.isArray(this.State()[listName])) {
-               var key = this.$itemKey[listName];
-               if (key != null)
-                  vm.$removeList(listName, function (i) { return i[key] == iVMUpdate[prop] });
+         for (var prop in iVMUpdate) {
+            // Look for property that end with '_add'. Interpret the value as a list item to be added 
+            // to an existing list whose property name precedes that suffix.
+            var match = /(.*)_add/.exec(prop);
+            if (match != null) {
+               var listName = match[1];
+               if (Array.isArray(this.State()[listName]))
+                  vm.$addList(listName, iVMUpdate[prop]);
                else
-                  console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
+                  console.error("unable to resolve " + prop);
+               delete iVMUpdate[prop];
+               continue;
             }
-            else
-               console.error("[" + this.$vmId + "] '" + listName + "' is not found or not an array.");
-            delete iVMUpdate[prop];
-            continue;
+
+            // Look for property that end with '_update'. Interpret the value as a list item to be updated 
+            // to an existing list whose property name precedes that suffix.
+            var match = /(.*)_update/.exec(prop);
+            if (match != null) {
+               var listName = match[1];
+               if (Array.isArray(this.State()[listName]))
+                  vm.$updateList(listName, iVMUpdate[prop]);
+               else
+                  console.error("[" + this.$vmId + "] '" + listName + "' is not found or not an array.");
+               delete iVMUpdate[prop];
+               continue;
+            }
+
+            // Look for property that end with '_remove'. Interpret the value as a list item key to remove
+            // from an existing list whose property name precedes that suffix.
+            var match = /(.*)_remove/.exec(prop);
+            if (match != null) {
+               var listName = match[1];
+               if (Array.isArray(this.State()[listName])) {
+                  var key = this.$itemKey[listName];
+                  if (key != null)
+                     vm.$removeList(listName, function (i) { return i[key] == iVMUpdate[prop] });
+                  else
+                     console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
+               }
+               else
+                  console.error("[" + this.$vmId + "] '" + listName + "' is not found or not an array.");
+               delete iVMUpdate[prop];
+               continue;
+            }
+
+            // Look for property that end with '_itemKey'. Interpret the value as the property name that will
+            // uniquely identify items in the list.
+            var match = /(.*)_itemKey/.exec(prop);
+            if (match != null) {
+               var listName = match[1];
+               var itemKey = {};
+               itemKey[listName] = iVMUpdate[prop];
+               vm.$setItemKey(itemKey);
+               delete iVMUpdate[prop];
+               continue;
+            }
+         }
+      },
+
+         // Requests state from the server view model.
+         dotnetifyVM.prototype.$request = function () {
+            if (dotnetify.isConnected()) {
+               dotnetify.hubServer.request_VM(this.$vmId, this.$vmArg);
+               this.$requested = true;
+            }
          }
 
-         // Look for property that end with '_itemKey'. Interpret the value as the property name that will
-         // uniquely identify items in the list.
-         var match = /(.*)_itemKey/.exec(prop);
-         if (match != null) {
-            var listName = match[1];
-            var itemKey = {};
-            itemKey[listName] = iVMUpdate[prop];
-            vm.$setItemKey(itemKey);
-            delete iVMUpdate[prop];
-            continue;
+      // Updates state from the server view model to the view.
+      // iVMData - Serialized state from the server.
+      dotnetifyVM.prototype.$update = function (iVMData) {
+         if (dotnetify.debug) {
+            console.log("[" + this.$vmId + "] received> ");
+            console.log(JSON.parse(iVMData));
+
+            if (dotnetify.debugFn != null)
+               dotnetify.debugFn(this.$vmId, "received", JSON.parse(iVMData));
          }
-      }
-   },
 
-   // Requests state from the server view model.
-   dotnetifyVM.prototype.$request = function () {
-      if (dotnetify.isConnected()) {
-         dotnetify.hubServer.request_VM(this.$vmId, this.$vmArg);
-         this.$requested = true;
-      }
-   }
+         var vmData = JSON.parse(iVMData);
+         this.$preProcess(vmData);
 
-   // Updates state from the server view model to the view.
-   // iVMData - Serialized state from the server.
-   dotnetifyVM.prototype.$update = function (iVMData) {
-      if (dotnetify.debug) {
-         console.log("[" + this.$vmId + "] received> ");
-         console.log(JSON.parse(iVMData));
+         var state = this.State();
+         state = $.extend(state, vmData);
+         this.State(state);
 
-         if (dotnetify.debugFn != null)
-            dotnetify.debugFn(this.$vmId, "received", JSON.parse(iVMData));
+         if (!this.$loaded)
+            this.$onLoad();
       }
 
-      var vmData = JSON.parse(iVMData);
-      this.$preProcess(vmData);
+      // Handles initial view model load event.
+      dotnetifyVM.prototype.$onLoad = function () {
 
-      var state = this.State();
-      state = $.extend(state, vmData);
-      this.State(state);
-
-      if (!this.$loaded)
-         this.$onLoad();
-   }
-
-   // Handles initial view model load event.
-   dotnetifyVM.prototype.$onLoad = function () {
-
-      // Call any plugin's $ready function if provided to give a chance to do
-      // things when the view model is ready.
-      for (var pluginId in dotnetify.react.plugins) {
-         var plugin = dotnetify.react.plugins[pluginId];
-         if (typeof plugin["$ready"] === "function")
-            plugin.$ready.apply(this);
-      }
-      this.$loaded = true;
-   }
-
-   // *** CRUD Functions ***
-
-   // Sets items key to identify individual items in a list.
-   // Accepts object literal: { "<list name>": "<key prop name>", ... }
-   dotnetifyVM.prototype.$setItemKey = function (iItemKey) {
-      this.$itemKey = iItemKey;
-   }
-
-   //// Adds a new item to a state array.
-   dotnetifyVM.prototype.$addList = function (iListName, iNewItem) {
-      // Check if the list already has an item with the same key. If so, replace it.
-      var key = this.$itemKey[iListName];
-      if (key != null) {
-         if (!iNewItem.hasOwnProperty(key)) {
-            console.error("[" + this.$vmId + "] couldn't add item to '" + iListName + "' due to missing property '" + key + "'");
-            return;
+         // Call any plugin's $ready function if provided to give a chance to do
+         // things when the view model is ready.
+         for (var pluginId in dotnetify.react.plugins) {
+            var plugin = dotnetify.react.plugins[pluginId];
+            if (typeof plugin["$ready"] === "function")
+               plugin.$ready.apply(this);
          }
-         var match = this.State()[iListName].filter(function (i) { return i[key] == iNewItem[key] });
-         if (match.length > 0) {
-            console.error("[" + this.$vmId + "] couldn't add item to '" + listName + "' because the key already exists");
-            return;
-         }
+         this.$loaded = true;
       }
 
-      var items = this.State()[iListName];
-      items.push(iNewItem);
+      // *** CRUD Functions ***
 
-      var state = {};
-      state[iListName] = items;
-      this.State(state);
-   }
+      // Sets items key to identify individual items in a list.
+      // Accepts object literal: { "<list name>": "<key prop name>", ... }
+      dotnetifyVM.prototype.$setItemKey = function (iItemKey) {
+         this.$itemKey = iItemKey;
+      }
 
-   // Removes an item from a state array.
-   dotnetifyVM.prototype.$removeList = function (iListName, iFilter) {
-      var state = {};
-      state[iListName] = this.State()[iListName].filter(function (i) { return !iFilter(i) });
-      this.State(state);
-   }
-
-   //// Updates existing item to an observable array.
-   dotnetifyVM.prototype.$updateList = function (iListName, iNewItem) {
-
-      // Check if the list already has an item with the same key. If so, update it.
-      var key = this.$itemKey[iListName];
-      if (key != null) {
-         if (!iNewItem.hasOwnProperty(key)) {
-            console.error("[" + this.$vmId + "] couldn't update item to '" + iListName + "' due to missing property '" + key + "'");
-            return;
+      //// Adds a new item to a state array.
+      dotnetifyVM.prototype.$addList = function (iListName, iNewItem) {
+         // Check if the list already has an item with the same key. If so, replace it.
+         var key = this.$itemKey[iListName];
+         if (key != null) {
+            if (!iNewItem.hasOwnProperty(key)) {
+               console.error("[" + this.$vmId + "] couldn't add item to '" + iListName + "' due to missing property '" + key + "'");
+               return;
+            }
+            var match = this.State()[iListName].filter(function (i) { return i[key] == iNewItem[key] });
+            if (match.length > 0) {
+               console.error("[" + this.$vmId + "] couldn't add item to '" + listName + "' because the key already exists");
+               return;
+            }
          }
+
+         var items = this.State()[iListName];
+         items.push(iNewItem);
+
          var state = {};
-         state[iListName] = this.State()[iListName].map(function (i) { return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i });
+         state[iListName] = items;
          this.State(state);
       }
-      else
-         console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
-   }
 
-   // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
-   // of the parent component, so that when the child component connects to its back-end view model, the child view model
-   // instance is created within the scope of the parent view model.
-   // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
-   // injects properties and dispatch functions into the component.
-   dotnetify.react.Scope = _React.createClass({
-      displayName: "Scope",
-
-      propTypes: { vm: _React.PropTypes.string },
-      contextTypes: { scoped: _React.PropTypes.func },
-      childContextTypes: {
-         scoped: _React.PropTypes.func.isRequired,
-         connect: _React.PropTypes.func.isRequired
-      },
-      scoped: function scoped(vmId) {
-         var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
-         return scope ? scope + "." + vmId : vmId;
-      },
-      getChildContext: function getChildContext() {
-         var _this = this;
-
-         return {
-            scoped: function scoped(vmId) {
-               return _this.scoped(vmId);
-            },
-            connect: function connect(vmId, component, compGetState, compSetState, vmArg) {
-               var getState = typeof compGetState === "function" ? compGetState : function () {
-                  return component.state;
-               };
-               var setState = typeof compSetState === "function" ? compSetState : function (state) {
-                  return component.setState(state);
-               };
-               if (typeof compGetState !== "function") vmArg = compGetState;
-
-               component.vmId = _this.scoped(vmId);
-               component.vm = dotnetify.react.connect(component.vmId, component, getState, setState, vmArg);
-               component.dispatch = function (state) {
-                  return component.vm.$dispatch(state);
-               };
-               component.dispatchState = function (state) {
-                  setState(state);
-                  component.vm.$dispatch(state);
-               };
-               return window.vmStates ? window.vmStates[component.vmId] : null;
-            }
-         };
-      },
-      render: function render() {
-         return this.props.children;
+      // Removes an item from a state array.
+      dotnetifyVM.prototype.$removeList = function (iListName, iFilter) {
+         var state = {};
+         state[iListName] = this.State()[iListName].filter(function (i) { return !iFilter(i) });
+         this.State(state);
       }
-   });
 
-   return dotnetify;
-}))
+      //// Updates existing item to an observable array.
+      dotnetifyVM.prototype.$updateList = function (iListName, iNewItem) {
+
+         // Check if the list already has an item with the same key. If so, update it.
+         var key = this.$itemKey[iListName];
+         if (key != null) {
+            if (!iNewItem.hasOwnProperty(key)) {
+               console.error("[" + this.$vmId + "] couldn't update item to '" + iListName + "' due to missing property '" + key + "'");
+               return;
+            }
+            var state = {};
+            state[iListName] = this.State()[iListName].map(function (i) { return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i });
+            this.State(state);
+         }
+         else
+            console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
+      }
+
+      // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
+      // of the parent component, so that when the child component connects to its back-end view model, the child view model
+      // instance is created within the scope of the parent view model.
+      // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
+      // injects properties and dispatch functions into the component.
+      dotnetify.react.Scope = _React.createClass({
+         displayName: "Scope",
+
+         propTypes: { vm: _React.PropTypes.string },
+         contextTypes: { scoped: _React.PropTypes.func },
+         childContextTypes: {
+            scoped: _React.PropTypes.func.isRequired,
+            connect: _React.PropTypes.func.isRequired
+         },
+         scoped: function scoped(vmId) {
+            var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
+            return scope ? scope + "." + vmId : vmId;
+         },
+         getChildContext: function getChildContext() {
+            var _this = this;
+
+            return {
+               scoped: function scoped(vmId) {
+                  return _this.scoped(vmId);
+               },
+               connect: function connect(vmId, component, compGetState, compSetState, vmArg) {
+                  var getState = typeof compGetState === "function" ? compGetState : function () {
+                     return component.state;
+                  };
+                  var setState = typeof compSetState === "function" ? compSetState : function (state) {
+                     return component.setState(state);
+                  };
+                  if (typeof compGetState !== "function") vmArg = compGetState;
+
+                  component.vmId = _this.scoped(vmId);
+                  component.vm = dotnetify.react.connect(component.vmId, component, getState, setState, vmArg);
+                  component.dispatch = function (state) {
+                     return component.vm.$dispatch(state);
+                  };
+                  component.dispatchState = function (state) {
+                     setState(state);
+                     component.vm.$dispatch(state);
+                  };
+                  return window.vmStates ? window.vmStates[component.vmId] : null;
+               }
+            };
+         },
+         render: function render() {
+            return this.props.children;
+         }
+      });
+
+      return dotnetify;
+   }))
