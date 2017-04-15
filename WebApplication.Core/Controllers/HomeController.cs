@@ -30,7 +30,7 @@ namespace WebApplication.Core.Controllers
 
          // If not ending with .js or .map, assume it's a request for static html file.
          if (!id.EndsWith(".js") && !id.EndsWith(".map"))
-            id = Path.Combine(_hostingEnvironment.ContentRootPath, "Views\\" + (id.EndsWith(".html") ? id : id + ".html"));
+            id = Path.Combine(_hostingEnvironment.ContentRootPath, "Views/" + (id.EndsWith(".html") ? id : id + ".html"));
          return File(id);
       }
 
@@ -75,7 +75,7 @@ namespace WebApplication.Core.Controllers
             if (id.EndsWith("_cshtml"))
                return View("/Views/" + id.Replace("_cshtml", ".cshtml"), model?.GetType() != typeof(object) ? model : null);
 
-            var htmlFilePath = Path.Combine(_hostingEnvironment.ContentRootPath, "Views\\" + (id.EndsWith(".html") ? id : id + ".html"));
+            var htmlFilePath = Path.Combine(_hostingEnvironment.ContentRootPath, "Views/" + (id.EndsWith(".html") ? id : id + ".html"));
             return new HtmlResult(htmlFilePath);
          }
          return null;

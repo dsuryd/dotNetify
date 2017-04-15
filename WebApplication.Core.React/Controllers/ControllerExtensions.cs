@@ -14,7 +14,7 @@ namespace WebApplication.Core.React.Controllers
       public static FileStreamResult FileResult(this Controller controller, IHostingEnvironment hostingEnv, string fileName)
       {
          string path = fileName;
-         path = Path.Combine(hostingEnv.ContentRootPath, "wwwroot\\" + fileName);
+         path = Path.Combine(hostingEnv.ContentRootPath, "wwwroot/" + fileName);
 
          var mimeType = "text/plain";
          if (fileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
