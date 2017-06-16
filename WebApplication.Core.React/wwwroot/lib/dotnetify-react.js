@@ -151,7 +151,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-         version: "1.0.2-beta",
+         version: "1.0.3-beta",
          viewModels: {},
          plugins: {},
 
@@ -396,6 +396,13 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             if (!window.hasOwnProperty(iReactClassName)) {
                console.error("[" + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
                return;
+            }
+
+            try {
+               _ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
+            }
+            catch (e) {
+               console.error(e);
             }
 
             try {
