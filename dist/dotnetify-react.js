@@ -144,6 +144,8 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          offlineTimeout: 5000,
          offlineCacheFn: null,
 
+         exceptionHandler: null,
+
          _connectRetry: 0,
          isConnected: function () {
             return $.connection.hub.state == $.signalR.connectionState.connected
@@ -151,7 +153,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-         version: "1.0.3-beta",
+         version: "1.0.4-beta",
          viewModels: {},
          plugins: {},
 
@@ -170,9 +172,13 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                var hub = $.connection.dotNetifyHub;
                hub.client.response_VM = function (iVMId, iVMData) {
 
-                  // Report unauthorized access.
-                  if (iVMData == "403") {
-                     console.error("Unauthorized access to " + iVMId);
+                  // Handle server-side exception.
+                  if (iVMData && iVMData.hasOwnProperty("ExceptionType") && iVMData.hasOwnProperty("Message"))
+                  {
+                     if (dotNetify.exceptionHandler !== null)
+                        dotnetify.exceptionHandler(iVMData.ExceptionType, iVMData.Message);
+                     else
+                        console.error("[" + iVMId + "] " + iVMData.ExceptionType + ": " + iVMData.Message);
                      return;
                   }
 
