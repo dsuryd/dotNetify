@@ -17,7 +17,6 @@ namespace WebApplication.Core.React
       public void Invoke(IDotNetifyHubContext hubContext)
       {
          Trace.WriteLine(JsonConvert.SerializeObject(hubContext.CallerContext.User));
-         throw new System.UnauthorizedAccessException();
       }
    }
 }
