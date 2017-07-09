@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -29,11 +30,9 @@ namespace DotNetify
    /// </summary>
    public class DotNetifyHub : Hub
    {
-      /// <summary>
-      /// Factory of view model controllers.
-      /// </summary>
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IPrincipalAccessor _principalAccessor;
+      private readonly IList<Func<IMiddleware>> _middlewareFactories;
 
       /// <summary>
       /// View model controller associated with the current connection.
@@ -56,12 +55,14 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
       /// <param name="principalAccessor">Allow to pass the hub principal.</param>
-      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor)
+      /// <param name="middlewareFactories">Middlewares to intercept incoming view model requests and updates.</param>
+      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IList<Func<IMiddleware>> middlewareFactories)
       {
          _vmControllerFactory = vmControllerFactory;
          _vmControllerFactory.ResponseDelegate = Response_VM;
 
          _principalAccessor = principalAccessor;
+         _middlewareFactories = middlewareFactories;
       }
 
       /// <summary>
@@ -88,12 +89,18 @@ namespace DotNetify
       {
          try
          {
+            RunMiddlewares(new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmArg));
+
             Trace.WriteLine($"[dotNetify] Request_VM: {vmId} {Context.ConnectionId}");
             VMController.OnRequestVM(Context.ConnectionId, vmId, vmArg);
          }
-         catch (UnauthorizedAccessException)
+         catch (OperationCanceledException ex)
          {
-            Response_VM(Context.ConnectionId, vmId, "403");
+            Trace.WriteLine(ex.Message);
+         }
+         catch (UnauthorizedAccessException ex)
+         {
+            Response_VM(Context.ConnectionId, vmId, SerializeException(ex));
          }
          catch (Exception ex)
          {
@@ -110,12 +117,18 @@ namespace DotNetify
       {
          try
          {
+            RunMiddlewares(new DotNetifyHubContext(Context, nameof(Update_VM), vmId, vmData));
+
             Trace.WriteLine($"[dotNetify] Update_VM: {vmId} {Context.ConnectionId} {JsonConvert.SerializeObject(vmData)}");
             VMController.OnUpdateVM(Context.ConnectionId, vmId, vmData);
          }
-         catch (UnauthorizedAccessException)
+         catch(OperationCanceledException ex)
          {
-            Response_VM(Context.ConnectionId, vmId, "403");
+            Trace.WriteLine(ex.Message);
+         }
+         catch (UnauthorizedAccessException ex)
+         {
+            Response_VM(Context.ConnectionId, vmId, SerializeException(ex));
          }
          catch (Exception ex)
          {
@@ -138,6 +151,30 @@ namespace DotNetify
             Trace.Fail(ex.ToString());
          }
       }
+
+      /// <summary>
+      /// Run the middlewares.
+      /// </summary>
+      /// <param name="hubContext">DotNetify hub context.</param>
+      private void RunMiddlewares(IDotNetifyHubContext hubContext)
+      {
+         try
+         {
+            _middlewareFactories?.ToList().ForEach(factory => factory().Invoke(hubContext));
+         }
+         catch (Exception ex)
+         {
+            Response_VM(Context.ConnectionId, hubContext.VMId, SerializeException(ex));
+            throw new OperationCanceledException($"Middleware threw {ex.GetType().Name}: {ex.Message}", ex);
+         }
+      }
+
+      /// <summary>
+      /// Serializes an exception.
+      /// </summary>
+      /// <param name="ex">Exception to serialize.</param>
+      /// <returns>Serialized exception.</returns>
+      private string SerializeException(Exception ex) => JsonConvert.SerializeObject(new { ExceptionType = ex.GetType().Name, Message = ex.Message });
 
       #endregion
 

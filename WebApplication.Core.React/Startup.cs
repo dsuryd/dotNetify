@@ -32,7 +32,11 @@ namespace WebApplication.Core.React
 
          app.UseWebSockets();
          app.UseSignalR(); // Required by dotNetify.
-         app.UseDotNetify();
+         app.UseDotNetify(config =>
+         {
+            config.UseMiddleware<LogRequestMiddleware>();
+            config.UseMiddleware<LogUserMiddleware>();
+         });
 
          app.UseMvc(routes =>
          {
