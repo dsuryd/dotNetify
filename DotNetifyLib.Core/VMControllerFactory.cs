@@ -30,15 +30,19 @@ namespace DotNetify
       private readonly IMemoryCache _controllersCache;
 
       /// <summary>
-      /// How long to keep a view model controller in memory after it hasn't been accessed for a while.
+      /// How long to keep a view model controller in memory after it hasn't been accessed for a while. Default to never expire.
       /// </summary>
-      public TimeSpan CacheExpiration { get; set; } = new TimeSpan(0, 20, 0);
+      public TimeSpan? CacheExpiration { get; set; }
 
       /// <summary>
       /// Delegate to return the response back to the client.
       /// </summary>
       public VMController.VMResponseDelegate ResponseDelegate { get; set; }
 
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="memoryCache">Memory cache for storing the view model controllers.</param>
       public VMControllerFactory(IMemoryCache memoryCache)
       {
          if (memoryCache == null)
@@ -89,9 +93,13 @@ namespace DotNetify
       /// <returns>Cache entry options.</returns>
       private MemoryCacheEntryOptions GetCacheEntryOptions()
       {
-         return new MemoryCacheEntryOptions()
-         .SetSlidingExpiration(CacheExpiration)
-         .RegisterPostEvictionCallback((key, value, reason, substate) => ((value as Lazy<VMController>).Value as IDisposable).Dispose());
+         var options = new MemoryCacheEntryOptions()
+            .RegisterPostEvictionCallback((key, value, reason, substate) => ((value as Lazy<VMController>).Value as IDisposable).Dispose());
+
+         if (CacheExpiration.HasValue)
+            options.SetSlidingExpiration(CacheExpiration.Value);
+
+         return options;
       }
    }
 }

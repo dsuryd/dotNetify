@@ -34,7 +34,9 @@ namespace DotNetify
          // Make sure all the required services are there.
          if (provider.GetService<IMemoryCache>() == null)
             throw new InvalidOperationException("No service of type IMemoryCache has been registered. Please add the service by calling 'IServiceCollection.AddMemoryCache()' in the startup class.");
-         if (provider.GetService<IVMControllerFactory>() == null)
+
+         var vmControllerFactory = provider.GetService<IVMControllerFactory>();
+         if (vmControllerFactory == null)
             throw new InvalidOperationException("Please call 'IServiceCollection.AddDotNetify()' inside the ConfigureServices() of the startup class.");
 
          // Use ASP.NET Core DI to provide view model instances by default.
@@ -59,6 +61,10 @@ namespace DotNetify
          // If no view model assembly has been registered, default to the entry assembly.
          if (!dotNetifyConfig.HasAssembly)
             dotNetifyConfig.RegisterEntryAssembly();
+
+         // Sets how long to keep a view model controller in memory after it hasn't been accessed for a while.
+         if (dotNetifyConfig.VMControllerCacheExpiration.HasValue)
+            vmControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
 
          // Add middleware factories to the hub.
          var middlewareFactories = provider.GetService<IList<Func<IMiddleware>>>();
