@@ -25,8 +25,8 @@ Documentation and live demo can be found at [http://dotnetify.net](http://dotnet
 
 ## Knockout Code Example
 
-* Real-time live chart: [Live Chart Example](https://github.com/dsuryd/dotNetify-example-livechart).    
-* Mobile app example: [Web/Mobile App Template](https://github.com/dsuryd/dotNetify-app-template).
+* Real-time live chart: [Live Chart Example](https://github.com/dsuryd/dotnetify-knockout-demo/tree/master/LiveChart).    
+* Mobile app example: [Web/Mobile App Template](https://github.com/dsuryd/dotnetify-knockout-demo/tree/master/MobileApp).
 
 ## Installation
 
