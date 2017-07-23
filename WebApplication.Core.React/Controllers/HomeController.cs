@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using DotNetify;
 using DotNetify.Routing;
@@ -7,7 +9,7 @@ namespace WebApplication.Core.React.Controllers
 {
    public class HomeController : Controller
    {
-      private IHostingEnvironment _hostingEnv;
+      private readonly IHostingEnvironment _hostingEnv;
 
       public HomeController(IHostingEnvironment hostingEnv)
       {
@@ -20,24 +22,34 @@ namespace WebApplication.Core.React.Controllers
 
       // Returns JS files for Composite View example, including initial view model states for faster client-side rendering.
       [Route("module/get/CompositeView")]
-      public IActionResult AFITop100(string view, string vm)
-      {
-         var js = this.File(_hostingEnv, "/js/PaginatedTable.js") + this.File(_hostingEnv, "/js/CompositeView.js");
-         string vmState = BuildStateString("AFITop100VM")
-            + BuildStateString("AFITop100VM.FilterableMovieTableVM.MovieTableVM")
-            + BuildStateString("AFITop100VM.MovieDetailsVM");
-         return Content(vmState + js, "text/js");
-      }
+      public IActionResult CompositeView(string view, string vm) => Content(string.Concat(
+         GetInitialState(new List<string>
+         {
+            "AFITop100VM",
+            "AFITop100VM.FilterableMovieTableVM.MovieTableVM",
+            "AFITop100VM.MovieDetailsVM"
+         }),
+         GetJavascript(new List<string>
+         {
+            "PaginatedTable",
+            "CompositeView"
+         })), "text/js");
 
       // Returns JS file of a view, including initial view model states for faster client-side rendering.
       [Route("module/get/{view}/{vm?}")]
-      public IActionResult Module(string view, string vm)
-      {
-         var js = this.File(_hostingEnv, $"/js/{view}.js");
-         string vmState = vm != null ? BuildStateString(vm) : null;
-         return Content(vmState + js, "text/js");
-      }
+      public IActionResult Module(string view, string vm) => Content(string.Concat(GetInitialState(vm), GetJavascript(view)), "text/js");
 
-      private string BuildStateString(string vm) => $"window.vmStates = window.vmStates || {{}}; window.vmStates['{vm}'] = {VMController.GetInitialState(vm) ?? "{}"};";
+      #region Private Methods
+
+      private string GetJavascript(string view) => this.File(_hostingEnv, $"/js/{view}.js");
+
+      private string GetInitialState(string vm) => vm == null ? null : $@"
+         window.vmStates = window.vmStates || {{}}; 
+         window.vmStates['{vm}'] = {VMController.GetInitialState(vm) ?? "{}"};";
+
+      private string GetJavascript(List<string> views) => views.Select(view => GetJavascript(view)).Aggregate((s1, s2) => string.Concat(s1, s2));
+      private string GetInitialState(List<string> viewModels) => viewModels.Select(vm => GetInitialState(vm)).Aggregate((s1, s2) => string.Concat(s1, s2));
+
+      #endregion
    }
 }
