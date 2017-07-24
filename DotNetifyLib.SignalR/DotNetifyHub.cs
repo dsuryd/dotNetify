@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using DotNetify.Security;
 
 namespace DotNetify
@@ -84,9 +85,17 @@ namespace DotNetify
       /// This method is called by browser clients to request view model data.
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
-      /// <param name="vmArg">Optional view model's initialization argument.</param>
+      /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
       public void Request_VM(string vmId, object vmArg)
       {
+         // Extract any header data out of the argument.
+         object headers = null;
+         if ( vmArg is JObject && (vmArg as JObject)["$vmArg"] != null)
+         {
+            headers = (vmArg as JObject)["$headers"];
+            vmArg = (vmArg as JObject)["$vmArg"];
+         }
+
          try
          {
             RunMiddlewares(new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmArg));

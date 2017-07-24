@@ -11,7 +11,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\*.json;wwwroot\js\*.js;wwwroot\js\CompositeView\*.js" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <Content Include="wwwroot\js\SecurePage.jsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AFITop100.json" />
+    <EmbeddedResource Include="Resources\employees.json" />
+    <EmbeddedResource Include="Resources\webstore.json" />
+    <EmbeddedResource Include="wwwroot\js\BookStore.js" />
+    <EmbeddedResource Include="wwwroot\js\BookStore.min.js" />
+    <EmbeddedResource Include="wwwroot\js\CompositeView.js" />
+    <EmbeddedResource Include="wwwroot\js\CompositeView.min.js" />
+    <EmbeddedResource Include="wwwroot\js\ControlTypes.js" />
+    <EmbeddedResource Include="wwwroot\js\ControlTypes.min.js" />
+    <EmbeddedResource Include="wwwroot\js\GridView.js" />
+    <EmbeddedResource Include="wwwroot\js\GridView.min.js" />
+    <EmbeddedResource Include="wwwroot\js\HelloWorld.js" />
+    <EmbeddedResource Include="wwwroot\js\HelloWorld.min.js" />
+    <EmbeddedResource Include="wwwroot\js\index.js" />
+    <EmbeddedResource Include="wwwroot\js\index.min.js" />
+    <EmbeddedResource Include="wwwroot\js\LiveChart.js" />
+    <EmbeddedResource Include="wwwroot\js\LiveChart.min.js" />
+    <EmbeddedResource Include="wwwroot\js\PaginatedTable.js" />
+    <EmbeddedResource Include="wwwroot\js\PaginatedTable.min.js" />
+    <EmbeddedResource Include="wwwroot\js\SimpleList.js" />
+    <EmbeddedResource Include="wwwroot\js\SimpleList.min.js" />
     <None Update="wwwroot\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>

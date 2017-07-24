@@ -42,5 +42,9 @@
   {
     "outputFile": "wwwroot/js/BookStoreFront.js",
     "inputFile": "wwwroot/js/BookStoreFront.jsx"
+  },
+  {
+    "outputFile": "wwwroot/js/SecurePage.js",
+    "inputFile": "wwwroot/js/SecurePage.jsx"
   }
 ]
