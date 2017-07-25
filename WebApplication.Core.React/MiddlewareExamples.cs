@@ -1,6 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using DotNetify;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace WebApplication.Core.React
 {
@@ -12,11 +14,23 @@ namespace WebApplication.Core.React
       }
     }
 
-   public class LogUserMiddleware : IMiddleware
+   public class JwtBearerAuthenticationMiddleware : IMiddleware
    {
+      private class HeaderData
+      {
+         public string Authorization { get; set; }
+      }
+
       public void Invoke(IDotNetifyHubContext hubContext)
       {
-         Trace.WriteLine(JsonConvert.SerializeObject(hubContext.CallerContext.User));
+         var headers = hubContext.Headers<HeaderData>();
+         if (headers != null && headers.Authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+         {
+            var token = headers.Authorization.Substring("Bearer ".Length).Trim();
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+
+            Trace.WriteLine("JWT: " + JsonConvert.SerializeObject(jwt));
+         }
       }
    }
 }

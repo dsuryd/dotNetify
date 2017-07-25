@@ -16,10 +16,6 @@
     "inputFile": "wwwroot/js/index.jsx"
   },
   {
-    "outputFile": "wwwroot/js/Scope.js",
-    "inputFile": "wwwroot/js/Scope.jsx"
-  },
-  {
     "outputFile": "wwwroot/js/SimpleList.js",
     "inputFile": "wwwroot/js/SimpleList.jsx"
   },
@@ -38,10 +34,6 @@
   {
     "outputFile": "wwwroot/js/BookStore.js",
     "inputFile": "wwwroot/js/BookStore.jsx"
-  },
-  {
-    "outputFile": "wwwroot/js/BookStoreFront.js",
-    "inputFile": "wwwroot/js/BookStoreFront.jsx"
   },
   {
     "outputFile": "wwwroot/js/SecurePage.js",

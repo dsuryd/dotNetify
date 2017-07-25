@@ -35,6 +35,9 @@ namespace DotNetify
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IList<Func<IMiddleware>> _middlewareFactories;
 
+      internal const string JTOKEN_vmArg = "$vmArg";
+      internal const string JTOKEN_headers = "$headers";
+
       /// <summary>
       /// View model controller associated with the current connection.
       /// </summary>
@@ -90,10 +93,10 @@ namespace DotNetify
       {
          // Extract any header data out of the argument.
          object headers = null;
-         if ( vmArg is JObject && (vmArg as JObject)["$vmArg"] != null)
+         if ( vmArg is JObject && (vmArg as JObject)[JTOKEN_vmArg] != null)
          {
-            headers = (vmArg as JObject)["$headers"];
-            vmArg = (vmArg as JObject)["$vmArg"];
+            headers = (vmArg as JObject)[JTOKEN_headers];
+            vmArg = (vmArg as JObject)[JTOKEN_vmArg];
          }
 
          try

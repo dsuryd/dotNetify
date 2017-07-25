@@ -33,7 +33,7 @@ namespace WebApplication.Core.React
          app.UseDotNetify(config =>
          {
             config.UseMiddleware<LogRequestMiddleware>();
-            config.UseMiddleware<LogUserMiddleware>();
+            config.UseMiddleware<JwtBearerAuthenticationMiddleware>();
          });
 
          app.UseMvc(routes =>
