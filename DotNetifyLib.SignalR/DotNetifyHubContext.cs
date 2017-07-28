@@ -21,27 +21,21 @@ namespace DotNetify
    /// <summary>
    /// Provides request context for a middleware.
    /// </summary>
-   public interface IDotNetifyHubContext
-   {
-      HubCallerContext CallerContext { get; }
-      string MethodName { get; }
-      string VMId { get; }
-      object Data { get; }
-   }
-
-   internal class DotNetifyHubContext : IDotNetifyHubContext
+   public class DotNetifyHubContext
    {
       public HubCallerContext CallerContext { get; }
-      public string MethodName { get; }
+      public string CallType { get; }
       public string VMId { get; }
       public object Data { get; }
+      public object Headers { get; }
 
-      internal DotNetifyHubContext(HubCallerContext callerContext, string methodName, string vmId, object data)
+      internal DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers)
       {
          CallerContext = callerContext;
-         MethodName = methodName;
+         CallType = callType;
          VMId = vmId;
          Data = data;
+         Headers = headers;
       }
    }
 }

@@ -32,9 +32,14 @@
                <div className="header clearfix">
                   <h3>Example: Secure Page *** UNDER CONSTRUCTION ***</h3>
                </div>
-               {this.state.authenticated ?
-                  <SecurePageView onSignOut={handleSignOut} /> :
-                  <LoginForm onSubmit={handleSubmit} errorText={this.state.loginError} />}
+               <div className="row">
+                  <div className="col-md-6">
+                     <LoginForm onSubmit={handleSubmit} onSignOut={handleSignOut} errorText={this.state.loginError} authenticated={this.state.authenticated} />
+                  </div>
+                  <div className="col-md-6">
+                     <SecurePageView authenticated={this.state.authenticated} /> 
+                  </div>
+               </div>
             </div>
          </MuiThemeProvider>
       )
@@ -50,14 +55,23 @@ class LoginForm extends React.Component {
       let handleUserNameChange = event => this.setState({ username: event.target.value });
       let handlePasswordChange = event => this.setState({ password: event.target.value });
       let handleSubmit = () => this.props.onSubmit(this.state);
+      let handleSignOut = () => this.props.onSignOut();
       return (
          <div className="jumbotron">
-            <h3>Sign in</h3>
-            <p>
-               <TextField id="UserName" floatingLabelText="User name" value={this.state.username} onChange={handleUserNameChange} errorText={this.props.errorText} /><br />
-               <TextField id="Password" floatingLabelText="Password" value={this.state.password} onChange={handlePasswordChange} errorText={this.props.errorText} />
-            </p>
-            <RaisedButton label="Submit" primary={true} onClick={handleSubmit} />
+            {this.props.authenticated ?
+               <div>
+                  <h3>Signed in as {this.state.username}</h3>
+                  <RaisedButton label="Sign out" primary={true} onClick={handleSignOut} /> 
+               </div> :
+               <div>
+                  <h3>Sign in</h3>
+                  <p>
+                     <TextField id="UserName" floatingLabelText="User name" value={this.state.username} onChange={handleUserNameChange} errorText={this.props.errorText} /><br />
+                     <TextField id="Password" floatingLabelText="Password" value={this.state.password} onChange={handlePasswordChange} errorText={this.props.errorText} />
+                  </p>
+                  <RaisedButton label="Submit" primary={true} onClick={handleSubmit} />
+               </div>
+            }
          </div>
       );
    }
@@ -68,18 +82,19 @@ class SecurePageView extends React.Component {
       super(props);
       this.state = {};
 
-      let bearerToken = "Bearer " + window.sessionStorage.getItem("access_token");
-      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: { Authorization: bearerToken } });
+      let accessToken = window.sessionStorage.getItem("access_token");
+      let bearerToken = accessToken ? "Bearer " + accessToken : null;
+      let headers = bearerToken ? { headers: { Authorization: bearerToken } } : null;
+      this.vm = dotnetify.react.connect("SecurePageVM", this, headers);
    }
    componentWillUnmount() {
       this.vm.$destroy();
    }
    render() {
-      let handleSignOut = () => this.props.onSignOut();
       return (
          <div className="jumbotron">
             <h3>Secure View</h3>
-            <RaisedButton label="Sign out" primary={true} onClick={handleSignOut} />
+            <div>{this.props.authenticated ? "Authenticated" : "Not authenticated"}</div>
          </div>
       );
    }

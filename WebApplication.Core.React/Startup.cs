@@ -34,6 +34,8 @@ namespace WebApplication.Core.React
          {
             config.UseMiddleware<LogRequestMiddleware>();
             config.UseMiddleware<JwtBearerAuthenticationMiddleware>();
+
+            config.UseFilters<AuthorizeFilter>();
          });
 
          app.UseMvc(routes =>

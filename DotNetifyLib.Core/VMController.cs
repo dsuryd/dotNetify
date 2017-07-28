@@ -21,11 +21,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
 using System.Windows.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using DotNetify.Security;
 
 namespace DotNetify
 {
@@ -56,6 +54,20 @@ namespace DotNetify
       /// <param name="args">Optional constructor arguments.</param>
       /// <returns>Object of type T.</returns>
       public delegate object CreateInstanceDelegate(Type type, object[] args);
+
+      /// <summary>
+      /// Delegate to provide interception hook when requesting a view model.
+      /// </summary>
+      /// <param name="vm">View model.</param>
+      /// <param name="vmArg">Optional view model initialization argument.</param>
+      public delegate void RequestingVMHookDelegate(string vmId, BaseVM vm, ref object vmArg);
+
+      /// <summary>
+      /// Delegate to provide interception hook when updating a view model.
+      /// </summary>
+      /// <param name="vm">View model.</param>
+      /// <param name="data">Data provided to the view model.</param>
+      public delegate void UpdatingVMHookDelegate(string vmId, BaseVM vm, ref Dictionary<string, object> data);
 
       #endregion
 
@@ -110,9 +122,14 @@ namespace DotNetify
       public static T Create<T>(object[] args = null) where T : class => CreateInstance(typeof(T), args) as T;
 
       /// <summary>
-      /// Security context.
+      /// Interception hook for requesting a view model.
       /// </summary>
-      public IPrincipal Principal;
+      public RequestingVMHookDelegate RequestingVM { get; set; }
+
+      /// <summary>
+      /// Interception hook for updating a view model.
+      /// </summary>
+      public UpdatingVMHookDelegate UpdatingVM { get; set; }
 
       // Default constructor.
       public VMController()
@@ -193,9 +210,8 @@ namespace DotNetify
          // Create a new view model instance whose class name is matching the given VMId.
          BaseVM vmInstance = !_activeVMs.ContainsKey(vmId) ? CreateVM(vmId, vmArg) : _activeVMs[vmId].Instance;
 
-         // Make sure current security context is authorized to access the view model.
-         if (!IsAuthorized(vmInstance))
-            throw new UnauthorizedAccessException();
+         // Invokes the interception delegate.
+         RequestingVM?.Invoke(vmId, vmInstance, ref vmArg);
 
          var vmData = Serialize(vmInstance);
 
@@ -239,9 +255,8 @@ namespace DotNetify
          // Update the new values from the client to the server view model.
          var vmInstance = _activeVMs[vmId].Instance;
 
-         // Make sure current security context is authorized to access the view model.
-         if (!IsAuthorized(vmInstance))
-            throw new UnauthorizedAccessException();
+         // Invoke the interception delegate.
+         UpdatingVM?.Invoke(vmId, vmInstance, ref data);
 
          lock (vmInstance)
          {
@@ -387,17 +402,6 @@ namespace DotNetify
          masterVM?.OnSubVMCreated(vmInstance);
 
          return vmInstance;
-      }
-
-      /// <summary>
-      /// Returns whether current security context is authorized to access a view model.
-      /// </summary>
-      /// <param name="vmInstance">View model instance.</param>
-      /// <returns>True if authorized.</returns>
-      protected virtual bool IsAuthorized(BaseVM vmInstance)
-      {
-         var authAttr = vmInstance.GetType().GetTypeInfo().GetCustomAttribute<AuthorizeAttribute>();
-         return authAttr == null || authAttr.IsAuthorized(Principal);
       }
 
       /// <summary>

@@ -31,8 +31,9 @@ namespace DotNetify
          // Add service to get the hub principal.
          services.AddScoped<IPrincipalAccessor>(p => new HubPrincipalAccessor());
 
-         // Add middleware factories.
+         // Add middleware and filter factories.
          services.AddSingleton<IList<Func<IMiddleware>>>(p => new List<Func<IMiddleware>>());
+         services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
 
          return services;
       }

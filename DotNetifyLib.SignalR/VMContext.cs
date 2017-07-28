@@ -14,22 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-using System;
-using Newtonsoft.Json.Linq;
-
 namespace DotNetify
 {
-    public static class DotNetifyHubContextExtensions
-    {
-      public static T Headers<T>(this IDotNetifyHubContext context)
+   /// <summary>
+   /// Provides request context for a view model filter.
+   /// </summary>
+   public class VMContext
+   {
+      public DotNetifyHubContext HubContext { get; }
+      public BaseVM Instance { get; }
+
+      internal VMContext(DotNetifyHubContext hubContext, BaseVM instance)
       {
-         try
-         {
-            if (context.Data is JObject && (context.Data as JObject)[DotNetifyHub.JTOKEN_headers] != null)
-               return (context.Data as JObject)[DotNetifyHub.JTOKEN_headers].ToObject<T>();
-         }
-         catch (Exception) { }
-         return default(T);
+         HubContext = hubContext;
+         Instance = instance;
       }
    }
 }

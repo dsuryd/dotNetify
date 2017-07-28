@@ -14,14 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
+
 namespace DotNetify
 {
    /// <summary>
-   /// Provides middleware to intercept incoming view model requests and updates.
-   /// The middleware can throw an exception to cancel the operation. The exception type and message will be sent to the client instead.
+   /// Marker interface for view model filter pipelines.
    /// </summary>
-   public interface IMiddleware
+   public interface IVMFilter
    {
-      void Invoke(DotNetifyHubContext context);
+   }
+
+   /// <summary>
+   /// Provides filter pipelines for view models that's associated with a class attribute.
+   /// </summary>
+   public interface IVMFilter<TAttribute> : IVMFilter where TAttribute : Attribute
+   {
+      void Invoke(TAttribute attribute, VMContext context);
    }
 }

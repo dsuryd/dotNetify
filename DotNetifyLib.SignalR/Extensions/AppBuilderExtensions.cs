@@ -26,6 +26,7 @@ namespace DotNetify
    public static class AppBuilderExtensions
    {
       private static List<Type> _middlewareTypes = new List<Type>();
+      private static List<Type> _filterTypes = new List<Type>();
 
       public static IApplicationBuilder UseDotNetify(this IApplicationBuilder appBuilder, Action<IDotNetifyConfiguration> config = null)
       {
@@ -70,9 +71,14 @@ namespace DotNetify
          var middlewareFactories = provider.GetService<IList<Func<IMiddleware>>>();
          _middlewareTypes.ForEach(t => middlewareFactories?.Add(() => (IMiddleware)factoryMethod(t, null)));
 
+         // Add filter factories to the hub.
+         var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
+         _filterTypes.ForEach(t => filterFactories?.Add(t, () => (IVMFilter)factoryMethod(t, null)));
+
          return appBuilder;
       }
 
       public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig) where T : IMiddleware => _middlewareTypes.Add(typeof(T));
+      public static void UseFilters<T>(this IDotNetifyConfiguration dotNetifyConfig) where T : IVMFilter => _filterTypes.Add(typeof(T));
    }
 }

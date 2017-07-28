@@ -16,10 +16,12 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DotNetify.Security;
@@ -34,9 +36,12 @@ namespace DotNetify
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IList<Func<IMiddleware>> _middlewareFactories;
+      private readonly IDictionary<Type, Func<IVMFilter>> _vmFilterFactories;
+      private readonly IMemoryCache _headersCache;
+      private readonly Func<string, string> _headersKey = (string connectionId) => JTOKEN_HEADERS + connectionId;
 
-      internal const string JTOKEN_vmArg = "$vmArg";
-      internal const string JTOKEN_headers = "$headers";
+      private const string JTOKEN_VMARG = "$vmArg";
+      private const string JTOKEN_HEADERS = "$headers";
 
       /// <summary>
       /// View model controller associated with the current connection.
@@ -49,9 +54,20 @@ namespace DotNetify
                (_principalAccessor as HubPrincipalAccessor).Principal = Context.User;
 
             var vmController = _vmControllerFactory.GetInstance(Context.ConnectionId);
-            vmController.Principal = _principalAccessor.Principal;
+            vmController.RequestingVM = RunRequestingVMFilters;
+            vmController.UpdatingVM = RunUpdatingVMFilters;
+
             return vmController;
          }
+      }
+
+      /// <summary>
+      /// Request headers of the current connection.
+      /// </summary>
+      private object Headers
+      {
+         get { return _headersCache.Get(_headersKey(Context.ConnectionId)); }
+         set { _headersCache.Set(_headersKey(Context.ConnectionId), value); }
       }
 
       /// <summary>
@@ -60,13 +76,16 @@ namespace DotNetify
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
       /// <param name="principalAccessor">Allow to pass the hub principal.</param>
       /// <param name="middlewareFactories">Middlewares to intercept incoming view model requests and updates.</param>
-      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IList<Func<IMiddleware>> middlewareFactories)
+      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IMemoryCache headersCache,
+            IList<Func<IMiddleware>> middlewareFactories, IDictionary<Type, Func<IVMFilter>> vmFilterFactories)
       {
          _vmControllerFactory = vmControllerFactory;
-         _vmControllerFactory.ResponseDelegate = Response_VM;
+         _vmControllerFactory.ResponseDelegate = SendResponse;
 
          _principalAccessor = principalAccessor;
          _middlewareFactories = middlewareFactories;
+         _vmFilterFactories = vmFilterFactories;
+         _headersCache = headersCache;
       }
 
       /// <summary>
@@ -79,7 +98,31 @@ namespace DotNetify
       {
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(Context.ConnectionId);
+         _headersCache.Remove(_headersKey(Context.ConnectionId));
          return base.OnDisconnected(stopCalled);
+      }
+
+      /// <summary>
+      /// This method is called by the VMManager to send response back to browser clients.
+      /// </summary>
+      /// <param name="connectionId">Identifies the browser client making prior request.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data in serialized JSON.</param>
+      public void SendResponse(string connectionId, string vmId, string vmData)
+      {
+         try
+         {
+            vmData = RunMiddlewares(nameof(Response_VM), vmId, vmData, false);
+            Response_VM(connectionId, vmId, vmData);
+         }
+         catch (OperationCanceledException ex)
+         {
+            Trace.WriteLine(ex.Message);
+         }
+         catch (Exception ex)
+         {
+            Trace.Fail(ex.ToString());
+         }
       }
 
       #region Client Requests
@@ -91,17 +134,10 @@ namespace DotNetify
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
       public void Request_VM(string vmId, object vmArg)
       {
-         // Extract any header data out of the argument.
-         object headers = null;
-         if ( vmArg is JObject && (vmArg as JObject)[JTOKEN_vmArg] != null)
-         {
-            headers = (vmArg as JObject)[JTOKEN_headers];
-            vmArg = (vmArg as JObject)[JTOKEN_vmArg];
-         }
-
          try
          {
-            RunMiddlewares(new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmArg));
+            vmArg = ExtractHeaders(vmArg);
+            vmArg = RunMiddlewares(nameof(Request_VM), vmId, vmArg);
 
             Trace.WriteLine($"[dotNetify] Request_VM: {vmId} {Context.ConnectionId}");
             VMController.OnRequestVM(Context.ConnectionId, vmId, vmArg);
@@ -129,12 +165,16 @@ namespace DotNetify
       {
          try
          {
-            RunMiddlewares(new DotNetifyHubContext(Context, nameof(Update_VM), vmId, vmData));
+            // If this method is called only to refresh the connection request headers, leave as soon as the headers were extracted.
+            if ((vmData = ExtractHeaders(vmData)).Count == 0)
+               return;
+
+            vmData = RunMiddlewares(nameof(Update_VM), vmId, vmData) as Dictionary<string, object>;
 
             Trace.WriteLine($"[dotNetify] Update_VM: {vmId} {Context.ConnectionId} {JsonConvert.SerializeObject(vmData)}");
             VMController.OnUpdateVM(Context.ConnectionId, vmId, vmData);
          }
-         catch(OperationCanceledException ex)
+         catch (OperationCanceledException ex)
          {
             Trace.WriteLine(ex.Message);
          }
@@ -164,20 +204,120 @@ namespace DotNetify
          }
       }
 
+      #endregion
+
+      #region Server Responses
+
       /// <summary>
-      /// Run the middlewares.
+      /// This method is called internally to send response back to browser clients.
       /// </summary>
-      /// <param name="hubContext">DotNetify hub context.</param>
-      private void RunMiddlewares(IDotNetifyHubContext hubContext)
+      /// <param name="connectionId">Identifies the browser client making prior request.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data in serialized JSON.</param>
+      internal void Response_VM(string connectionId, string vmId, string vmData)
+      {
+         Trace.WriteLine($"[dotNetify] Response_VM: {vmId} {connectionId} {vmData}");
+         if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
+            Clients.Client(connectionId).Response_VM(vmId, vmData);
+      }
+
+      #endregion
+
+      /// <summary>
+      /// Extract headers from the given argument.
+      /// </summary>
+      /// <param name="data">Data that comes from Request_VM or Update_VM.</param>
+      /// <returns>The input argument sans headers.</returns>
+      private T ExtractHeaders<T>(T data) where T : class
+      {
+         if (typeof(T) == typeof(Dictionary<string, object>))
+         {
+            var vmData = data as Dictionary<string, object>;
+            if (vmData.ContainsKey(JTOKEN_HEADERS))
+            {
+               Headers = vmData[JTOKEN_HEADERS];
+               vmData.Remove(JTOKEN_HEADERS);
+            }
+            return vmData as T;
+         }
+         else
+         {
+            JObject arg = data as JObject;
+            if (arg.Property(JTOKEN_HEADERS) != null)
+               Headers = arg[JTOKEN_HEADERS];
+            if (arg.Property(JTOKEN_VMARG) != null)
+               data = arg[JTOKEN_VMARG] as T;
+            return data;
+         }
+      }
+
+      /// <summary>
+      /// Run the middlewares on the data.
+      /// </summary>
+      /// <param name="callType">Call type: Request_VM, Update_VM or Response_VM.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="data">Call data.</param>
+      /// <param name="exceptionSent">Whether the exception should be sent to the client.</param>
+      /// <returns>Hub context data.</returns>
+      private T RunMiddlewares<T>(string callType, string vmId, T data, bool exceptionSent = true) where T : class
       {
          try
          {
+            var hubContext = new DotNetifyHubContext(Context, callType, vmId, data, Headers);
             _middlewareFactories?.ToList().ForEach(factory => factory().Invoke(hubContext));
+            return hubContext.Data as T;
          }
          catch (Exception ex)
          {
-            Response_VM(Context.ConnectionId, hubContext.VMId, SerializeException(ex));
+            if (exceptionSent)
+               Response_VM(Context.ConnectionId, vmId, SerializeException(ex));
             throw new OperationCanceledException($"Middleware threw {ex.GetType().Name}: {ex.Message}", ex);
+         }
+      }
+
+      /// <summary>
+      /// Runs the view model filter.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vm">View model instance.</param>
+      /// <param name="vmArg">Optional view model argument.</param>
+      private void RunRequestingVMFilters(string vmId, BaseVM vm, ref object vmArg) => RunVMFilters(nameof(Request_VM), vmId, vm, ref vmArg);
+
+      /// <summary>
+      /// Runs the view model filter.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vm">View model instance.</param>
+      /// <param name="data">Update data for the view model.</param>
+      private void RunUpdatingVMFilters(string vmId, BaseVM vm, ref Dictionary<string, object> data) => RunVMFilters(nameof(Update_VM), vmId, vm, ref data);
+
+      /// <summary>
+      /// Runs the view model filter.
+      /// </summary>
+      /// <param name="callType">Call type: Request_VM, Update_VM or Response_VM.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vm">View model instance.</param>
+      /// <param name="data">Call data.</param>
+      private void RunVMFilters<T>(string callType, string vmId, BaseVM vm, ref T data) where T : class
+      {
+         try
+         {
+            var vmContext = new VMContext(new DotNetifyHubContext(Context, callType, vmId, data, Headers), vm);
+            foreach (var attr in vm.GetType().GetTypeInfo().GetCustomAttributes())
+            {
+               var vmFilterType = typeof(IVMFilter<>).MakeGenericType(attr.GetType());
+               if (_vmFilterFactories.Keys.Any(t => vmFilterType.IsAssignableFrom(t)))
+               {
+                  var vmFilter = _vmFilterFactories.FirstOrDefault(kvp => vmFilterType.IsAssignableFrom(kvp.Key)).Value();
+                  vmFilterType.GetMethod("Invoke")?.Invoke(vmFilter, new object[] { attr, vmContext });
+                  data = vmContext.HubContext.Data as T;
+               }
+            }
+         }
+         catch (Exception ex)
+         {
+            Response_VM(Context.ConnectionId, vmId, SerializeException(ex));
+            throw new OperationCanceledException($"Filter threw {ex.GetType().Name}: {ex.Message}", ex);
          }
       }
 
@@ -187,24 +327,5 @@ namespace DotNetify
       /// <param name="ex">Exception to serialize.</param>
       /// <returns>Serialized exception.</returns>
       private string SerializeException(Exception ex) => JsonConvert.SerializeObject(new { ExceptionType = ex.GetType().Name, Message = ex.Message });
-
-      #endregion
-
-      #region Server Responses
-
-      /// <summary>
-      /// This method is called by the VMManager to send response back to browser clients.
-      /// </summary>
-      /// <param name="connectionId">Identifies the browser client making prior request.</param>
-      /// <param name="vmId">Identifies the view model.</param>
-      /// <param name="vmData">View model data in serialized JSON.</param>
-      public void Response_VM(string connectionId, string vmId, string vmData)
-      {
-         Trace.WriteLine($"[dotNetify] Response_VM: {vmId} {connectionId} {vmData}");
-         if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
-            Clients.Client(connectionId).Response_VM(vmId, vmData);
-      }
-
-      #endregion
    }
 }

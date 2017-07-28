@@ -69,7 +69,20 @@ var SecurePage = (function (_React$Component) {
                      'Example: Secure Page *** UNDER CONSTRUCTION ***'
                   )
                ),
-               this.state.authenticated ? React.createElement(SecurePageView, { onSignOut: handleSignOut }) : React.createElement(LoginForm, { onSubmit: handleSubmit, errorText: this.state.loginError })
+               React.createElement(
+                  'div',
+                  { className: 'row' },
+                  React.createElement(
+                     'div',
+                     { className: 'col-md-6' },
+                     React.createElement(LoginForm, { onSubmit: handleSubmit, onSignOut: handleSignOut, errorText: this.state.loginError, authenticated: this.state.authenticated })
+                  ),
+                  React.createElement(
+                     'div',
+                     { className: 'col-md-6' },
+                     React.createElement(SecurePageView, { authenticated: this.state.authenticated })
+                  )
+               )
             )
          );
       }
@@ -102,22 +115,39 @@ var LoginForm = (function (_React$Component2) {
          var handleSubmit = function handleSubmit() {
             return _this3.props.onSubmit(_this3.state);
          };
+         var handleSignOut = function handleSignOut() {
+            return _this3.props.onSignOut();
+         };
          return React.createElement(
             'div',
             { className: 'jumbotron' },
-            React.createElement(
-               'h3',
+            this.props.authenticated ? React.createElement(
+               'div',
                null,
-               'Sign in'
-            ),
-            React.createElement(
-               'p',
+               React.createElement(
+                  'h3',
+                  null,
+                  'Signed in as ',
+                  this.state.username
+               ),
+               React.createElement(RaisedButton, { label: 'Sign out', primary: true, onClick: handleSignOut })
+            ) : React.createElement(
+               'div',
                null,
-               React.createElement(TextField, { id: 'UserName', floatingLabelText: 'User name', value: this.state.username, onChange: handleUserNameChange, errorText: this.props.errorText }),
-               React.createElement('br', null),
-               React.createElement(TextField, { id: 'Password', floatingLabelText: 'Password', value: this.state.password, onChange: handlePasswordChange, errorText: this.props.errorText })
-            ),
-            React.createElement(RaisedButton, { label: 'Submit', primary: true, onClick: handleSubmit })
+               React.createElement(
+                  'h3',
+                  null,
+                  'Sign in'
+               ),
+               React.createElement(
+                  'p',
+                  null,
+                  React.createElement(TextField, { id: 'UserName', floatingLabelText: 'User name', value: this.state.username, onChange: handleUserNameChange, errorText: this.props.errorText }),
+                  React.createElement('br', null),
+                  React.createElement(TextField, { id: 'Password', floatingLabelText: 'Password', value: this.state.password, onChange: handlePasswordChange, errorText: this.props.errorText })
+               ),
+               React.createElement(RaisedButton, { label: 'Submit', primary: true, onClick: handleSubmit })
+            )
          );
       }
    }]);
@@ -134,8 +164,10 @@ var SecurePageView = (function (_React$Component3) {
       _get(Object.getPrototypeOf(SecurePageView.prototype), 'constructor', this).call(this, props);
       this.state = {};
 
-      var bearerToken = "Bearer " + window.sessionStorage.getItem("access_token");
-      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: { Authorization: bearerToken } });
+      var accessToken = window.sessionStorage.getItem("access_token");
+      var bearerToken = accessToken ? "Bearer " + accessToken : null;
+      var headers = bearerToken ? { headers: { Authorization: bearerToken } } : null;
+      this.vm = dotnetify.react.connect("SecurePageVM", this, headers);
    }
 
    _createClass(SecurePageView, [{
@@ -146,11 +178,6 @@ var SecurePageView = (function (_React$Component3) {
    }, {
       key: 'render',
       value: function render() {
-         var _this4 = this;
-
-         var handleSignOut = function handleSignOut() {
-            return _this4.props.onSignOut();
-         };
          return React.createElement(
             'div',
             { className: 'jumbotron' },
@@ -159,7 +186,11 @@ var SecurePageView = (function (_React$Component3) {
                null,
                'Secure View'
             ),
-            React.createElement(RaisedButton, { label: 'Sign out', primary: true, onClick: handleSignOut })
+            React.createElement(
+               'div',
+               null,
+               this.props.authenticated ? "Authenticated" : "Not authenticated"
+            )
          );
       }
    }]);
