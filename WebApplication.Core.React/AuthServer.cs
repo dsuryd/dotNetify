@@ -84,7 +84,7 @@ namespace WebApplication.Core.React
             return;
          }
 
-         var now = DateTimeOffset.UtcNow;
+         var now = DateTimeOffset.Now;
 
          // Specifically add the jti (random nonce), iat (issued timestamp), and sub (subject/user) claims.
          // You can add other claims here, if you want:

@@ -144,8 +144,6 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          offlineTimeout: 5000,
          offlineCacheFn: null,
 
-         exceptionHandler: null,
-
          _connectRetry: 0,
          isConnected: function () {
             return $.connection.hub.state == $.signalR.connectionState.connected
@@ -153,7 +151,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-         version: "1.0.4-beta",
+         version: "1.0.3-beta",
          viewModels: {},
          plugins: {},
 
@@ -172,18 +170,22 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                var hub = $.connection.dotNetifyHub;
                hub.client.response_VM = function (iVMId, iVMData) {
 
+                  var vm = self.viewModels.hasOwnProperty(iVMId) ? self.viewModels[iVMId] : null;
+
                   // Handle server-side exception.
-                  if (iVMData && iVMData.hasOwnProperty("ExceptionType") && iVMData.hasOwnProperty("Message"))
-                  {
-                     if (dotNetify.exceptionHandler !== null)
-                        dotnetify.exceptionHandler(iVMData.ExceptionType, iVMData.Message);
-                     else
-                        console.error("[" + iVMId + "] " + iVMData.ExceptionType + ": " + iVMData.Message);
-                     return;
+                  var vmData = JSON.parse(iVMData);
+                  if (vmData && vmData.hasOwnProperty("ExceptionType") && vmData.hasOwnProperty("Message")) {
+                     var exception = { name: vmData.ExceptionType, message: vmData.Message };
+
+                     if (vm && typeof vm.$exceptionHandler === "function")
+                        return vm.$exceptionHandler(exception);
+
+                     console.error("[" + iVMId + "] " + exception.name + ": " + exception.message);
+                     throw exception;
                   }
 
-                  if (self.viewModels.hasOwnProperty(iVMId))
-                     self.viewModels[iVMId].$update(iVMData);
+                  if (vm)
+                     vm.$update(iVMData);
                   else
                      // If we get to this point, that means the server holds a view model instance
                      // whose view no longer existed.  So, tell the server to dispose the view model.
@@ -243,13 +245,20 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          },
 
          // Connects to a server view model.
-         connect: function (iVMId, iReact, iGetState, iSetState, iVMArg) {
-            if (dotnetify.ssr)
-               return dotnetify.react.ssrConnect(iVMId, iReact, iVMArg);
+         connect: function (iVMId, iReact, iOptions) {
+            if (arguments.length < 2)
+               throw new Error("[dotNetify] Missing arguments. Usage: connect(vmId, component) ");
+            else if (arguments.length > 3)
+               throw new Error("[dotNetify] Deprecated parameters. New usage: connect(vmId, component [,{getState, setState, vmArg, headers, exceptionHandler}]) ");
+
+            if (dotnetify.ssr) {
+               var vmArg = iOptions && iOptions["vmArg"];
+               return dotnetify.react.ssrConnect(iVMId, iReact, vmArg);
+            }
 
             var self = dotnetify.react;
             if (!self.viewModels.hasOwnProperty(iVMId))
-               self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg);
+               self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, iOptions);
             else
                console.error("Component is attempting to connect to an already active '" + iVMId + "'.  If it's from a dismounted component, you must add vm.$destroy to componentWillUnmount().");
 
@@ -277,28 +286,31 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       // Client-side view model that acts as a proxy of the server view model.
       // iVMId - identifies the view model.
       // iReact - React component.
-      // iGetState - React state accessor (optional).
-      // iSetState - React state mutator (optional).
-      // iVMArg - view model arguments (optional).
-      function dotnetifyVM(iVMId, iReact, iGetState, iSetState, iVMArg) {
+      // iOptions - Optional configuration options:
+      //    getState: state accessor.
+      //    setState: state mutator. 
+      //    vmArg: view model arguments.
+      //    headers: request headers, for things like authentication token.
+      function dotnetifyVM(iVMId, iReact, iOptions) {
 
          this.$vmId = iVMId;
          this.$component = iReact;
-         this.$vmArg = iVMArg;
+         this.$vmArg = iOptions && iOptions["vmArg"];
+         this.$headers = iOptions && iOptions["headers"];
+         this.$exceptionHandler = iOptions && iOptions["exceptionHandler"];
          this.$requested = false;
          this.$loaded = false;
          this.$itemKey = {};
 
-         if (typeof iGetState !== "function") {
-            this.$vmArg = iGetState;
-            iGetState = function () { return iReact.state; };
-            iSetState = function (state) { iReact.setState(state); };
-         }
+         var getState = iOptions && iOptions["getState"];
+         var setState = iOptions && iOptions["setState"];
+         getState = typeof getState === "function" ? getState : function () { return iReact.state; };
+         setState = typeof setState === "function" ? setState : function (state) { iReact.setState(state); };
 
-         if (iReact.props.hasOwnProperty("vmArg"))
+         if (iReact && iReact.props.hasOwnProperty("vmArg"))
             this.$vmArg = $.extend(this.$vmArg, iReact.props.vmArg);
 
-         this.State = function (state) { return typeof state === "undefined" ? iGetState() : iSetState(state) };
+         this.State = function (state) { return typeof state === "undefined" ? getState() : setState(state) };
 
          // Inject plugin functions into this view model.
          for (var pluginId in dotnetify.react.plugins) {
@@ -499,7 +511,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          // Requests state from the server view model.
          dotnetifyVM.prototype.$request = function () {
             if (dotnetify.isConnected()) {
-               dotnetify.hubServer.request_VM(this.$vmId, this.$vmArg);
+               dotnetify.hubServer.request_VM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
                this.$requested = true;
             }
          }
@@ -621,22 +633,12 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                scoped: function scoped(vmId) {
                   return _this.scoped(vmId);
                },
-               connect: function connect(vmId, component, compGetState, compSetState, vmArg) {
-                  var getState = typeof compGetState === "function" ? compGetState : function () {
-                     return component.state;
-                  };
-                  var setState = typeof compSetState === "function" ? compSetState : function (state) {
-                     return component.setState(state);
-                  };
-                  if (typeof compGetState !== "function") vmArg = compGetState;
-
+               connect: function connect(vmId, component, options) {
                   component.vmId = _this.scoped(vmId);
-                  component.vm = dotnetify.react.connect(component.vmId, component, getState, setState, vmArg);
-                  component.dispatch = function (state) {
-                     return component.vm.$dispatch(state);
-                  };
+                  component.vm = dotnetify.react.connect(component.vmId, component, options);
+                  component.dispatch = function (state) { return component.vm.$dispatch(state); };
                   component.dispatchState = function (state) {
-                     setState(state);
+                     component.vm.State(state);
                      component.vm.$dispatch(state);
                   };
                   return window.vmStates ? window.vmStates[component.vmId] : null;

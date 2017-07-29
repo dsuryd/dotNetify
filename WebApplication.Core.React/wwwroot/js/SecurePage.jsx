@@ -37,7 +37,7 @@
                      <LoginForm onSubmit={handleSubmit} onSignOut={handleSignOut} errorText={this.state.loginError} authenticated={this.state.authenticated} />
                   </div>
                   <div className="col-md-6">
-                     <SecurePageView authenticated={this.state.authenticated} /> 
+                     {this.state.authenticated ? <SecurePageView authenticated={true} /> : <div><SecurePageView /></div>}
                   </div>
                </div>
             </div>
@@ -80,21 +80,27 @@ class LoginForm extends React.Component {
 class SecurePageView extends React.Component {
    constructor(props) {
       super(props);
-      this.state = {};
+      this.state = {SecureCaption: null, SecureData: null};
 
       let accessToken = window.sessionStorage.getItem("access_token");
       let bearerToken = accessToken ? "Bearer " + accessToken : null;
-      let headers = bearerToken ? { headers: { Authorization: bearerToken } } : null;
-      this.vm = dotnetify.react.connect("SecurePageVM", this, headers);
+      let authHeader = bearerToken ? { Authorization: bearerToken } : {};
+
+      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: this.onException });
    }
    componentWillUnmount() {
       this.vm.$destroy();
+   }
+   onException(exception) {
+      console.error(exception.message);
    }
    render() {
       return (
          <div className="jumbotron">
             <h3>Secure View</h3>
-            <div>{this.props.authenticated ? "Authenticated" : "Not authenticated"}</div>
+            <div>{this.state.SecureCaption ? "Authenticated" : "Not authenticated"}</div>
+            <h4>{this.state.SecureCaption}</h4>
+            <div>{this.state.SecureData}</div>
          </div>
       );
    }

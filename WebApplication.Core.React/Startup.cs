@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Text;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using DotNetify;
+using DotNetify.Security;
 
 namespace WebApplication.Core.React
 {
@@ -32,8 +36,20 @@ namespace WebApplication.Core.React
          app.UseSignalR(); // Required by dotNetify.
          app.UseDotNetify(config =>
          {
+            string secretKey = "dotnetifydemo_secretkey_123!";
+            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
+
             config.UseMiddleware<LogRequestMiddleware>();
-            config.UseMiddleware<JwtBearerAuthenticationMiddleware>();
+            config.UseJwtBearerAuthentication(new TokenValidationParameters
+            {
+               IssuerSigningKey = signingKey,
+               ValidAudience = "DotNetifyDemoApp",
+               ValidIssuer = "DotNetifyDemoServer",
+               ValidateIssuerSigningKey = true,
+               ValidateAudience = true,
+               ValidateIssuer = true,
+               ValidateLifetime = true
+            });
 
             config.UseFilters<AuthorizeFilter>();
          });

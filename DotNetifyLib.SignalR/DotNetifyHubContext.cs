@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using Microsoft.AspNetCore.SignalR.Hubs;
+using System.Security.Principal;
 
 namespace DotNetify
 {
@@ -28,14 +29,16 @@ namespace DotNetify
       public string VMId { get; }
       public object Data { get; }
       public object Headers { get; }
+      public IPrincipal Principal { get; set; }
 
-      internal DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers)
+      internal DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers, IPrincipal principal)
       {
          CallerContext = callerContext;
          CallType = callType;
          VMId = vmId;
          Data = data;
          Headers = headers;
+         Principal = principal;
       }
    }
 }

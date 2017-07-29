@@ -170,19 +170,22 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                var hub = $.connection.dotNetifyHub;
                hub.client.response_VM = function (iVMId, iVMData) {
 
-                  // Handle server-side exception.
-                  if (iVMData && iVMData.hasOwnProperty("ExceptionType") && iVMData.hasOwnProperty("Message"))
-                  {
-                     console.error("[" + iVMId + "] " + iVMData.ExceptionType + ": " + iVMData.Message);
+                  var vm = self.viewModels.hasOwnProperty(iVMId) ? self.viewModels[iVMId] : null;
 
-                     var error = new Error();
-                     error.name = iVMData.ExceptionType;
-                     error.message = iVMData.Message;
-                     throw error;
+                  // Handle server-side exception.
+                  var vmData = JSON.parse(iVMData);
+                  if (vmData && vmData.hasOwnProperty("ExceptionType") && vmData.hasOwnProperty("Message")) {
+                     var exception = { name: vmData.ExceptionType, message: vmData.Message };
+
+                     if (vm && typeof vm.$exceptionHandler === "function")
+                        return vm.$exceptionHandler(exception);
+
+                     console.error("[" + iVMId + "] " + exception.name + ": " + exception.message);
+                     throw exception;
                   }
 
-                  if (self.viewModels.hasOwnProperty(iVMId))
-                     self.viewModels[iVMId].$update(iVMData);
+                  if (vm)
+                     vm.$update(iVMData);
                   else
                      // If we get to this point, that means the server holds a view model instance
                      // whose view no longer existed.  So, tell the server to dispose the view model.
@@ -246,7 +249,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             if (arguments.length < 2)
                throw new Error("[dotNetify] Missing arguments. Usage: connect(vmId, component) ");
             else if (arguments.length > 3)
-               throw new Error("[dotNetify] Deprecated parameters. New usage: connect(vmId, component [,{getState, setState, vmArg, headers}]) ");
+               throw new Error("[dotNetify] Deprecated parameters. New usage: connect(vmId, component [,{getState, setState, vmArg, headers, exceptionHandler}]) ");
 
             if (dotnetify.ssr) {
                var vmArg = iOptions && iOptions["vmArg"];
@@ -294,14 +297,15 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          this.$component = iReact;
          this.$vmArg = iOptions && iOptions["vmArg"];
          this.$headers = iOptions && iOptions["headers"];
+         this.$exceptionHandler = iOptions && iOptions["exceptionHandler"];
          this.$requested = false;
          this.$loaded = false;
          this.$itemKey = {};
 
          var getState = iOptions && iOptions["getState"];
          var setState = iOptions && iOptions["setState"];
-         getState = typeof getState === "function" ? getState: function () { return iReact.state; };
-         setState = typeof setState === "function" ? setState: function (state) { iReact.setState(state); };
+         getState = typeof getState === "function" ? getState : function () { return iReact.state; };
+         setState = typeof setState === "function" ? setState : function (state) { iReact.setState(state); };
 
          if (iReact && iReact.props.hasOwnProperty("vmArg"))
             this.$vmArg = $.extend(this.$vmArg, iReact.props.vmArg);

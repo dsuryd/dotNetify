@@ -25,8 +25,8 @@ namespace DotNetify
 {
    public static class AppBuilderExtensions
    {
-      private static List<Type> _middlewareTypes = new List<Type>();
-      private static List<Type> _filterTypes = new List<Type>();
+      private readonly static List<Tuple<Type, object[]>> _middlewareTypes = new List<Tuple<Type, object[]>>();
+      private readonly static List<Tuple<Type, object[]>> _filterTypes = new List<Tuple<Type, object[]>>();
 
       public static IApplicationBuilder UseDotNetify(this IApplicationBuilder appBuilder, Action<IDotNetifyConfiguration> config = null)
       {
@@ -69,16 +69,16 @@ namespace DotNetify
 
          // Add middleware factories to the hub.
          var middlewareFactories = provider.GetService<IList<Func<IMiddleware>>>();
-         _middlewareTypes.ForEach(t => middlewareFactories?.Add(() => (IMiddleware)factoryMethod(t, null)));
+         _middlewareTypes.ForEach(t => middlewareFactories?.Add(() => (IMiddleware)factoryMethod(t.Item1, t.Item2)));
 
          // Add filter factories to the hub.
          var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
-         _filterTypes.ForEach(t => filterFactories?.Add(t, () => (IVMFilter)factoryMethod(t, null)));
+         _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter)factoryMethod(t.Item1, t.Item2)));
 
          return appBuilder;
       }
 
-      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig) where T : IMiddleware => _middlewareTypes.Add(typeof(T));
-      public static void UseFilters<T>(this IDotNetifyConfiguration dotNetifyConfig) where T : IVMFilter => _filterTypes.Add(typeof(T));
+      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddleware => _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+      public static void UseFilters<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter => _filterTypes.Add(Tuple.Create(typeof(T), args));
    }
 }

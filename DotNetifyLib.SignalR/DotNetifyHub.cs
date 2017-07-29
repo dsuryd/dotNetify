@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
@@ -43,6 +44,8 @@ namespace DotNetify
       private const string JTOKEN_VMARG = "$vmArg";
       private const string JTOKEN_HEADERS = "$headers";
 
+      private IPrincipal _principal;
+
       /// <summary>
       /// View model controller associated with the current connection.
       /// </summary>
@@ -51,7 +54,7 @@ namespace DotNetify
          get
          {
             if (_principalAccessor is HubPrincipalAccessor)
-               (_principalAccessor as HubPrincipalAccessor).Principal = Context.User;
+               (_principalAccessor as HubPrincipalAccessor).Principal = _principal ?? Context.User;
 
             var vmController = _vmControllerFactory.GetInstance(Context.ConnectionId);
             vmController.RequestingVM = RunRequestingVMFilters;
@@ -263,8 +266,9 @@ namespace DotNetify
       {
          try
          {
-            var hubContext = new DotNetifyHubContext(Context, callType, vmId, data, Headers);
+            var hubContext = new DotNetifyHubContext(Context, callType, vmId, data, Headers, _principal);
             _middlewareFactories?.ToList().ForEach(factory => factory().Invoke(hubContext));
+            _principal = hubContext.Principal;
             return hubContext.Data as T;
          }
          catch (Exception ex)
@@ -302,7 +306,7 @@ namespace DotNetify
       {
          try
          {
-            var vmContext = new VMContext(new DotNetifyHubContext(Context, callType, vmId, data, Headers), vm);
+            var vmContext = new VMContext(new DotNetifyHubContext(Context, callType, vmId, data, Headers, _principal), vm);
             foreach (var attr in vm.GetType().GetTypeInfo().GetCustomAttributes())
             {
                var vmFilterType = typeof(IVMFilter<>).MakeGenericType(attr.GetType());
@@ -316,7 +320,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Response_VM(Context.ConnectionId, vmId, SerializeException(ex));
+            Response_VM(Context.ConnectionId, vmId, SerializeException(ex.InnerException));
             throw new OperationCanceledException($"Filter threw {ex.GetType().Name}: {ex.Message}", ex);
          }
       }

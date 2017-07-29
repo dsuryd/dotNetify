@@ -80,7 +80,11 @@ var SecurePage = (function (_React$Component) {
                   React.createElement(
                      'div',
                      { className: 'col-md-6' },
-                     React.createElement(SecurePageView, { authenticated: this.state.authenticated })
+                     this.state.authenticated ? React.createElement(SecurePageView, { authenticated: true }) : React.createElement(
+                        'div',
+                        null,
+                        React.createElement(SecurePageView, null)
+                     )
                   )
                )
             )
@@ -162,18 +166,24 @@ var SecurePageView = (function (_React$Component3) {
       _classCallCheck(this, SecurePageView);
 
       _get(Object.getPrototypeOf(SecurePageView.prototype), 'constructor', this).call(this, props);
-      this.state = {};
+      this.state = { SecureCaption: null, SecureData: null };
 
       var accessToken = window.sessionStorage.getItem("access_token");
       var bearerToken = accessToken ? "Bearer " + accessToken : null;
-      var headers = bearerToken ? { headers: { Authorization: bearerToken } } : null;
-      this.vm = dotnetify.react.connect("SecurePageVM", this, headers);
+      var authHeader = bearerToken ? { Authorization: bearerToken } : {};
+
+      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: this.onException });
    }
 
    _createClass(SecurePageView, [{
       key: 'componentWillUnmount',
       value: function componentWillUnmount() {
          this.vm.$destroy();
+      }
+   }, {
+      key: 'onException',
+      value: function onException(exception) {
+         console.error(exception.message);
       }
    }, {
       key: 'render',
@@ -189,7 +199,17 @@ var SecurePageView = (function (_React$Component3) {
             React.createElement(
                'div',
                null,
-               this.props.authenticated ? "Authenticated" : "Not authenticated"
+               this.state.SecureCaption ? "Authenticated" : "Not authenticated"
+            ),
+            React.createElement(
+               'h4',
+               null,
+               this.state.SecureCaption
+            ),
+            React.createElement(
+               'div',
+               null,
+               this.state.SecureData
             )
          );
       }
