@@ -102,7 +102,7 @@ var LoginForm = (function (_React$Component2) {
       _classCallCheck(this, LoginForm);
 
       _get(Object.getPrototypeOf(LoginForm.prototype), 'constructor', this).call(this, props);
-      this.state = { username: "demo", password: "dotnetify" };
+      this.state = { username: "guest", password: "dotnetify" };
    }
 
    _createClass(LoginForm, [{
@@ -131,8 +131,7 @@ var LoginForm = (function (_React$Component2) {
                React.createElement(
                   'h3',
                   null,
-                  'Signed in as ',
-                  this.state.username
+                  'Signed in'
                ),
                React.createElement(RaisedButton, { label: 'Sign out', primary: true, onClick: handleSignOut })
             ) : React.createElement(

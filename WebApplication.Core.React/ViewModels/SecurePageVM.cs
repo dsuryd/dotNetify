@@ -13,11 +13,13 @@ namespace ViewModels
    {
       private Timer _timer;
 
-      public string SecureCaption => "Only authenticated user can see this live clock.";
+      public string SecureCaption { get; }
       public string SecureData => DateTime.Now.ToString();
 
-      public SecurePageVM()
+      public SecurePageVM(IPrincipalAccessor principalAccessor)
       {
+         SecureCaption = $"Only authenticated user \"{principalAccessor.Principal.Identity.Name}\" can see this live clock.";
+
          _timer = new Timer(state =>
          {
             Changed(nameof(SecureData));

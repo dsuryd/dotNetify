@@ -49,7 +49,7 @@
 class LoginForm extends React.Component {
    constructor(props) {
       super(props);
-      this.state = { username: "demo", password: "dotnetify" };
+      this.state = { username: "guest", password: "dotnetify" };
    }
    render() {
       let handleUserNameChange = event => this.setState({ username: event.target.value });
@@ -60,7 +60,7 @@ class LoginForm extends React.Component {
          <div className="jumbotron">
             {this.props.authenticated ?
                <div>
-                  <h3>Signed in as {this.state.username}</h3>
+                  <h3>Signed in</h3>
                   <RaisedButton label="Sign out" primary={true} onClick={handleSignOut} /> 
                </div> :
                <div>

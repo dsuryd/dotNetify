@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Security.Principal;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -88,12 +90,14 @@ namespace WebApplication.Core.React
 
          // Specifically add the jti (random nonce), iat (issued timestamp), and sub (subject/user) claims.
          // You can add other claims here, if you want:
-         var claims = new Claim[]
+         var claims = new List<Claim>
          {
             new Claim(JwtRegisteredClaimNames.Sub, username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
          };
+
+         claims.AddRange(identity.Claims);
 
          // Create the JWT and write it to a string
          var jwt = new JwtSecurityToken(
@@ -118,11 +122,23 @@ namespace WebApplication.Core.React
 
       private Task<ClaimsIdentity> GetIdentity(string username, string password)
       {
-         if (username == "demo" && password == "dotnetify")
-            return Task.FromResult(new ClaimsIdentity(new System.Security.Principal.GenericIdentity(username, "Token"), new Claim[] { }));
+         ClaimsIdentity identity = null;
 
-         // Credentials are invalid, or account doesn't exist
-         return Task.FromResult<ClaimsIdentity>(null);
+         if (username == "guest" && password == "dotnetify")
+         {
+            identity = new ClaimsIdentity(new GenericIdentity(username, "Token"), new Claim[] {
+               new Claim(ClaimsIdentity.DefaultNameClaimType, username)
+            });
+         }
+         else if (username == "admin" && password == "dotnetify")
+         {
+            identity = new ClaimsIdentity(new GenericIdentity(username, "Token"), new Claim[] {
+               new Claim(ClaimsIdentity.DefaultNameClaimType, username),
+               new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin")
+            });
+         }
+
+         return Task.FromResult<ClaimsIdentity>(identity);
       }
    }
 }
