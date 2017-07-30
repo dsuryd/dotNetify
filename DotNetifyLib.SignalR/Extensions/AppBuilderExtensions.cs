@@ -20,6 +20,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Caching.Memory;
+using DotNetify.Security;
 
 namespace DotNetify
 {
@@ -67,9 +68,12 @@ namespace DotNetify
          if (dotNetifyConfig.VMControllerCacheExpiration.HasValue)
             vmControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
 
+         // Add middleware to extract headers from incoming requests.
+         _middlewareTypes.Insert(0, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
+
          // Add middleware factories to the hub.
-         var middlewareFactories = provider.GetService<IList<Func<IMiddleware>>>();
-         _middlewareTypes.ForEach(t => middlewareFactories?.Add(() => (IMiddleware)factoryMethod(t.Item1, t.Item2)));
+         var middlewareFactories = provider.GetService<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>();
+         _middlewareTypes.ForEach(t => middlewareFactories?.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(t.Item1, () => (IMiddlewarePipeline)factoryMethod(t.Item1, t.Item2))));
 
          // Add filter factories to the hub.
          var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
@@ -78,7 +82,7 @@ namespace DotNetify
          return appBuilder;
       }
 
-      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddleware => _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline => _middlewareTypes.Add(Tuple.Create(typeof(T), args));
       public static void UseFilters<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter => _filterTypes.Add(Tuple.Create(typeof(T), args));
    }
 }

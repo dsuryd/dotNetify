@@ -29,10 +29,12 @@ namespace DotNetify
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
 
          // Add service to get the hub principal.
-         services.AddScoped<IPrincipalAccessor>(p => new HubPrincipalAccessor());
+         services.AddScoped<IPrincipalAccessor, HubPrincipalAccessor>();
+
+         services.AddScoped<IHubPipeline, HubPipeline>();
 
          // Add middleware and filter factories.
-         services.AddSingleton<IList<Func<IMiddleware>>>(p => new List<Func<IMiddleware>>());
+         services.AddSingleton<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>(p => new List<Tuple<Type, Func<IMiddlewarePipeline>>>());
          services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
 
          return services;

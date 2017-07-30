@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Threading.Tasks;
 
 namespace DotNetify
 {
@@ -30,6 +31,6 @@ namespace DotNetify
    /// </summary>
    public interface IVMFilter<TAttribute> : IVMFilter where TAttribute : Attribute
    {
-      void Invoke(TAttribute attribute, VMContext context);
+      Task OnExecuting(TAttribute attribute, VMContext context);
    }
 }

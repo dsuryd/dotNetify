@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json.Linq;
@@ -39,12 +40,12 @@ namespace DotNetify.Security
          _tokenValidationParameters = tokenValidationParameters;
       }
 
-      public void Invoke(DotNetifyHubContext hubContext)
+      public Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
          try
          {
             var headers = ParseHeaders<HeaderData>(hubContext);
-            if (headers?.Authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
+            if (headers?.Authorization?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
             {
                var token = headers.Authorization.Substring("Bearer ".Length).Trim();
                hubContext.Principal = new JwtSecurityTokenHandler().ValidateToken(token, _tokenValidationParameters, out SecurityToken validatedToken);
@@ -54,6 +55,8 @@ namespace DotNetify.Security
          {
             Trace.WriteLine(ex.Message);
          }
+
+         return next(hubContext);
       }
 
       private T ParseHeaders<T>(DotNetifyHubContext context) => context.Headers is JObject ? (context.Headers as JObject).ToObject<T>() : default(T);

@@ -27,8 +27,8 @@ namespace DotNetify
       public HubCallerContext CallerContext { get; }
       public string CallType { get; }
       public string VMId { get; }
-      public object Data { get; }
-      public object Headers { get; }
+      public object Data { get; set; }
+      public object Headers { get; set; }
       public IPrincipal Principal { get; set; }
 
       internal DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers, IPrincipal principal)

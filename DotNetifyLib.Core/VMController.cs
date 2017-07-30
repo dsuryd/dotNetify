@@ -56,18 +56,11 @@ namespace DotNetify
       public delegate object CreateInstanceDelegate(Type type, object[] args);
 
       /// <summary>
-      /// Delegate to provide interception hook when requesting a view model.
+      /// Delegate to provide interception hook for a view model action.
       /// </summary>
       /// <param name="vm">View model.</param>
-      /// <param name="vmArg">Optional view model initialization argument.</param>
-      public delegate void RequestingVMHookDelegate(string vmId, BaseVM vm, ref object vmArg);
-
-      /// <summary>
-      /// Delegate to provide interception hook when updating a view model.
-      /// </summary>
-      /// <param name="vm">View model.</param>
-      /// <param name="data">Data provided to the view model.</param>
-      public delegate void UpdatingVMHookDelegate(string vmId, BaseVM vm, ref Dictionary<string, object> data);
+      /// <param name="data">Data being passed to the view model.</param>
+      public delegate void FilterDelegate(string vmId, BaseVM vm, ref object data);
 
       #endregion
 
@@ -124,12 +117,12 @@ namespace DotNetify
       /// <summary>
       /// Interception hook for requesting a view model.
       /// </summary>
-      public RequestingVMHookDelegate RequestingVM { get; set; }
+      public FilterDelegate RequestingVM { get; set; }
 
       /// <summary>
       /// Interception hook for updating a view model.
       /// </summary>
-      public UpdatingVMHookDelegate UpdatingVM { get; set; }
+      public FilterDelegate UpdatingVM { get; set; }
 
       // Default constructor.
       public VMController()
@@ -256,7 +249,8 @@ namespace DotNetify
          var vmInstance = _activeVMs[vmId].Instance;
 
          // Invoke the interception delegate.
-         UpdatingVM?.Invoke(vmId, vmInstance, ref data);
+         object dataObject = data;
+         UpdatingVM?.Invoke(vmId, vmInstance, ref dataObject);
 
          lock (vmInstance)
          {

@@ -14,14 +14,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Hubs;
+
 namespace DotNetify
 {
    /// <summary>
-   /// Provides middleware to intercept incoming view model requests and updates.
-   /// The middleware can throw an exception to cancel the operation. The exception type and message will be sent to the client instead.
+   /// Marker interface for a variety of middleware pipelines.
    /// </summary>
-   public interface IMiddleware
+   public interface IMiddlewarePipeline
    {
-      void Invoke(DotNetifyHubContext context);
+   }
+
+   public delegate Task NextDelegate(DotNetifyHubContext context);
+
+   /// <summary>
+   /// Provides interception of incoming view model actions.
+   /// If the middleware throws an exception, the exception type and message will be sent to the client.
+   /// </summary>
+   public interface IMiddleware : IMiddlewarePipeline
+   {
+      Task Invoke(DotNetifyHubContext context, NextDelegate next);
+   }
+
+   /// <summary>
+   /// Provides interception of client disconnected event.
+   /// </summary>
+   public interface IDisconnectionMiddleware : IMiddlewarePipeline
+   {
+      Task OnDisconnected(HubCallerContext context);
+   }
+
+   /// <summary>
+   /// Provides interception when an exception is thrown either from a view model or middlewares.
+   /// </summary>
+   public interface IExceptionMiddleware : IMiddlewarePipeline
+   {
+      Task<Exception> OnException(HubCallerContext context, Exception exception);
    }
 }

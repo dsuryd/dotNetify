@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-using DotNetify;
-using DotNetify.Security;
 using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace DotNetify.Security
 {
@@ -26,7 +25,7 @@ namespace DotNetify.Security
    /// </summary>
    public class AuthorizeFilter : IVMFilter<AuthorizeAttribute>
    {
-      public void Invoke(AuthorizeAttribute auth, VMContext context)
+      public Task OnExecuting(AuthorizeAttribute auth, VMContext context)
       {
          var principal = context.HubContext.Principal;
 
@@ -42,6 +41,8 @@ namespace DotNetify.Security
 
          if (!authd)
             throw new UnauthorizedAccessException();
+
+         return Task.CompletedTask;
       }
    }
 }
