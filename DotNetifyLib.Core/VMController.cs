@@ -60,7 +60,8 @@ namespace DotNetify
       /// </summary>
       /// <param name="vm">View model.</param>
       /// <param name="data">Data being passed to the view model.</param>
-      public delegate void FilterDelegate(string vmId, BaseVM vm, ref object data);
+      /// <param name="vmAction">View model action.</param>
+      public delegate void FilterDelegate(string vmId, BaseVM vm, object data, Action<object> vmAction);
 
       #endregion
 
@@ -104,6 +105,27 @@ namespace DotNetify
 
       #endregion
 
+      #region Filters
+
+      /// <summary>
+      /// Interception hook for incoming actions to request view models.
+      /// </summary>
+      public FilterDelegate RequestVMFilter { get; set; }
+
+      /// <summary>
+      /// Interception hook for incoming actions to update view models.
+      /// </summary>
+      public FilterDelegate UpdateVMFilter { get; set; }
+
+      /// <summary>
+      /// Interception hook for outgoing response from view models.
+      /// </summary>
+      public FilterDelegate ResponseVMFilter { get; set; }
+
+      #endregion
+
+      #region Factory Method
+
       /// <summary>
       /// Delegate to override default mechanism used for creating view model instances.
       /// </summary>
@@ -114,15 +136,7 @@ namespace DotNetify
       /// </summary>
       public static T Create<T>(object[] args = null) where T : class => CreateInstance(typeof(T), args) as T;
 
-      /// <summary>
-      /// Interception hook for requesting a view model.
-      /// </summary>
-      public FilterDelegate RequestingVM { get; set; }
-
-      /// <summary>
-      /// Interception hook for updating a view model.
-      /// </summary>
-      public FilterDelegate UpdatingVM { get; set; }
+      #endregion
 
       // Default constructor.
       public VMController()
@@ -203,28 +217,28 @@ namespace DotNetify
          // Create a new view model instance whose class name is matching the given VMId.
          BaseVM vmInstance = !_activeVMs.ContainsKey(vmId) ? CreateVM(vmId, vmArg) : _activeVMs[vmId].Instance;
 
-         // Invokes the interception delegate.
-         RequestingVM?.Invoke(vmId, vmInstance, ref vmArg);
-
-         var vmData = Serialize(vmInstance);
-
-         // Send the view model data back to the browser client.
-         _vmResponse?.Invoke(connectionId, vmId, vmData);
-
-         // Reset the changed property states.
-         vmInstance.AcceptChangedProperties();
-
-         // Add the view model instance to the controller.
-         if (!_activeVMs.ContainsKey(vmId))
+         RequestVMFilter.Invoke(vmId, vmInstance, vmArg, data =>
          {
-            _activeVMs.TryAdd(vmId, new VMInfo { Instance = vmInstance, ConnectionId = connectionId });
-            vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
-         }
-         else
-            _activeVMs[vmId].ConnectionId = connectionId;
+            var vmData = Serialize(vmInstance);
 
-         // If this request causes other view models to change, push those new values back to the client.
-         PushUpdates();
+            // Send the view model data back to the browser client.
+            _vmResponse?.Invoke(connectionId, vmId, vmData);
+
+            // Reset the changed property states.
+            vmInstance.AcceptChangedProperties();
+
+            // Add the view model instance to the controller.
+            if (!_activeVMs.ContainsKey(vmId))
+            {
+               _activeVMs.TryAdd(vmId, new VMInfo { Instance = vmInstance, ConnectionId = connectionId });
+               vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
+            }
+            else
+               _activeVMs[vmId].ConnectionId = connectionId;
+
+            // If this request causes other view models to change, push those new values back to the client.
+            PushUpdates();
+         });
       }
 
       /// <summary>
@@ -249,23 +263,23 @@ namespace DotNetify
          var vmInstance = _activeVMs[vmId].Instance;
 
          // Invoke the interception delegate.
-         object dataObject = data;
-         UpdatingVM?.Invoke(vmId, vmInstance, ref dataObject);
-
-         lock (vmInstance)
+         UpdateVMFilter.Invoke(vmId, vmInstance, data, filteredData =>
          {
-            foreach (var kvp in data)
+            lock (vmInstance)
             {
-               UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
+               foreach (var kvp in filteredData as Dictionary<string, object>)
+               {
+                  UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
 
-               // If the view model was recreated, include the changes that trigger this update to overwrite their initial values.
-               if (isRecreated && !vmInstance.ChangedProperties.ContainsKey(kvp.Key))
-                  vmInstance.ChangedProperties.TryAdd(kvp.Key, kvp.Value);
+                  // If the view model was recreated, include the changes that trigger this update to overwrite their initial values.
+                  if (isRecreated && !vmInstance.ChangedProperties.ContainsKey(kvp.Key))
+                     vmInstance.ChangedProperties.TryAdd(kvp.Key, kvp.Value);
+               }
             }
-         }
 
-         // If the updates cause some properties of this and other view models to change, push those new values back to the client.
-         PushUpdates();
+            // If the updates cause some properties of this and other view models to change, push those new values back to the client.
+            PushUpdates();
+         });
       }
 
       /// <summary>
@@ -313,7 +327,7 @@ namespace DotNetify
          string vmNamespace = null;
          JToken namespaceToken;
          if (vmArg is JObject && (vmArg as JObject).TryGetValue(NAMESPACE, StringComparison.OrdinalIgnoreCase, out namespaceToken))
-         { 
+         {
             vmNamespace = namespaceToken.ToString();
             (vmArg as JObject).Remove(NAMESPACE);
          }
@@ -504,10 +518,14 @@ namespace DotNetify
                if (changedProperties.Count > 0)
                {
                   var vmData = Serialize(changedProperties);
-                  _vmResponse(kvp.Value.ConnectionId, kvp.Key, vmData);
 
-                  // After the changes are forwarded, accept the changes so they won't be marked as changed anymore.
-                  vmInstance.AcceptChangedProperties();
+                  ResponseVMFilter.Invoke(kvp.Key, vmInstance, vmData, filteredData =>
+                  {
+                     _vmResponse(kvp.Value.ConnectionId, kvp.Key, (string)filteredData);
+
+                     // After the changes are forwarded, accept the changes so they won't be marked as changed anymore.
+                     vmInstance.AcceptChangedProperties();
+                  });
                }
             }
          }

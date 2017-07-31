@@ -27,10 +27,16 @@ namespace DotNetify
    }
 
    /// <summary>
+   /// Delegate to invoke the next filter in the pipeline.
+   /// </summary>
+   /// <param name="context">DotNetify hub context.</param>
+   public delegate Task NextFilterDelegate(VMContext context);
+
+   /// <summary>
    /// Provides filter pipelines for view models that's associated with a class attribute.
    /// </summary>
    public interface IVMFilter<TAttribute> : IVMFilter where TAttribute : Attribute
    {
-      Task OnExecuting(TAttribute attribute, VMContext context);
+      Task Invoke(TAttribute attribute, VMContext context, NextFilterDelegate next);
    }
 }

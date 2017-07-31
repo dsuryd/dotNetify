@@ -35,16 +35,25 @@ namespace DotNetify.Security
 
       private readonly TokenValidationParameters _tokenValidationParameters;
 
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="tokenValidationParameters">Parameters for validating a token.</param>
       public JwtBearerAuthenticationMiddleware(TokenValidationParameters tokenValidationParameters)
       {
          _tokenValidationParameters = tokenValidationParameters;
       }
 
+      /// <summary>
+      /// Invokes middleware.
+      /// </summary>
+      /// <param name="hubContext">DotNetify hub context.</param>
+      /// <param name="next">Next middleware delegate.</param>
       public Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
          try
          {
-            var headers = ParseHeaders<HeaderData>(hubContext);
+            var headers = ParseHeaders<HeaderData>(hubContext.Headers);
             if (headers?.Authorization?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
             {
                var token = headers.Authorization.Substring("Bearer ".Length).Trim();
@@ -59,7 +68,12 @@ namespace DotNetify.Security
          return next(hubContext);
       }
 
-      private T ParseHeaders<T>(DotNetifyHubContext context) => context.Headers is JObject ? (context.Headers as JObject).ToObject<T>() : default(T);
+      /// <summary>
+      /// Parses headers JSON into object of a certain type.
+      /// </summary>
+      /// <param name="headers">Headers in JSON or null.</param>
+      /// <returns>Headers object.</returns>
+      private T ParseHeaders<T>(object headers) => headers is JObject ? (headers as JObject).ToObject<T>() : default(T);
    }
 
    /// <summary>

@@ -27,6 +27,10 @@ namespace DotNetify
    {
    }
 
+   /// <summary>
+   /// Delegate to invoke the next middleware in the pipeline.
+   /// </summary>
+   /// <param name="context">DotNetify hub context.</param>
    public delegate Task NextDelegate(DotNetifyHubContext context);
 
    /// <summary>

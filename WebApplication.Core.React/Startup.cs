@@ -39,7 +39,7 @@ namespace WebApplication.Core.React
             string secretKey = "dotnetifydemo_secretkey_123!";
             var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
 
-            config.UseDeveloperLogging(log => System.Diagnostics.Trace.WriteLine(log));
+            config.UseDeveloperLogging();
             config.UseJwtBearerAuthentication(new TokenValidationParameters
             {
                IssuerSigningKey = signingKey,
@@ -51,7 +51,7 @@ namespace WebApplication.Core.React
                ValidateLifetime = true
             });
 
-            config.UseFilters<AuthorizeFilter>();
+            config.UseFilter<AuthorizeFilter>();
          });
 
          app.UseMvc(routes =>

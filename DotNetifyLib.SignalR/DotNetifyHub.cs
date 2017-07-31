@@ -16,7 +16,6 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -34,8 +33,16 @@ namespace DotNetify
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IHubPipeline _hubPipeline;
-
       private IPrincipal _principal;
+
+      /// <summary>
+      /// Identity principal of the hub connection.
+      /// </summary>
+      private IPrincipal Principal
+      {
+         get { return _principal ?? Context.User; }
+         set { _principal = value; }
+      }
 
       /// <summary>
       /// View model controller associated with the current connection.
@@ -45,11 +52,12 @@ namespace DotNetify
          get
          {
             if (_principalAccessor is HubPrincipalAccessor)
-               (_principalAccessor as HubPrincipalAccessor).Principal = _principal ?? Context.User;
+               (_principalAccessor as HubPrincipalAccessor).Principal = Principal;
 
             var vmController = _vmControllerFactory.GetInstance(Context.ConnectionId);
-            vmController.RequestingVM = RunRequestingVMFilters;
-            vmController.UpdatingVM = RunUpdatingVMFilters;
+            vmController.RequestVMFilter = RunRequestingVMFilters;
+            vmController.UpdateVMFilter = RunUpdatingVMFilters;
+            vmController.ResponseVMFilter = RunRespondingVMFilters;
 
             return vmController;
          }
@@ -60,6 +68,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
       /// <param name="principalAccessor">Allow to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
       public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IHubPipeline hubPipeline)
       {
          _vmControllerFactory = vmControllerFactory;
@@ -103,7 +112,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Trace.Fail(ex.ToString());
+            _hubPipeline.RunExceptionMiddleware(Context, ex);
          }
       }
 
@@ -120,16 +129,16 @@ namespace DotNetify
          {
             _hubPipeline.RunMiddlewares(Context, nameof(Request_VM), vmId, vmArg, ctx =>
             {
-               _principal = ctx.Principal;
+               Principal = ctx.Principal;
                VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
                return Task.CompletedTask;
             });
-
          }
          catch (Exception ex)
          {
             var finalEx = _hubPipeline.RunExceptionMiddleware(Context, ex);
-            Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
+            if (finalEx is OperationCanceledException == false)
+               Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
 
@@ -144,14 +153,16 @@ namespace DotNetify
          {
             _hubPipeline.RunMiddlewares(Context, nameof(Update_VM), vmId, vmData, ctx =>
             {
-               _principal = ctx.Principal;
+               Principal = ctx.Principal;
                VMController.OnUpdateVM(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
                return Task.CompletedTask;
             });
          }
          catch (Exception ex)
          {
-            Response_VM(Context.ConnectionId, vmId, SerializeException(ex));
+            var finalEx = _hubPipeline.RunExceptionMiddleware(Context, ex);
+            if (finalEx is OperationCanceledException == false)
+               Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
 
@@ -167,7 +178,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Trace.Fail(ex.ToString());
+            _hubPipeline.RunExceptionMiddleware(Context, ex);
          }
       }
 
@@ -195,11 +206,15 @@ namespace DotNetify
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vm">View model instance.</param>
       /// <param name="vmArg">Optional view model argument.</param>
-      private void RunVMFilters(string callType, string vmId, BaseVM vm, ref object vmArg) 
+      private void RunVMFilters(string callType, string vmId, BaseVM vm, object data, Action<object> vmAction)
       {
          try
          {
-            _hubPipeline.RunVMFilters(Context, callType, vmId, vm, ref vmArg, _principal);
+            _hubPipeline.RunVMFilters(Context, callType, vmId, vm, data, Principal, ctx =>
+            {
+               vmAction(ctx.HubContext.Data);
+               return Task.CompletedTask;
+            } );
          }
          catch (TargetInvocationException ex)
          {
@@ -210,12 +225,27 @@ namespace DotNetify
       /// <summary>
       /// Runs the filter before the view model is requested.
       /// </summary>
-      private void RunRequestingVMFilters(string vmId, BaseVM vm, ref object vmArg) => RunVMFilters(nameof(Request_VM), vmId, vm, ref vmArg);
+      private void RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => RunVMFilters(nameof(Request_VM), vmId, vm, vmArg, vmAction);
 
       /// <summary>
       /// Runs the filter before the view model is updated.
       /// </summary>
-      private void RunUpdatingVMFilters(string vmId, BaseVM vm, ref object vmArg) => RunVMFilters(nameof(Update_VM), vmId, vm, ref vmArg);
+      private void RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction) => RunVMFilters(nameof(Update_VM), vmId, vm, vmData, vmAction);
+
+      /// <summary>
+      /// Runs the filter before the view model respond to something.
+      /// </summary>
+      private void RunRespondingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction)
+      {
+         try
+         {
+            RunVMFilters(nameof(Response_VM), vmId, vm, vmData, vmAction);
+         }
+         catch(Exception ex)
+         {
+            _hubPipeline.RunExceptionMiddleware(Context, ex);
+         }
+      }
 
       /// <summary>
       /// Serializes an exception.

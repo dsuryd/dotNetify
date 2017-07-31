@@ -26,15 +26,15 @@ using Microsoft.AspNetCore.SignalR.Hubs;
 namespace DotNetify
 {
    /// <summary>
-   /// Provides management of the invocation of pipeline middlewares and view model filters for the dotNetify hub.
+   /// Provides invocation of middlewares and view model filters.
    /// </summary>
    public interface IHubPipeline
    {
-      T RunMiddlewares<T>(HubCallerContext context, string callType, string vmId, T data, NextDelegate finalAction) where T : class;
+      void RunMiddlewares(HubCallerContext context, string callType, string vmId, object data, NextDelegate finalAction);
 
       void RunDisconnectionMiddlewares(HubCallerContext context);
 
-      void RunVMFilters<T>(HubCallerContext context, string callType, string vmId, BaseVM vm, ref T data, IPrincipal principal) where T : class;
+      void RunVMFilters(HubCallerContext context, string callType, string vmId, BaseVM vm, object data, IPrincipal principal, NextFilterDelegate finalFilter);
 
       Exception RunExceptionMiddleware(HubCallerContext context, Exception exception);
    }
@@ -47,9 +47,8 @@ namespace DotNetify
       /// <summary>
       /// Constructor.
       /// </summary>
-      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
-      /// <param name="principalAccessor">Allow to pass the hub principal.</param>
-      /// <param name="middlewareFactories">Middlewares to intercept incoming view model requests and updates.</param>
+      /// <param name="middlewareFactories">Middlewares to intercept view model actions on a global level.</param>
+      /// /// <param name="vmFilterFactories">View model filters to intercept view model actions on a view model level.</param>
       public HubPipeline(IList<Tuple<Type, Func<IMiddlewarePipeline>>> middlewareFactories, IDictionary<Type, Func<IVMFilter>> vmFilterFactories)
       {
          _middlewareFactories = middlewareFactories;
@@ -72,18 +71,16 @@ namespace DotNetify
       /// <param name="data">Call data.</param>
       /// <param name="exceptionSent">Whether the exception should be sent to the client.</param>
       /// <returns>Hub context data.</returns>
-      public T RunMiddlewares<T>(HubCallerContext context, string callType, string vmId, T data, NextDelegate finalAction) where T : class
+      public void RunMiddlewares(HubCallerContext context, string callType, string vmId, object data, NextDelegate finalAction)
       {
-         var nextActions = new Stack<NextDelegate>();
-         nextActions.Push(finalAction);
+         var nextMiddlewares = new Stack<NextDelegate>();
+         nextMiddlewares.Push(finalAction);
          foreach (IMiddleware middleware in GetMiddlewares<IMiddleware>().Reverse<IMiddlewarePipeline>())
-            nextActions.Push(ctx => middleware.Invoke(ctx, nextActions.Pop()));
+            nextMiddlewares.Push(ctx => middleware.Invoke(ctx, nextMiddlewares.Pop()));
 
          var hubContext = new DotNetifyHubContext(context, callType, vmId, data, null, context.User);
-         if (nextActions.Count > 0)
-            nextActions.Pop()(hubContext);
-
-         return hubContext.Data as T;
+         if (nextMiddlewares.Count > 0)
+            nextMiddlewares.Pop()(hubContext);
       }
 
       /// <summary>
@@ -96,7 +93,7 @@ namespace DotNetify
          {
             GetMiddlewares<IDisconnectionMiddleware>().ToList().ForEach(middleware => (middleware as IDisconnectionMiddleware).OnDisconnected(context));
          }
-         catch(Exception ex)
+         catch (Exception ex)
          {
             Trace.Fail(ex.ToString());
          }
@@ -128,21 +125,27 @@ namespace DotNetify
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vm">View model instance.</param>
       /// <param name="data">Call data.</param>
-      public void RunVMFilters<T>(HubCallerContext context, string callType, string vmId, BaseVM vm, ref T data, IPrincipal principal) where T : class
+      public void RunVMFilters(HubCallerContext context, string callType, string vmId, BaseVM vm, object data, IPrincipal principal, NextFilterDelegate finalFilter)
       {
-         var vmContext = new VMContext(new DotNetifyHubContext(context, callType, vmId, data, null, principal), vm);
+         var nextFilters = new Stack<NextFilterDelegate>();
+         nextFilters.Push(finalFilter);
 
          // Find and execute the filter that matches each view model class attribute.
-         foreach (var attr in vm.GetType().GetTypeInfo().GetCustomAttributes())
+         foreach (var attr in vm.GetType().GetTypeInfo().GetCustomAttributes().Reverse())
          {
             var vmFilterType = typeof(IVMFilter<>).MakeGenericType(attr.GetType());
             if (_vmFilterFactories.Keys.Any(t => vmFilterType.IsAssignableFrom(t)))
             {
                var vmFilter = _vmFilterFactories.FirstOrDefault(kvp => vmFilterType.IsAssignableFrom(kvp.Key)).Value();
-               vmFilterType.GetMethod(nameof(IVMFilter<Attribute>.OnExecuting))?.Invoke(vmFilter, new object[] { attr, vmContext });
-               data = vmContext.HubContext.Data as T;
+               var vmFilterInvokeMethod = vmFilterType.GetMethod(nameof(IVMFilter<Attribute>.Invoke));
+               if (vmFilterInvokeMethod != null)
+                  nextFilters.Push(ctx => (Task)vmFilterInvokeMethod.Invoke(vmFilter, new object[] { attr, ctx, nextFilters.Pop() }));
             }
          }
+
+         var vmContext = new VMContext(new DotNetifyHubContext(context, callType, vmId, data, null, principal), vm);
+         if (nextFilters.Count > 0)
+            nextFilters.Pop()(vmContext);
       }
    }
 }

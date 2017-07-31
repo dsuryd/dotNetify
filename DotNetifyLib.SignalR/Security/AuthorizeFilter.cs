@@ -25,7 +25,7 @@ namespace DotNetify.Security
    /// </summary>
    public class AuthorizeFilter : IVMFilter<AuthorizeAttribute>
    {
-      public Task OnExecuting(AuthorizeAttribute auth, VMContext context)
+      public Task Invoke(AuthorizeAttribute auth, VMContext context, NextFilterDelegate next)
       {
          var principal = context.HubContext.Principal;
 
@@ -42,7 +42,7 @@ namespace DotNetify.Security
          if (!authd)
             throw new UnauthorizedAccessException();
 
-         return Task.CompletedTask;
+         return next(context);
       }
    }
 }

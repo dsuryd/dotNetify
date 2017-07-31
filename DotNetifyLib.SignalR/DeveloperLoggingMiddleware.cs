@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using DotNetify;
 using Microsoft.AspNetCore.SignalR.Hubs;
@@ -35,11 +36,16 @@ namespace WebApplication.Core.React
 
       public Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
-         _trace($@"[dotNetify] connId={hubContext.CallerContext.ConnectionId} type={hubContext.CallType} 
+         var log = $@"[dotNetify] connId={hubContext.CallerContext.ConnectionId} 
+            type={hubContext.CallType} 
             vmId={hubContext.VMId} 
-            data={JsonConvert.SerializeObject(hubContext.Data ?? string.Empty)} 
-            headers={JsonConvert.SerializeObject(hubContext.Headers ?? string.Empty)}");
+            data={JsonConvert.SerializeObject(hubContext.Data ?? string.Empty)}";
 
+         if (hubContext.Headers != null)
+            log += $@"
+            headers={JsonConvert.SerializeObject(hubContext.Headers)}";
+
+         _trace(log);
          return next(hubContext);
       }
 
@@ -61,9 +67,9 @@ namespace WebApplication.Core.React
    /// </summary>
    public static class DeveloperLoggingMiddlewareExtensions
    {
-      public static void UseDeveloperLogging(this IDotNetifyConfiguration config, LogTraceDelegate logTraceDelegate)
+      public static void UseDeveloperLogging(this IDotNetifyConfiguration config, LogTraceDelegate logTraceDelegate = null)
       {
-         config.UseMiddleware<DeveloperLoggingMiddleware>(logTraceDelegate);
+         config.UseMiddleware<DeveloperLoggingMiddleware>(logTraceDelegate ?? (log => Trace.WriteLine(log)));
       }
    }
 }

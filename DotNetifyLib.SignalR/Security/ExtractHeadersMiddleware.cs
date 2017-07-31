@@ -23,6 +23,9 @@ using Newtonsoft.Json.Linq;
 
 namespace DotNetify.Security
 {
+   /// <summary>
+   /// Middleware to extract headers from the incoming view model data.
+   /// </summary>
    public class ExtractHeadersMiddleware : IMiddleware, IDisconnectionMiddleware
    {
       private const string JTOKEN_VMARG = "$vmArg";
@@ -31,11 +34,20 @@ namespace DotNetify.Security
       private readonly IMemoryCache _headersCache;
       private readonly Func<string, string> _headersKey = (string connectionId) => JTOKEN_HEADERS + connectionId;
 
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="headersCache">Memory cache to store headers per connection.</param>
       public ExtractHeadersMiddleware(IMemoryCache headersCache)
       {
          _headersCache = headersCache;
       }
 
+      /// <summary>
+      /// Invokes middleware.
+      /// </summary>
+      /// <param name="context">DotNetify hub context.</param>
+      /// <param name="next">Next middleware delegate.</param>
       public Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
          // Only extract headers from incoming requests.
@@ -45,22 +57,25 @@ namespace DotNetify.Security
          // Set initial headers from previously cached headers.
          context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
 
-         var data = context.Data;
-         var headers = ExtractHeaders(ref data);
-         if (headers != null)
+         var tuple = ExtractHeaders(context.Data);
+         if (tuple.Item1 != null)
          {
-            context.Data = data;
-            context.Headers = headers;
-            _headersCache.Set(_headersKey(context.CallerContext.ConnectionId), headers);
+            context.Headers = tuple.Item1;
+            _headersCache.Set(_headersKey(context.CallerContext.ConnectionId), context.Headers);
          }
+         context.Data = tuple.Item2;
 
          // If the incoming message is only for updating the headers, no need to continue down the pipeline.
-         if (data == null && context.CallType == nameof(DotNetifyHub.Update_VM))
+         if (context.Data == null && context.CallType == nameof(DotNetifyHub.Update_VM))
             return Task.CompletedTask;
 
          return next(context);
       }
 
+      /// <summary>
+      /// Handles disconnected event by removing the headers associated with the connection from the cache.
+      /// </summary>
+      /// <param name="context">SignalR hub context.</param>
       public Task OnDisconnected(HubCallerContext context)
       {
          _headersCache.Remove(_headersKey(context.ConnectionId));
@@ -68,11 +83,11 @@ namespace DotNetify.Security
       }
 
       /// <summary>
-      /// Extract headers from the given argument.
+      /// Extract headers from view model data.
       /// </summary>
       /// <param name="data">Data that comes from Request_VM or Update_VM.</param>
-      /// <returns>The input argument sans headers.</returns>
-      private object ExtractHeaders<T>(ref T data) where T : class
+      /// <returns>Tuple consisting of headers and data.</returns>
+      private Tuple<object, T> ExtractHeaders<T>(T data) where T : class
       {
          object headers = null;
 
@@ -99,7 +114,7 @@ namespace DotNetify.Security
                data = arg[JTOKEN_VMARG] as T;
          }
 
-         return headers;
+         return Tuple.Create(headers, data);
       }
    }
 }
