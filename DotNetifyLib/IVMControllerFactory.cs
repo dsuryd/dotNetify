@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
+
 namespace DotNetify
 {
    /// <summary>
@@ -21,6 +23,16 @@ namespace DotNetify
    /// </summary>
    public interface IVMControllerFactory
    {
+      /// <summary>
+      /// How long to keep a view model controller in memory after it hasn't been accessed for a while. Default to never expire.
+      /// </summary>
+      TimeSpan? CacheExpiration { get; set; }
+
+      /// <summary>
+      /// Delegate to return the response back to the client.
+      /// </summary>
+      VMController.VMResponseDelegate ResponseDelegate { get; set; }
+
       /// <summary>
       /// Creates a view model controller and assigns it a key. 
       /// On subsequent calls, use the same key to return the same object.

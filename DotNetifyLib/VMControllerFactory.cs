@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2016 Dicky Suryadi
+Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ limitations under the License.
  */
 
 using System;
-using System.Runtime.Caching;
 
 namespace DotNetify
 {
@@ -27,17 +26,29 @@ namespace DotNetify
       /// <summary>
       /// View model controllers by the client connection Ids.
       /// </summary>
-      private readonly Lazy<MemoryCache> _controllersCache = new Lazy<MemoryCache>(() => new MemoryCache("DotNetify"));
+      private readonly IMemoryCache _controllersCache;
 
       /// <summary>
-      /// How long to keep a view model controller in memory after it hasn't been accessed for a while.
+      /// How long to keep a view model controller in memory after it hasn't been accessed for a while. Default to never expire.
       /// </summary>
-      public TimeSpan CacheExpiration { get; set; } = new TimeSpan(0, 20, 0);
+      public TimeSpan? CacheExpiration { get; set; }
 
       /// <summary>
-      /// Singleton; used for when there is no dependency injection.
+      /// Delegate to return the response back to the client.
       /// </summary>
-      public static VMControllerFactory Singleton { get; } = new VMControllerFactory();
+      public VMController.VMResponseDelegate ResponseDelegate { get; set; }
+
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="memoryCache">Memory cache for storing the view model controllers.</param>
+      public VMControllerFactory(IMemoryCache memoryCache)
+      {
+         if (memoryCache == null)
+            throw new ArgumentNullException("No service of type IMemoryCache has been registered.");
+
+         _controllersCache = memoryCache;
+      }
 
       /// <summary>
       /// Creates a view model controller and assigns it a key. 
@@ -47,11 +58,15 @@ namespace DotNetify
       /// <returns>View model controller.</returns>
       public VMController GetInstance(string key)
       {
-         var cache = _controllersCache.Value;
-         var newValue = new Lazy<VMController>(() => new VMController(DotNetifyHub.Response_VM));
-         var cachedValue = cache.AddOrGetExisting(key, newValue, GetCacheItemPolicy()) as Lazy<VMController>;
+         var cache = _controllersCache;
 
-         return cachedValue == null ? newValue.Value : cachedValue.Value;
+         Lazy<VMController> cachedValue;
+         if (!cache.TryGetValue(key, out cachedValue))
+         {
+            cachedValue = new Lazy<VMController>(() => new VMController(ResponseDelegate));
+            cache.Set(key, cachedValue, GetCacheEntryOptions());
+         }
+         return cachedValue?.Value;
       }
 
       /// <summary>
@@ -61,8 +76,9 @@ namespace DotNetify
       /// <returns>True if the object was removed.</returns>
       public bool Remove(string key)
       {
-         var cache = _controllersCache.Value;
-         if (cache.Contains(key))
+         var cache = _controllersCache;
+         object value;
+         if (cache.TryGetValue(key, out value))
          {
             cache.Remove(key);
             return true;
@@ -71,16 +87,18 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Returns cached item policy for view model controllers.
+      /// Returns cached entry options for view model controllers.
       /// </summary>
-      /// <returns>Cache item policy.</returns>
-      private CacheItemPolicy GetCacheItemPolicy()
+      /// <returns>Cache entry options.</returns>
+      private MemoryCacheEntryOptions GetCacheEntryOptions()
       {
-         return new CacheItemPolicy
-         {
-            SlidingExpiration = CacheExpiration,
-            RemovedCallback = i => ((i.CacheItem.Value as Lazy<VMController>).Value as IDisposable).Dispose()
-         };
+         var options = new MemoryCacheEntryOptions()
+            .RegisterPostEvictionCallback((key, value, reason, substate) => ((value as Lazy<VMController>).Value as IDisposable).Dispose());
+
+         if (CacheExpiration.HasValue)
+            options.SetSlidingExpiration(CacheExpiration.Value);
+
+         return options;
       }
    }
 }

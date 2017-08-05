@@ -9,7 +9,7 @@
       "router": "dotnetify.router",
       "binder": "dotnetify.binder",
       "binder-polymer": "dotnetify.binder.polymer",
-      "signalr": "jquery.signalR-2.2.0.min",
+      "signalr": "jquery.signalR-2.2.2.min",
       "bootstrap": "DemoLibs/bootstrap.min"
    },
    shim: {

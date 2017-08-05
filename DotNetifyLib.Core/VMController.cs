@@ -141,6 +141,9 @@ namespace DotNetify
       // Default constructor.
       public VMController()
       {
+         RequestVMFilter = (string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => vmAction(vmArg);
+         UpdateVMFilter = (string vmId, BaseVM vm, object vmData, Action<object> vmAction) => vmAction(vmData);
+         ResponseVMFilter = (string vmId, BaseVM vm, object vmData, Action<object> vmAction) => vmAction(vmData);
       }
 
       /// <summary>

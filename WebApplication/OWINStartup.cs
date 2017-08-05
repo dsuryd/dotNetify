@@ -38,7 +38,7 @@ namespace WebApplication
                else if (type == typeof(CompositeViewVM))
                   return new CompositeViewVM(new EmployeeModel());
 
-               return Activator.CreateInstance(type, args);
+               return ActivatorUtilities.CreateInstance(type, args);
             });
          });
       }

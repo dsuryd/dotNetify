@@ -21,11 +21,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
 using System.Windows.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using DotNetify.Security;
 
 namespace DotNetify
 {
@@ -56,6 +54,14 @@ namespace DotNetify
       /// <param name="args">Optional constructor arguments.</param>
       /// <returns>Object of type T.</returns>
       public delegate object CreateInstanceDelegate(Type type, object[] args);
+
+      /// <summary>
+      /// Delegate to provide interception hook for a view model action.
+      /// </summary>
+      /// <param name="vm">View model.</param>
+      /// <param name="data">Data being passed to the view model.</param>
+      /// <param name="vmAction">View model action.</param>
+      public delegate void FilterDelegate(string vmId, BaseVM vm, object data, Action<object> vmAction);
 
       #endregion
 
@@ -99,6 +105,27 @@ namespace DotNetify
 
       #endregion
 
+      #region Filters
+
+      /// <summary>
+      /// Interception hook for incoming actions to request view models.
+      /// </summary>
+      public FilterDelegate RequestVMFilter { get; set; }
+
+      /// <summary>
+      /// Interception hook for incoming actions to update view models.
+      /// </summary>
+      public FilterDelegate UpdateVMFilter { get; set; }
+
+      /// <summary>
+      /// Interception hook for outgoing response from view models.
+      /// </summary>
+      public FilterDelegate ResponseVMFilter { get; set; }
+
+      #endregion
+
+      #region Factory Method
+
       /// <summary>
       /// Delegate to override default mechanism used for creating view model instances.
       /// </summary>
@@ -109,16 +136,14 @@ namespace DotNetify
       /// </summary>
       public static T Create<T>(object[] args = null) where T : class => CreateInstance(typeof(T), args) as T;
 
-      /// <summary>
-      /// Security context.
-      /// </summary>
-      public IPrincipal Principal;
+      #endregion
 
-      /// <summary>
-      ///  Default constructor.
-      /// </summary>
+      // Default constructor.
       public VMController()
       {
+         RequestVMFilter = (string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => vmAction(vmArg);
+         UpdateVMFilter = (string vmId, BaseVM vm, object vmData, Action<object> vmAction) => vmAction(vmData);
+         ResponseVMFilter = (string vmId, BaseVM vm, object vmData, Action<object> vmAction) => vmAction(vmData);
       }
 
       /// <summary>
@@ -156,6 +181,7 @@ namespace DotNetify
          return vm != null ? vmController.Serialize(vm) : null;
       }
 
+      /// <summary>
       /// Registers all view model types in an assembly.
       /// </summary>
       /// <param name="vmAssembly">Assembly.</param>
@@ -170,7 +196,7 @@ namespace DotNetify
          _registeredAssemblies.Add(vmAssembly.FullName);
 
          bool hasVMTypes = false;
-         foreach (Type vmType in vmAssembly.GetExportedTypes().Where(i => typeof(BaseVM).IsAssignableFrom(i)))
+         foreach (Type vmType in vmAssembly.GetExportedTypes().Where(i => typeof(BaseVM).GetTypeInfo().IsAssignableFrom(i)))
          {
             hasVMTypes = true;
             if (_vmTypes.Find(i => i == vmType) == null)
@@ -194,29 +220,28 @@ namespace DotNetify
          // Create a new view model instance whose class name is matching the given VMId.
          BaseVM vmInstance = !_activeVMs.ContainsKey(vmId) ? CreateVM(vmId, vmArg) : _activeVMs[vmId].Instance;
 
-         // Make sure current security context is authorized to access the view model.
-         if (!IsAuthorized(vmInstance))
-            throw new UnauthorizedAccessException();
-
-         var vmData = Serialize(vmInstance);
-
-         // Send the view model data back to the browser client.
-         _vmResponse?.Invoke(connectionId, vmId, vmData);
-
-         // Reset the changed property states.
-         vmInstance.AcceptChangedProperties();
-
-         // Add the view model instance to the controller.
-         if (!_activeVMs.ContainsKey(vmId))
+         RequestVMFilter.Invoke(vmId, vmInstance, vmArg, data =>
          {
-            _activeVMs.TryAdd(vmId, new VMInfo { Instance = vmInstance, ConnectionId = connectionId });
-            vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
-         }
-         else
-            _activeVMs[vmId].ConnectionId = connectionId;
+            var vmData = Serialize(vmInstance);
 
-         // If this request causes other view models to change, push those new values back to the client.
-         PushUpdates();
+            // Send the view model data back to the browser client.
+            _vmResponse?.Invoke(connectionId, vmId, vmData);
+
+            // Reset the changed property states.
+            vmInstance.AcceptChangedProperties();
+
+            // Add the view model instance to the controller.
+            if (!_activeVMs.ContainsKey(vmId))
+            {
+               _activeVMs.TryAdd(vmId, new VMInfo { Instance = vmInstance, ConnectionId = connectionId });
+               vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
+            }
+            else
+               _activeVMs[vmId].ConnectionId = connectionId;
+
+            // If this request causes other view models to change, push those new values back to the client.
+            PushUpdates();
+         });
       }
 
       /// <summary>
@@ -240,24 +265,24 @@ namespace DotNetify
          // Update the new values from the client to the server view model.
          var vmInstance = _activeVMs[vmId].Instance;
 
-         // Make sure current security context is authorized to access the view model.
-         if (!IsAuthorized(vmInstance))
-            throw new UnauthorizedAccessException();
-
-         lock (vmInstance)
+         // Invoke the interception delegate.
+         UpdateVMFilter.Invoke(vmId, vmInstance, data, filteredData =>
          {
-            foreach (var kvp in data)
+            lock (vmInstance)
             {
-               UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
+               foreach (var kvp in filteredData as Dictionary<string, object>)
+               {
+                  UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
 
-               // If the view model was recreated, include the changes that trigger this update to overwrite their initial values.
-               if (isRecreated && !vmInstance.ChangedProperties.ContainsKey(kvp.Key))
-                  vmInstance.ChangedProperties.TryAdd(kvp.Key, kvp.Value);
+                  // If the view model was recreated, include the changes that trigger this update to overwrite their initial values.
+                  if (isRecreated && !vmInstance.ChangedProperties.ContainsKey(kvp.Key))
+                     vmInstance.ChangedProperties.TryAdd(kvp.Key, kvp.Value);
+               }
             }
-         }
 
-         // If the updates cause some properties of this and other view models to change, push those new values back to the client.
-         PushUpdates();
+            // If the updates cause some properties of this and other view models to change, push those new values back to the client.
+            PushUpdates();
+         });
       }
 
       /// <summary>
@@ -305,7 +330,7 @@ namespace DotNetify
          string vmNamespace = null;
          JToken namespaceToken;
          if (vmArg is JObject && (vmArg as JObject).TryGetValue(NAMESPACE, StringComparison.OrdinalIgnoreCase, out namespaceToken))
-         { 
+         {
             vmNamespace = namespaceToken.ToString();
             (vmArg as JObject).Remove(NAMESPACE);
          }
@@ -391,17 +416,6 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Returns whether current security context is authorized to access a view model.
-      /// </summary>
-      /// <param name="vmInstance">View model instance.</param>
-      /// <returns>True if authorized.</returns>
-      protected virtual bool IsAuthorized(BaseVM vmInstance)
-      {
-         var authAttr = vmInstance.GetType().GetCustomAttribute<AuthorizeAttribute>();
-         return authAttr == null || authAttr.IsAuthorized(Principal);
-      }
-
-      /// <summary>
       /// Updates a value of a view model.
       /// </summary>
       /// <param name="vmInstance">View model instance.</param>
@@ -417,11 +431,11 @@ namespace DotNetify
             for (int i = 0; i < path.Length; i++)
             {
                var propName = path[i];
-               var propInfo = vmType.GetProperty(propName);
+               var propInfo = vmType.GetTypeInfo().GetProperty(propName);
                if (propInfo == null)
                   throw new UnresolvedVMUpdateException();
 
-               var propType = propInfo.PropertyType;
+               var propType = propInfo.PropertyType.GetTypeInfo();
 
                if (i < path.Length - 1)
                {
@@ -432,7 +446,7 @@ namespace DotNetify
                   if (path[i + 1].StartsWith("$"))
                   {
                      var key = path[i + 1].TrimStart('$');
-                     var methodInfo = vmType.GetMethod(propName + "_get");
+                     var methodInfo = vmType.GetTypeInfo().GetMethod(propName + "_get");
                      if (methodInfo == null)
                         throw new UnresolvedVMUpdateException();
 
@@ -449,7 +463,7 @@ namespace DotNetify
                      vmType = vmObject != null ? vmObject.GetType() : propInfo.PropertyType;
                   }
                }
-               else if (typeof(ICommand).IsAssignableFrom(propInfo.PropertyType) && vmObject != null)
+               else if (typeof(ICommand).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType) && vmObject != null)
                {
                   // If the property type is ICommand, execute the command.
                   (propInfo.GetValue(vmObject) as ICommand)?.Execute(newValue);
@@ -464,7 +478,7 @@ namespace DotNetify
                else if (propInfo.SetMethod != null && vmObject != null)
                {
                   // Update the new value to the property.
-                  if (propInfo.PropertyType.IsClass && propInfo.PropertyType != typeof(string))
+                  if (propType.IsClass && propInfo.PropertyType != typeof(string))
                      propInfo.SetValue(vmObject, JsonConvert.DeserializeObject(newValue, propInfo.PropertyType));
                   else
                   {
@@ -477,7 +491,7 @@ namespace DotNetify
                   // unless the value is changed internally, so that we don't send the same value back to the client
                   // during PushUpdates call by this VMController.
                   var changedProperties = vmInstance.ChangedProperties;
-                  if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? String.Empty).ToString() == newValue)
+                  if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? string.Empty).ToString() == newValue)
                   {
                      object value;
                      changedProperties.TryRemove(vmPath, out value);
@@ -507,10 +521,14 @@ namespace DotNetify
                if (changedProperties.Count > 0)
                {
                   var vmData = Serialize(changedProperties);
-                  _vmResponse?.Invoke(kvp.Value.ConnectionId, kvp.Key, vmData);
 
-                  // After the changes are forwarded, accept the changes so they won't be marked as changed anymore.
-                  vmInstance.AcceptChangedProperties();
+                  ResponseVMFilter.Invoke(kvp.Key, vmInstance, vmData, filteredData =>
+                  {
+                     _vmResponse(kvp.Value.ConnectionId, kvp.Key, (string)filteredData);
+
+                     // After the changes are forwarded, accept the changes so they won't be marked as changed anymore.
+                     vmInstance.AcceptChangedProperties();
+                  });
                }
             }
          }

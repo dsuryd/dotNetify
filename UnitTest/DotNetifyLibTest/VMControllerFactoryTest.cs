@@ -12,10 +12,10 @@ namespace UnitTest
       {
          var id1 = "1";
          var id2 = "2";
-         var factory = DotNetify.VMControllerFactory.Singleton;
+         var factory = new ServiceProvider().GetService<IVMControllerFactory>();
+         factory.ResponseDelegate = (string connectionId, string vmId, string vmData) => { };
 
          Assert.IsNotNull(factory as IVMControllerFactory);
-         Assert.AreEqual(20, factory.CacheExpiration.Minutes);
 
          var instance1 = factory.GetInstance(id1);
          var instance2 = factory.GetInstance(id2);

@@ -35,6 +35,8 @@ var dotNetify = {};
 
    /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
    /// <reference path="jquery.signalR.js" />
+   /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
+   /// <reference path="jquery.signalR.js" />
    (function ($, window, undefined) {
       /// <param name="$" type="jQuery" />
       "use strict";
@@ -114,6 +116,10 @@ var dotNetify = {};
                return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Request_VM"], $.makeArray(arguments)));
             },
 
+            sendResponse: function (connectionId, vmId, vmData) {
+               return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["SendResponse"], $.makeArray(arguments)));
+            },
+
             update_VM: function (vmId, vmData) {
                return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Update_VM"], $.makeArray(arguments)));
             }
@@ -125,7 +131,7 @@ var dotNetify = {};
       signalR.hub = $.hubConnection("/signalr", { useDefaultPath: false });
       $.extend(signalR, signalR.hub.createHubProxies());
 
-   }($, window));
+   }(window.jQuery, window));
 
    dotnetify = $.extend(dotnetify,
    {
