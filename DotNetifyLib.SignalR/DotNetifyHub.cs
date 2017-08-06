@@ -33,6 +33,7 @@ namespace DotNetify
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IHubPipeline _hubPipeline;
+      private DotNetifyHubContext _hubContext;
       private IPrincipal _principal;
 
       /// <summary>
@@ -104,7 +105,8 @@ namespace DotNetify
       {
          try
          {
-            _hubPipeline.RunMiddlewares(Context, nameof(Response_VM), vmId, vmData, ctx =>
+            _hubContext = new DotNetifyHubContext(Context, nameof(Response_VM), vmId, vmData, null, Principal);
+            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Response_VM(connectionId, ctx.VMId, ctx.Data as string);
                return Task.CompletedTask;
@@ -127,7 +129,8 @@ namespace DotNetify
       {
          try
          {
-            _hubPipeline.RunMiddlewares(Context, nameof(Request_VM), vmId, vmArg, ctx =>
+            _hubContext = new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmArg, null, Principal);
+            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
                VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
@@ -151,7 +154,8 @@ namespace DotNetify
       {
          try
          {
-            _hubPipeline.RunMiddlewares(Context, nameof(Update_VM), vmId, vmData, ctx =>
+            _hubContext = new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmData, null, Principal);
+            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
                VMController.OnUpdateVM(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
@@ -205,12 +209,14 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vm">View model instance.</param>
+      /// <param name="data">View model data.</param>
       /// <param name="vmArg">Optional view model argument.</param>
-      private void RunVMFilters(string callType, string vmId, BaseVM vm, object data, Action<object> vmAction)
+      private void RunVMFilters(BaseVM vm, object data, Action<object> vmAction)
       {
          try
          {
-            _hubPipeline.RunVMFilters(Context, callType, vmId, vm, data, Principal, ctx =>
+            _hubContext.Data = data;
+            _hubPipeline.RunVMFilters(_hubContext, vm, ctx =>
             {
                vmAction(ctx.HubContext.Data);
                return Task.CompletedTask;
@@ -225,12 +231,12 @@ namespace DotNetify
       /// <summary>
       /// Runs the filter before the view model is requested.
       /// </summary>
-      private void RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => RunVMFilters(nameof(Request_VM), vmId, vm, vmArg, vmAction);
+      private void RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => RunVMFilters(vm, vmArg, vmAction);
 
       /// <summary>
       /// Runs the filter before the view model is updated.
       /// </summary>
-      private void RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction) => RunVMFilters(nameof(Update_VM), vmId, vm, vmData, vmAction);
+      private void RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction) => RunVMFilters(vm, vmData, vmAction);
 
       /// <summary>
       /// Runs the filter before the view model respond to something.
@@ -239,7 +245,7 @@ namespace DotNetify
       {
          try
          {
-            RunVMFilters(nameof(Response_VM), vmId, vm, vmData, vmAction);
+            RunVMFilters(vm, vmData, vmAction);
          }
          catch(Exception ex)
          {

@@ -231,7 +231,7 @@ var AdminSecurePageView = (function (_React$Component4) {
       var bearerToken = accessToken ? "Bearer " + accessToken : null;
       var authHeader = bearerToken ? { Authorization: bearerToken } : {};
 
-      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: this.onException });
+      this.vm = dotnetify.react.connect("SecurePageVM.AdminVM", this, { headers: authHeader, exceptionHandler: this.onException });
    }
 
    _createClass(AdminSecurePageView, [{

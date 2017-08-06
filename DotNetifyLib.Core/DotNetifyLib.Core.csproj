@@ -4,12 +4,21 @@
     <VersionPrefix>2.0.0</VersionPrefix>
     <TargetFramework>netstandard1.6</TargetFramework>
     <AssemblyName>DotNetifyLib.Core</AssemblyName>
-    <PackageId>DotNetifyLib.Core</PackageId>
+    <PackageId>DotNetify.Core</PackageId>
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>2.2.0-pre</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>Simple, lightweight, yet powerful way to build real-time web apps. Library for .NET Core.</Description>
+    <Authors>Dicky Suryadi</Authors>
+    <PackageProjectUrl>http://dotnetify.net/</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/dsuryd/dotNetify/blob/master/LICENSE.md</PackageLicenseUrl>
+    <Copyright>Copyright 2015-</Copyright>
+    <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
+    <PackageTags>netcore realtime signalr mobile web websocket</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

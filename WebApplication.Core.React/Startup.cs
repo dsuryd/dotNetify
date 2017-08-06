@@ -38,9 +38,7 @@ namespace WebApplication.Core.React
          {
             string secretKey = "dotnetifydemo_secretkey_123!";
             var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
-
-            config.UseDeveloperLogging();
-            config.UseJwtBearerAuthentication(new TokenValidationParameters
+            var tokenValidationParameters = new TokenValidationParameters
             {
                IssuerSigningKey = signingKey,
                ValidAudience = "DotNetifyDemoApp",
@@ -49,9 +47,22 @@ namespace WebApplication.Core.React
                ValidateAudience = true,
                ValidateIssuer = true,
                ValidateLifetime = true
-            });
+            };
 
+            // Middleware to log incoming/outgoing message; default to Sytem.Diagnostic.Trace.
+            config.UseDeveloperLogging();
+
+            // Middleware to do authenticate token in incoming request headers.
+            config.UseJwtBearerAuthentication(tokenValidationParameters);
+
+            // Filter to check whether user has permission to access view models with [Authorize] attribute.
             config.UseFilter<AuthorizeFilter>();
+
+            // Demonstration middleware that extracts auth token from incoming request headers.
+            config.UseMiddleware<ExtractAccessTokenMiddleware>(tokenValidationParameters);
+
+            // Demonstration filter that passes access token from the middleware to the ViewModels.SecurePageVM class instance.
+            config.UseFilter<SetAccessTokenFilter>();
          });
 
          app.UseMvc(routes =>

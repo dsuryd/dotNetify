@@ -14,8 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-using Microsoft.AspNetCore.SignalR.Hubs;
+using System;
+using System.Collections.Generic;
 using System.Security.Principal;
+using Microsoft.AspNetCore.SignalR.Hubs;
 
 namespace DotNetify
 {
@@ -24,12 +26,15 @@ namespace DotNetify
    /// </summary>
    public class DotNetifyHubContext
    {
+      private Lazy<Dictionary<string, object>> _pipelineData = new Lazy<Dictionary<string, object>>();
+
       public HubCallerContext CallerContext { get; }
       public string CallType { get; }
       public string VMId { get; }
       public object Data { get; set; }
       public object Headers { get; set; }
       public IPrincipal Principal { get; set; }
+      public IDictionary<string, object> PipelineData => _pipelineData.Value;
 
       internal DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers, IPrincipal principal)
       {

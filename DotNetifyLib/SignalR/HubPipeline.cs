@@ -30,11 +30,11 @@ namespace DotNetify
    /// </summary>
    public interface IHubPipeline
    {
-      void RunMiddlewares(HubCallerContext context, string callType, string vmId, object data, NextDelegate finalAction);
+      void RunMiddlewares(DotNetifyHubContext hubContext, NextDelegate finalAction);
 
       void RunDisconnectionMiddlewares(HubCallerContext context);
 
-      void RunVMFilters(HubCallerContext context, string callType, string vmId, BaseVM vm, object data, IPrincipal principal, NextFilterDelegate finalFilter);
+      void RunVMFilters(DotNetifyHubContext hubContext, BaseVM vm, NextFilterDelegate finalFilter);
 
       Exception RunExceptionMiddleware(HubCallerContext context, Exception exception);
    }
@@ -66,19 +66,15 @@ namespace DotNetify
       /// <summary>
       /// Run the middlewares on the data.
       /// </summary>
-      /// <param name="callType">Call type: Request_VM, Update_VM or Response_VM.</param>
-      /// <param name="vmId">Identifies the view model.</param>
-      /// <param name="data">Call data.</param>
-      /// <param name="exceptionSent">Whether the exception should be sent to the client.</param>
-      /// <returns>Hub context data.</returns>
-      public void RunMiddlewares(HubCallerContext context, string callType, string vmId, object data, NextDelegate finalAction)
+      /// <param name="hubContext">Hub context.</param>
+      /// <param name="finalAction">The last action to do after running all the middlewares.</param>
+      public void RunMiddlewares(DotNetifyHubContext hubContext, NextDelegate finalAction)
       {
          var nextMiddlewares = new Stack<NextDelegate>();
          nextMiddlewares.Push(finalAction);
          foreach (IMiddleware middleware in GetMiddlewares<IMiddleware>().Reverse<IMiddlewarePipeline>())
             nextMiddlewares.Push(ctx => middleware.Invoke(ctx, nextMiddlewares.Pop()));
 
-         var hubContext = new DotNetifyHubContext(context, callType, vmId, data, null, context.User);
          if (nextMiddlewares.Count > 0)
             nextMiddlewares.Pop()(hubContext);
       }
@@ -121,11 +117,9 @@ namespace DotNetify
       /// <summary>
       /// Runs the view model filter.
       /// </summary>
-      /// <param name="callType">Call type: Request_VM, Update_VM or Response_VM.</param>
-      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="hubContext">Hub context.</param>
       /// <param name="vm">View model instance.</param>
-      /// <param name="data">Call data.</param>
-      public void RunVMFilters(HubCallerContext context, string callType, string vmId, BaseVM vm, object data, IPrincipal principal, NextFilterDelegate finalFilter)
+      public void RunVMFilters(DotNetifyHubContext hubContext, BaseVM vm, NextFilterDelegate finalFilter)
       {
          var nextFilters = new Stack<NextFilterDelegate>();
          nextFilters.Push(finalFilter);
@@ -143,7 +137,7 @@ namespace DotNetify
             }
          }
 
-         var vmContext = new VMContext(new DotNetifyHubContext(context, callType, vmId, data, null, principal), vm);
+         var vmContext = new VMContext(hubContext, vm);
          if (nextFilters.Count > 0)
             nextFilters.Pop()(vmContext);
       }

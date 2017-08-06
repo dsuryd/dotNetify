@@ -116,7 +116,7 @@ class AdminSecurePageView extends React.Component {
       let bearerToken = accessToken ? "Bearer " + accessToken : null;
       let authHeader = bearerToken ? { Authorization: bearerToken } : {};
 
-      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: this.onException });
+      this.vm = dotnetify.react.connect("SecurePageVM.AdminVM", this, { headers: authHeader, exceptionHandler: this.onException });
    }
    componentWillUnmount() {
       this.vm.$destroy();
