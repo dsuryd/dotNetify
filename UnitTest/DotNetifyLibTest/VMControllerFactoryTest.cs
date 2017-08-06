@@ -12,7 +12,7 @@ namespace UnitTest
       {
          var id1 = "1";
          var id2 = "2";
-         var factory = new ServiceProvider().GetService<IVMControllerFactory>();
+         var factory = new VMControllerFactory(new MemoryCacheAdapter());
          factory.ResponseDelegate = (string connectionId, string vmId, string vmData) => { };
 
          Assert.IsNotNull(factory as IVMControllerFactory);

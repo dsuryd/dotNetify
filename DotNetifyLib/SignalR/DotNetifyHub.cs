@@ -67,9 +67,9 @@ namespace DotNetify
       /// Default constructor.
       /// </summary>
       public DotNetifyHub() : this(
-         ServiceProvider.Get<IVMControllerFactory>(),
-         ServiceProvider.Get<IPrincipalAccessor>(),
-         ServiceProvider.Get<IHubPipeline>()
+         ActivatorUtilities.ServiceProvider.GetService<IVMControllerFactory>(),
+         ActivatorUtilities.ServiceProvider.GetService<IPrincipalAccessor>(),
+         ActivatorUtilities.ServiceProvider.GetService<IHubPipeline>()
          )
       {
       }
