@@ -56,8 +56,9 @@ namespace DotNetify.Security
             var headers = ParseHeaders<HeaderData>(hubContext.Headers);
             if (headers?.Authorization?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
             {
+               SecurityToken validatedToken;
                var token = headers.Authorization.Substring("Bearer ".Length).Trim();
-               hubContext.Principal = new JwtSecurityTokenHandler().ValidateToken(token, _tokenValidationParameters, out SecurityToken validatedToken);
+               hubContext.Principal = new JwtSecurityTokenHandler().ValidateToken(token, _tokenValidationParameters, out validatedToken);
             }
          }
          catch (Exception ex)
