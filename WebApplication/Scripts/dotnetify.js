@@ -135,7 +135,7 @@ var dotNetify = {};
 
    dotnetify = $.extend(dotnetify,
    {
-      version: "1.1.3",
+      version: "1.1.4",
       hub: null,
 
       // Debug mode.
