@@ -65,10 +65,10 @@ class LoginForm extends React.Component {
                </div> :
                <div>
                   <h3>Sign in</h3>
-                  <p>
+                  <div>
                      <TextField id="UserName" floatingLabelText="User name" value={this.state.username} onChange={handleUserNameChange} errorText={this.props.errorText} /><br />
                      <TextField id="Password" floatingLabelText="Password" value={this.state.password} onChange={handlePasswordChange} errorText={this.props.errorText} />
-                  </p>
+                  </div>
                   <RaisedButton label="Submit" primary={true} onClick={handleSubmit} />
                </div>
             }
@@ -101,8 +101,32 @@ class SecurePageView extends React.Component {
             <div>{this.state.SecureCaption ? "Authenticated" : "Not authenticated"}</div>
             <h4>{this.state.SecureCaption}</h4>
             <div>{this.state.SecureData}</div>
+            <AdminSecurePageView />
          </div>
       );
+   }
+}
+
+class AdminSecurePageView extends React.Component {
+   constructor(props) {
+      super(props);
+      this.state = { AdminCaption: null };
+
+      let accessToken = window.sessionStorage.getItem("access_token");
+      let bearerToken = accessToken ? "Bearer " + accessToken : null;
+      let authHeader = bearerToken ? { Authorization: bearerToken } : {};
+
+      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: this.onException });
+   }
+   componentWillUnmount() {
+      this.vm.$destroy();
+   }
+   onException(exception) {
+      console.error(exception.message);
+   }
+   render() {
+      const adminCaption = this.state.AdminCaption ? <h3>{this.state.AdminCaption}</h3> : <span />;
+      return <div>{adminCaption}</div>;
    }
 }
 

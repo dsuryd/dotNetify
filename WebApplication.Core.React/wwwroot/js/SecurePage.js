@@ -143,7 +143,7 @@ var LoginForm = (function (_React$Component2) {
                   'Sign in'
                ),
                React.createElement(
-                  'p',
+                  'div',
                   null,
                   React.createElement(TextField, { id: 'UserName', floatingLabelText: 'User name', value: this.state.username, onChange: handleUserNameChange, errorText: this.props.errorText }),
                   React.createElement('br', null),
@@ -209,11 +209,57 @@ var SecurePageView = (function (_React$Component3) {
                'div',
                null,
                this.state.SecureData
-            )
+            ),
+            React.createElement(AdminSecurePageView, null)
          );
       }
    }]);
 
    return SecurePageView;
+})(React.Component);
+
+var AdminSecurePageView = (function (_React$Component4) {
+   _inherits(AdminSecurePageView, _React$Component4);
+
+   function AdminSecurePageView(props) {
+      _classCallCheck(this, AdminSecurePageView);
+
+      _get(Object.getPrototypeOf(AdminSecurePageView.prototype), 'constructor', this).call(this, props);
+      this.state = { AdminCaption: null };
+
+      var accessToken = window.sessionStorage.getItem("access_token");
+      var bearerToken = accessToken ? "Bearer " + accessToken : null;
+      var authHeader = bearerToken ? { Authorization: bearerToken } : {};
+
+      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: this.onException });
+   }
+
+   _createClass(AdminSecurePageView, [{
+      key: 'componentWillUnmount',
+      value: function componentWillUnmount() {
+         this.vm.$destroy();
+      }
+   }, {
+      key: 'onException',
+      value: function onException(exception) {
+         console.error(exception.message);
+      }
+   }, {
+      key: 'render',
+      value: function render() {
+         var adminCaption = this.state.AdminCaption ? React.createElement(
+            'h3',
+            null,
+            this.state.AdminCaption
+         ) : React.createElement('span', null);
+         return React.createElement(
+            'div',
+            null,
+            adminCaption
+         );
+      }
+   }]);
+
+   return AdminSecurePageView;
 })(React.Component);
 

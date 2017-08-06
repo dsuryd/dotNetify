@@ -2,6 +2,7 @@
 using DotNetify;
 using DotNetify.Security;
 using System.Threading;
+using System.Security.Claims;
 
 namespace ViewModels
 {
@@ -28,5 +29,12 @@ namespace ViewModels
       }
 
       public override void Dispose() => _timer.Dispose();
+   }
+
+   [Authorize("admin")]
+   [Authorize(ClaimsIdentity.DefaultRoleClaimType, "admin")]
+   public class AdminSecurePageVM : BaseVM
+   {
+      public string AdminCaption => "Only Admin role can see this";
    }
 }
