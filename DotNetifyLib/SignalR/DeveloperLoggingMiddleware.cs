@@ -17,7 +17,7 @@ limitations under the License.
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR.Hubs;
+using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
 
 namespace DotNetify
