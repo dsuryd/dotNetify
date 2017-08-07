@@ -55,7 +55,8 @@ namespace DotNetify.Security
          ClaimsPrincipal principal = null;
          try
          {
-            principal = ValidateBearerToken(ParseHeaders<HeaderData>(hubContext.Headers), out SecurityToken validatedToken);
+            SecurityToken validatedToken;
+            principal = ValidateBearerToken(ParseHeaders<HeaderData>(hubContext.Headers), out validatedToken);
          }
          catch (Exception ex)
          {
