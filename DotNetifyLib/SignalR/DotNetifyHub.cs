@@ -84,7 +84,7 @@ namespace DotNetify
       public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IHubPipeline hubPipeline)
       {
          _vmControllerFactory = vmControllerFactory;
-         _vmControllerFactory.ResponseDelegate = SendResponse;
+         _vmControllerFactory.ResponseDelegate = Response_VM;
          _principalAccessor = principalAccessor;
          _hubPipeline = hubPipeline;
       }
@@ -104,29 +104,6 @@ namespace DotNetify
          _hubPipeline.RunDisconnectionMiddlewares(Context);
 
          return base.OnDisconnected(stopCalled);
-      }
-
-      /// <summary>
-      /// This method is called by the VMManager to send response back to browser clients.
-      /// </summary>
-      /// <param name="connectionId">Identifies the browser client making prior request.</param>
-      /// <param name="vmId">Identifies the view model.</param>
-      /// <param name="vmData">View model data in serialized JSON.</param>
-      public void SendResponse(string connectionId, string vmId, string vmData)
-      {
-         try
-         {
-            _hubContext = new DotNetifyHubContext(Context, nameof(Response_VM), vmId, vmData, null, Principal);
-            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
-            {
-               Response_VM(connectionId, ctx.VMId, ctx.Data as string);
-               return Task.CompletedTask;
-            });
-         }
-         catch (Exception ex)
-         {
-            _hubPipeline.RunExceptionMiddleware(Context, ex);
-         }
       }
 
       #region Client Requests
@@ -256,11 +233,19 @@ namespace DotNetify
       {
          try
          {
-            RunVMFilters(vm, vmData, vmAction);
+            _hubContext = new DotNetifyHubContext(Context, nameof(Response_VM), vmId, vmData, null, Principal);
+            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
+            {
+               Principal = ctx.Principal;
+               RunVMFilters(vm, vmData, vmAction);
+               return Task.CompletedTask;
+            });
          }
          catch (Exception ex)
          {
-            _hubPipeline.RunExceptionMiddleware(Context, ex);
+            var finalEx = _hubPipeline.RunExceptionMiddleware(Context, ex);
+            if (finalEx is OperationCanceledException == false)
+               Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
 

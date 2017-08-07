@@ -48,11 +48,7 @@ namespace DotNetify.Security
       /// <param name="context">DotNetify hub context.</param>
       /// <param name="next">Next middleware delegate.</param>
       public Task Invoke(DotNetifyHubContext context, NextDelegate next)
-      {
-         // Only extract headers from incoming requests.
-         if (context.CallType == nameof(DotNetifyHub.Response_VM))
-            return next(context);
-         
+      {       
          // Set initial headers from previously cached headers.
          context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
 

@@ -1,4 +1,5 @@
-﻿using DotNetify.Security;
+﻿using System;
+using DotNetify.Security;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 
@@ -12,9 +13,15 @@ namespace DotNetify
       {
          if (hubContext.CallType == nameof(DotNetifyHub.Request_VM))
          {
-            ValidateBearerToken(ParseHeaders<HeaderData>(hubContext.Headers), out SecurityToken validatedToken);
-            if (validatedToken != null)
-               hubContext.PipelineData.Add("AccessToken", validatedToken);
+            try
+            {
+               ValidateBearerToken(ParseHeaders<HeaderData>(hubContext.Headers), out SecurityToken validatedToken);
+               if (validatedToken != null)
+                  hubContext.PipelineData.Add("AccessToken", validatedToken);
+            }
+            catch (Exception)
+            {
+            }
          }
 
          return next(hubContext);

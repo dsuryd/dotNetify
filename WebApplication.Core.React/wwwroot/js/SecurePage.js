@@ -15,8 +15,7 @@ var SecurePage = (function (_React$Component) {
       _classCallCheck(this, SecurePage);
 
       _get(Object.getPrototypeOf(SecurePage.prototype), 'constructor', this).call(this, props);
-      var hasAccessToken = window.sessionStorage.getItem("access_token") != null;
-      this.state = { loginError: null, authenticated: hasAccessToken };
+      this.state = { loginError: null, accessToken: window.sessionStorage.getItem("access_token") };
    }
 
    _createClass(SecurePage, [{
@@ -32,7 +31,7 @@ var SecurePage = (function (_React$Component) {
             return response.json();
          }).then(function (token) {
             window.sessionStorage.setItem("access_token", token.access_token);
-            _this.setState({ loginError: null, authenticated: true });
+            _this.setState({ loginError: null, accessToken: token.access_token });
          })['catch'](function (error) {
             return _this.setState({ loginError: "Invalid user name or password" });
          });
@@ -41,7 +40,7 @@ var SecurePage = (function (_React$Component) {
       key: 'signOut',
       value: function signOut() {
          window.sessionStorage.clear();
-         this.setState({ authenticated: false });
+         this.setState({ accessToken: null });
       }
    }, {
       key: 'render',
@@ -52,6 +51,9 @@ var SecurePage = (function (_React$Component) {
             return _this2.signIn(info.username, info.password);
          };
          var handleSignOut = function handleSignOut() {
+            return _this2.signOut();
+         };
+         var handleExpiredAccess = function handleExpiredAccess() {
             return _this2.signOut();
          };
          return React.createElement(
@@ -66,25 +68,22 @@ var SecurePage = (function (_React$Component) {
                   React.createElement(
                      'h3',
                      null,
-                     'Example: Secure Page *** UNDER CONSTRUCTION ***'
+                     'Example: Secure Page'
                   )
                ),
                React.createElement(
                   'div',
-                  { className: 'row' },
-                  React.createElement(
+                  null,
+                  React.createElement(LoginForm, {
+                     onSubmit: handleSubmit,
+                     onSignOut: handleSignOut,
+                     errorText: this.state.loginError,
+                     authenticated: this.state.accessToken != null }),
+                  React.createElement('br', null),
+                  this.state.accessToken != null ? React.createElement(SecurePageView, { accessToken: this.state.accessToken, onExpiredAccess: handleExpiredAccess }) : React.createElement(
                      'div',
-                     { className: 'col-md-6' },
-                     React.createElement(LoginForm, { onSubmit: handleSubmit, onSignOut: handleSignOut, errorText: this.state.loginError, authenticated: this.state.authenticated })
-                  ),
-                  React.createElement(
-                     'div',
-                     { className: 'col-md-6' },
-                     this.state.authenticated ? React.createElement(SecurePageView, { authenticated: true }) : React.createElement(
-                        'div',
-                        null,
-                        React.createElement(SecurePageView, null)
-                     )
+                     null,
+                     React.createElement(SecurePageView, null)
                   )
                )
             )
@@ -102,7 +101,7 @@ var LoginForm = (function (_React$Component2) {
       _classCallCheck(this, LoginForm);
 
       _get(Object.getPrototypeOf(LoginForm.prototype), 'constructor', this).call(this, props);
-      this.state = { username: "guest", password: "dotnetify" };
+      this.state = { username: "", password: "dotnetify" };
    }
 
    _createClass(LoginForm, [{
@@ -123,17 +122,12 @@ var LoginForm = (function (_React$Component2) {
             return _this3.props.onSignOut();
          };
          return React.createElement(
-            'div',
-            { className: 'jumbotron' },
+            Paper,
+            { zDepth: 1, style: { padding: "2em", backgroundColor: '#f6f6f6' } },
             this.props.authenticated ? React.createElement(
                'div',
                null,
-               React.createElement(
-                  'h3',
-                  null,
-                  'Signed in'
-               ),
-               React.createElement(RaisedButton, { label: 'Sign out', primary: true, onClick: handleSignOut })
+               React.createElement(RaisedButton, { label: 'Sign out', secondary: true, onClick: handleSignOut })
             ) : React.createElement(
                'div',
                null,
@@ -145,7 +139,7 @@ var LoginForm = (function (_React$Component2) {
                React.createElement(
                   'div',
                   null,
-                  React.createElement(TextField, { id: 'UserName', floatingLabelText: 'User name', value: this.state.username, onChange: handleUserNameChange, errorText: this.props.errorText }),
+                  React.createElement(TextField, { id: 'UserName', floatingLabelText: 'User name', value: this.state.username, onChange: handleUserNameChange, errorText: this.props.errorText, floatingLabelFixed: true, hintText: 'Type guest or admin' }),
                   React.createElement('br', null),
                   React.createElement(TextField, { id: 'Password', floatingLabelText: 'Password', value: this.state.password, onChange: handlePasswordChange, errorText: this.props.errorText })
                ),
@@ -162,16 +156,19 @@ var SecurePageView = (function (_React$Component3) {
    _inherits(SecurePageView, _React$Component3);
 
    function SecurePageView(props) {
+      var _this4 = this;
+
       _classCallCheck(this, SecurePageView);
 
       _get(Object.getPrototypeOf(SecurePageView.prototype), 'constructor', this).call(this, props);
-      this.state = { SecureCaption: null, SecureData: null };
+      this.state = { SecureCaption: "Not authenticated" };
 
-      var accessToken = window.sessionStorage.getItem("access_token");
-      var bearerToken = accessToken ? "Bearer " + accessToken : null;
+      var bearerToken = this.props.accessToken ? "Bearer " + this.props.accessToken : null;
       var authHeader = bearerToken ? { Authorization: bearerToken } : {};
 
-      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: this.onException });
+      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: function exceptionHandler(ex) {
+            return _this4.onException(ex);
+         } });
    }
 
    _createClass(SecurePageView, [{
@@ -182,24 +179,19 @@ var SecurePageView = (function (_React$Component3) {
    }, {
       key: 'onException',
       value: function onException(exception) {
-         console.error(exception.message);
+         if (exception.name == "UnauthorizedAccessException" && this.props.onExpiredAccess) this.props.onExpiredAccess();
       }
    }, {
       key: 'render',
       value: function render() {
+         var _this5 = this;
+
+         var handleExpiredAccess = function handleExpiredAccess() {
+            return _this5.props.onExpiredAccess && _this5.props.onExpiredAccess();
+         };
          return React.createElement(
-            'div',
-            { className: 'jumbotron' },
-            React.createElement(
-               'h3',
-               null,
-               'Secure View'
-            ),
-            React.createElement(
-               'div',
-               null,
-               this.state.SecureCaption ? "Authenticated" : "Not authenticated"
-            ),
+            Paper,
+            { style: { padding: "2em" } },
             React.createElement(
                'h4',
                null,
@@ -210,7 +202,7 @@ var SecurePageView = (function (_React$Component3) {
                null,
                this.state.SecureData
             ),
-            React.createElement(AdminSecurePageView, null)
+            React.createElement(AdminSecurePageView, { accessToken: this.props.accessToken, onExpiredAccess: handleExpiredAccess })
          );
       }
    }]);
@@ -225,13 +217,12 @@ var AdminSecurePageView = (function (_React$Component4) {
       _classCallCheck(this, AdminSecurePageView);
 
       _get(Object.getPrototypeOf(AdminSecurePageView.prototype), 'constructor', this).call(this, props);
-      this.state = { AdminCaption: null };
+      this.state = {};
 
-      var accessToken = window.sessionStorage.getItem("access_token");
-      var bearerToken = accessToken ? "Bearer " + accessToken : null;
+      var bearerToken = this.props.accessToken ? "Bearer " + this.props.accessToken : null;
       var authHeader = bearerToken ? { Authorization: bearerToken } : {};
 
-      this.vm = dotnetify.react.connect("SecurePageVM.AdminVM", this, { headers: authHeader, exceptionHandler: this.onException });
+      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: function exceptionHandler(ex) {} });
    }
 
    _createClass(AdminSecurePageView, [{
@@ -240,22 +231,26 @@ var AdminSecurePageView = (function (_React$Component4) {
          this.vm.$destroy();
       }
    }, {
-      key: 'onException',
-      value: function onException(exception) {
-         console.error(exception.message);
-      }
-   }, {
       key: 'render',
       value: function render() {
-         var adminCaption = this.state.AdminCaption ? React.createElement(
-            'h3',
-            null,
-            this.state.AdminCaption
-         ) : React.createElement('span', null);
-         return React.createElement(
+         return !this.state.TokenIssuer ? null : React.createElement(
             'div',
             null,
-            adminCaption
+            React.createElement('br', null),
+            React.createElement(
+               'h4',
+               null,
+               'Admin-only view:'
+            ),
+            React.createElement(
+               'div',
+               null,
+               this.state.TokenIssuer,
+               React.createElement('br', null),
+               this.state.TokenValidFrom,
+               React.createElement('br', null),
+               this.state.TokenValidTo
+            )
          );
       }
    }]);

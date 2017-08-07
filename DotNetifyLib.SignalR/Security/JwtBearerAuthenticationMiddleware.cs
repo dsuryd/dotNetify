@@ -52,16 +52,17 @@ namespace DotNetify.Security
       /// <param name="next">Next middleware delegate.</param>
       public virtual Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
+         ClaimsPrincipal principal = null;
          try
          {
-            var principal = ValidateBearerToken(ParseHeaders<HeaderData>(hubContext.Headers), out SecurityToken validatedToken);
-            hubContext.Principal = principal ?? hubContext.Principal;
+            principal = ValidateBearerToken(ParseHeaders<HeaderData>(hubContext.Headers), out SecurityToken validatedToken);
          }
          catch (Exception ex)
          {
             Trace.WriteLine(ex.Message);
          }
 
+         hubContext.Principal = principal ?? hubContext.CallerContext.User;
          return next(hubContext);
       }
 

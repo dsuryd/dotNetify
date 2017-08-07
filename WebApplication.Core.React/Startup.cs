@@ -46,7 +46,8 @@ namespace WebApplication.Core.React
                ValidateIssuerSigningKey = true,
                ValidateAudience = true,
                ValidateIssuer = true,
-               ValidateLifetime = true
+               ValidateLifetime = true,
+               ClockSkew = TimeSpan.FromSeconds(0)
             };
 
             // Middleware to log incoming/outgoing message; default to Sytem.Diagnostic.Trace.

@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,7 +29,7 @@ namespace DotNetify.Security
    /// </summary>
    public class JwtBearerAuthenticationMiddleware : IMiddleware
    {
-      private class HeaderData
+      protected class HeaderData
       {
          public string Authorization { get; set; }
       }
@@ -49,24 +50,37 @@ namespace DotNetify.Security
       /// </summary>
       /// <param name="hubContext">DotNetify hub context.</param>
       /// <param name="next">Next middleware delegate.</param>
-      public Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
+      public virtual Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
+         ClaimsPrincipal principal = null;
          try
          {
-            var headers = ParseHeaders<HeaderData>(hubContext.Headers);
-            if (headers?.Authorization?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
-            {
-               SecurityToken validatedToken;
-               var token = headers.Authorization.Substring("Bearer ".Length).Trim();
-               hubContext.Principal = new JwtSecurityTokenHandler().ValidateToken(token, _tokenValidationParameters, out validatedToken);
-            }
+            principal = ValidateBearerToken(ParseHeaders<HeaderData>(hubContext.Headers), out SecurityToken validatedToken);
          }
          catch (Exception ex)
          {
             Trace.WriteLine(ex.Message);
          }
 
+         hubContext.Principal = principal ?? hubContext.CallerContext.User;
          return next(hubContext);
+      }
+
+      /// <summary>
+      /// Validates the bearer token inside the Authorization header.
+      /// </summary>
+      /// <param name="headers">Headers data.</param>
+      /// <param name="validatedToken">Validated bearer token.</param>
+      /// <returns>Claims principal from the token.</returns>
+      protected ClaimsPrincipal ValidateBearerToken(HeaderData headers, out SecurityToken validatedToken)
+      {
+         validatedToken = null;
+         if (headers?.Authorization?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
+         {
+            var token = headers.Authorization.Substring("Bearer ".Length).Trim();
+            return new JwtSecurityTokenHandler().ValidateToken(token, _tokenValidationParameters, out validatedToken);
+         }
+         return null;
       }
 
       /// <summary>
@@ -74,7 +88,7 @@ namespace DotNetify.Security
       /// </summary>
       /// <param name="headers">Headers in JSON or null.</param>
       /// <returns>Headers object.</returns>
-      private T ParseHeaders<T>(object headers) => headers is JObject ? (headers as JObject).ToObject<T>() : default(T);
+      protected T ParseHeaders<T>(object headers) => headers is JObject ? (headers as JObject).ToObject<T>() : default(T);
    }
 
    /// <summary>

@@ -30,7 +30,7 @@ namespace ViewModels
          new Link { Route = this.GetRoute("CompositeView"), Caption = "Composite View", Description = "Building modular app through composition" },
          new Link { Route = this.GetRoute("LiveChart"), Caption = "Live Chart", Description = "Real-time made easy"  },
          new Link { Route = this.GetRoute("BookStore"), Caption = "Book Store", Description = "SPA routing with deep-linking"  },
-         new Link { Route = this.GetRoute("SecurePage"), Caption = "Secure Page", Description = "Authentication and authorization"  },
+         new Link { Route = this.GetRoute("SecurePage"), Caption = "Secure Page", Description = "JWT authentication and claims-based authorization"  },
       };
 
       public IndexVM()
