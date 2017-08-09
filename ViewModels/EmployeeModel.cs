@@ -39,7 +39,11 @@ namespace ViewModels
       protected int _newId = 100;
       protected int? _numRecords;
 
-      public EmployeeModel(int? numRecords = null)
+      public EmployeeModel()
+      {
+      }
+
+      public EmployeeModel(int numRecords)
       {
          _numRecords = numRecords;
       }

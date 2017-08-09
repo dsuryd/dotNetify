@@ -17,14 +17,12 @@ namespace WebApplication
          // implementation of IServiceProvider.
          var provider = new TinyIoCServiceProvider();
          provider
-            .AddScoped(arg => new SimpleListVM(new EmployeeModel(7)))
-            .AddScoped(arg => new BetterListVM(new EmployeeModel(7)))
-            .AddScoped(arg => new EmployeeModel())
-            .AddScoped<AFITop100Model>()
-            .AddScoped<AFITop100VM>()
-            .AddScoped<TreeViewVM>()
-            .AddScoped<GridViewVM>()
-            .AddScoped<CompositeViewVM>();
+            .AddTransient<EmployeeModel>()
+            .AddTransient<AFITop100Model>()
+            .AddTransient<AFITop100VM>()
+            .AddTransient<TreeViewVM>()
+            .AddTransient<GridViewVM>()
+            .AddTransient<CompositeViewVM>();
          
          app.MapSignalR();
          app.UseDotNetify(config =>
@@ -32,6 +30,18 @@ namespace WebApplication
             // Register the DEMO assembly "ViewModels". All subclasses of DotNetify.BaseVM 
             // inside that assembly will be known as view models.
             config.RegisterAssembly("ViewModels");
+
+            // Override default factory method to provide custom objects.
+            config.SetFactoryMethod((type, args) =>
+            {
+               if (type == typeof(SimpleListVM))
+                  return new SimpleListVM(new EmployeeModel(7));
+               else if (type == typeof(BetterListVM))
+                  return new BetterListVM(new EmployeeModel(7));
+
+               return ActivatorUtilities.CreateInstance(provider, type, args);
+            });
+
          }, provider);
       }
    }
