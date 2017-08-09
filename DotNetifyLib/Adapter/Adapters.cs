@@ -105,7 +105,7 @@ namespace DotNetify
 
       public void Set<T>(string key, T cachedValue, MemoryCacheEntryOptions options = null) where T : class
       {
-         _cache.AddOrGetExisting(key, cachedValue, options?.GetCacheItemPolicy());
+         _cache.Set(key, cachedValue, options?.GetCacheItemPolicy());
       }
 
       public void Remove(string key) => _cache.Remove(key);

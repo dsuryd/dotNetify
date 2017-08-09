@@ -31,7 +31,7 @@ namespace DotNetify
 
       public IServiceCollection AddSingleton<TInterface>(Func<object, TInterface> factory) where TInterface : class
       {
-         TinyIoCContainer.Current.Register((TInterface)factory(null));
+         TinyIoCContainer.Current.Register(factory(null));
          return this;
       }
 
@@ -41,24 +41,26 @@ namespace DotNetify
          return this;
       }
 
-      public IServiceCollection AddScoped<TInterface, TImpl>()
-         where TInterface : class
-         where TImpl : class, TInterface
+      public IServiceCollection AddTransient<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface
       {
          TinyIoCContainer.Current.Register<TInterface, TImpl>().AsMultiInstance();
          return this;
       }
 
-      public IServiceCollection AddScoped<TInterface>(Func<object, TInterface> factory) where TInterface : class
-      {
-         TinyIoCContainer.Current.Register((TInterface)factory(null));
-         return this;
-      }
-
-      public IServiceCollection AddScoped<TImpl>() where TImpl : class
+      public IServiceCollection AddTransient<TImpl>() where TImpl : class
       {
          TinyIoCContainer.Current.Register<TImpl>().AsMultiInstance();
          return this;
+      }
+
+      public virtual IServiceCollection AddScoped<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface
+      {
+         throw new NotImplementedException();
+      }
+
+      public virtual IServiceCollection AddScoped<TImpl>() where TImpl : class
+      {
+         throw new NotImplementedException();
       }
 
       public T GetService<T>() where T : class => TinyIoCContainer.Current.Resolve<T>();

@@ -23,8 +23,11 @@ namespace DotNetify
       IServiceCollection AddSingleton<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface;
       IServiceCollection AddSingleton<TInterface>(Func<object, TInterface> factory) where TInterface : class;
       IServiceCollection AddSingleton<TImpl>() where TImpl: class;
+
+      IServiceCollection AddTransient<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface;
+      IServiceCollection AddTransient<TImpl>() where TImpl : class;
+
       IServiceCollection AddScoped<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface;
-      IServiceCollection AddScoped<TInterface>(Func<object, TInterface> factory) where TInterface : class;
       IServiceCollection AddScoped<TImpl>() where TImpl : class;
    }
 
@@ -42,7 +45,10 @@ namespace DotNetify
       {
          try
          {
-            return provider.GetService(type) ?? Activator.CreateInstance(type, args);
+            object instance = null;
+            if (args?.Length > 0)
+               instance = Activator.CreateInstance(type, args);
+            return instance ?? provider.GetService(type);
          }
          catch(Exception)
          {

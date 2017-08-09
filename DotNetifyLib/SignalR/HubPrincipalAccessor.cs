@@ -5,6 +5,6 @@ namespace DotNetify
 {
     internal class HubPrincipalAccessor : IPrincipalAccessor
     {
-      public IPrincipal Principal { get; set; }
+      public IPrincipal Principal { get; set; } = System.Threading.Thread.CurrentPrincipal;
     }
 }
