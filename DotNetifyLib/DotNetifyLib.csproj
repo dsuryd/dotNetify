@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Adapter\IServiceProvider.cs" />
     <Compile Include="Adapter\TinyIoCServiceProvider.cs" />
+    <Compile Include="Adapter\TinyIoCThreadScopeExtensions.cs" />
     <Compile Include="SignalR\DeveloperLoggingMiddleware.cs" />
     <Compile Include="SignalR\Extensions\AppBuilderExtensions.cs" />
     <Compile Include="BaseVM.CRUDExtension.cs" />

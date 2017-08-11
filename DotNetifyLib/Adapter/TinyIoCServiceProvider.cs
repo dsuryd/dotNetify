@@ -55,12 +55,14 @@ namespace DotNetify
 
       public virtual IServiceCollection AddScoped<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface
       {
-         throw new NotImplementedException();
+         TinyIoCContainer.Current.Register<TInterface, TImpl>().AsPerThread();
+         return this;
       }
 
       public virtual IServiceCollection AddScoped<TImpl>() where TImpl : class
       {
-         throw new NotImplementedException();
+         TinyIoCContainer.Current.Register<TImpl>().AsPerThread();
+         return this;
       }
 
       public T GetService<T>() where T : class => TinyIoCContainer.Current.Resolve<T>();

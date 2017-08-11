@@ -92,6 +92,8 @@ namespace DotNetify
    {
       private MemoryCache _cache = new MemoryCache("DotNetify");
 
+      public event EventHandler<string> Removed;
+
       public bool TryGetValue<T>(string key, out T cachedValue) where T : class
       {
          cachedValue = null;
@@ -108,6 +110,10 @@ namespace DotNetify
          _cache.Set(key, cachedValue, options?.GetCacheItemPolicy());
       }
 
-      public void Remove(string key) => _cache.Remove(key);
+      public void Remove(string key)
+      {
+         _cache.Remove(key);
+         Removed?.Invoke(this, key);
+      }
    }
 }
