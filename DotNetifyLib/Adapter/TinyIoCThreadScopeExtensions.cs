@@ -20,7 +20,7 @@ using TinyIoC;
 
 namespace DotNetify
 {
-   public static class TinyIoCSignalRExtensions
+   public static class TinyIoThreadScopeExtensions
    {
       public class ThreadLifetimeProvider : TinyIoCContainer.ITinyIoCObjectLifetimeProvider
       {
