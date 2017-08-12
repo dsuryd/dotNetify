@@ -52,3 +52,7 @@ IconPhone = require("material-ui/svg-icons/communication/phone").default;
 // Used by Material-UI.
 injectTapEventPlugin = require( "react-tap-event-plugin" );
 injectTapEventPlugin();
+
+// IE polyfill for promise/fetch.
+window.Promise = require("promise-polyfill");
+require("whatwg-fetch");

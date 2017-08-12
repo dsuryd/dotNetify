@@ -226,7 +226,7 @@ limitations under the License.
 
       // Add plugin functions.
       dotnetify.react.router = {
-         version: "1.0.2-beta",
+         version: "1.0.3-beta",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -358,7 +358,17 @@ limitations under the License.
                   equal: function (iStr1, iStr2) { return iStr1 != null && iStr2 != null && iStr1.toLowerCase() == iStr2.toLowerCase() },
                   // Whether the string starts or ends with a value.
                   startsWith: function (iStr, iValue) { return iStr.toLowerCase().slice(0, iValue.length) == iValue.toLowerCase() },
-                  endsWith: function (iStr, iValue) { return iValue == '' || iStr.toLowerCase().slice(-iValue.length) == iValue.toLowerCase(); }
+                  endsWith: function (iStr, iValue) { return iValue == '' || iStr.toLowerCase().slice(-iValue.length) == iValue.toLowerCase(); },
+                  // Dispatch event with IE polyfill.
+                  dispatchEvent: function (iEvent) {
+                     if (typeof Event === "function")
+                        window.dispatchEvent(new Event(iEvent));
+                     else {
+                        var event = document.createEvent("CustomEvent");
+                        event.initEvent(iEvent, true, true);
+                        window.dispatchEvent(event);
+                     }
+                  }
                }
             })();
 
@@ -489,7 +499,7 @@ limitations under the License.
                   if (dotnetify.react.router.urlPath == "" || force == true) {
                      if (dotnetify.debug)
                         console.log("router> routed");
-                     window.dispatchEvent(new Event('dotnetify.routed'));
+                     utils.dispatchEvent("dotnetify.routed");
                   }
                }.bind(iScope),
 

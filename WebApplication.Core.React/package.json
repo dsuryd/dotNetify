@@ -7,7 +7,7 @@
       "bootstrap": "^3.3.7",
       "react": "^15.4.2",
       "react-dom": "^15.4.2",
-      "signalr": "^2.2.1",
+      "signalr": "^2.2.2",
       "material-ui": "^0.16.7",
       "react-tap-event-plugin": "^2.0.1",
       "chart.js": "1.1.1",
@@ -15,6 +15,8 @@
    },
    "devDependencies": {
       "webpack": "^2.2.1",
-      "webpack-uglify-js-plugin": "^1.1.9"
+      "webpack-uglify-js-plugin": "^1.1.9",
+      "promise-polyfill":  "^6.0.2",
+      "whatwg-fetch": "^2.0.3"
    }
 }
