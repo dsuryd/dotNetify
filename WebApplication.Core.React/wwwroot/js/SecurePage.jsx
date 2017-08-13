@@ -6,7 +6,7 @@
    signIn(username, password) {
       var form = new FormData();
       form.append('username', username);
-      form.append('password', password);
+      form.append('password', password); // Demo only; don't submit clear text pwd in prod code!
       fetch('http://localhost:52000/token', { method: 'post', body: form })
          .then(response => {
             if (!response.ok) throw Error(response.statusText);
@@ -23,9 +23,9 @@
       this.setState({ accessToken: null });
    }
    render() {
-      let handleSubmit = info => this.signIn(info.username, info.password);
-      let handleSignOut = () => this.signOut();
-      let handleExpiredAccess = () => this.signOut();
+      const handleSubmit = info => this.signIn(info.username, info.password);
+      const handleSignOut = () => this.signOut();
+      const handleExpiredAccess = () => this.signOut();
       return (
          <MuiThemeProvider>
             <div className="container-fluid">
@@ -55,10 +55,10 @@ class LoginForm extends React.Component {
       this.state = { username: "", password: "dotnetify" };
    }
    render() {
-      let handleUserNameChange = event => this.setState({ username: event.target.value });
-      let handlePasswordChange = event => this.setState({ password: event.target.value });
-      let handleSubmit = () => this.props.onSubmit(this.state);
-      let handleSignOut = () => this.props.onSignOut();
+      const handleUserNameChange = event => this.setState({ username: event.target.value });
+      const handlePasswordChange = event => this.setState({ password: event.target.value });
+      const handleSubmit = () => this.props.onSubmit(this.state);
+      const handleSignOut = () => this.props.onSignOut();
       return (
          <Paper zDepth={1} style={{ padding: "2em", backgroundColor: '#f6f6f6' }}>
             {this.props.authenticated ?
@@ -93,11 +93,11 @@ class SecurePageView extends React.Component {
       this.vm.$destroy();
    }
    onException(exception) {
-      if (exception.name == "UnauthorizedAccessException" && this.props.onExpiredAccess)
+      if (exception.name == "UnauthorizedAccessException")
          this.props.onExpiredAccess();
    }
    render() {
-      let handleExpiredAccess = () => this.props.onExpiredAccess && this.props.onExpiredAccess();
+      let handleExpiredAccess = () => this.props.onExpiredAccess();
       return (
          <Paper style={{ padding: "2em" }}>
             <h4>{this.state.SecureCaption}</h4>

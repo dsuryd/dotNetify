@@ -25,7 +25,7 @@ var SecurePage = (function (_React$Component) {
 
          var form = new FormData();
          form.append('username', username);
-         form.append('password', password);
+         form.append('password', password); // Demo only; don't submit clear text pwd in prod code!
          fetch('http://localhost:52000/token', { method: 'post', body: form }).then(function (response) {
             if (!response.ok) throw Error(response.statusText);
             return response.json();
@@ -179,7 +179,7 @@ var SecurePageView = (function (_React$Component3) {
    }, {
       key: 'onException',
       value: function onException(exception) {
-         if (exception.name == "UnauthorizedAccessException" && this.props.onExpiredAccess) this.props.onExpiredAccess();
+         if (exception.name == "UnauthorizedAccessException") this.props.onExpiredAccess();
       }
    }, {
       key: 'render',
@@ -187,7 +187,7 @@ var SecurePageView = (function (_React$Component3) {
          var _this5 = this;
 
          var handleExpiredAccess = function handleExpiredAccess() {
-            return _this5.props.onExpiredAccess && _this5.props.onExpiredAccess();
+            return _this5.props.onExpiredAccess();
          };
          return React.createElement(
             Paper,

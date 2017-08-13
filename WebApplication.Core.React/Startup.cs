@@ -20,9 +20,7 @@ namespace WebApplication.Core.React
          services.AddMvc();
          services.AddLocalization();
 
-         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();  // Required by ReactJS.NET.
          services.AddSignalR();  // Required by dotNetify.
-
          services.AddDotNetify();
       }
 
@@ -30,7 +28,7 @@ namespace WebApplication.Core.React
       public void Configure( IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory )
       {
          app.UseStaticFiles();
-         app.UseAuthServer(); // Provide auth tokens.
+         app.UseAuthServer(); // Provide auth tokens for Secure Page demo.
 
          app.UseWebSockets();
          app.UseSignalR(); // Required by dotNetify.
