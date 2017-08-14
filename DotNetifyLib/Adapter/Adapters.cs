@@ -35,6 +35,8 @@ namespace DotNetify
          builder.UseDotNetify(config);
          return appBuilder;
       }
+
+      public static IAppBuilder UseDotNetify(this IAppBuilder appBuilder, IServiceProvider serviceProvider) => appBuilder.UseDotNetify(null, serviceProvider);
    }
 
    public interface IApplicationBuilder
