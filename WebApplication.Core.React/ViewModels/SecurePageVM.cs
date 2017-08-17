@@ -23,7 +23,7 @@ namespace ViewModels
 
       public SecurePageVM(IPrincipalAccessor principalAccessor)
       {
-         _userName = principalAccessor.Principal.Identity.Name;
+         _userName = principalAccessor.Principal?.Identity.Name;
       }
 
       public override void Dispose() => _timer?.Dispose();
