@@ -3,6 +3,7 @@
 
 DotNetify is a free, open source project that lets you create amazing real-time web and mobile hybrid apps using HTML5 and C# on cross-platform .NET Core backend. 
 
+
 __*** dotNetify-React is in BETA - check out docs and live demo at [http://dotnetify.net/react](http://dotnetify.net/react)__
 
 ## Features
@@ -11,8 +12,9 @@ __*** dotNetify-React is in BETA - check out docs and live demo at [http://dotne
 * Integrate SignalR and [React](https://facebook.github.io/react/), or Knockout to support .NET back-end MVVM architecture.
 * Built-in real-time across WebSockets, perfect for IoT consumer apps.
 * Full support for single-page apps, including deep-linked, nested routing.
-* Run on [ASP.NET Core](http://asp.net/core), ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
+* Run on [ASP.NET Core](http://asp.net/core), ASP.NET Framework and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
 * Modern tooling: Visual Studio 2017,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
+* __NEW:__ support custom middlewares and filters, JWT authentication.
 
 ## Documentation
 
@@ -30,10 +32,6 @@ Documentation and live demo can be found at [http://dotnetify.net](http://dotnet
 
 ## Installation
 
-ASP.NET 4.5:  
-*PM> Install-Package DotNetify*
-
-ASP.NET Core:  
 *PM> Install-Package DotNetify.Core -pre*  
 *PM> Install-Package DotNetify.SignalR -pre*  
 *$ npm install dotnetify --save*
