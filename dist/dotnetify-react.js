@@ -123,7 +123,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             return proxies;
          };
 
-         signalR.hub = $.hubConnection("/signalr", { useDefaultPath: false });
+         signalR.hub = $.hubConnection(dotnetify.hubPath, { useDefaultPath: false });
          $.extend(signalR, signalR.hub.createHubProxies());
 
       }($, window));
@@ -133,6 +133,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          hub: null,
          hubServer: $.connection.dotNetifyHub.server,
          hubOptions: { "transport": ["webSockets", "longPolling"] },
+         hubPath: "/signalr",
 
          // Debug mode.
          debug: true,
