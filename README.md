@@ -1,7 +1,7 @@
 # &nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 
-DotNetify is a free, open source project that lets you create amazing real-time, reactive web apps using HTML/Javascript front-end and cross-platform C# .NET backend. 
+DotNetify is a free, open source project that lets you create amazing real-time, reactive web apps with HTML/Javascript front-end on cross-platform C# .NET back-end. 
 
 
 __*** dotNetify-React is in BETA - check out docs and live demo at [http://dotnetify.net/react](http://dotnetify.net/react)__
