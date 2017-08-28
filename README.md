@@ -33,9 +33,16 @@ Includes example using ***Electron*** to build cross-platform desktop app.
 
 ## Installation
 
+*$ npm install dotnetify --save*
+
+ASP.NET Core:
+
 *PM> Install-Package DotNetify.Core -pre*  
 *PM> Install-Package DotNetify.SignalR -pre*  
-*$ npm install dotnetify --save*
+
+ASP.NET 4.5:
+
+*PM> Install-Package DotNetify*  
 
 Read the website on how to configure your project ([React](http://dotnetify.net/react/Installation) | [Knockout](http://dotnetify.net/index/Installing)).
 
