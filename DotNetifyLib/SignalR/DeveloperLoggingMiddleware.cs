@@ -51,7 +51,7 @@ namespace DotNetify
       public Task OnDisconnected(HubCallerContext context)
       {
          _trace($"[dotNetify] connId={context.ConnectionId} type=OnDisconnected");
-         return Task.CompletedTask;
+         return Task.FromResult(0);
       }
 
       public Task<Exception> OnException(HubCallerContext context, Exception exception)

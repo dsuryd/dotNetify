@@ -62,7 +62,7 @@ namespace DotNetify.Security
 
          // If the incoming message is only for updating the headers, no need to continue down the pipeline.
          if (context.Data == null && context.CallType == nameof(DotNetifyHub.Update_VM))
-            return Task.CompletedTask;
+            return Task.FromResult(0);
 
          return next(context);
       }
@@ -74,7 +74,7 @@ namespace DotNetify.Security
       public Task OnDisconnected(HubCallerContext context)
       {
          _headersCache.Remove(_headersKey(context.ConnectionId));
-         return Task.CompletedTask;
+         return Task.FromResult(0);
       }
 
       /// <summary>

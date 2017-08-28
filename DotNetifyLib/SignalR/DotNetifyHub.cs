@@ -122,7 +122,7 @@ namespace DotNetify
             {
                Principal = ctx.Principal;
                VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
-               return Task.CompletedTask;
+               return Task.FromResult(0);
             });
          }
          catch (Exception ex)
@@ -147,7 +147,7 @@ namespace DotNetify
             {
                Principal = ctx.Principal;
                VMController.OnUpdateVM(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
-               return Task.CompletedTask;
+               return Task.FromResult(0);
             });
          }
          catch (Exception ex)
@@ -207,7 +207,7 @@ namespace DotNetify
             _hubPipeline.RunVMFilters(_hubContext, vm, ctx =>
             {
                vmAction(ctx.HubContext.Data);
-               return Task.CompletedTask;
+               return Task.FromResult(0);
             });
          }
          catch (TargetInvocationException ex)
@@ -238,7 +238,7 @@ namespace DotNetify
             {
                Principal = ctx.Principal;
                RunVMFilters(vm, vmData, vmAction);
-               return Task.CompletedTask;
+               return Task.FromResult(0);
             });
          }
          catch (Exception ex)
