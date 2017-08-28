@@ -14,7 +14,7 @@ __*** dotNetify-React is in BETA - check out docs and live demo at [http://dotne
 * Full support for single-page apps, including deep-linked, nested routing.
 * Run on [ASP.NET Core](http://asp.net/core), ASP.NET Framework and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
 * Modern tooling: Visual Studio 2017,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
-* __NEW:__ Powerful infracture that includes token-based authentication support, dependency injections, WebSocket request/response pipelines.
+* __NEW:__ Powerful infrastructure that includes token-based authentication support, dependency injections, WebSocket request/response pipelines.
 
 ## Documentation
 
