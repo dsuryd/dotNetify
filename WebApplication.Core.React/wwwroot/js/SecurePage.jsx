@@ -94,7 +94,7 @@ class SecurePageView extends React.Component {
    }
    onException(exception) {
       if (exception.name == "UnauthorizedAccessException")
-         this.props.onExpiredAccess();
+         this.props.onExpiredAccess && this.props.onExpiredAccess();
    }
    render() {
       let handleExpiredAccess = () => this.props.onExpiredAccess();

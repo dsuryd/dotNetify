@@ -179,7 +179,7 @@ var SecurePageView = (function (_React$Component3) {
    }, {
       key: 'onException',
       value: function onException(exception) {
-         if (exception.name == "UnauthorizedAccessException") this.props.onExpiredAccess();
+         if (exception.name == "UnauthorizedAccessException") this.props.onExpiredAccess && this.props.onExpiredAccess();
       }
    }, {
       key: 'render',
