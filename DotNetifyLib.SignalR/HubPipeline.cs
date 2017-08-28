@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Hubs;
 
@@ -58,7 +57,7 @@ namespace DotNetify
       private List<IMiddlewarePipeline> GetMiddlewares<TMiddleware>() where TMiddleware : IMiddlewarePipeline
       {
          return _middlewareFactories?
-            .Where(tuple => typeof(TMiddleware).IsAssignableFrom(tuple.Item1))
+            .Where(tuple => typeof(TMiddleware).GetTypeInfo().IsAssignableFrom(tuple.Item1))
             .Select(tuple => tuple.Item2())
             .ToList();
       }
@@ -127,11 +126,11 @@ namespace DotNetify
          // Find and execute the filter that matches each view model class attribute.
          foreach (var attr in vm.GetType().GetTypeInfo().GetCustomAttributes().Reverse())
          {
-            var vmFilterType = typeof(IVMFilter<>).MakeGenericType(attr.GetType());
-            if (_vmFilterFactories.Keys.Any(t => vmFilterType.IsAssignableFrom(t)))
+            var vmFilterType = typeof(IVMFilter<>).GetTypeInfo().MakeGenericType(attr.GetType());
+            if (_vmFilterFactories.Keys.Any(t => vmFilterType.GetTypeInfo().IsAssignableFrom(t)))
             {
-               var vmFilter = _vmFilterFactories.FirstOrDefault(kvp => vmFilterType.IsAssignableFrom(kvp.Key)).Value();
-               var vmFilterInvokeMethod = vmFilterType.GetMethod(nameof(IVMFilter<Attribute>.Invoke));
+               var vmFilter = _vmFilterFactories.FirstOrDefault(kvp => vmFilterType.GetTypeInfo().IsAssignableFrom(kvp.Key)).Value();
+               var vmFilterInvokeMethod = vmFilterType.GetTypeInfo().GetMethod(nameof(IVMFilter<Attribute>.Invoke));
                if (vmFilterInvokeMethod != null)
                   nextFilters.Push(ctx => (Task)vmFilterInvokeMethod.Invoke(vmFilter, new object[] { attr, ctx, nextFilters.Pop() }));
             }
