@@ -1,18 +1,20 @@
 # &nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 
-DotNetify is a free, open source project that lets you create amazing real-time web and mobile hybrid apps using HTML5 and C# on cross-platform .NET Core backend. 
+DotNetify is a free, open source project that lets you create amazing real-time, reactive web apps with HTML/Javascript front-end on cross-platform C# .NET back-end. 
+
 
 __*** dotNetify-React is in BETA - check out docs and live demo at [http://dotnetify.net/react](http://dotnetify.net/react)__
 
 ## Features
 
-* Simple and lightweight - no JS client-side framework, no REST API controllers.
-* Integrate SignalR and [React](https://facebook.github.io/react/), or Knockout to support .NET back-end MVVM architecture.
-* Built-in real-time across WebSockets, perfect for IoT consumer apps.
+* Simple and lightweight - no big JS client-side framework, no REST APIs, no explicit HTTP requests.
+* Integrate SignalR and [React](https://facebook.github.io/react/), or Knockout to support reactive .NET back-end MVVM.
+* Built-in real-time across WebSocket, perfect for IoT consumer apps.
 * Full support for single-page apps, including deep-linked, nested routing.
-* Run on [ASP.NET Core](http://asp.net/core), ASP.NET 4.5 and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
+* Run on [ASP.NET Core](http://asp.net/core), ASP.NET Framework and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
 * Modern tooling: Visual Studio 2017,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
+* __NEW:__ Powerful infrastructure that includes token-based authentication support, dependency injections, WebSocket request/response pipelines.
 
 ## Documentation
 
@@ -22,6 +24,7 @@ Documentation and live demo can be found at [http://dotnetify.net](http://dotnet
 
 * Real-time "Hello World" with Visual Studio 2017 + WebPack: [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).   
 * Real-time "Hello World" with create-react-app + Node.js + .NET Core: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).  
+Includes example using ***Electron*** to build cross-platform desktop app.
 
 ## Knockout Code Example
 
@@ -30,10 +33,6 @@ Documentation and live demo can be found at [http://dotnetify.net](http://dotnet
 
 ## Installation
 
-ASP.NET 4.5:  
-*PM> Install-Package DotNetify*
-
-ASP.NET Core:  
 *PM> Install-Package DotNetify.Core -pre*  
 *PM> Install-Package DotNetify.SignalR -pre*  
 *$ npm install dotnetify --save*
