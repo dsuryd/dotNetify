@@ -56,6 +56,10 @@ module.exports = function (grunt) {
                   dest: "../dist/dotnetify.router.js"
                },
                {
+                  src: "wwwroot/lib/knockout.mapping-latest.js",
+                  dest: "../dist/knockout.mapping-latest.js"
+               },
+               {
                   src: "../WebApplication.Core.React/wwwroot/lib/dotnetify-react.js",
                   dest: "../dist/dotnetify-react.js"
                },
@@ -64,8 +68,12 @@ module.exports = function (grunt) {
                   dest: "../dist/dotnetify-react.router.js"
                },
                {
-                  src: "wwwroot/lib/knockout.mapping-latest.js",
-                  dest: "../dist/knockout.mapping-latest.js"
+                  src: "../WebApplication.Core.React/wwwroot/lib/jquery-shim.js",
+                  dest: "../dist/jquery-shim.js"
+               },
+               {
+                  src: "../WebApplication.Core.React/wwwroot/lib/no-jquery.signalR.js",
+                  dest: "../dist/no-jquery.signalR.js"
                }
             ]
          }

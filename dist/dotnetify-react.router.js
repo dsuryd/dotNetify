@@ -16,17 +16,18 @@ limitations under the License.
 
 // Support using AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
-   if (typeof define === "function" && define["amd"]) {
-      define(['react', 'jquery', 'dotnetify'], factory);
+   if (typeof exports === "object" && typeof module === "object") {
+      var jquery = typeof jQuery !== "undefined" ? jQuery : require('./jquery-shim');
+      module.exports = factory(require('react'), require('react-dom'), jquery, require('dotnetify'));
    }
-   else if (typeof exports === "object" && typeof module === "object") {
-      module.exports = factory(require('react'), require('jquery'), require('dotnetify'));
+   else if (typeof define === "function" && define["amd"]) {
+      define(['react', 'react-dom', './jquery-shim', 'dotnetify'], factory);
    }
    else {
-      factory(React, jQuery, dotnetify);
+      factory(React, ReactDOM, jQuery, dotnetify);
    }
 }
-   (function (_React, $, dotnetify) {
+   (function (_React, _ReactDOM, $, dotnetify) {
 
       // PathJS. Need this specific version, because latest version is causing issue.
       var Path = {
@@ -226,7 +227,7 @@ limitations under the License.
 
       // Add plugin functions.
       dotnetify.react.router = {
-         version: "1.0.3-beta",
+         version: "1.0.4-beta",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -368,7 +369,8 @@ limitations under the License.
                         event.initEvent(iEvent, true, true);
                         window.dispatchEvent(event);
                      }
-                  }
+                  },
+                  grep: function (iArray, iFilter) { return (Array.isArray(iArray)) ? iArray.filter(iFilter) : []; }
                }
             })();
 
@@ -418,7 +420,7 @@ limitations under the License.
                   // Build the absolute root path.
                   vm.$router.initRoot();
 
-                  $.each(templates, function (idx, template) {
+                  templates.forEach(function (template, idx) {
                      // If url pattern isn't given, consider Id as the pattern.
                      var urlPattern = template.UrlPattern != null ? template.UrlPattern : template.Id;
                      urlPattern = urlPattern != "" ? urlPattern : "/";
@@ -484,8 +486,69 @@ limitations under the License.
                   if (utils.endsWith(iViewUrl, "html"))
                      vm.$loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
                   else
-                     vm.$loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
+                     vm.$router.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
 
+               }.bind(iScope),
+
+               // Loads an HTML view.
+               loadHtmlView: function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+                  var vm = this;
+
+                  try {
+                     // Unmount any React component before replacing with a new DOM. 
+                     _ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
+                  }
+                  catch (e) {
+                     console.error(e);
+                  }
+
+                  // Load the HTML view.
+                  $(iTargetSelector).load(iViewUrl, null, function () {
+                     if (iJsModuleUrl != null) {
+                        $.getScript(iJsModuleUrl, function () {
+                           if (typeof callbackFn === "function")
+                              callbackFn.call(vm);
+                        });
+                     }
+                     else if (typeof callbackFn === "function")
+                        callbackFn.call(vm);
+                  });
+               }.bind(iScope),
+
+               // Loads a React view.
+               loadReactView: function (iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
+                  var vm = this;
+                  var createViewFunc = function () {
+                     if (!window.hasOwnProperty(iReactClassName)) {
+                        console.error("[" + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
+                        return;
+                     }
+
+                     try {
+                        _ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
+                     }
+                     catch (e) {
+                        console.error(e);
+                     }
+
+                     try {
+                        var reactElement = _React.createElement(window[iReactClassName], iReactProps);
+                        _ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
+                     }
+                     catch (e) {
+                        console.error(e);
+                     }
+                     if (typeof callbackFn === "function")
+                        callbackFn.call(vm, reactElement);
+                  }
+
+                  if (iJsModuleUrl == null)
+                     createViewFunc();
+                  else {
+                     // Load all javascripts first. Multiple files can be specified with comma delimiter.
+                     var getScripts = iJsModuleUrl.split(",").map(function (i) { return $.getScript(i); });
+                     $.when.apply($, getScripts).done(createViewFunc);
+                  }
                }.bind(iScope),
 
                // Routes to a path.
@@ -578,7 +641,7 @@ limitations under the License.
 
                   // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
                   if (utils.equal(urlPath, root) || utils.equal(urlPath, root + "/") || urlPath === "/") {
-                     var match = $.grep(state.RoutingState.Templates, function (iTemplate) { return iTemplate.UrlPattern === "" });
+                     var match = utils.grep(state.RoutingState.Templates, function (iTemplate) { return iTemplate.UrlPattern === "" });
                      if (match.length > 0) {
                         vm.$router.routeTo("", match[0]);
                         dotnetify.react.router.urlPath = "";
@@ -594,13 +657,13 @@ limitations under the License.
                   if (utils.startsWith(urlPath, root)) {
 
                      var routeElem = null;
-                     var match = $.grep(vm.$router.routes, function (elem) {
+                     var match = utils.grep(vm.$router.routes, function (elem) {
                         return utils.startsWith(urlPath + "/", elem.Url + "/")
                      });
                      if (match.length > 0) {
                         // If more than one match, find the best match.
                         for (var i = 0; i < match.length; i++)
-                           if (routeElem == null || routeElem.Url.length < $(match[i]).get(0).Url.length)
+                           if (routeElem == null || routeElem.Url.length < match[i].Url.length)
                               routeElem = match[i];
                      }
 
@@ -662,7 +725,7 @@ limitations under the License.
             var path = iRoute.Path;
             var template = null;
             if (state.hasOwnProperty("RoutingState") && state.RoutingState.Templates != null) {
-               var match = $.grep(state.RoutingState.Templates, function (iTemplate) { return iTemplate.Id == iRoute.TemplateId });
+               var match = state.RoutingState.Templates.filter(function (iTemplate) { return iTemplate.Id == iRoute.TemplateId });
                if (match.length > 0) {
                   template = match[0];
 

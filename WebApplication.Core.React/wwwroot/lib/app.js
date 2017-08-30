@@ -1,7 +1,7 @@
-﻿$ = jQuery = require( "jquery" ); // Add jQuery to global window for Bootstrap and SignalR.
-require( "bootstrap" );
-require( "signalr" );
-React = require( "react" );
+﻿$ = jQuery = require("jquery"); // Add jQuery to global window for Bootstrap.
+require("bootstrap");
+require("./no-jquery.signalR");
+React = require("react");
 ReactDOM = require("react-dom");
 
 // ChartJS.
@@ -17,22 +17,22 @@ Card = require("material-ui/Card").Card;
 CardActions = require("material-ui/Card").CardActions;
 CardHeader = require("material-ui/Card").CardHeader;
 CardText = require("material-ui/Card").CardText;
-Checkbox = require( "material-ui/Checkbox" ).default;
+Checkbox = require("material-ui/Checkbox").default;
 Chip = require("material-ui/Chip").default;
 Dialog = require("material-ui/Dialog").default;
-IconButton = require( "material-ui/IconButton" ).default;
-FlatButton = require( "material-ui/FlatButton" ).default;
-MenuItem = require( "material-ui/MenuItem" ).default;
+IconButton = require("material-ui/IconButton").default;
+FlatButton = require("material-ui/FlatButton").default;
+MenuItem = require("material-ui/MenuItem").default;
 Paper = require("material-ui/Paper").default;
-RadioButtonGroup = require( "material-ui/RadioButton" ).RadioButtonGroup;
+RadioButtonGroup = require("material-ui/RadioButton").RadioButtonGroup;
 RadioButton = require("material-ui/RadioButton").RadioButton;
-RaisedButton = require( "material-ui/RaisedButton" ).default;
+RaisedButton = require("material-ui/RaisedButton").default;
 SelectField = require("material-ui/SelectField").default;
 Snackbar = require("material-ui/Snackbar").default;
-Step = require( "material-ui/Stepper" ).Step;
+Step = require("material-ui/Stepper").Step;
 Stepper = require("material-ui/Stepper").Stepper;
-StepLabel = require( "material-ui/Stepper" ).StepLabel;
-TextField = require( "material-ui/TextField" ).default;
+StepLabel = require("material-ui/Stepper").StepLabel;
+TextField = require("material-ui/TextField").default;
 Toggle = require("material-ui/Toggle").default;
 Table = require("material-ui/Table").Table;
 TableBody = require("material-ui/Table").TableBody;
@@ -50,7 +50,7 @@ IconMovie = require("material-ui/svg-icons/AV/movie").default;
 IconPhone = require("material-ui/svg-icons/communication/phone").default;
 
 // Used by Material-UI.
-injectTapEventPlugin = require( "react-tap-event-plugin" );
+injectTapEventPlugin = require("react-tap-event-plugin");
 injectTapEventPlugin();
 
 // IE polyfill for promise/fetch.

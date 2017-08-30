@@ -19,19 +19,18 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
 // Support using either AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
-   if (typeof define === "function" && define["amd"]) {
-      define(['react', 'react-dom', 'jquery', 'signalr'], factory);
+   if (typeof exports === "object" && typeof module === "object") {
+      var jquery = typeof jQuery !== "undefined" ? jQuery : require('./jquery-shim');
+      module.exports = factory(require('react'), jquery, window, require('./no-jquery.signalR'));
    }
-   else if (typeof exports === "object" && typeof module === "object") {
-      if (typeof window.jQuery === "undefined")
-         window.jQuery = require('jquery');
-      module.exports = factory(require('react'), require('react-dom'), window.jQuery, require('signalr'));
+   else if (typeof define === "function" && define["amd"]) {
+      define(['react', './jquery-shim', './no-jquery.signalR'], factory);
    }
    else {
-      factory(React, ReactDOM, jQuery);
+      factory(React, jQuery, window);
    }
 }
-   (function (_React, _ReactDOM, $) {
+   (function (_React, $, window) {
 
       // SignalR hub auto-generated from /signalr/hubs.
       /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
@@ -152,7 +151,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-         version: "1.0.3-beta",
+         version: "1.0.4-beta",
          viewModels: {},
          plugins: {},
 
@@ -209,7 +208,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                      if (dotnetify.offline && !dotnetify.isConnected()) {
                         getInitialStates();
                         dotnetify.isOffline = true;
-                        $(document).trigger("offline", dotnetify.isOffline);
+                        $(document).triggerHandler("offline", dotnetify.isOffline);
                      }
                   }, dotnetify.offlineTimeout);
 
@@ -235,7 +234,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                   var isOffline = state.newState != 1;
                   if (dotnetify.isOffline != isOffline) {
                      dotnetify.isOffline = isOffline;
-                     $(document).trigger("offline", dotnetify.isOffline);
+                     $(document).triggerHandler("offline", dotnetify.isOffline);
                   }
                });
             }
@@ -380,69 +379,6 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             }
 
             this.$updateList(listName, item);
-         }
-      }
-
-      // Loads an HTML view.
-      dotnetifyVM.prototype.$loadHtmlView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
-         var vm = this;
-
-         try {
-            // Unmount any React component before replacing with a new DOM. 
-            _ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
-         }
-         catch (e) {
-            console.error(e);
-         }
-
-         // Load the HTML view.
-         $(iTargetSelector).load(iViewUrl, null, function () {
-            if (iJsModuleUrl != null) {
-               $.getScript(iJsModuleUrl, function () {
-                  if (typeof callbackFn === "function")
-                     callbackFn.call(vm);
-               });
-            }
-            else if (typeof callbackFn === "function")
-               callbackFn.call(vm);
-         });
-      }
-
-      // Loads a React view.
-      dotnetifyVM.prototype.$loadReactView = function (iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
-         var vm = this;
-         var createViewFunc = function () {
-            if (!window.hasOwnProperty(iReactClassName)) {
-               console.error("[" + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
-               return;
-            }
-
-            try {
-               _ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
-            }
-            catch (e) {
-               console.error(e);
-            }
-
-            try {
-               var reactElement = _React.createElement(window[iReactClassName], iReactProps);
-               _ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
-            }
-            catch (e) {
-               console.error(e);
-            }
-            if (typeof callbackFn === "function")
-               callbackFn.call(vm, reactElement);
-         }
-
-         if (iJsModuleUrl == null)
-            createViewFunc();
-         else {
-            // Load all javascripts first. Multiple files can be specified with comma delimiter.
-            var getScripts = iJsModuleUrl.split(",").map(function (i) { return $.getScript(i); });
-            getScripts.push($.Deferred(function (deferred) { $(deferred.resolve); }));
-
-            $.when.apply($, getScripts).done(createViewFunc);
          }
       }
 

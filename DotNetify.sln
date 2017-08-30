@@ -17,7 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E
 		dist\dotnetify.min.js = dist\dotnetify.min.js
 		dist\dotnetify.router.js = dist\dotnetify.router.js
 		dist\dotnetify.router.min.js = dist\dotnetify.router.min.js
+		index.js = index.js
+		dist\jquery-shim.js = dist\jquery-shim.js
 		dist\knockout.mapping-latest.js = dist\knockout.mapping-latest.js
+		dist\no-jquery.signalR.js = dist\no-jquery.signalR.js
 		package.json = package.json
 	EndProjectSection
 EndProject

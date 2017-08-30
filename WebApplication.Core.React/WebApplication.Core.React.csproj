@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\js\SecurePage.jsx" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Resources\AFITop100.json" />
     <EmbeddedResource Include="Resources\employees.json" />
     <EmbeddedResource Include="Resources\webstore.json" />
