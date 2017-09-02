@@ -2,7 +2,7 @@
 var jQueryShim = jQueryDeferred.extend(
    function (selector) {
 
-      if (selector === window)
+      if (selector === window || selector.document)
          return {
             0: selector,
             on: function (iEvent, iHandler) { window.addEventListener(iEvent, iHandler); },
@@ -88,11 +88,12 @@ var jQueryShim = jQueryDeferred.extend(
          };
          head.appendChild(script);
          return promise;
-      }
+      },
+      support: { cors: true }
    }
 );
 
-if (typeof jQuery === "undefined")
-   jQuery = jQueryShim;
+if (typeof window !== "undefined")
+   window.jQuery = window.jQuery || jQueryShim;
 
 module.exports = jQueryShim;

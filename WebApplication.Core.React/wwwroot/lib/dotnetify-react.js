@@ -19,15 +19,17 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
 // Support using either AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
+   var _window = window || global;
+
    if (typeof exports === "object" && typeof module === "object") {
-      var jquery = typeof jQuery !== "undefined" ? jQuery : require('./jquery-shim');
-      module.exports = factory(require('react'), jquery, window, require('./no-jquery.signalR'));
+      var jquery = typeof window !== "undefined" ? window.jQuery || require('./jquery-shim') : require('./jquery-shim');
+      module.exports = factory(require('react'), jquery, _window, require('./no-jquery.signalR'));
    }
    else if (typeof define === "function" && define["amd"]) {
       define(['react', './jquery-shim', './no-jquery.signalR'], factory);
    }
    else {
-      factory(React, jQuery, window);
+      factory(React, jQuery, _window);
    }
 }
    (function (_React, $, window) {
@@ -130,6 +132,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       dotnetify = $.extend(dotnetify, {
          // SignalR hub.
          hub: null,
+         hubServerUrl: null,
          hubServer: $.connection.dotNetifyHub.server,
          hubOptions: { "transport": ["webSockets", "longPolling"] },
          hubPath: "/signalr",
@@ -166,6 +169,10 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             };
 
             if (dotnetify.hub === null) {
+               // Set the server URL if defined.
+               if (dotnetify.hubServerUrl)
+                  $.connection.hub.url = dotnetify.hubServerUrl;
+
                // Setup SignalR server method handler.
                var hub = $.connection.dotNetifyHub;
                hub.client.response_VM = function (iVMId, iVMData) {
@@ -307,7 +314,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          getState = typeof getState === "function" ? getState : function () { return iReact.state; };
          setState = typeof setState === "function" ? setState : function (state) { iReact.setState(state); };
 
-         if (iReact && iReact.props.hasOwnProperty("vmArg"))
+         if (iReact && iReact.props && iReact.props.hasOwnProperty("vmArg"))
             this.$vmArg = $.extend(this.$vmArg, iReact.props.vmArg);
 
          this.State = function (state) { return typeof state === "undefined" ? getState() : setState(state) };
