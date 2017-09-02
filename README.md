@@ -3,18 +3,17 @@
 
 DotNetify is a free, open source project that lets you create amazing real-time, reactive web apps with HTML/Javascript front-end on cross-platform C# .NET back-end. 
 
-
-__*** dotNetify-React is in BETA - check out docs and live demo at [http://dotnetify.net/react](http://dotnetify.net/react)__
-
 ## Features
 
 * Simple and lightweight - no big JS client-side framework, no REST APIs, no explicit HTTP requests.
 * Integrate SignalR and [React](https://facebook.github.io/react/), or Knockout to support reactive .NET back-end MVVM.
 * Built-in real-time across WebSocket, perfect for IoT consumer apps.
-* Full support for single-page apps, including deep-linked, nested routing.
+* Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
 * Run on [ASP.NET Core](http://asp.net/core), ASP.NET Framework and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
-* Modern tooling: Visual Studio 2017,  [Typescript](https://www.typescriptlang.org/), [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
-* __NEW:__ Powerful infrastructure that includes token-based authentication support, dependency injections, WebSocket request/response pipelines.
+* Modern tooling: Visual Studio 2017, [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
+* __NEW:__ Powerful back-end infrastructure, including dependency injection and WebSocket request/response pipelines.
+
+__*** Coming soon: integration with React Native__
 
 ## Documentation
 
@@ -50,4 +49,4 @@ Read the website on how to configure your project ([React](http://dotnetify.net/
 Licensed under the Apache License, Version 2.0.
 
 ## Contributing
-All contribution is welcome; reach out to find out how you can help.  If you like the idea behind this project, please let others know about it! 
+All contribution is welcome: star this project, let others know about it, report issues, submit pull requests!
