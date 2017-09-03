@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Text;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using DotNetify;
 using DotNetify.Security;
@@ -15,7 +12,7 @@ namespace WebApplication.Core.React
    {
       // This method gets called by the runtime. Use this method to add services to the container.
       // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
-      public void ConfigureServices( IServiceCollection services )
+      public void ConfigureServices(IServiceCollection services)
       {
          services.AddMvc();
          services.AddLocalization();
@@ -25,7 +22,7 @@ namespace WebApplication.Core.React
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-      public void Configure( IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory )
+      public void Configure(IApplicationBuilder app)
       {
          app.UseStaticFiles();
          app.UseAuthServer(); // Provide auth tokens for Secure Page demo.
@@ -35,10 +32,9 @@ namespace WebApplication.Core.React
          app.UseDotNetify(config =>
          {
             string secretKey = "dotnetifydemo_secretkey_123!";
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
             var tokenValidationParameters = new TokenValidationParameters
             {
-               IssuerSigningKey = signingKey,
+               IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
                ValidAudience = "DotNetifyDemoApp",
                ValidIssuer = "DotNetifyDemoServer",
                ValidateIssuerSigningKey = true,
