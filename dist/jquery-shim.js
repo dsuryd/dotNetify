@@ -10,7 +10,8 @@ var jQueryShim = jQueryDeferred.extend(
             unbind: function (iEvent, iHandler) { window.removeEventListener(iEvent, iHandler, false); }
          };
 
-      selector.events = selector.events || {};
+      if (typeof selector !== "string")
+         selector.events = selector.events || {};
 
       return {
          0: selector,
@@ -37,6 +38,19 @@ var jQueryShim = jQueryDeferred.extend(
             else if (iArgs)
                args.push(iArgs);
             handlers.forEach(function (handler) { handler.apply(this, args); });
+         },
+         load: function (iUrl, iArgs, iHandler) {
+            var request = new window.XMLHttpRequest();
+            request.open('GET', iUrl, true);
+            request.onload = function () {
+               if (request.status >= 200 && request.status < 400) {
+                  var response = request.responseText;
+                  document.querySelector(selector).innerHTML = response;
+                  iHandler.call(document.querySelector(selector));
+               }
+            };
+            request.send();
+            return { abort: function (reason) { return request.abort(reason); } };
          }
       };
    },

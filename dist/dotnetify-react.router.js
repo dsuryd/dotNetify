@@ -484,7 +484,7 @@ limitations under the License.
                   iJsModuleUrl = dotnetify.react.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
                   if (utils.endsWith(iViewUrl, "html"))
-                     vm.$loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
+                     vm.$router.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
                   else
                      vm.$router.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
 

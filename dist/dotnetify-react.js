@@ -23,16 +23,16 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
    if (typeof exports === "object" && typeof module === "object") {
       var jquery = typeof window !== "undefined" ? window.jQuery || require('./jquery-shim') : require('./jquery-shim');
-      module.exports = factory(require('react'), jquery, _window, require('./no-jquery.signalR'));
+      module.exports = factory(jquery, _window, require('./no-jquery.signalR'));
    }
    else if (typeof define === "function" && define["amd"]) {
-      define(['react', './jquery-shim', './no-jquery.signalR'], factory);
+      define(['./jquery-shim', './no-jquery.signalR'], factory);
    }
    else {
-      factory(React, jQuery, _window);
+      factory(jQuery, _window);
    }
 }
-   (function (_React, $, window) {
+   (function ($, window) {
 
       // SignalR hub auto-generated from /signalr/hubs.
       /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
@@ -148,9 +148,10 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          offlineCacheFn: null,
 
          _connectRetry: 0,
-         isConnected: function () {
-            return $.connection.hub.state == $.signalR.connectionState.connected
-         },
+         isConnected: function () { return $.connection.hub.state == $.signalR.connectionState.connected },
+
+         // Generic connect function for non-React app.
+         connect: function (iVMId, iOptions) { return dotnetify.react.connect(iVMId, null, iOptions); }
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
@@ -551,48 +552,6 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          else
             console.error("[" + this.$vmId + "] missing item key for '" + listName + "'; add " + listName + "_itemKey property to the view model.");
       }
-
-      // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
-      // of the parent component, so that when the child component connects to its back-end view model, the child view model
-      // instance is created within the scope of the parent view model.
-      // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
-      // injects properties and dispatch functions into the component.
-      dotnetify.react.Scope = _React.createClass({
-         displayName: "Scope",
-
-         propTypes: { vm: _React.PropTypes.string },
-         contextTypes: { scoped: _React.PropTypes.func },
-         childContextTypes: {
-            scoped: _React.PropTypes.func.isRequired,
-            connect: _React.PropTypes.func.isRequired
-         },
-         scoped: function scoped(vmId) {
-            var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
-            return scope ? scope + "." + vmId : vmId;
-         },
-         getChildContext: function getChildContext() {
-            var _this = this;
-
-            return {
-               scoped: function scoped(vmId) {
-                  return _this.scoped(vmId);
-               },
-               connect: function connect(vmId, component, options) {
-                  component.vmId = _this.scoped(vmId);
-                  component.vm = dotnetify.react.connect(component.vmId, component, options);
-                  component.dispatch = function (state) { return component.vm.$dispatch(state); };
-                  component.dispatchState = function (state) {
-                     component.vm.State(state);
-                     component.vm.$dispatch(state);
-                  };
-                  return window.vmStates ? window.vmStates[component.vmId] : null;
-               }
-            };
-         },
-         render: function render() {
-            return this.props.children;
-         }
-      });
 
       return dotnetify;
    }))
