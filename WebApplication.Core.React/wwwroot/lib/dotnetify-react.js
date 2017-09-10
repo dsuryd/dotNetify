@@ -476,7 +476,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          this.$preProcess(vmData);
 
          var state = this.State();
-         state = $.extend(state, vmData);
+         state = $.extend({}, state, vmData);
          this.State(state);
 
          if (!this.$loaded)
