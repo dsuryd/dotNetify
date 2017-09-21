@@ -1,7 +1,4 @@
-﻿/*!
- * no-jquery.signalR
- */
-(function (factory) {
+﻿(function (factory) {
    var _window = window || global;
    _window.noJQuerySignalR = { version: "1.0.0" };
 

@@ -23,135 +23,38 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
    if (typeof exports === "object" && typeof module === "object") {
       var jquery = typeof window !== "undefined" ? window.jQuery || require('./jquery-shim') : require('./jquery-shim');
-      module.exports = factory(jquery, _window, require('./no-jquery.signalR'));
+      module.exports = factory(jquery, _window, require('./dotnetify-hub'));
    }
    else if (typeof define === "function" && define["amd"]) {
-      define(['./jquery-shim', './no-jquery.signalR'], factory);
+      define(['./jquery-shim', './dotnetify-hub'], factory);
    }
    else {
-      factory(jQuery, _window);
+      factory(jQuery, _window, dotnetifyHub);
    }
 }
-   (function ($, window) {
-
-      // SignalR hub auto-generated from /signalr/hubs.
-      /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
-      /// <reference path="jquery.signalR.js" />
-      (function ($, window, undefined) {
-         /// <param name="$" type="jQuery" />
-         "use strict";
-
-         if (typeof ($.signalR) !== "function") {
-            throw new Error("SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.");
-         }
-
-         var signalR = $.signalR;
-
-         function makeProxyCallback(hub, callback) {
-            return function () {
-               // Call the client hub method
-               callback.apply(hub, $.makeArray(arguments));
-            };
-         }
-
-         function registerHubProxies(instance, shouldSubscribe) {
-            var key, hub, memberKey, memberValue, subscriptionMethod;
-
-            for (key in instance) {
-               if (instance.hasOwnProperty(key)) {
-                  hub = instance[key];
-
-                  if (!(hub.hubName)) {
-                     // Not a client hub
-                     continue;
-                  }
-
-                  if (shouldSubscribe) {
-                     // We want to subscribe to the hub events
-                     subscriptionMethod = hub.on;
-                  } else {
-                     // We want to unsubscribe from the hub events
-                     subscriptionMethod = hub.off;
-                  }
-
-                  // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
-                  for (memberKey in hub.client) {
-                     if (hub.client.hasOwnProperty(memberKey)) {
-                        memberValue = hub.client[memberKey];
-
-                        if (!$.isFunction(memberValue)) {
-                           // Not a client hub function
-                           continue;
-                        }
-
-                        subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
-                     }
-                  }
-               }
-            }
-         }
-
-         $.hubConnection.prototype.createHubProxies = function () {
-            var proxies = {};
-            this.starting(function () {
-               // Register the hub proxies as subscribed
-               // (instance, shouldSubscribe)
-               registerHubProxies(proxies, true);
-
-               this._registerSubscribedHubs();
-            }).disconnected(function () {
-               // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
-               // (instance, shouldSubscribe)
-               registerHubProxies(proxies, false);
-            });
-
-            proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
-            proxies['dotNetifyHub'].client = {};
-            proxies['dotNetifyHub'].server = {
-               dispose_VM: function (vmId) {
-                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Dispose_VM"], $.makeArray(arguments)));
-               },
-
-               request_VM: function (vmId, vmArg) {
-                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Request_VM"], $.makeArray(arguments)));
-               },
-
-               update_VM: function (vmId, vmData) {
-                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(["Update_VM"], $.makeArray(arguments)));
-               }
-            };
-
-            return proxies;
-         };
-
-         signalR.hub = $.hubConnection(dotnetify.hubPath, { useDefaultPath: false });
-         $.extend(signalR, signalR.hub.createHubProxies());
-
-      }($, window));
+   (function ($, window, dotnetifyHub) {
 
       dotnetify = $.extend(dotnetify, {
-         // SignalR hub.
-         hub: null,
+         // SignalR hub options.
          hubServerUrl: null,
-         hubServer: $.connection.dotNetifyHub.server,
+         hubServer: dotnetifyHub.server,
          hubOptions: { "transport": ["webSockets", "longPolling"] },
-         hubPath: "/signalr",
+         hubPath: dotnetifyHub.hubPath,
 
          // Debug mode.
          debug: true,
          debugFn: null,
 
-         // Offline mode.
-         offline: false,
-         isOffline: true,
-         offlineTimeout: 5000,
-         offlineCacheFn: null,
-
-         _connectRetry: 0,
-         isConnected: function () { return $.connection.hub.state == $.signalR.connectionState.connected },
+         // Connection state.
+         isConnected: function () { return dotnetifyHub.isConnected; },
+         connectionStateHandler: null,
 
          // Generic connect function for non-React app.
-         connect: function (iVMId, iOptions) { return dotnetify.react.connect(iVMId, null, iOptions); }
+         connect: function (iVMId, iOptions) { return dotnetify.react.connect(iVMId, null, iOptions); },
+
+         // Internal variables. Do not modify!
+         _hub: null,
+         _connectRetry: 0
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
@@ -169,14 +72,15 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                }
             };
 
-            if (dotnetify.hub === null) {
+            if (dotnetify._hub === null) {
+               dotnetifyHub.hubPath = dotnetify.hubPath;
+
                // Set the server URL if defined.
                if (dotnetify.hubServerUrl)
-                  $.connection.hub.url = dotnetify.hubServerUrl;
+                  dotnetifyHub.url = dotnetify.hubServerUrl;
 
                // Setup SignalR server method handler.
-               var hub = $.connection.dotNetifyHub;
-               hub.client.response_VM = function (iVMId, iVMData) {
+               dotnetifyHub.client.response_VM = function (iVMId, iVMData) {
 
                   var vm = self.viewModels.hasOwnProperty(iVMId) ? self.viewModels[iVMId] : null;
 
@@ -202,7 +106,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
                // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.
                var startHub = function () {
-                  var hub = typeof dotnetify.hubOptions === "undefined" ? $.connection.hub.start() : $.connection.hub.start(dotnetify.hubOptions);
+                  var hub = dotnetifyHub.start(dotnetify.hubOptions);
                   hub.done(function () {
                      dotnetify._connectRetry = 0;
                      getInitialStates();
@@ -211,45 +115,32 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                         console.error(e);
                      });
 
-                  // If offline mode is enabled, apply the widget anyway when there's no connection.
-                  setTimeout(function () {
-                     if (dotnetify.offline && !dotnetify.isConnected()) {
-                        getInitialStates();
-                        dotnetify.isOffline = true;
-                        $(document).triggerHandler("offline", dotnetify.isOffline);
-                     }
-                  }, dotnetify.offlineTimeout);
-
                   return hub;
                }
-               dotnetify.hub = startHub();
+               dotnetify._hub = startHub();
 
                // On disconnected, keep attempting to start the connection in increasing interval.
-               $.connection.hub.disconnected(function () {
+               dotnetifyHub.disconnected(function () {
                   setTimeout(function () {
-                     dotnetify.hub = startHub();
+                     dotnetify._hub = startHub();
                   }, dotnetify._connectRetry * 5000 + 500);
 
                   if (dotnetify._connectRetry < 3)
                      dotnetify._connectRetry++;
                });
 
-               // Use SignalR event to raise the offline event with true/false argument.
-               $.connection.hub.stateChanged(function (state) {
+               // Use SignalR event to raise the connection state event.
+               dotnetifyHub.stateChanged(function (state) {
                   var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
-                  console.log("SignalR: " + stateText[state.newState]);
+                  if(dotnetify.debug)
+                     console.log("SignalR: " + stateText[state.newState]);
 
-                  var isOffline = state.newState != 1;
-                  if (dotnetify.isOffline != isOffline) {
-                     dotnetify.isOffline = isOffline;
-                     $(document).triggerHandler("offline", dotnetify.isOffline);
-                  }
+                  if (typeof dotnetify.connectionStateHandler === "function")
+                     dotnetify.connectionStateHandler(stateText[state.newState]);
                });
             }
             else if (dotnetify.isConnected())
-               dotnetify.hub.done(getInitialStates);
-            else if (dotnetify.offline)
-               getInitialStates();
+               dotnetify._hub.done(getInitialStates);
          },
 
          // Connects to a server view model.
@@ -288,6 +179,15 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             // Need to be asynch to allow initial state to be processed.
             setTimeout(function () { vm.$update(JSON.stringify(window.ssr[iVMId])); }, 100);
             return vm;
+         },
+
+         // Get all view models.
+         getViewModels: function () {
+            var self = dotnetify.react;
+            var vmArray = [];
+            for (var vmId in self.viewModels) 
+               vmArray.push(self.viewModels[vmId]);
+            return vmArray;
          }
       });
 

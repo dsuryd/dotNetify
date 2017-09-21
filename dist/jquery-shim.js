@@ -1,4 +1,20 @@
-﻿var jQueryDeferred = require("jquery-deferred");
+﻿/* 
+Copyright 2017 Dicky Suryadi
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+
+var jQueryDeferred = require("jquery-deferred");
 var jQueryShim = jQueryDeferred.extend(
    function (selector) {
 
@@ -15,11 +31,13 @@ var jQueryShim = jQueryDeferred.extend(
 
       return {
          0: selector,
+
          bind: function (iEvent, iHandler) {
             var event = selector.events[iEvent] || [];
             event.push(iHandler);
             selector.events[iEvent] = event;
          },
+
          unbind: function (iEvent, iHandler) {
             var handlers = selector.events[iEvent] || [];
             if (iHandler) {
@@ -30,6 +48,7 @@ var jQueryShim = jQueryDeferred.extend(
                handlers = [];
             selector.events[iEvent] = handlers;
          },
+
          triggerHandler: function (iEvent, iArgs) {
             var handlers = selector.events[iEvent] || [];
             var args = [{ type: iEvent }];
@@ -39,6 +58,7 @@ var jQueryShim = jQueryDeferred.extend(
                args.push(iArgs);
             handlers.forEach(function (handler) { handler.apply(this, args); });
          },
+
          load: function (iUrl, iArgs, iHandler) {
             var request = new window.XMLHttpRequest();
             request.open('GET', iUrl, true);
@@ -56,11 +76,18 @@ var jQueryShim = jQueryDeferred.extend(
    },
    jQueryDeferred,
    {
+      support: { cors: true },
+
       trim: function (iStr) { return typeof iStr === "string" ? iStr.trim() : iStr; },
+
       inArray: function (iArray, iItem) { return iArray.indexOf(iItem) !== -1; },
+
       makeArray: function makeArray(iArray) { return [].slice.call(iArray, 0); },
+
       merge: function (iArray1, iArray2) { Array.prototype.push.apply(iArray1, iArray2); return iArray1; },
+
       isEmptyObject: function (iObj) { return !iObj || Object.keys(iObj).length === 0 },
+
       ajax: function (iOptions) {
          var request = new window.XMLHttpRequest();
          request.onreadystatechange = function () {
@@ -84,6 +111,7 @@ var jQueryShim = jQueryDeferred.extend(
             abort: function (reason) { return request.abort(reason); }
          };
       },
+
       getScript: function (iUrl, iSuccess) {
          var done = false;
          var promise = jQueryDeferred.Deferred();
@@ -102,12 +130,12 @@ var jQueryShim = jQueryDeferred.extend(
          };
          head.appendChild(script);
          return promise;
-      },
-      support: { cors: true }
+      }
    }
 );
 
 if (typeof window !== "undefined")
    window.jQuery = window.jQuery || jQueryShim;
 
-module.exports = jQueryShim;
+if (typeof exports === "object" && typeof module === "object")
+   module.exports = jQueryShim;
