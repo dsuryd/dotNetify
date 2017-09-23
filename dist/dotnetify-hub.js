@@ -151,7 +151,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
       });
 
       dotnetifyHub = $.extend(dotnetifyHub, {
-
+         version: "1.0.0-beta",
          hubPath: "/signalr",
 
          start: function (iHubOptions) {
