@@ -1,14 +1,15 @@
 # &nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
+[![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 
 DotNetify is a free, open source project that lets you create amazing real-time, reactive web apps with HTML/Javascript front-end on cross-platform C# .NET back-end. 
 
-__*** Coming soon: integration with React Native.__
+__*** NEW: React Native support with v2.0.6-beta ***__
 
 ## Features
 
-* Simple and lightweight - no big JS client-side framework, no REST APIs, no explicit HTTP requests.
-* Integrate SignalR and [React](https://facebook.github.io/react/), or Knockout to support reactive .NET back-end MVVM.
+* Simple and lightweight - no big JS client-side framework, no REST APIs, no AJAX requests.
+* Integrate SignalR and [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/) or Knockout to support reactive .NET back-end MVVM.
 * Built-in real-time across WebSocket, perfect for IoT consumer apps.
 * Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
 * Run on [ASP.NET Core](http://asp.net/core), ASP.NET Framework and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
