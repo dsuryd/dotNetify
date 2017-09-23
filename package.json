@@ -5,6 +5,7 @@
    "main": "index.js",
    "files": [
       "dist/*.js",
+      "dist/*.ts",
       "README.*",
       "LICENSE.*"
    ],
@@ -24,8 +25,9 @@
    "keywords": [
       "dotnetify",
       "signalr",
-      "knockout",
       "react",
+      "react-native",
+      "knockout",
       "mvvm",
       "web",
       "mobile",
