@@ -52,4 +52,8 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.6.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\typings\" />
+  </ItemGroup>
+
 </Project>

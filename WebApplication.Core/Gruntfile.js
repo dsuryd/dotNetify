@@ -82,6 +82,14 @@ module.exports = function (grunt) {
                {
                   src: "../WebApplication.Core.React/wwwroot/lib/no-jquery.signalR.js",
                   dest: "../dist/no-jquery.signalR.js"
+               },
+               {
+                  src: "../WebApplication.Core.React/wwwroot/lib/typings/dotnetify.d.ts",
+                  dest: "../dist/dotnetify.d.ts"
+               },
+               {
+                  src: "../WebApplication.Core.React/wwwroot/lib/typings/dotnetify-react.router.d.ts",
+                  dest: "../dist/dotnetify-react.router.d.ts"
                }
             ]
          }
