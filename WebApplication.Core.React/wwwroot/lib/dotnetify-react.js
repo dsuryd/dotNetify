@@ -46,8 +46,17 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          debugFn: null,
 
          // Connection state.
-         isConnected: function () { return dotnetifyHub.isConnected; },
          connectionStateHandler: null,
+         isConnected: function () { return dotnetifyHub.isConnected; },
+
+         triggerConnectionStateEvent: function (state, ex) {
+            if (typeof dotnetify.connectionStateHandler === "function")
+               dotnetify.connectionStateHandler(state, ex);
+            else if (ex)
+               console.error(ex);
+            else if (dotnetify.debug)
+               console.log("SignalR: " + state);
+         },
 
          // Generic connect function for non-React app.
          connect: function (iVMId, iOptions) { return dotnetify.react.connect(iVMId, null, iOptions); },
@@ -106,16 +115,14 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
                // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.
                var startHub = function () {
-                  var hub = dotnetifyHub.start(dotnetify.hubOptions);
-                  hub.done(function () {
-                     dotnetify._connectRetry = 0;
-                     getInitialStates();
-                  })
-                     .fail(function (e) {
-                        console.error(e);
+                  return dotnetifyHub.start(dotnetify.hubOptions)
+                     .done(function () {
+                        dotnetify._connectRetry = 0;
+                        getInitialStates();
+                     })
+                     .fail(function (ex) {
+                        dotnetify.triggerConnectionStateEvent("error", ex);
                      });
-
-                  return hub;
                }
                dotnetify._hub = startHub();
 
@@ -131,12 +138,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
                // Use SignalR event to raise the connection state event.
                dotnetifyHub.stateChanged(function (state) {
-                  var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
-                  if(dotnetify.debug)
-                     console.log("SignalR: " + stateText[state.newState]);
-
-                  if (typeof dotnetify.connectionStateHandler === "function")
-                     dotnetify.connectionStateHandler(stateText[state.newState]);
+                  dotnetify.triggerConnectionStateEvent(state);
                });
             }
             else if (dotnetify.isConnected())
@@ -185,7 +187,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          getViewModels: function () {
             var self = dotnetify.react;
             var vmArray = [];
-            for (var vmId in self.viewModels) 
+            for (var vmId in self.viewModels)
                vmArray.push(self.viewModels[vmId]);
             return vmArray;
          }
@@ -237,7 +239,16 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             if (typeof plugin["$destroy"] === "function")
                plugin.$destroy.apply(this);
          }
-         dotnetify.hubServer.dispose_VM(this.$vmId);
+
+         if (dotnetify.isConnected()) {
+            try {
+               dotnetify.hubServer.dispose_VM(this.$vmId);
+            }
+            catch (ex) {
+               dotnetify.triggerConnectionStateEvent("error", ex);
+            }
+         }
+
          delete dotnetify.react.viewModels[this.$vmId];
       }
 
@@ -257,8 +268,8 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                      dotnetify.debugFn(this.$vmId, "sent", iValue);
                }
             }
-            catch (e) {
-               console.error(e);
+            catch (ex) {
+               dotnetify.triggerConnectionStateEvent("error", ex);
             }
          }
       }
@@ -351,15 +362,15 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                continue;
             }
          }
-      },
+      }
 
-         // Requests state from the server view model.
-         dotnetifyVM.prototype.$request = function () {
-            if (dotnetify.isConnected()) {
-               dotnetify.hubServer.request_VM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
-               this.$requested = true;
-            }
+      // Requests state from the server view model.
+      dotnetifyVM.prototype.$request = function () {
+         if (dotnetify.isConnected()) {
+            dotnetify.hubServer.request_VM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
+            this.$requested = true;
          }
+      }
 
       // Updates state from the server view model to the view.
       // iVMData - Serialized state from the server.

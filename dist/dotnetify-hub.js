@@ -165,7 +165,10 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
          },
 
          stateChanged: function (iHandler) {
-            return $.connection.hub.stateChanged(iHandler);
+            return $.connection.hub.stateChanged(function (state) {
+               var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
+               iHandler(stateText[state.newState]);
+            });
          }
       });
 
