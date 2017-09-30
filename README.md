@@ -4,7 +4,7 @@
 
 DotNetify is a free, open source project that lets you create amazing real-time, reactive web apps with HTML/Javascript front-end on cross-platform C# .NET back-end. 
 
-__*** NEW: React Native support with v2.0.6-beta ***__
+__*** NEW: React Native support with v2.0.6-beta - [see demo here](https://github.com/dsuryd/dotnetify-react-native-demo) ***__
 
 ## Features
 
