@@ -12,8 +12,8 @@
     "inputFile": "wwwroot/js/HelloWorld.jsx"
   },
   {
-    "outputFile": "wwwroot/js/index.js",
-    "inputFile": "wwwroot/js/index.jsx"
+    "outputFile": "wwwroot/js/Index.js",
+    "inputFile": "wwwroot/js/Index.jsx"
   },
   {
     "outputFile": "wwwroot/js/SimpleList.js",
