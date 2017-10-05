@@ -17,7 +17,7 @@ limitations under the License.
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.SignalR.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 

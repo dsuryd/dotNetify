@@ -32,7 +32,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
    }
 }
    (function ($, signalR, window) {
-
+      
       // SignalR .NET Core.
       if (signalR && signalR.HubConnection) {
 

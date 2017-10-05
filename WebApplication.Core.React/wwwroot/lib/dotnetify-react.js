@@ -67,7 +67,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-         version: "1.0.4-beta",
+         version: "1.0.5-beta",
          viewModels: {},
          plugins: {},
 
@@ -110,7 +110,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                   else
                      // If we get to this point, that means the server holds a view model instance
                      // whose view no longer existed.  So, tell the server to dispose the view model.
-                     hub.server.dispose_VM(iVMId);
+                     dotnetifyHub.server.dispose_VM(iVMId);
                };
 
                // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.

@@ -10,7 +10,8 @@
       "material-ui": "^0.16.7",
       "react-tap-event-plugin": "^2.0.1",
       "chart.js": "1.1.1",
-      "react-chartjs": "0.8.0"
+      "react-chartjs": "0.8.0",
+      "@aspnet/signalr-client": "^1.0.0-alpha1-final"
    },
    "devDependencies": {
       "webpack": "^2.2.1",

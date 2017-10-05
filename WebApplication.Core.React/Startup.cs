@@ -28,7 +28,7 @@ namespace WebApplication.Core.React
          app.UseAuthServer(); // Provide auth tokens for Secure Page demo.
 
          app.UseWebSockets();
-         app.UseSignalR(); // Required by dotNetify.
+         app.UseSignalR(routes => routes.MapHub<DotNetifyHub>("dotnetify"));  // Required by dotNetify.
          app.UseDotNetify(config =>
          {
             string secretKey = "dotnetifydemo_secretkey_123!";

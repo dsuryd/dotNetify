@@ -34,6 +34,8 @@ namespace DotNetify
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IHubPipeline _hubPipeline;
       private DotNetifyHubContext _hubContext;
+      private IHubContext<DotNetifyHub> _globalHubContext;
+      private HubCallerContext _callerContext;
       private IPrincipal _principal;
 
       /// <summary>
@@ -70,12 +72,14 @@ namespace DotNetify
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
       /// <param name="principalAccessor">Allow to pass the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
-      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IHubPipeline hubPipeline)
+      /// <param name="globalHubContext">Provides access to hubs.</param>
+      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IHubPipeline hubPipeline, IHubContext<DotNetifyHub> globalHubContext)
       {
          _vmControllerFactory = vmControllerFactory;
          _vmControllerFactory.ResponseDelegate = Response_VM;
          _principalAccessor = principalAccessor;
          _hubPipeline = hubPipeline;
+         _globalHubContext = globalHubContext;
       }
 
       /// <summary>
@@ -84,7 +88,7 @@ namespace DotNetify
       /// <param name="stopCalled">True, if stop was called on the client closing the connection gracefully;
       /// false, if the connection has been lost for longer than the timeout.</param>
       /// <returns></returns>
-      public override Task OnDisconnected(bool stopCalled)
+      public override Task OnDisconnectedAsync(Exception exception)
       {
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(Context.ConnectionId);
@@ -92,7 +96,7 @@ namespace DotNetify
          // Allow middlewares to hook to the event.
          _hubPipeline.RunDisconnectionMiddlewares(Context);
 
-         return base.OnDisconnected(stopCalled);
+         return base.OnDisconnectedAsync(exception);
       }
 
       #region Client Requests
@@ -106,7 +110,8 @@ namespace DotNetify
       {
          try
          {
-            _hubContext = new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmArg, null, Principal);
+            _callerContext = Context;
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Request_VM), vmId, vmArg, null, Principal);
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
@@ -131,7 +136,8 @@ namespace DotNetify
       {
          try
          {
-            _hubContext = new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmData, null, Principal);
+            _callerContext = Context;
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Request_VM), vmId, vmData, null, Principal);
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
@@ -176,7 +182,7 @@ namespace DotNetify
       internal void Response_VM(string connectionId, string vmId, string vmData)
       {
          if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
-            Clients.Client(connectionId).Response_VM(vmId, vmData);
+            _globalHubContext.Clients.Client(connectionId).InvokeAsync(nameof(Response_VM), new object[] { vmId, vmData });
       }
 
       #endregion
@@ -222,7 +228,7 @@ namespace DotNetify
       {
          try
          {
-            _hubContext = new DotNetifyHubContext(Context, nameof(Response_VM), vmId, vmData, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Response_VM), vmId, vmData, null, Principal);
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;

@@ -20,7 +20,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify
 {

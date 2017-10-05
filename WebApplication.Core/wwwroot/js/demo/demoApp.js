@@ -9,7 +9,7 @@
       "router": "dotnetify.router",
       "binder": "dotnetify.binder",
       "binder-polymer": "dotnetify.binder.polymer",
-      "signalr": "jquery.signalR",
+      "signalr": "signalr-clientES5-1.0.0-alpha1-final", 
       "bootstrap": "demo/bootstrap.min"
    },
    shim: {
@@ -17,7 +17,6 @@
       "jquery-ui": ["jquery"],
       "knockout": { exports: "ko" },
       "bootstrap": ["jquery"],
-      "signalr": { deps: ["jquery"], exports: "$.connection" },
       "binder-polymer": ["binder"]
    }
 });

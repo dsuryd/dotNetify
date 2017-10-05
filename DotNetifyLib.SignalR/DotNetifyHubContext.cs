@@ -17,7 +17,7 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Security.Principal;
-using Microsoft.AspNetCore.SignalR.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify
 {

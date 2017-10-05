@@ -16,7 +16,7 @@ limitations under the License.
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify
 {

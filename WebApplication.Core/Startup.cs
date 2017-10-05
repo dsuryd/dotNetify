@@ -30,7 +30,7 @@ namespace WebApplication.Core
          services.AddMvc();
 
          // SignalR and Memory Cache are required by dotNetify.
-         services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+         services.AddSignalR();
          services.AddMemoryCache();
          services.AddDotNetify();
 
@@ -58,7 +58,7 @@ namespace WebApplication.Core
 
          // Required by dotNetify.
          app.UseWebSockets();
-         app.UseSignalR();
+         app.UseSignalR(routes => routes.MapHub<DotNetifyHub>("dotnetify"));
 
          app.UseDotNetify(config => {
 
