@@ -238,9 +238,9 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            var finalEx = _hubPipeline.RunExceptionMiddleware(Context, ex);
+            var finalEx = _hubPipeline.RunExceptionMiddleware(_callerContext, ex);
             if (finalEx is OperationCanceledException == false)
-               Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
+               Response_VM(_callerContext.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
 

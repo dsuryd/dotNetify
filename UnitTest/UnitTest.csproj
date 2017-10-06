@@ -73,7 +73,7 @@
       <Project>{329f210e-0721-462c-a368-14121dcee135}</Project>
       <Name>DotNetifyLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ViewModels\ViewModels.csproj">
+    <ProjectReference Include="..\ASP.NET Demo\ViewModels\ViewModels.csproj">
       <Project>{d777b14b-c36d-48a8-b5a8-2f5b0fceb0cc}</Project>
       <Name>ViewModels</Name>
     </ProjectReference>

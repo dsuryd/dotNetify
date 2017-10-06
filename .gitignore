@@ -3,14 +3,14 @@
 ################################################################################
 
 /.vs
-/DotNetifyLib.Core/bin/Debug/netstandard1.6
-/DotNetifyLib.Core/obj/Debug/netstandard1.6
-/DotNetifyLib/obj/Debug
+/DotNetifyLib.Core/bin
+/DotNetifyLib.Core/obj
 /DotNetifyLib/bin
+/DotNetifyLib/obj
 /DotNetifyLib.Core/DotNetifyLib.Core.xproj.user
 /DotNetifyLib.Core/project.lock.json
-/DotNetifyLib.SignalR/bin/Debug/netstandard1.6
-/DotNetifyLib.SignalR/obj/Debug/netstandard1.6
+/DotNetifyLib.SignalR/bin
+/DotNetifyLib.SignalR/obj
 /DotNetifyLib.SignalR/DotNetifyLib.SignalR.xproj.user
 /DotNetifyLib.SignalR/project.lock.json
 /packages
@@ -90,3 +90,15 @@
 /WebApplication.Core.React/obj
 /UpgradeLog.htm
 /DotNetifyLib.SignalR/bin
+/ASP.NET Core Demo/WebApplication.Core/node_modules
+/ASP.NET Core Demo/WebApplication.Core/obj
+/ASP.NET Core Demo/ViewModels.Examples/bin
+/ASP.NET Core Demo/ViewModels.Examples/obj
+/ASP.NET Core Demo/WebApplication.Core/bin
+/ASP.NET Core Demo/WebApplication.Core.React/bin
+/ASP.NET Core Demo/WebApplication.Core.React/node_modules
+/ASP.NET Core Demo/WebApplication.Core.React/obj
+/ASP.NET Demo/ViewModels/bin
+/ASP.NET Demo/ViewModels/obj
+/ASP.NET Demo/WebApplication/Bin
+/ASP.NET Demo/WebApplication/obj
