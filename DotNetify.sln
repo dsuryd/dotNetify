@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E
 		package.json = package.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication", "ASP.NET Demo\WebApplication\WebApplication.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication.Knockout", "ASP.NET Demo\WebApplication.Knockout\WebApplication.Knockout.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetifyLib", "DotNetifyLib\DotNetifyLib.csproj", "{329F210E-0721-462C-A368-14121DCEE135}"
 EndProject
@@ -38,11 +38,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Core", "DotNet
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.SignalR", "DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj", "{97C031E6-BD91-45A7-B8C0-037A3CB9FD3E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModels.Examples", "ASP.NET Core Demo\ViewModels.Examples\ViewModels.Examples.csproj", "{D404DC45-B2C9-40C3-9CDA-7DC0FF7ED4DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModels", "ASP.NET Core Demo\ViewModels\ViewModels.csproj", "{D404DC45-B2C9-40C3-9CDA-7DC0FF7ED4DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication.Core", "ASP.NET Core Demo\WebApplication.Core\WebApplication.Core.csproj", "{A6D46694-DBCE-47EC-B1E1-8F10B0351E82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication.Knockout", "ASP.NET Core Demo\WebApplication.Knockout\WebApplication.Knockout.csproj", "{A6D46694-DBCE-47EC-B1E1-8F10B0351E82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication.Core.React", "ASP.NET Core Demo\WebApplication.Core.React\WebApplication.Core.React.csproj", "{958CDC01-6AE9-480F-A12B-49B95C707238}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication.React", "ASP.NET Core Demo\WebApplication.React\WebApplication.React.csproj", "{958CDC01-6AE9-480F-A12B-49B95C707238}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Knockout", "Knockout", "{2867C26D-0063-47F2-BA45-143CF0762543}"
 EndProject

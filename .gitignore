@@ -102,3 +102,14 @@
 /ASP.NET Demo/ViewModels/obj
 /ASP.NET Demo/WebApplication/Bin
 /ASP.NET Demo/WebApplication/obj
+/ASP.NET Core Demo/ViewModels/bin
+/ASP.NET Core Demo/ViewModels/obj
+/ASP.NET Core Demo/WebApplication.Knockout/bin
+/ASP.NET Core Demo/WebApplication.Knockout/node_modules
+/ASP.NET Core Demo/WebApplication.Knockout/obj
+/ASP.NET Core Demo/WebApplication.React/bin
+/ASP.NET Core Demo/WebApplication.React/node_modules
+/ASP.NET Core Demo/WebApplication.React/obj
+/ASP.NET Demo/WebApplication.Knockout/Bin
+/ASP.NET Demo/WebApplication.Knockout/obj
+/ASP.NET Demo/WebApplication.Knockout/Scripts/lib
