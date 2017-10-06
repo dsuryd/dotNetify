@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E
 		package.json = package.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication.Knockout", "ASP.NET Demo\WebApplication.Knockout\WebApplication.Knockout.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication", "ASP.NET Demo\WebApplication.Knockout\WebApplication.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetifyLib", "DotNetifyLib\DotNetifyLib.csproj", "{329F210E-0721-462C-A368-14121DCEE135}"
 EndProject
