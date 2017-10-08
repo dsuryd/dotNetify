@@ -48,11 +48,11 @@ module.exports = function (grunt) {
          dist: {
             files: [
                {
-                  src: "../../src/knockout/dotnetify.js",
+                  src: "wwwroot/lib/dotnetify.js",
                   dest: "../../dist/dotnetify.js"
                },
                {
-                  src: "../../src/knockout/dotnetify.router.js",
+                  src: "wwwroot/lib/dotnetify.router.js",
                   dest: "../../dist/dotnetify.router.js"
                },
                {
@@ -60,35 +60,35 @@ module.exports = function (grunt) {
                   dest: "../../dist/knockout.mapping-latest.js"
                },
                {
-                  src: "../../src/dotnetify-hub.js",
+                  src: "../WebApplication.React/wwwroot/lib/dotnetify-hub.js",
                   dest: "../../dist/dotnetify-hub.js"
                },
                {
-                  src: "../../src/react/dotnetify-react.js",
+                  src: "../WebApplication.React/wwwroot/lib/dotnetify-react.js",
                   dest: "../../dist/dotnetify-react.js"
                },
                {
-                  src: "../../src/react/dotnetify-react.router.js",
+                  src: "../WebApplication.React/wwwroot/lib/dotnetify-react.router.js",
                   dest: "../../dist/dotnetify-react.router.js"
                },
                {
-                  src: "../../src/react/dotnetify-react.scope.js",
+                  src: "../WebApplication.React/wwwroot/lib/dotnetify-react.scope.js",
                   dest: "../../dist/dotnetify-react.scope.js"
                },
                {
-                  src: "../../src/jquery-shim.js",
+                  src: "../WebApplication.React/wwwroot/lib/jquery-shim.js",
                   dest: "../../dist/jquery-shim.js"
                },
                {
-                  src: "../../src/no-jquery.signalR.js",
+                  src: "../WebApplication.React/wwwroot/lib/no-jquery.signalR.js",
                   dest: "../../dist/no-jquery.signalR.js"
                },
                {
-                  src: "../../src/typings/dotnetify.d.ts",
+                  src: "../WebApplication.React/wwwroot/lib/typings/dotnetify.d.ts",
                   dest: "../../dist/dotnetify.d.ts"
                },
                {
-                  src: "../../src/typings/dotnetify-react.router.d.ts",
+                  src: "../WebApplication.React/wwwroot/lib/typings/dotnetify-react.router.d.ts",
                   dest: "../../dist/dotnetify-react.router.d.ts"
                }
             ]
@@ -111,17 +111,17 @@ module.exports = function (grunt) {
             files: [
                {
                   src: [
-                     "../../src/knockout/dotnetify.js",
-                     "../../src/knockout/dotnetify.router.js"
+                     "wwwroot/lib/dotnetify.js",
+                     "wwwroot/lib/dotnetify.router.js"
                   ],
                   dest: "../../dist/dotnetify.min.js"
                },
                {
                   src: [
-                     "../../src/dotnetify-hub.js",
-                     "../../src/react/dotnetify-react.js",
-                     "../../src/react/dotnetify-react.router.js",
-                     "../../src/react/dotnetify-react.scope.js"
+                     "../WebApplication.React/wwwroot/lib/dotnetify-hub.js",
+                     "../WebApplication.React/wwwroot/lib/dotnetify-react.js",
+                     "../WebApplication.React/wwwroot/lib/dotnetify-react.router.js",
+                     "../WebApplication.React/wwwroot/lib/dotnetify-react.scope.js"
                   ],
                   dest: "../../dist/dotnetify-react.min.js"
                }

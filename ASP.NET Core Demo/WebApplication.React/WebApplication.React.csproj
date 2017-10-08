@@ -11,6 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\lib\typings\**" />
+    <Content Remove="wwwroot\lib\typings\**" />
+    <EmbeddedResource Remove="wwwroot\lib\typings\**" />
+    <None Remove="wwwroot\lib\typings\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Resources\AFITop100.json" />
     <EmbeddedResource Include="Resources\employees.json" />
     <EmbeddedResource Include="Resources\webstore.json" />
@@ -46,10 +53,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.1.4" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.7.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\lib\typings\" />
   </ItemGroup>
 
   <ItemGroup>

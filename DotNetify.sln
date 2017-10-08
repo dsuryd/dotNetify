@@ -68,6 +68,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "react", "react", "{9D9A8393
 		src\react\dotnetify-react.scope.js = src\react\dotnetify-react.scope.js
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "typings", "typings", "{F544D200-E987-41B2-8532-A8E0085B6986}"
+	ProjectSection(SolutionItems) = preProject
+		src\typings\dotnetify-react.router.d.ts = src\typings\dotnetify-react.router.d.ts
+		src\typings\dotnetify.d.ts = src\typings\dotnetify.d.ts
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Android = Debug|Android
@@ -428,6 +434,7 @@ Global
 		{2867C26D-0063-47F2-BA45-143CF0762543} = {4D24F814-2737-4143-8FC7-308D12F67719}
 		{D077EE0B-21A8-43D5-AD28-81C1521ED335} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
 		{9D9A8393-59C7-47B2-A735-C4FE3F80C11D} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
+		{F544D200-E987-41B2-8532-A8E0085B6986} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A66C33F-8652-4550-975D-6599E2C985B6}
