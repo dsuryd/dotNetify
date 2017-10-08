@@ -46,6 +46,28 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication.React", "ASP
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Knockout", "Knockout", "{2867C26D-0063-47F2-BA45-143CF0762543}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E963CE9C-CF3C-4380-9518-04FC4B225524}"
+	ProjectSection(SolutionItems) = preProject
+		src\dotnetify-hub.js = src\dotnetify-hub.js
+		src\jquery-shim.js = src\jquery-shim.js
+		src\no-jquery.signalR.js = src\no-jquery.signalR.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "knockout", "knockout", "{D077EE0B-21A8-43D5-AD28-81C1521ED335}"
+	ProjectSection(SolutionItems) = preProject
+		src\knockout\dotnetify.binder.js = src\knockout\dotnetify.binder.js
+		src\knockout\dotnetify.binder.polymer.js = src\knockout\dotnetify.binder.polymer.js
+		src\knockout\dotnetify.js = src\knockout\dotnetify.js
+		src\knockout\dotnetify.router.js = src\knockout\dotnetify.router.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "react", "react", "{9D9A8393-59C7-47B2-A735-C4FE3F80C11D}"
+	ProjectSection(SolutionItems) = preProject
+		src\react\dotnetify-react.js = src\react\dotnetify-react.js
+		src\react\dotnetify-react.router.js = src\react\dotnetify-react.router.js
+		src\react\dotnetify-react.scope.js = src\react\dotnetify-react.scope.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Android = Debug|Android
@@ -404,6 +426,8 @@ Global
 		{A6D46694-DBCE-47EC-B1E1-8F10B0351E82} = {2867C26D-0063-47F2-BA45-143CF0762543}
 		{958CDC01-6AE9-480F-A12B-49B95C707238} = {4D24F814-2737-4143-8FC7-308D12F67719}
 		{2867C26D-0063-47F2-BA45-143CF0762543} = {4D24F814-2737-4143-8FC7-308D12F67719}
+		{D077EE0B-21A8-43D5-AD28-81C1521ED335} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
+		{9D9A8393-59C7-47B2-A735-C4FE3F80C11D} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A66C33F-8652-4550-975D-6599E2C985B6}
