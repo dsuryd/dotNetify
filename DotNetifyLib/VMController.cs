@@ -322,18 +322,12 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional view model's initialization argument.</param>
+      /// <param name="vmNamespace">Optional view model type's namespace.</param>
       /// <returns>View model instance.</returns>
-      protected virtual BaseVM CreateVM(string vmId, object vmArg = null)
+      protected virtual BaseVM CreateVM(string vmId, object vmArg = null, string vmNamespace = null)
       {
          // If the namespace argument is given, try to resolve the view model type to that namespace.
-         const string NAMESPACE = "namespace";
-         string vmNamespace = null;
-         JToken namespaceToken;
-         if (vmArg is JObject && (vmArg as JObject).TryGetValue(NAMESPACE, StringComparison.OrdinalIgnoreCase, out namespaceToken))
-         {
-            vmNamespace = namespaceToken.ToString();
-            (vmArg as JObject).Remove(NAMESPACE);
-         }
+         vmNamespace = vmNamespace ?? ExtractNamespace(ref vmArg);
 
          // If the view model Id is in the form of a delimited path, it has a master view model.
          BaseVM masterVM = null;
@@ -346,8 +340,7 @@ namespace DotNetify
             {
                if (!_activeVMs.ContainsKey(masterVMId))
                {
-                  var arg = !string.IsNullOrEmpty(vmNamespace) ? JObject.Parse($"{{{NAMESPACE}: '{vmNamespace}'}}") : null;
-                  masterVM = CreateVM(masterVMId, arg);
+                  masterVM = CreateVM(masterVMId, null, vmNamespace);
                   _activeVMs.TryAdd(masterVMId, new VMInfo { Instance = masterVM });
                }
                else
@@ -403,11 +396,8 @@ namespace DotNetify
 
          // If there are view model arguments, set them into the instance.
          if (vmArg is JObject)
-         {
-            var vmJsonArg = (JObject)vmArg;
-            foreach (var prop in vmJsonArg.Properties())
+            foreach (var prop in (vmArg as JObject).Properties())
                UpdateVM(vmInstance, prop.Name, prop.Value.ToString());
-         }
 
          // Pass the view model instance to the master view model.
          masterVM?.OnSubVMCreated(vmInstance);
@@ -551,6 +541,24 @@ namespace DotNetify
             Trace.Fail(ex.ToString());
             return string.Empty;
          }
+      }
+
+      /// <summary>
+      /// Extracts the namespace string from a view model initialization argument.
+      /// </summary>
+      /// <param name="vmArg">View model's initialization argument.</param>
+      /// <returns>Namespace string or null.</returns>
+      private string ExtractNamespace(ref object vmArg)
+      {
+         const string NAMESPACE = "namespace";
+         string vmNamespace = null;
+         JToken namespaceToken;
+         if (vmArg is JObject && (vmArg as JObject).TryGetValue(NAMESPACE, StringComparison.OrdinalIgnoreCase, out namespaceToken))
+         {
+            vmNamespace = namespaceToken.ToString();
+            (vmArg as JObject).Remove(NAMESPACE);
+         }
+         return vmNamespace;
       }
 
       /// <summary>
