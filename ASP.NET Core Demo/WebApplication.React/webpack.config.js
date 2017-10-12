@@ -8,7 +8,7 @@ module.exports = {
    resolve: {
       modules: ["wwwroot/lib", "node_modules"],
       alias: {
-         signalR: "@aspnet/signalr-client/dist/browser/signalr-clientES5-1.0.0-alpha1-final"
+         signalR: "@aspnet/signalr-client/dist/browser/signalr-clientES5-1.0.0-alpha2-final"
          //signalR: "./no-jquery.signalR"
       }
    },

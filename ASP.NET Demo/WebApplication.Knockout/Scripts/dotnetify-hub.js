@@ -32,7 +32,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
    }
 }
    (function ($, signalR, window) {
-      
+
       // SignalR .NET Core.
       if (signalR && signalR.HubConnection) {
 
@@ -59,7 +59,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
             },
 
             disconnected: function (iHandler) {
-               return dotnetifyHub._connection.onConnectionClosed(iHandler);
+               return dotnetifyHub._connection.connectionClosed(iHandler);
             },
 
             stateChanged: function (iHandler) {
