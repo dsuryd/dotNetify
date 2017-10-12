@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplication.Core.React.Resources {
+namespace WebApplication.React.Resources {
     using System;
     using System.Reflection;
     

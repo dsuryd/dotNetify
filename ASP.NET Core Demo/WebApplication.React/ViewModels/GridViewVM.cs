@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Localization;
-using WebApplication.Core.React.Resources;
+using WebApplication.React.Resources;
 using DotNetify;
 
 namespace ViewModels
