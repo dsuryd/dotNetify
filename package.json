@@ -10,12 +10,7 @@
       "LICENSE.*"
    ],
    "dependencies": {
-      "jquery": "^3.1.1",
-      "jquery-deferred": "^0.3.1",
-      "jquery.ui.widget": "^1.10.3",
-      "knockout": "^3.4.1",
-      "react": "^15.4.2",
-      "react-dom": "^15.4.2"
+      "jquery-deferred": "^0.3.1"
    },
    "repository": {
       "type": "git",

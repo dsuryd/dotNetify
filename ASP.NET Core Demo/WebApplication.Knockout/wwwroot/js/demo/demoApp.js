@@ -9,7 +9,7 @@
       "router": "dotnetify.router",
       "binder": "dotnetify.binder",
       "binder-polymer": "dotnetify.binder.polymer",
-      "signalr": "signalr-clientES5-1.0.0-alpha1-final", 
+      "signalr": "signalr-clientES5-1.0.0-alpha2-final", 
       "bootstrap": "demo/bootstrap.min"
    },
    shim: {

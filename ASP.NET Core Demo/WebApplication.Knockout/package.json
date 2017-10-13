@@ -7,7 +7,7 @@
     "jquery.ui.widget": "^1.10.3",
     "knockout": "^3.4.1",
     "requirejs": "^2.3.2",
-    "signalr": "^2.2.1"
+    "signalr": "^2.2.2"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
