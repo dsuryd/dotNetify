@@ -36,10 +36,10 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
       dotnetify = $.extend(dotnetify, {
          // SignalR hub options.
-         hubServerUrl: null,
-         hubServer: dotnetifyHub.server,
+         hub: dotnetifyHub,
          hubOptions: { "transport": ["webSockets", "longPolling"] },
          hubPath: dotnetifyHub.hubPath,
+         hubServerUrl: null,
 
          // Debug mode.
          debug: true,
@@ -62,8 +62,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          connect: function (iVMId, iOptions) { return dotnetify.react.connect(iVMId, null, iOptions); },
 
          // Internal variables. Do not modify!
-         _hub: null,
-         _connectRetry: 0
+         _hub: null
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
@@ -74,12 +73,6 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          // Initializes connection to SignalR server hub.
          init: function () {
             var self = dotnetify.react;
-            var getInitialStates = function () {
-               for (var vmId in self.viewModels) {
-                  if (!self.viewModels[vmId].$requested)
-                     self.viewModels[vmId].$request();
-               }
-            };
 
             if (dotnetify._hub === null) {
                dotnetifyHub.hubPath = dotnetify.hubPath;
@@ -113,27 +106,10 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                      dotnetifyHub.server.dispose_VM(iVMId);
                };
 
-               // Start SignalR hub connection, and if successful, apply the widget to all scoped elements.
-               var startHub = function () {
-                  return dotnetifyHub.start(dotnetify.hubOptions)
-                     .done(function () {
-                        dotnetify._connectRetry = 0;
-                        getInitialStates();
-                     })
-                     .fail(function (ex) {
-                        dotnetify.triggerConnectionStateEvent("error", ex);
-                     });
-               }
-               dotnetify._hub = startHub();
-
-               // On disconnected, keep attempting to start the connection in increasing interval.
+               // On disconnected, keep attempting to start the connection.
                dotnetifyHub.disconnected(function () {
-                  setTimeout(function () {
-                     dotnetify._hub = startHub();
-                  }, dotnetify._connectRetry * 5000 + 500);
-
-                  if (dotnetify._connectRetry < 3)
-                     dotnetify._connectRetry++;
+                  dotnetify._hub = null;
+                  dotnetifyHub.reconnect(self.startHub);
                });
 
                // Use SignalR event to raise the connection state event.
@@ -141,8 +117,32 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                   dotnetify.triggerConnectionStateEvent(state);
                });
             }
+
+            self.startHub();
+         },
+
+         // Starts the connection to the SignalR server hub.
+         startHub: function () {
+            var self = dotnetify.react;
+            var getInitialStates = function () {
+               for (var vmId in self.viewModels) {
+                  if (!self.viewModels[vmId].$requested)
+                     self.viewModels[vmId].$request();
+               }
+            };
+
+            if (dotnetify._hub === null) {
+               for (var vmId in self.viewModels)
+                  self.viewModels[vmId].$requested = false;
+
+               dotnetify._hub = dotnetifyHub.start(dotnetify.hubOptions)
+                  .done(function () { getInitialStates(); })
+                  .fail(function (ex) { dotnetify.triggerConnectionStateEvent("error", ex); });
+            }
             else if (dotnetify.isConnected())
                dotnetify._hub.done(getInitialStates);
+
+            return dotnetify._hub;
          },
 
          // Connects to a server view model.
@@ -242,7 +242,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
          if (dotnetify.isConnected()) {
             try {
-               dotnetify.hubServer.dispose_VM(this.$vmId);
+               dotnetifyHub.server.dispose_VM(this.$vmId);
             }
             catch (ex) {
                dotnetify.triggerConnectionStateEvent("error", ex);
@@ -258,7 +258,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
          if (dotnetify.isConnected()) {
             try {
-               dotnetify.hubServer.update_VM(this.$vmId, iValue);
+               dotnetifyHub.server.update_VM(this.$vmId, iValue);
 
                if (dotnetify.debug) {
                   console.log("[" + this.$vmId + "] sent> ");
@@ -367,7 +367,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       // Requests state from the server view model.
       dotnetifyVM.prototype.$request = function () {
          if (dotnetify.isConnected()) {
-            dotnetify.hubServer.request_VM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
+            dotnetifyHub.server.request_VM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
             this.$requested = true;
          }
       }

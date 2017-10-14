@@ -43,31 +43,54 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
          dotnetifyHub = $.extend(dotnetifyHub, {
             hubPath: "/dotnetify",
             url: null,
+            reconnectDelay: 5000,
 
+            // Internal variables. Do not modify!
             _connection: null,
+            _disconnectedHandler: function () { },
+            _stateChangedHandler: function (iNewState) { },
+
+            _onDisconnected: function () {
+               dotnetifyHub._changeState(4);
+               dotnetifyHub._disconnectedHandler();
+            },
+            _changeState: function (iNewState) {
+               var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
+               dotnetifyHub._stateChangedHandler(stateText[iNewState]);
+            },
 
             start: function (iHubOptions) {
                dotnetifyHub._connection = new signalR.HubConnection(dotnetifyHub.hubPath);
-
                dotnetifyHub._connection.on("response_vm", dotnetifyHub.client.response_VM);
+               dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
                var promise = dotnetifyHub._connection.start();
+               promise
+                  .then(function () { dotnetifyHub._changeState(1); })
+                  .catch(dotnetifyHub._onDisconnected);
+
                return {
-                  done: function (iHandler) { promise.then(iHandler); return this; },
+                  done: function (iHandler) { promise.then(iHandler).catch(function () { }); return this; },
                   fail: function (iHandler) { promise.catch(iHandler); return this; }
                };
             },
 
             disconnected: function (iHandler) {
-               return dotnetifyHub._connection.onclose(iHandler);
+               if (typeof iHandler === "function")
+                  dotnetifyHub._disconnectedHandler = iHandler;
             },
 
             stateChanged: function (iHandler) {
+               if (typeof iHandler === "function")
+                  dotnetifyHub._stateChangedHandler = iHandler;
+            },
 
-               //return $.connection.hub.stateChanged(function (state) {
-               //   var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
-               //   iHandler(stateText[state.newState]);
-               //});
+            reconnect: function (iStartHubFunc) {
+               if (typeof iStartHubFunc === "function")
+                  setTimeout(function () {
+                     dotnetifyHub._changeState(2);
+                     iStartHubFunc();
+                  }, dotnetifyHub.reconnectDelay);
             },
 
             client: {},
