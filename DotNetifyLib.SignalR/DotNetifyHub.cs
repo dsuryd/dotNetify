@@ -43,7 +43,7 @@ namespace DotNetify
       /// </summary>
       private IPrincipal Principal
       {
-         get { return _principal ?? Context.User; }
+         get { return _principal ?? _callerContext?.User; }
          set { _principal = value; }
       }
 
@@ -161,7 +161,14 @@ namespace DotNetify
       {
          try
          {
-            VMController.OnDisposeVM(Context.ConnectionId, vmId);
+            _callerContext = Context;
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Dispose_VM), vmId, null, null, Principal);
+            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
+            {
+               Principal = ctx.Principal;
+               VMController.OnDisposeVM(Context.ConnectionId, vmId);
+               return Task.CompletedTask;
+            });
          }
          catch (Exception ex)
          {
