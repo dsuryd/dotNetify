@@ -42,7 +42,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          hubServerUrl: null,
 
          // Debug mode.
-         debug: true,
+         debug: false,
          debugFn: null,
 
          // Connection state.
