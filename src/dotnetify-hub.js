@@ -60,7 +60,13 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
             },
 
             start: function (iHubOptions) {
-               dotnetifyHub._connection = new signalR.HubConnection(dotnetifyHub.hubPath);
+               // Map the transport option.
+               var transportOptions = { 'webSockets': 0, 'serverSentEvents': 1, 'longPolling': 2 };
+               if (iHubOptions && Array.isArray(iHubOptions.transport))
+                  iHubOptions.transport = transportOptions[iHubOptions.transport[0]];
+
+               var url = dotnetifyHub.url ? dotnetifyHub.url + dotnetifyHub.hubPath : dotnetifyHub.hubPath;
+               dotnetifyHub._connection = new signalR.HubConnection(url, iHubOptions);
                dotnetifyHub._connection.on("response_vm", dotnetifyHub.client.response_VM);
                dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
