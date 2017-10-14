@@ -1,6 +1,5 @@
 ﻿$ = jQuery = require("jquery"); // Add jQuery to global window for Bootstrap.
 require("bootstrap");
-// require("./no-jquery.signalR");
 dotnetifyHub = require("./dotnetify-hub");
 React = require("react");
 ReactDOM = require("react-dom");
