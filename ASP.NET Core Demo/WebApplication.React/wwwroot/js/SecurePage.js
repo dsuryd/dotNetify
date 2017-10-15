@@ -80,11 +80,7 @@ var SecurePage = (function (_React$Component) {
                      errorText: this.state.loginError,
                      authenticated: this.state.accessToken != null }),
                   React.createElement('br', null),
-                  this.state.accessToken != null ? React.createElement(SecurePageView, { accessToken: this.state.accessToken, onExpiredAccess: handleExpiredAccess }) : React.createElement(
-                     'div',
-                     null,
-                     React.createElement(SecurePageView, null)
-                  )
+                  this.state.accessToken ? React.createElement(SecurePageView, { accessToken: this.state.accessToken, onExpiredAccess: handleExpiredAccess }) : React.createElement(NotAuthenticatedView, null)
                )
             )
          );
@@ -152,6 +148,18 @@ var LoginForm = (function (_React$Component2) {
    return LoginForm;
 })(React.Component);
 
+var NotAuthenticatedView = function NotAuthenticatedView() {
+   return React.createElement(
+      Paper,
+      { style: { padding: "2em" } },
+      React.createElement(
+         'h4',
+         null,
+         'Not authenticated'
+      )
+   );
+};
+
 var SecurePageView = (function (_React$Component3) {
    _inherits(SecurePageView, _React$Component3);
 
@@ -163,18 +171,18 @@ var SecurePageView = (function (_React$Component3) {
       _get(Object.getPrototypeOf(SecurePageView.prototype), 'constructor', this).call(this, props);
       this.state = { SecureCaption: "Not authenticated" };
 
-      var bearerToken = this.props.accessToken ? "Bearer " + this.props.accessToken : null;
-      var authHeader = bearerToken ? { Authorization: bearerToken } : {};
-
-      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: function exceptionHandler(ex) {
-            return _this4.onException(ex);
-         } });
+      if (this.props.accessToken) {
+         var authHeader = { Authorization: "Bearer " + this.props.accessToken };
+         this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: function exceptionHandler(ex) {
+               return _this4.onException(ex);
+            } });
+      }
    }
 
    _createClass(SecurePageView, [{
       key: 'componentWillUnmount',
       value: function componentWillUnmount() {
-         this.vm.$destroy();
+         this.vm && this.vm.$destroy();
       }
    }, {
       key: 'onException',
@@ -219,16 +227,16 @@ var AdminSecurePageView = (function (_React$Component4) {
       _get(Object.getPrototypeOf(AdminSecurePageView.prototype), 'constructor', this).call(this, props);
       this.state = {};
 
-      var bearerToken = this.props.accessToken ? "Bearer " + this.props.accessToken : null;
-      var authHeader = bearerToken ? { Authorization: bearerToken } : {};
-
-      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: function exceptionHandler(ex) {} });
+      if (this.props.accessToken) {
+         var authHeader = { Authorization: "Bearer " + this.props.accessToken };
+         this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: function exceptionHandler(ex) {} });
+      }
    }
 
    _createClass(AdminSecurePageView, [{
       key: 'componentWillUnmount',
       value: function componentWillUnmount() {
-         this.vm.$destroy();
+         this.vm && this.vm.$destroy();
       }
    }, {
       key: 'render',

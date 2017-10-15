@@ -1,15 +1,17 @@
-﻿var RouteLink = dotnetify.react.router.RouteLink;
+﻿const RouteLink = dotnetify.react.router.RouteLink;
 
-var BookStore = React.createClass({
-   getInitialState() {
+class BookStore extends React.Component {
+   constructor(props) {
+      super(props);
+
       this.vm = dotnetify.react.connect("BookStoreVM", this);
       this.vm.onRouteEnter = (path, template) => template.Target = "BookPanel";
 
-      return window.vmStates.BookStoreVM;
-   },
+      this.state = window.vmStates.BookStoreVM;
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       return (
          <MuiThemeProvider>
@@ -27,9 +29,12 @@ var BookStore = React.createClass({
          </MuiThemeProvider>
       )
    }
-});
+}
 
-var BookStoreFront = React.createClass({
+class BookStoreFront extends React.Component {
+   constructor(props) {
+      super(props);
+   }
    render() {
       if (this.props.books == null)
          return <div></div>
@@ -52,20 +57,20 @@ var BookStoreFront = React.createClass({
          </div>
       )
    }
-});
-
-var BookDefault = function (props) {
-   return <div></div>;
 }
 
-var Book = React.createClass({
-   getInitialState() {
+const BookDefault = () => <div></div>
+
+class Book extends React.Component {
+   constructor(props) {
+      super(props);
+
       this.vm = dotnetify.react.connect("BookDetailsVM", this);
-      return { Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" }, open: true };
-   },
+      this.state = { Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" }, open: true };
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       var book = this.state.Book;
 
@@ -74,7 +79,7 @@ var Book = React.createClass({
          window.history.back();
       }
 
-      const actions = [<FlatButton label="Back" primary={true} onTouchTap={handleClose} />]
+      const actions = [<FlatButton label="Back" primary={true} onClick={handleClose} />]
 
       return (
          <MuiThemeProvider>
@@ -94,4 +99,4 @@ var Book = React.createClass({
          </MuiThemeProvider>
       )
    }
-});
+}

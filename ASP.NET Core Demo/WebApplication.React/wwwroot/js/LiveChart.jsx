@@ -1,14 +1,16 @@
-﻿var LiveChart = React.createClass({
-   getInitialState() {
+﻿class LiveChart extends React.Component {
+   constructor(props) {
+      super(props);
+
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("LiveChartVM", this);
 
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
-      return window.vmStates.LiveChartVM;
-   },
+      this.state = window.vmStates.LiveChartVM;
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       return (
          <div className="container-fluid">
@@ -16,29 +18,31 @@
                <h3>Example: Live Chart</h3>
             </div>
             <MuiThemeProvider>
-            <div className="row">
-               <div className="col-md-8">
-                  <Paper style={{padding: "2em"}}>
-                     <LiveLineChart data={this.state.InitialLineData} nextData={this.state.NextLineData} />
-                  </Paper>
+               <div className="row">
+                  <div className="col-md-8">
+                     <Paper style={{ padding: "2em" }}>
+                        <LiveLineChart data={this.state.InitialLineData} nextData={this.state.NextLineData} />
+                     </Paper>
+                  </div>
+                  <div className="col-md-4">
+                     <Paper style={{ padding: "2em" }}>
+                        <LiveDoughnutChart data={this.state.InitialDoughnutData} nextData={this.state.NextDoughnutData} />
+                     </Paper>
+                     <Paper style={{ padding: "2em", marginTop: "1em" }}>
+                        <LiveBarChart data={this.state.InitialBarData} nextData={this.state.NextBarData} />
+                     </Paper>
+                  </div>
                </div>
-               <div className="col-md-4">
-                  <Paper style={{padding: "2em"}}>
-                     <LiveDoughnutChart data={this.state.InitialDoughnutData} nextData={this.state.NextDoughnutData} />
-                  </Paper>
-                  <Paper style={{padding: "2em", marginTop: "1em"}}>
-                     <LiveBarChart data={this.state.InitialBarData} nextData={this.state.NextBarData} />
-                  </Paper>
-               </div>
-            </div>
             </MuiThemeProvider>
          </div>
-     );
+      );
    }
-});
+}
 
-const LiveLineChart = React.createClass({
-   getInitialState() {
+class LiveLineChart extends React.Component {
+   constructor(props) {
+      super(props);
+
       // Build the ChartJS data parameter with initial data.
       var initialData = {
          labels: [],
@@ -56,9 +60,8 @@ const LiveLineChart = React.createClass({
          initialData.datasets[0].data.push(data[1]);
       });
 
-      return { chartData: initialData };
-   },
-
+      this.state = { chartData: initialData };
+   }
    render() {
       var chartData = this.state.chartData;
       const chartOptions = { responsive: true, animation: false };
@@ -75,12 +78,14 @@ const LiveLineChart = React.createClass({
 
       return (
          <LineChart data={chartData} options={chartOptions}>{updateData(this.props.nextData)}</LineChart>
-     );
+      );
    }
-});
+}
 
-const LiveBarChart = React.createClass({
-   getInitialState() {
+class LiveBarChart extends React.Component {
+   constructor(props) {
+      super(props);
+
       // Build the ChartJS data parameter with initial data.
       var initialData = {
          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
@@ -92,9 +97,8 @@ const LiveBarChart = React.createClass({
          }]
       };
       initialData.datasets[0].data = this.props.data;
-      return { chartData: initialData };
-   },
-
+      this.state = { chartData: initialData };
+   }
    render() {
       var chartData = this.state.chartData;
       const chartOptions = { responsive: true, animation: true };
@@ -106,12 +110,14 @@ const LiveBarChart = React.createClass({
 
       return (
          <BarChart data={chartData} options={chartOptions}>{updateData(this.props.nextData)}</BarChart>
-     );
+      );
+   }
 }
-});
 
-const LiveDoughnutChart = React.createClass({
-   getInitialState() {
+class LiveDoughnutChart extends React.Component {
+   constructor(props) {
+      super(props);
+
       // Build the ChartJS data parameter with initial data.
       var initialData = [
          {
@@ -131,9 +137,8 @@ const LiveDoughnutChart = React.createClass({
          }];
 
       this.props.data.map((val, idx) => initialData[idx].value = val);
-      return { chartData: initialData };
-   },
-
+      this.state = { chartData: initialData };
+   }
    render() {
       var chartData = this.state.chartData;
       const chartOptions = { responsive: true, animation: true };
@@ -145,6 +150,6 @@ const LiveDoughnutChart = React.createClass({
 
       return (
          <DoughnutChart data={chartData} options={chartOptions}>{updateData(this.props.nextData)}</DoughnutChart>
-     );
+      );
    }
-});
+}

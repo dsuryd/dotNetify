@@ -1,6 +1,9 @@
-﻿var Scope = dotnetify.react.Scope;
+﻿const Scope = dotnetify.react.Scope;
 
-var CompositeView = React.createClass({
+class CompositeView extends React.Component {
+   constructor(props) {
+      super(props);
+   }
    render() {
       return (
          <div className="container-fluid">
@@ -12,21 +15,19 @@ var CompositeView = React.createClass({
                   <AFITop100 />
                </Scope>
             </MuiThemeProvider>
-
          </div>
-     );
+      );
    }
-});
+}
 
-var AFITop100 = React.createClass({
-   contextTypes: { connect: React.PropTypes.func },
-
-   getInitialState() {
-      return this.context.connect("AFITop100VM", this) || {};
-   },
+class AFITop100 extends React.Component {
+   constructor(props, context) {
+      super(props, context);
+      this.state = this.context.connect("AFITop100VM", this) || {};
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       const iconMovie = <IconMovie style={{ color: "white" }} />
       return (
@@ -35,9 +36,9 @@ var AFITop100 = React.createClass({
                <div className="row">
                   <div className="col-md-12">
                      <AppBar title="AFI's 100 Greatest American Films of All Time"
-                             iconElementLeft={iconMovie}
-                             iconStyleLeft={{marginTop: "20px"}}
-                             style={{marginBottom: "1em"}} />
+                        iconElementLeft={iconMovie}
+                        iconStyleLeft={{ marginTop: "20px" }}
+                        style={{ marginBottom: "1em" }} />
                   </div>
                </div>
                <div className="row">
@@ -58,41 +59,43 @@ var AFITop100 = React.createClass({
          </Scope>
       );
    }
-});
+}
 
-var MovieTable = React.createClass({
-   contextTypes: { connect: React.PropTypes.func },
+AFITop100.contextTypes = { connect: PropTypes.func };
 
-   getInitialState() {
-      return this.context.connect("MovieTableVM", this) || {};
-   },
+class MovieTable extends React.Component {
+   constructor(props, context) {
+      super(props, context);
+      this.state = this.context.connect("MovieTableVM", this) || {};
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       return (
          <PaginatedTable colWidths={["1em", "20%", "80px", "40%", "20%"]}
-                         headers={this.state.Headers}
-                         data={this.state.Data}
-                         itemKey={this.state.ItemKey}
-                         select={this.state.SelectedKey}
-                         pagination={this.state.Pagination}
-                         page={this.state.SelectedPage}
-                         onSelect={id => this.dispatchState({ SelectedKey: id })}
-                         onSelectPage={page => this.dispatchState({SelectedPage: page})} />
+            headers={this.state.Headers}
+            data={this.state.Data}
+            itemKey={this.state.ItemKey}
+            select={this.state.SelectedKey}
+            pagination={this.state.Pagination}
+            page={this.state.SelectedPage}
+            onSelect={id => this.dispatchState({ SelectedKey: id })}
+            onSelectPage={page => this.dispatchState({ SelectedPage: page })} />
       );
    }
-});
+}
 
-var MovieDetails = React.createClass({
-   contextTypes: { connect: React.PropTypes.func },
+MovieTable.contextTypes = { connect: PropTypes.func };
 
-   getInitialState() {
-      return this.context.connect("MovieDetailsVM", this) || { Movie: {} };
-   },
+class MovieDetails extends React.Component {
+   constructor(props, context) {
+      super(props, context);
+      this.state = this.context.connect("MovieDetailsVM", this) || { Movie: {} };
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       const movie = this.state.Movie || {};
       const casts = movie.Cast ? movie.Cast.split(",") : [];
@@ -100,26 +103,28 @@ var MovieDetails = React.createClass({
       return (
          <Card>
             <CardHeader title={movie.Movie} subtitle={movie.Year}
-                        titleStyle={{color: "#ff4081", fontSize: "large"}}
-                        style={{borderBottom: "solid 1px #e6e6e6"}} />
+               titleStyle={{ color: "#ff4081", fontSize: "large" }}
+               style={{ borderBottom: "solid 1px #e6e6e6" }} />
             <CardText>
                <p>
                   <b>Director</b><br />
                   {movie.Director}<br />
                </p>
-                <p>
+               <p>
                   <b>Cast</b><br />
-                   {casts.map((cast, idx) => <span key={idx }>{cast}<br /></span>)}
-                </p>
+                  {casts.map((cast, idx) => <span key={idx}>{cast}<br /></span>)}
+               </p>
             </CardText>
          </Card>
       );
    }
-});
+}
 
-var MovieFilter = React.createClass({
-   contextTypes: { connect: React.PropTypes.func },
-   getInitialState() {
+MovieDetails.contextTypes = { connect: PropTypes.func };
+
+class MovieFilter extends React.Component {
+   constructor(props, context) {
+      super(props, context);
       // Combine state from back-end with local state.
       // This can be more concise using Object.assign if not for IE 11 support.
       var state = this.context.connect("MovieFilterVM", this) || {};
@@ -129,20 +134,21 @@ var MovieFilter = React.createClass({
          filter: "Any",
          operation: "has",
          operations: ["has"],
-         text: "" };
+         text: ""
+      };
       for (var prop in localState)
          state[prop] = localState[prop];
-      return state;
-   },
+      this.state = state;
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       const movieProps = ["Any", "Rank", "Movie", "Year", "Cast", "Director"];
       const iconApply = <IconFilter />
 
-      const filterProps = movieProps.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)
-      const filterOperations = this.state.operations.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop } />)
+      const filterProps = movieProps.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop} />)
+      const filterOperations = this.state.operations.map((prop, idx) => <MenuItem key={idx} value={prop} primaryText={prop} />)
 
       const updateFilterDropdown = value => {
          this.setState({ filter: value });
@@ -174,41 +180,43 @@ var MovieFilter = React.createClass({
 
       return (
          <Card>
-            <CardHeader title="Filters" style={{borderBottom: "solid 1px #e6e6e6"}} />
+            <CardHeader title="Filters" style={{ borderBottom: "solid 1px #e6e6e6" }} />
             <CardText>
                <div className="row">
                   <div className="col-md-4">
                      <SelectField fullWidth={true}
-                                  value={this.state.filter}
-                                  onChange={(event, idx, value) => updateFilterDropdown(value)}>
+                        value={this.state.filter}
+                        onChange={(event, idx, value) => updateFilterDropdown(value)}>
                         {filterProps}
                      </SelectField>
                   </div>
                   <div className="col-md-4">
                      <SelectField fullWidth={true}
-                                  value={this.state.operation}
-                                  onChange={(event, index, value) => this.setState({ operation: value })}>
+                        value={this.state.operation}
+                        onChange={(event, index, value) => this.setState({ operation: value })}>
                         {filterOperations}
                      </SelectField>
                   </div>
-                   <div className="col-md-4">
-                      <TextField id="FilterText" fullWidth={true}
-                                 value={this.state.text}
-                                 onChange={event => this.setState({ text: event.target.value })} />
-                   </div>
+                  <div className="col-md-4">
+                     <TextField id="FilterText" fullWidth={true}
+                        value={this.state.text}
+                        onChange={event => this.setState({ text: event.target.value })} />
+                  </div>
                </div>
                <div className="row">
-                  <div className="col-md-12" style={{display: 'flex', flexWrap: 'wrap'}}>
+                  <div className="col-md-12" style={{ display: 'flex', flexWrap: 'wrap' }}>
                      {filters}
                   </div>
                </div>
             </CardText>
             <CardActions>
                <FlatButton label="Apply" icon={iconApply}
-                           onClick={handleApply}
-                           disabled={this.state.text.length == 0} />
+                  onClick={handleApply}
+                  disabled={this.state.text.length == 0} />
             </CardActions>
          </Card>
       );
    }
-});
+}
+
+MovieFilter.contextTypes = { connect: PropTypes.func };

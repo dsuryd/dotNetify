@@ -1,6 +1,8 @@
-﻿var HelloWorld = React.createClass({
+﻿class HelloWorld extends React.Component {
 
-   getInitialState() {
+   constructor(props) {
+      super(props);
+
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("HelloWorldVM", this);
 
@@ -11,11 +13,11 @@
       }
 
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
-      return window.vmStates.HelloWorldVM;
-   },
+      this.state = window.vmStates.HelloWorldVM;
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       return (
          <div className="container-fluid">
@@ -45,23 +47,22 @@
          </div>
       );
    }
-});
+}
 
-var TextBox = React.createClass({
-   getInitialState() {
-      return {
-         changed: false
-      }
-   },
+class TextBox extends React.Component {
+   constructor(props) {
+      super(props);
+      this.state = { changed: false };
+   }
    handleChange(event) {
       this.setState({ changed: true });
       this.props.onChange(event.target.value);
-   },
+   }
    handleBlur() {
       if (this.state.changed)
          this.props.onUpdate(this.props.value);
       this.setState({ changed: false });
-   },
+   }
    render() {
       return (
          <div>
@@ -74,4 +75,4 @@ var TextBox = React.createClass({
          </div>
      );
    }
-});
+}

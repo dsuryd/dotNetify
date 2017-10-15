@@ -1,6 +1,6 @@
-﻿var SimpleList = React.createClass({
-
-   getInitialState() {
+﻿class SimpleList extends React.Component {
+   constructor(props) {
+      super(props);
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("SimpleListVM", this);
 
@@ -12,11 +12,11 @@
       }
 
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
-      return window.vmStates.SimpleListVM;
-   },
+      this.state = window.vmStates.SimpleListVM;
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       const handleUpdate = (value) => {
          var update = this.state.Employees.map(employee => employee.Id == value.Id ? Object.assign(employee, value) : employee);
@@ -33,28 +33,31 @@
                <div>
                   <AddNameBox onAdd={value => this.dispatch({ Add: value })} />
                   <EmployeeTable data={this.state.Employees}
-                                 onUpdate={handleUpdate}
-                                 onRemove={id => this.dispatch({ Remove: id })} />
+                     onUpdate={handleUpdate}
+                     onRemove={id => this.dispatch({ Remove: id })} />
                   <Snackbar open={this.state.ShowNotification} message="Changes saved" autoHideDuration={1000}
-                            onRequestClose={() => this.setState({ ShowNotification: false })} />
+                     onRequestClose={() => this.setState({ ShowNotification: false })} />
                </div>
             </MuiThemeProvider>
          </div>
       );
    }
-});
+}
 
-var EmployeeTable = React.createClass({
+class EmployeeTable extends React.Component {
+   constructor(props) {
+      super(props);
+   }
    render() {
       const lastColWidth = { width: "10em" }
       const iconDelete = <IconDelete style={{ width: 20, height: 20 }} color='#8B8C8D' />
 
       const employees = this.props.data.map(employee =>
          <TableRow key={employee.Id}>
-            <TableRowColumn><InlineEdit text={employee.FirstName} onChange={value => this.props.onUpdate({ Id: employee.Id, FirstName:value })} /></TableRowColumn>
+            <TableRowColumn><InlineEdit text={employee.FirstName} onChange={value => this.props.onUpdate({ Id: employee.Id, FirstName: value })} /></TableRowColumn>
             <TableRowColumn><InlineEdit text={employee.LastName} onChange={value => this.props.onUpdate({ Id: employee.Id, LastName: value })} /></TableRowColumn>
             <TableRowColumn style={lastColWidth}>
-               <FlatButton label="Remove" labelStyle={{fontSize: "8pt"}} icon={iconDelete} onClick={() => this.props.onRemove(employee.Id)} />
+               <FlatButton label="Remove" labelStyle={{ fontSize: "8pt" }} icon={iconDelete} onClick={() => this.props.onRemove(employee.Id)} />
             </TableRowColumn>
          </TableRow>
       );
@@ -73,18 +76,17 @@ var EmployeeTable = React.createClass({
                   {employees}
                </TableBody>
             </Table>
-            <Paper style={{width:"11em", marginTop: "1em", backgroundColor: "#e0e0e0"}}><i>* Click a name to edit</i></Paper>
+            <Paper style={{ width: "11em", marginTop: "1em", backgroundColor: "#e0e0e0" }}><i>* Click a name to edit</i></Paper>
          </div>
       );
    }
-});
+}
 
-var AddNameBox = React.createClass({
-   getInitialState() {
-      return {
-         fullName: ""
-      }
-   },
+class AddNameBox extends React.Component {
+   constructor(props) {
+      super(props);
+      this.state = { fullName: "" }
+   }
    render() {
       const handleAdd = () => {
          if (this.state.fullName) {
@@ -95,21 +97,22 @@ var AddNameBox = React.createClass({
       return (
          <div>
             <TextField id="FullName" floatingLabelText="Full name"
-                       value={this.state.fullName}
-                       onChange={event => this.setState({ fullName: event.target.value })} />
-            <RaisedButton style={{ marginLeft: "1em" }} label="Add" primary={true} onClick={handleAdd } />
+               value={this.state.fullName}
+               onChange={event => this.setState({ fullName: event.target.value })} />
+            <RaisedButton style={{ marginLeft: "1em" }} label="Add" primary={true} onClick={handleAdd} />
          </div>
       );
    }
-});
+}
 
-var InlineEdit = React.createClass({
-   getInitialState() {
-      return {
+class InlineEdit extends React.Component {
+   constructor(props) {
+      super(props);
+      this.state = {
          edit: false,
          value: this.props.text
       }
-   },
+   }
    render() {
       const handleClick = event => {
          event.stopPropagation();
@@ -131,15 +134,15 @@ var InlineEdit = React.createClass({
 
       var elem;
       if (!this.state.edit)
-         elem = <div style={{ minHeight: "2em" }} onClick={handleClick }>{this.props.text}</div>
+         elem = <div style={{ minHeight: "2em" }} onClick={handleClick}>{this.props.text}</div>
       else
          elem = <TextField id="EditField" ref={input => setFocus(input)}
-                           value={this.state.value}
-                           onClick={handleClick}
-                           onBlur={handleBlur}
-                           onChange={event => this.setState({ value: event.target.value })} />
+            value={this.state.value}
+            onClick={handleClick}
+            onBlur={handleBlur}
+            onChange={event => this.setState({ value: event.target.value })} />
       return (
          <div>{elem}</div>
       );
    }
-});
+}

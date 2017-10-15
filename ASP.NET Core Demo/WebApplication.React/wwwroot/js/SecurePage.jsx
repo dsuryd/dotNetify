@@ -38,10 +38,8 @@
                      onSignOut={handleSignOut}
                      errorText={this.state.loginError}
                      authenticated={this.state.accessToken != null} />
-                  <br/>
-                  {this.state.accessToken != null
-                     ? <SecurePageView accessToken={this.state.accessToken} onExpiredAccess={handleExpiredAccess} />
-                     : <div><SecurePageView /></div>}
+                  <br />
+                  {this.state.accessToken ? <SecurePageView accessToken={this.state.accessToken} onExpiredAccess={handleExpiredAccess} /> : <NotAuthenticatedView />}
                </div>
             </div>
          </MuiThemeProvider>
@@ -79,18 +77,23 @@ class LoginForm extends React.Component {
    }
 }
 
+const NotAuthenticatedView = () => 
+   <Paper style={{ padding: "2em" }}>
+      <h4>Not authenticated</h4>
+   </Paper>
+
 class SecurePageView extends React.Component {
    constructor(props) {
       super(props);
       this.state = { SecureCaption: "Not authenticated" };
 
-      let bearerToken = this.props.accessToken ? "Bearer " + this.props.accessToken : null;
-      let authHeader = bearerToken ? { Authorization: bearerToken } : {};
-
-      this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: ex => this.onException(ex) });
+      if (this.props.accessToken) {
+         let authHeader = { Authorization: "Bearer " + this.props.accessToken };
+         this.vm = dotnetify.react.connect("SecurePageVM", this, { headers: authHeader, exceptionHandler: ex => this.onException(ex) });
+      }
    }
    componentWillUnmount() {
-      this.vm.$destroy();
+      this.vm && this.vm.$destroy();
    }
    onException(exception) {
       if (exception.name == "UnauthorizedAccessException")
@@ -113,13 +116,13 @@ class AdminSecurePageView extends React.Component {
       super(props);
       this.state = {};
 
-      let bearerToken = this.props.accessToken ? "Bearer " + this.props.accessToken : null;
-      let authHeader = bearerToken ? { Authorization: bearerToken } : {};
-
-      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: ex => { } });
+      if (this.props.accessToken) {
+         let authHeader = { Authorization: "Bearer " + this.props.accessToken };
+         this.vm = dotnetify.react.connect("AdminSecurePageVM", this, { headers: authHeader, exceptionHandler: ex => { } });
+      }
    }
    componentWillUnmount() {
-      this.vm.$destroy();
+      this.vm && this.vm.$destroy();
    }
    render() {
       return !this.state.TokenIssuer ? null :

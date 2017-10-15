@@ -7,8 +7,9 @@
       "bootstrap": "^3.3.7",
       "react": "^16.0.0",
       "react-dom": "^16.0.0",
-      "material-ui": "^0.16.7",
-      "react-tap-event-plugin": "^2.0.1",
+      "create-react-class": "^15.6.2",
+      "prop-types": "^15.6.0",
+      "material-ui": "0.19.4",
       "chart.js": "1.1.1",
       "react-chartjs": "0.8.0",
       "@aspnet/signalr-client": "^1.0.0-alpha2-final"

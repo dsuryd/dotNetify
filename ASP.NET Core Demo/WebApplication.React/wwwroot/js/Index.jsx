@@ -1,16 +1,15 @@
 ﻿var RouteLink = dotnetify.react.router.RouteLink;
 
-var Index = React.createClass({
-
-   getInitialState() {
+class Index extends React.Component {
+   constructor(props) {
+      super(props);
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("IndexVM", this);
       this.vm.onRouteEnter = (path, template) => template.Target = "Content";
 
-      var state = window.vmStates.IndexVM || {};
-      state["selectedLink"] = "";
-      return state;
-   },
+      this.state = window.vmStates.IndexVM || {};
+      this.state["selectedLink"] = "";
+   }
    render() {
       const styles = {
          navMenu: { padding: "15px", color: "rgb(125,135,140)", backgroundColor: "rgb(40,50,55)" },
@@ -65,7 +64,7 @@ var Index = React.createClass({
          </div>
       );
    }
-});
+}
 
 ReactDOM.render(
   <Index />,

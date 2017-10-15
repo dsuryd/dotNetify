@@ -1,6 +1,8 @@
-﻿var ControlTypes = React.createClass({
+﻿class ControlTypes extends React.Component {
 
-   getInitialState() {
+   constructor(props) {
+      super(props);
+
       // Connect this component to the back-end view model.
       this.vm = dotnetify.react.connect("ControlTypesVM", this);
 
@@ -11,11 +13,11 @@
       }
 
       // This component's JSX was loaded along with the VM's initial state for faster rendering.
-      return window.vmStates.ControlTypesVM;
-   },
+      this.state = window.vmStates.ControlTypesVM;
+   }
    componentWillUnmount() {
       this.vm.$destroy();
-   },
+   }
    render() {
       const radioButtons = this.state.RadioButtons.map(radio =>
          <RadioButton key={radio.value} {...radio} />
@@ -133,4 +135,4 @@
          </div>
       );
    }
-});
+}

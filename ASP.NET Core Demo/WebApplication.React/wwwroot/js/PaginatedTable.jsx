@@ -1,4 +1,7 @@
-﻿var PaginatedTable = React.createClass({
+﻿class PaginatedTable extends React.Component {
+   constructor(props) {
+      super(props);
+   }
    render() {
       return (
          <div>
@@ -11,9 +14,12 @@
          </div>
       );
    }
-});
+}
 
-var DataTable = React.createClass({
+class DataTable extends React.Component {
+   constructor(props) {
+      super(props);
+   }
    render() {
       const handleRowSelection = rows => {
          if (rows.length > 0)
@@ -54,9 +60,12 @@ var DataTable = React.createClass({
          </Table>
       );
    }
-});
+}
 
-var Pagination = React.createClass({
+class Pagination extends React.Component {
+   constructor(props) {
+      super(props);
+   }
    render() {
       const pageButtons = this.props.pagination.map(page =>
          <Paper key={page} style={{display: "inline", padding: ".5em 0"}}>
@@ -71,4 +80,4 @@ var Pagination = React.createClass({
          <div style={this.props.style}>{pageButtons}</div>
       );
    }
-});
+}

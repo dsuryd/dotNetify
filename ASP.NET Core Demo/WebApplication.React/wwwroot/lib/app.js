@@ -1,8 +1,12 @@
 ﻿$ = jQuery = require("jquery"); // Add jQuery to global window for Bootstrap.
 require("bootstrap");
+
 dotnetifyHub = require("./dotnetify-hub");
 React = require("react");
 ReactDOM = require("react-dom");
+createReactClass = require("create-react-class");
+PropTypes = require("prop-types");
+React.createClass = function (cls) { return createReactClass(cls);} // Polyfill for react-chartjs.
 
 // ChartJS.
 LineChart = require("react-chartjs").Line;
@@ -48,10 +52,6 @@ IconFilter = require("material-ui/svg-icons/content/filter-list").default;
 IconSearch = require("material-ui/svg-icons/action/search").default;
 IconMovie = require("material-ui/svg-icons/AV/movie").default;
 IconPhone = require("material-ui/svg-icons/communication/phone").default;
-
-// Used by Material-UI.
-injectTapEventPlugin = require("react-tap-event-plugin");
-injectTapEventPlugin();
 
 // IE polyfill for promise/fetch.
 window.Promise = require("promise-polyfill");
