@@ -71,7 +71,7 @@ var MovieTable = React.createClass({
    },
    render() {
       return (
-         <PaginatedTable colWidths={["1em", "20%", "4em", "40%", "20%"]}
+         <PaginatedTable colWidths={["1em", "20%", "80px", "40%", "20%"]}
                          headers={this.state.Headers}
                          data={this.state.Data}
                          itemKey={this.state.ItemKey}

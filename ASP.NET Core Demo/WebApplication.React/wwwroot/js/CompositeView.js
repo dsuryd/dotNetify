@@ -107,7 +107,7 @@ var MovieTable = React.createClass({
    render: function render() {
       var _this = this;
 
-      return React.createElement(PaginatedTable, { colWidths: ["1em", "20%", "4em", "40%", "20%"],
+      return React.createElement(PaginatedTable, { colWidths: ["1em", "20%", "80px", "40%", "20%"],
          headers: this.state.Headers,
          data: this.state.Data,
          itemKey: this.state.ItemKey,
