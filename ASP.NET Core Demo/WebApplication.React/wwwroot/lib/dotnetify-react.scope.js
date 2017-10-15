@@ -17,31 +17,31 @@ limitations under the License.
 // Support using AMD or CommonJS that loads our app.js, or being placed in <script> tag.
 (function (factory) {
    if (typeof exports === "object" && typeof module === "object") {
-      module.exports = factory(require('react'), require('dotnetify'));
+      module.exports = factory(require('create-react-class'), require('prop-types'), require('dotnetify'));
    }
    else if (typeof define === "function" && define["amd"]) {
-      define(['react', 'dotnetify'], factory);
+      define(['create-react-class', 'prop-types', 'dotnetify'], factory);
    }
    else {
-      factory(React, dotnetify);
+      factory(createReactClass, PropTypes, dotnetify);
    }
 }
-   (function (_React, dotnetify) {
+   (function (createReactClass, PropTypes, dotnetify) {
 
       // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
       // of the parent component, so that when the child component connects to its back-end view model, the child view model
       // instance is created within the scope of the parent view model.
       // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
       // injects properties and dispatch functions into the component.
-      dotnetify.react.Scope = _React.createClass({
+      dotnetify.react.Scope = createReactClass({
          displayName: "Scope",
-         version: "1.0.1",
+         version: "1.0.2",
 
-         propTypes: { vm: _React.PropTypes.string },
-         contextTypes: { scoped: _React.PropTypes.func },
+         propTypes: { vm: PropTypes.string },
+         contextTypes: { scoped: PropTypes.func },
          childContextTypes: {
-            scoped: _React.PropTypes.func.isRequired,
-            connect: _React.PropTypes.func.isRequired
+            scoped: PropTypes.func.isRequired,
+            connect: PropTypes.func.isRequired
          },
          scoped: function scoped(vmId) {
             var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;

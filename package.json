@@ -10,7 +10,9 @@
       "LICENSE.*"
    ],
    "dependencies": {
-      "jquery-deferred": "^0.3.1"
+      "jquery-deferred": "^0.3.1",
+      "create-react-class": "^15.6.2",
+      "prop-types": "^15.6.0"
    },
    "repository": {
       "type": "git",
