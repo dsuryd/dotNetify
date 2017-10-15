@@ -1,4 +1,6 @@
-﻿var RouteLink = dotnetify.react.router.RouteLink;
+﻿dotnetify.debug = true;
+
+const RouteLink = dotnetify.react.router.RouteLink;
 
 class Index extends React.Component {
    constructor(props) {
