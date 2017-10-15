@@ -45,7 +45,9 @@ var SimpleList = (function (_React$Component) {
 
          var handleUpdate = function handleUpdate(value) {
             var update = _this2.state.Employees.map(function (employee) {
-               return employee.Id == value.Id ? Object.assign(employee, value) : employee;
+               return employee.Id == value.Id ? Object.keys(value).forEach(function (key) {
+                  employee[key] = value[key];
+               }) : employee;
             });
             _this2.setState({ Employee: update });
             _this2.dispatch({ Update: value });

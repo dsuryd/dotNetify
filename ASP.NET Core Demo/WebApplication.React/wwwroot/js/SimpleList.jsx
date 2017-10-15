@@ -19,7 +19,7 @@
    }
    render() {
       const handleUpdate = (value) => {
-         var update = this.state.Employees.map(employee => employee.Id == value.Id ? Object.assign(employee, value) : employee);
+         var update = this.state.Employees.map(employee => employee.Id == value.Id ? Object.keys(value).forEach(function (key) { employee[key] = value[key]; }) : employee);
          this.setState({ Employee: update });
          this.dispatch({ Update: value });
       }
