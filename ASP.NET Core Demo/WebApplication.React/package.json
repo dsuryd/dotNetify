@@ -5,8 +5,8 @@
    "dependencies": {
       "jquery-deferred": "^0.3.1",
       "bootstrap": "^3.3.7",
-      "react": "^15.4.2",
-      "react-dom": "^15.4.2",
+      "react": "^16.0.0",
+      "react-dom": "^16.0.0",
       "material-ui": "^0.16.7",
       "react-tap-event-plugin": "^2.0.1",
       "chart.js": "1.1.1",
