@@ -53,6 +53,8 @@ class TextBox extends React.Component {
    constructor(props) {
       super(props);
       this.state = { changed: false };
+      this.handleChange = this.handleChange.bind(this);
+      this.handleBlur = this.handleBlur.bind(this);
    }
    handleChange(event) {
       this.setState({ changed: true });

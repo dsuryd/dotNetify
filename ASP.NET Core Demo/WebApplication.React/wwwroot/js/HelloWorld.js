@@ -115,6 +115,8 @@ var TextBox = (function (_React$Component2) {
 
       _get(Object.getPrototypeOf(TextBox.prototype), "constructor", this).call(this, props);
       this.state = { changed: false };
+      this.handleChange = this.handleChange.bind(this);
+      this.handleBlur = this.handleBlur.bind(this);
    }
 
    _createClass(TextBox, [{
