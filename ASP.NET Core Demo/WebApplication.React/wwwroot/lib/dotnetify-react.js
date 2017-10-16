@@ -179,7 +179,12 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             var vmState = window.ssr[iVMId];
             var getState = function () { return vmState; };
             var setState = function (state) { vmState = $.extend(vmState, state); };
-            var vm = self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, getState, setState, iVMArg);
+            var options = {
+               getState: getState,
+               setState: setState,
+               vmArg: iVMArg
+            };
+            var vm = self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, options);
 
             // Need to be asynch to allow initial state to be processed.
             setTimeout(function () { vm.$update(JSON.stringify(window.ssr[iVMId])); }, 100);
