@@ -18,16 +18,16 @@ limitations under the License.
 (function (factory) {
    if (typeof exports === "object" && typeof module === "object") {
       var jquery = typeof jQuery !== "undefined" ? jQuery : require('./jquery-shim');
-      module.exports = factory(require('react'), require('react-dom'), jquery, require('dotnetify'));
+      module.exports = factory(require('react'), require('react-dom'), require('create-react-class'), jquery, require('dotnetify'));
    }
    else if (typeof define === "function" && define["amd"]) {
-      define(['react', 'react-dom', './jquery-shim', 'dotnetify'], factory);
+      define(['react', 'react-dom', 'create-react-class', './jquery-shim', 'dotnetify'], factory);
    }
    else {
-      factory(React, ReactDOM, jQuery, dotnetify);
+      factory(React, ReactDOM, createReactClass, jQuery, dotnetify);
    }
 }
-   (function (_React, _ReactDOM, $, dotnetify) {
+   (function (_React, _ReactDOM, createReactClass, $, dotnetify) {
 
       // PathJS. Need this specific version, because latest version is causing issue.
       var Path = {
@@ -227,7 +227,7 @@ limitations under the License.
 
       // Add plugin functions.
       dotnetify.react.router = {
-         version: "1.0.4-beta",
+         version: "1.0.5-beta",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -820,7 +820,7 @@ limitations under the License.
       }
 
       // <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
-      dotnetify.react.router.RouteTarget = _React.createClass({
+      dotnetify.react.router.RouteTarget = createReactClass({
          displayName: "RouteTarget",
          componentWillMount: function componentWillMount() {
             var elem = document.getElementById(this.props.id);

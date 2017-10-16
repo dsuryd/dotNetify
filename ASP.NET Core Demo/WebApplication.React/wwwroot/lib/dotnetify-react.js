@@ -37,7 +37,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       dotnetify = $.extend(dotnetify, {
          // SignalR hub options.
          hub: dotnetifyHub,
-         hubOptions: { "transport": ["webSockets", "longPolling"] },
+         hubOptions: { transport: ["webSockets", "serverSentEvent", "longPolling"] },
          hubPath: dotnetifyHub.hubPath,
          hubServerUrl: null,
 
@@ -45,21 +45,24 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          debug: false,
          debugFn: null,
 
-         // Connection state.
+         // Handler for connection state changed events.
          connectionStateHandler: null,
-         isConnected: function () { return dotnetifyHub.isConnected; },
 
-         triggerConnectionStateEvent: function (state, ex) {
-            if (typeof dotnetify.connectionStateHandler === "function")
-               dotnetify.connectionStateHandler(state, ex);
-            else if (ex)
-               console.error(ex);
-            else if (dotnetify.debug)
-               console.log("SignalR: " + state);
-         },
+         // Whether connected to SignalR hub server.
+         isConnected: function () { return dotnetifyHub.isConnected; },
 
          // Generic connect function for non-React app.
          connect: function (iVMId, iOptions) { return dotnetify.react.connect(iVMId, null, iOptions); },
+
+         _triggerConnectionStateEvent: function (iState, iException) {
+            if (dotnetify.debug)
+               console.log("SignalR: " + (iException ? iException.message : iState));
+
+            if (typeof dotnetify.connectionStateHandler === "function")
+               dotnetify.connectionStateHandler(iState, iException);
+            else if (iException)
+               console.error(iException);
+         },
 
          // Internal variables. Do not modify!
          _hub: null
@@ -114,7 +117,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
                // Use SignalR event to raise the connection state event.
                dotnetifyHub.stateChanged(function (state) {
-                  dotnetify.triggerConnectionStateEvent(state);
+                  dotnetify._triggerConnectionStateEvent(state);
                });
             }
 
@@ -137,7 +140,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
                dotnetify._hub = dotnetifyHub.start(dotnetify.hubOptions)
                   .done(function () { getInitialStates(); })
-                  .fail(function (ex) { dotnetify.triggerConnectionStateEvent("error", ex); });
+                  .fail(function (ex) { dotnetify._triggerConnectionStateEvent("error", ex); });
             }
             else if (dotnetify.isConnected())
                dotnetify._hub.done(getInitialStates);
@@ -245,7 +248,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                dotnetifyHub.server.dispose_VM(this.$vmId);
             }
             catch (ex) {
-               dotnetify.triggerConnectionStateEvent("error", ex);
+               dotnetify._triggerConnectionStateEvent("error", ex);
             }
          }
 
@@ -269,7 +272,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
                }
             }
             catch (ex) {
-               dotnetify.triggerConnectionStateEvent("error", ex);
+               dotnetify._triggerConnectionStateEvent("error", ex);
             }
          }
       }

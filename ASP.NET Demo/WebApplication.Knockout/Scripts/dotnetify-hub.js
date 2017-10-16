@@ -43,31 +43,110 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
          dotnetifyHub = $.extend(dotnetifyHub, {
             hubPath: "/dotnetify",
             url: null,
+            reconnectDelay: [2, 5, 10],
+            reconnectRetry: null,
 
+            // Internal variables. Do not modify!
             _connection: null,
+            _reconnectCount: 0,
+            _startDoneHandler: null,
+            _startFailHandler: null,
+            _disconnectedHandler: function () { },
+            _stateChangedHandler: function (iNewState) { },
+
+            _onDisconnected: function () {
+               dotnetifyHub._changeState(4);
+               dotnetifyHub._disconnectedHandler();
+            },
+
+            _changeState: function (iNewState) {
+               if (iNewState == 1)
+                  dotnetifyHub._reconnectCount = 0;
+
+               var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected', 99: 'terminated' };
+               dotnetifyHub._stateChangedHandler(stateText[iNewState]);
+            },
+
+            _startConnection: function (iHubOptions, iTransportArray) {
+               var url = dotnetifyHub.url ? dotnetifyHub.url + dotnetifyHub.hubPath : dotnetifyHub.hubPath;
+               var hubOptions = {};
+               Object.keys(iHubOptions).forEach(function (key) { hubOptions[key] = iHubOptions[key] });
+               hubOptions.transport = iTransportArray.shift();
+
+               dotnetifyHub._connection = new signalR.HubConnection(url, hubOptions);
+               dotnetifyHub._connection.on("response_vm", dotnetifyHub.client.response_VM);
+               dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
+
+               var promise = dotnetifyHub._connection.start()
+                  .then(function () { dotnetifyHub._changeState(1); })
+                  .catch(function () {
+                     // If failed to start, fallback to the next transport.
+                     if (iTransportArray.length > 0)
+                        dotnetifyHub._startConnection(iHubOptions, iTransportArray);
+                     else
+                        dotnetifyHub._onDisconnected();
+                  });
+
+               if (typeof dotnetifyHub._startDoneHandler === "function")
+                  promise.then(dotnetifyHub._startDoneHandler).catch(dotnetifyHub._startFailHandler || function () { });
+               return promise;
+            },
 
             start: function (iHubOptions) {
-               dotnetifyHub._connection = new signalR.HubConnection(dotnetifyHub.hubPath);
+               dotnetifyHub._startDoneHandler = null;
+               dotnetifyHub._startFailHandler = null;
 
-               dotnetifyHub._connection.on("response_vm", dotnetifyHub.client.response_VM);
+               // Map the transport option.
+               var transport = [0];
+               var transportOptions = { 'webSockets': 0, 'serverSentEvents': 1, 'longPolling': 2 };
+               if (iHubOptions && Array.isArray(iHubOptions.transport))
+                  transport = iHubOptions.transport.map(function (arg) { return transportOptions[arg] });
 
-               var promise = dotnetifyHub._connection.start();
+               var promise = dotnetifyHub._startConnection(iHubOptions, transport);
                return {
-                  done: function (iHandler) { promise.then(iHandler); return this; },
-                  fail: function (iHandler) { promise.catch(iHandler); return this; }
+                  done: function (iHandler) {
+                     dotnetifyHub._startDoneHandler = iHandler;
+                     promise.then(iHandler).catch(function () { });
+                     return this;
+                  },
+                  fail: function (iHandler) {
+                     dotnetifyHub._startFailHandler = iHandler;
+                     promise.catch(iHandler);
+                     return this;
+                  }
                };
             },
 
             disconnected: function (iHandler) {
-               return dotnetifyHub._connection.onclose(iHandler);
+               if (typeof iHandler === "function")
+                  dotnetifyHub._disconnectedHandler = iHandler;
             },
 
             stateChanged: function (iHandler) {
+               if (typeof iHandler === "function")
+                  dotnetifyHub._stateChangedHandler = iHandler;
+            },
 
-               //return $.connection.hub.stateChanged(function (state) {
-               //   var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
-               //   iHandler(stateText[state.newState]);
-               //});
+            reconnect: function (iStartHubFunc) {
+               if (typeof iStartHubFunc === "function") {
+                  // Only attempt reconnect if the specified retry hasn't been exceeded.
+                  if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
+
+                     // Determine reconnect delay from the specified configuration array.
+                     var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ?
+                        dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] :
+                        dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+
+                     dotnetifyHub._reconnectCount++;
+
+                     setTimeout(function () {
+                        dotnetifyHub._changeState(2);
+                        iStartHubFunc();
+                     }, delay * 1000);
+                  }
+                  else
+                     dotnetifyHub._changeState(99);
+               }
             },
 
             client: {},
