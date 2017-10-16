@@ -1,4 +1,4 @@
-﻿// Type definitions for dotnetify-react.router v1.0.4-beta.
+﻿// Type definitions for dotnetify-react.router.
 // Project: https://github.com/dsuryd/dotnetify
 // Definitions by: brimce <https://github.com/Brimce>
 
