@@ -25,7 +25,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
       module.exports = factory(jquery, require('signalR'), _window);
    }
    else if (typeof define === "function" && define["amd"]) {
-      define(['jquery', 'signalr'], factory);
+      define(['jquery', 'signalR'], factory);
    }
    else {
       factory(jQuery, signalR, _window);
