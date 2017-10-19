@@ -12,7 +12,8 @@
    "dependencies": {
       "jquery-deferred": "^0.3.1",
       "create-react-class": "^15.6.2",
-      "prop-types": "^15.6.0"
+      "prop-types": "^15.6.0",
+      "@aspnet/signalr-client": "^1.0.0-alpha2-final"
    },
    "repository": {
       "type": "git",
