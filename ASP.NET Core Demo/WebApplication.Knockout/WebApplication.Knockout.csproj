@@ -7,7 +7,6 @@
     <OutputType>Exe</OutputType>
     <PackageId>WebApplication.Core</PackageId>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
 
   <ItemGroup>
@@ -48,9 +47,5 @@
   <ItemGroup>
     <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.2.301" />
   </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="xcopy  /Y /D  &quot;$(SolutionDir)src\knockout\*.js&quot; &quot;$(ProjectDir)wwwroot\lib&quot;&#xD;&#xA;xcopy  /Y /D  &quot;$(SolutionDir)src\dotnetify-hub.js&quot; &quot;$(ProjectDir)wwwroot\lib&quot;" />
-  </Target>
 
 </Project>

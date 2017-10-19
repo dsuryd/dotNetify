@@ -7,7 +7,6 @@
     <OutputType>Exe</OutputType>
     <PackageId>WebApplication.Core.React</PackageId>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,9 +57,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
   </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="xcopy  /Y /D  &quot;$(SolutionDir)src\react\*.js&quot; &quot;$(ProjectDir)wwwroot\lib&quot;&#xD;&#xA;xcopy  /Y /D  &quot;$(SolutionDir)src\*.js&quot; &quot;$(ProjectDir)wwwroot\lib&quot;" />
-  </Target>
 
 </Project>
