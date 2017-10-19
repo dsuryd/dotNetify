@@ -22,10 +22,10 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
 
    if (typeof exports === "object" && typeof module === "object") {
       var jquery = typeof window !== "undefined" ? window.jQuery || require('./jquery-shim') : require('./jquery-shim');
-      module.exports = factory(jquery, require('signalR'), _window);
+      module.exports = factory(jquery, require('./signalR-selector').default, _window);
    }
    else if (typeof define === "function" && define["amd"]) {
-      define(['jquery', 'signalr'], factory);
+      define(['jquery', 'signalR'], factory);
    }
    else {
       factory(jQuery, signalR, _window);
@@ -279,11 +279,23 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
 
          dotnetifyHub = $.extend(dotnetifyHub, {
             hubPath: "/signalr",
+            reconnectDelay: [2, 5, 10],
+            reconnectRetry: null,
+
+            _reconnectCount: 0,
+            _stateChangedHandler: function (iNewState) { },
 
             start: function (iHubOptions) {
-               if (typeof iHubOptions === "undefined")
-                  return $.connection.hub.start();
-               return $.connection.hub.start(iHubOptions);
+               var deferred;
+               if (iHubOptions)
+                  deferred = $.connection.hub.start(iHubOptions);
+               else
+                  deferred = $.connection.hub.start();
+               deferred.fail(function (error) {
+                  if (error.source && error.source.message === "Error parsing negotiate response.")
+                     console.warn("This client may be attempting to connect to an incompatible SignalR .NET Core server.")
+               });
+               return deferred;
             },
 
             disconnected: function (iHandler) {
@@ -291,10 +303,36 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
             },
 
             stateChanged: function (iHandler) {
+               dotnetifyHub._stateChangedHandler = iHandler;
                return $.connection.hub.stateChanged(function (state) {
+                  if (state == 1)
+                     dotnetifyHub._reconnectCount = 0;
+
                   var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
                   iHandler(stateText[state.newState]);
                });
+            },
+
+            reconnect: function (iStartHubFunc) {
+               if (typeof iStartHubFunc === "function") {
+                  // Only attempt reconnect if the specified retry hasn't been exceeded.
+                  if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
+
+                     // Determine reconnect delay from the specified configuration array.
+                     var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ?
+                        dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] :
+                        dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+
+                     dotnetifyHub._reconnectCount++;
+
+                     setTimeout(function () {
+                        dotnetifyHub._stateChangedHandler('reconnecting');
+                        iStartHubFunc();
+                     }, delay * 1000);
+                  }
+                  else
+                     dotnetifyHub._stateChangedHandler('terminated');
+               }
             }
          });
       }

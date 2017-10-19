@@ -10,35 +10,91 @@ module.exports = function (grunt) {
             files: [
                {
                   src: "node_modules/jquery/dist/jquery.min.js",
-                  dest: "wwwroot/lib",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
                   expand: true,
                   filter: "isFile",
                   flatten: true
                },
                {
                   src: "node_modules/jquery.ui.widget/jquery.ui.widget.js",
-                  dest: "wwwroot/lib",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
                   expand: true,
                   filter: "isFile",
                   flatten: true
                },
                {
                   src: "node_modules/knockout/build/output/knockout-latest.js",
-                  dest: "wwwroot/lib",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
                   expand: true,
                   filter: "isFile",
                   flatten: true
                },
                {
                   src: "node_modules/signalr/jquery.signalr.js",
-                  dest: "wwwroot/lib",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "node_modules/@aspnet/signalr-client/dist/browser/signalr-clientES5-1.0.0-alpha2-final.js",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
                   expand: true,
                   filter: "isFile",
                   flatten: true
                },
                {
                   src: "node_modules/requirejs/require.js",
-                  dest: "wwwroot/lib",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "../../src/dotnetify-hub.js",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "../../src/knockout/*.js",
+                  dest: "../WebApplication.Knockout/wwwroot/lib",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "../../src/dotnetify-hub.js",
+                  dest: "../../ASP.NET Demo/WebApplication.Knockout/Scripts",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "../../src/knockout/*.js",
+                  dest: "../../ASP.NET Demo/WebApplication.Knockout/Scripts",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "../../src/*.js",
+                  dest: "../WebApplication.React/wwwroot/lib",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "../../src/react/*.js",
+                  dest: "../WebApplication.React/wwwroot/lib",
+                  expand: true,
+                  filter: "isFile",
+                  flatten: true
+               },
+               {
+                  src: "../../src/*.js",
+                  dest: "../WebApplication.React/wwwroot/lib",
                   expand: true,
                   filter: "isFile",
                   flatten: true
@@ -82,6 +138,10 @@ module.exports = function (grunt) {
                {
                   src: "../../src/no-jquery.signalR.js",
                   dest: "../../dist/no-jquery.signalR.js"
+               },
+               {
+                  src: "../../src/signalR-selector.js",
+                  dest: "../../dist/signalR-selector.js"
                },
                {
                   src: "../../src/typings/dotnetify.d.ts",

@@ -22,10 +22,10 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
 
    if (typeof exports === "object" && typeof module === "object") {
       var jquery = typeof window !== "undefined" ? window.jQuery || require('./jquery-shim') : require('./jquery-shim');
-      module.exports = factory(jquery, require('signalR'), _window);
+      module.exports = factory(jquery, require('./signalR-selector').default, _window);
    }
    else if (typeof define === "function" && define["amd"]) {
-      define(['jquery', 'signalr'], factory);
+      define(['jquery', 'signalR'], factory);
    }
    else {
       factory(jQuery, signalR, _window);
@@ -286,11 +286,11 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
             _stateChangedHandler: function (iNewState) { },
 
             start: function (iHubOptions) {
-               var deferred; 
+               var deferred;
                if (iHubOptions)
                   deferred = $.connection.hub.start(iHubOptions);
                else
-                  deferred =  $.connection.hub.start();
+                  deferred = $.connection.hub.start();
                deferred.fail(function (error) {
                   if (error.source && error.source.message === "Error parsing negotiate response.")
                      console.warn("This client may be attempting to connect to an incompatible SignalR .NET Core server.")

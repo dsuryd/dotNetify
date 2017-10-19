@@ -6,11 +6,7 @@ module.exports = {
       filename: "wwwroot/lib/bundle.min.js"
    },
    resolve: {
-      modules: ["wwwroot/lib", "node_modules"],
-      alias: {
-         signalR: "@aspnet/signalr-client/dist/browser/signalr-clientES5-1.0.0-alpha2-final"
-         //signalR: "./no-jquery.signalR"
-      }
+      modules: ["wwwroot/lib", "node_modules"]
    },
    //plugins: [
    //   new webpack.optimize.UglifyJsPlugin({ minimize: true })

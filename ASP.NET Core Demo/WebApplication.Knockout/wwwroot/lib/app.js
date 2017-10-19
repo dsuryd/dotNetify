@@ -7,7 +7,7 @@
       "ko-mapping": "knockout.mapping-latest",
       "dotnetify": "dotnetify",
       "router": "dotnetify.router",
-      "signalr": "signalr-clientES5-1.0.0-alpha2-final"
+      "signalR": "signalR-clientES5-1.0.0-alpha2-final"
    },
    shim: {
       "jquery": { exports: "$" },

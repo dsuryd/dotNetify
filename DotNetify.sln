@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET Demo", "ASP.NET Demo", "{982511E3-DC01-4324-BF95-740B332FC8F9}"
 EndProject
@@ -51,6 +51,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E963CE9C-CF3
 		src\dotnetify-hub.js = src\dotnetify-hub.js
 		src\jquery-shim.js = src\jquery-shim.js
 		src\no-jquery.signalR.js = src\no-jquery.signalR.js
+		src\signalR-selector.js = src\signalR-selector.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "knockout", "knockout", "{D077EE0B-21A8-43D5-AD28-81C1521ED335}"
