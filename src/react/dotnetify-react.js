@@ -37,7 +37,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       dotnetify = $.extend(dotnetify, {
          // SignalR hub options.
          hub: dotnetifyHub,
-         hubOptions: { transport: ["webSockets", "serverSentEvent", "longPolling"] },
+         hubOptions: { transport: ["webSockets", "longPolling"] },
          hubPath: dotnetifyHub.hubPath,
          hubServerUrl: null,
 
