@@ -1,4 +1,4 @@
-﻿// Type definitions for dotnetify-react v1.0.6-beta.
+﻿// Type definitions for dotnetify-react.
 // Project: https://github.com/dsuryd/dotnetify
 // Definitions by: Dicky Suryadi, brimce <https://github.com/Brimce>
 

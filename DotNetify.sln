@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E
 		dist\knockout.mapping-latest.js = dist\knockout.mapping-latest.js
 		dist\no-jquery.signalR.js = dist\no-jquery.signalR.js
 		package.json = package.json
+		dist\signalR-selector.js = dist\signalR-selector.js
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication", "ASP.NET Demo\WebApplication.Knockout\WebApplication.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
