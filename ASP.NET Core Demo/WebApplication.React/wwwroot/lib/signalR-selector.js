@@ -16,7 +16,7 @@ limitations under the License.
 
 var signalRSelector = {
    _netfx: require('./no-jquery.signalR'),
-   _netcore: require('@aspnet/signalr-client'),
+   _netcore: require('@aspnet/signalr-client/dist/browser/signalr-clientES5-1.0.0-alpha2-final'),
    _default: null,
    netfx: function () { signalRSelector._default = signalRSelector._netfx; }
 };
