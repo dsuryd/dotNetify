@@ -1,6 +1,5 @@
 ﻿(function (factory) {
    var _window = window || global;
-   _window.noJQuerySignalR = { version: "1.0.0" };
 
    // If not in a browser environment, replace the window object with a stub customized to SignalR's need.
    if (typeof _window.document === "undefined") {
@@ -16,6 +15,7 @@
                   this.protocol = arr[0];
                   this.host = arr[2];
                   _window.location = { protocol: this.protocol, host: this.host };
+                  _window.document.location = _window.location;
                }
             });
             return elem;

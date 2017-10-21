@@ -12,19 +12,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E
 		dist\dotnetify-hub.js = dist\dotnetify-hub.js
 		dist\dotnetify-react.js = dist\dotnetify-react.js
 		dist\dotnetify-react.min.js = dist\dotnetify-react.min.js
-		dist\dotnetify-react.router.d.ts = dist\dotnetify-react.router.d.ts
 		dist\dotnetify-react.router.js = dist\dotnetify-react.router.js
 		dist\dotnetify-react.scope.js = dist\dotnetify-react.scope.js
-		dist\dotnetify.d.ts = dist\dotnetify.d.ts
 		dist\dotnetify.js = dist\dotnetify.js
 		dist\dotnetify.min.js = dist\dotnetify.min.js
 		dist\dotnetify.router.js = dist\dotnetify.router.js
 		index.js = index.js
 		dist\jquery-shim.js = dist\jquery-shim.js
 		dist\knockout.mapping-latest.js = dist\knockout.mapping-latest.js
-		dist\no-jquery.signalR.js = dist\no-jquery.signalR.js
 		package.json = package.json
-		dist\signalR-selector.js = dist\signalR-selector.js
+		dist\signalR-netcore.js = dist\signalR-netcore.js
+		dist\signalR-netfx.js = dist\signalR-netfx.js
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication", "ASP.NET Demo\WebApplication.Knockout\WebApplication.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
@@ -51,8 +49,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E963CE9C-CF3
 	ProjectSection(SolutionItems) = preProject
 		src\dotnetify-hub.js = src\dotnetify-hub.js
 		src\jquery-shim.js = src\jquery-shim.js
-		src\no-jquery.signalR.js = src\no-jquery.signalR.js
-		src\signalR-selector.js = src\signalR-selector.js
+		src\signalR-netcore.js = src\signalR-netcore.js
+		src\signalR-netfx.js = src\signalR-netfx.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "knockout", "knockout", "{D077EE0B-21A8-43D5-AD28-81C1521ED335}"
@@ -74,6 +72,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "typings", "typings", "{F544
 	ProjectSection(SolutionItems) = preProject
 		src\typings\dotnetify-react.router.d.ts = src\typings\dotnetify-react.router.d.ts
 		src\typings\dotnetify.d.ts = src\typings\dotnetify.d.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "typings", "typings", "{EFE128AD-150C-4B17-A3C6-15CE79972C4D}"
+	ProjectSection(SolutionItems) = preProject
+		dist\typings\dotnetify-react.router.d.ts = dist\typings\dotnetify-react.router.d.ts
+		dist\typings\dotnetify.d.ts = dist\typings\dotnetify.d.ts
 	EndProjectSection
 EndProject
 Global
@@ -437,6 +441,7 @@ Global
 		{D077EE0B-21A8-43D5-AD28-81C1521ED335} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
 		{9D9A8393-59C7-47B2-A735-C4FE3F80C11D} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
 		{F544D200-E987-41B2-8532-A8E0085B6986} = {E963CE9C-CF3C-4380-9518-04FC4B225524}
+		{EFE128AD-150C-4B17-A3C6-15CE79972C4D} = {9C5BEB91-E1EC-4006-B6D5-EB9E54EA6883}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A66C33F-8652-4550-975D-6599E2C985B6}

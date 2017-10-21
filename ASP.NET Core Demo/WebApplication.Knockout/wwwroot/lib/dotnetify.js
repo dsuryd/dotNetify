@@ -38,10 +38,11 @@ var dotNetify = {};
             version: "1.1.5",
 
             // SignalR hub options.
-            hubServerUrl: null,
-            hubServer: dotnetifyHub.server,
+            hub: dotnetifyHub,
+            hubLib: null,
             hubOptions: { "transport": ["webSockets", "longPolling"] },
-            hubPath: dotnetifyHub.hubPath,
+            hubPath: null,
+            hubServerUrl: null,
 
             // Debug mode.
             debug: false,
@@ -60,11 +61,7 @@ var dotNetify = {};
                var applyWidget = function () { $.each($("[data-vm]"), function () { $(this).dotnetify() }); };
 
                if (dotnetify._hub === null) {
-                  dotnetifyHub.hubPath = dotnetify.hubPath;
-
-                  // Set the server URL if defined.
-                  if (dotnetify.hubServerUrl)
-                     dotnetifyHub.url = dotnetify.hubServerUrl;
+                  dotnetifyHub.init(dotnetify.hubPath, dotnetify.hubServerUrl, dotnetify.hubLib);
 
                   dotnetifyHub.client.response_VM = function (iVMId, iVMData) {
 

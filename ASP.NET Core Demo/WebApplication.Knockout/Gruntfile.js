@@ -136,20 +136,20 @@ module.exports = function (grunt) {
                   dest: "../../dist/jquery-shim.js"
                },
                {
-                  src: "../../src/no-jquery.signalR.js",
-                  dest: "../../dist/no-jquery.signalR.js"
+                  src: "../../src/signalR-netfx.js",
+                  dest: "../../dist/signalR-netfx.js"
                },
                {
-                  src: "../../src/signalR-selector.js",
-                  dest: "../../dist/signalR-selector.js"
+                  src: "../../src/signalR-netcore.js",
+                  dest: "../../dist/signalR-netcore.js"
                },
                {
                   src: "../../src/typings/dotnetify.d.ts",
-                  dest: "../../dist/dotnetify.d.ts"
+                  dest: "../../dist/typings/dotnetify.d.ts"
                },
                {
                   src: "../../src/typings/dotnetify-react.router.d.ts",
-                  dest: "../../dist/dotnetify-react.router.d.ts"
+                  dest: "../../dist/typings/dotnetify-react.router.d.ts"
                }
             ]
          }

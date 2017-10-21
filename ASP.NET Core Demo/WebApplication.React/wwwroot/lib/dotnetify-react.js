@@ -38,7 +38,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
          // SignalR hub options.
          hub: dotnetifyHub,
          hubOptions: { transport: ["webSockets", "longPolling"] },
-         hubPath: dotnetifyHub.hubPath,
+         hubPath: null,
          hubServerUrl: null,
 
          // Debug mode.
@@ -78,11 +78,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             var self = dotnetify.react;
 
             if (dotnetify._hub === null) {
-               dotnetifyHub.hubPath = dotnetify.hubPath;
-
-               // Set the server URL if defined.
-               if (dotnetify.hubServerUrl)
-                  dotnetifyHub.url = dotnetify.hubServerUrl;
+               dotnetifyHub.init(dotnetify.hubPath, dotnetify.hubServerUrl, dotnetify.hubLib);
 
                // Setup SignalR server method handler.
                dotnetifyHub.client.response_VM = function (iVMId, iVMData) {
