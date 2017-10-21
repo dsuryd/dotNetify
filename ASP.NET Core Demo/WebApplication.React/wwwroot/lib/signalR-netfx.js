@@ -15,6 +15,7 @@
                   this.protocol = arr[0];
                   this.host = arr[2];
                   _window.location = { protocol: this.protocol, host: this.host };
+                  _window.document.location = _window.location;
                }
             });
             return elem;

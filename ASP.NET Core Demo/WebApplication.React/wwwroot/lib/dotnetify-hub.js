@@ -178,9 +178,6 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
          else {
             dotnetifyHub.type = "netfx";
 
-            if (iServerUrl)
-               $.connection.hub.url = iServerUrl;
-
             // SignalR hub auto-generated from /signalr/hubs.
             /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
             /// <reference path="jquery.signalR.js" />
@@ -281,11 +278,6 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
                set: function (val) { $.connection.hub.state = val; }
             });
 
-            Object.defineProperty(dotnetifyHub, "url", {
-               get: function () { return $.connection.hub.url; },
-               set: function (val) { $.connection.hub.url = val; }
-            });
-
             Object.defineProperty(dotnetifyHub, "client", {
                get: function () { return $.connection.dotNetifyHub.client; },
             });
@@ -300,6 +292,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
 
             dotnetifyHub = $.extend(dotnetifyHub, {
                hubPath: iHubPath || "/signalr",
+               url: iServerUrl,
                reconnectDelay: [2, 5, 10],
                reconnectRetry: null,
 
@@ -307,6 +300,10 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
                _stateChangedHandler: function (iNewState) { },
 
                start: function (iHubOptions) {
+
+                  if (dotnetifyHub.url)
+                     $.connection.hub.url = dotnetifyHub.url;
+
                   var deferred;
                   if (iHubOptions)
                      deferred = $.connection.hub.start(iHubOptions);
