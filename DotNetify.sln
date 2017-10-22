@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E
 		dist\knockout.mapping-latest.js = dist\knockout.mapping-latest.js
 		package.json = package.json
 		dist\signalR-netcore.js = dist\signalR-netcore.js
+		dist\signalR-netcore.min.js = dist\signalR-netcore.min.js
 		dist\signalR-netfx.js = dist\signalR-netfx.js
 	EndProjectSection
 EndProject

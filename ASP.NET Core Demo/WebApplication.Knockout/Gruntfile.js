@@ -184,7 +184,11 @@ module.exports = function (grunt) {
                      "../../src/react/dotnetify-react.scope.js"
                   ],
                   dest: "../../dist/dotnetify-react.min.js"
-               }
+               },
+               {
+                  src: "../../src/signalR-netcore.js",
+                  dest: "../../dist/signalR-netcore.min.js"
+               },
             ]
 
          }
