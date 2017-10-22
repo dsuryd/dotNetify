@@ -2,19 +2,20 @@
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 
-DotNetify is a free, open source project that lets you create amazing real-time, reactive web apps with HTML/Javascript front-end on cross-platform C# .NET back-end. 
+DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket. 
 
-__*** NEW: React Native support with v2.0.6-beta - [see demo here](https://github.com/dsuryd/dotnetify-react-native-demo) ***__
+## What's New
+
+* Latest: ***integrates with SignalR .NET Core 2.0 (alpha2).***
+* v2.0.6-beta: supports React Native - [see demo](https://github.com/dsuryd/dotnetify-react-native-demo).
 
 ## Features
 
-* Simple and lightweight - no big JS client-side framework, no REST APIs, no AJAX requests.
-* Integrate SignalR and [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/) or Knockout to support reactive .NET back-end MVVM.
-* Built-in real-time across WebSocket, perfect for IoT consumer apps.
+* Simple and lightweight - no heavy JS client-side framework, and no REST APIs.
+* Reactive back-end MVVM architecture on both .NET Core and .NET Framework.
+* Built-in real-time across WebSocket with SignalR.
 * Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
-* Run on [ASP.NET Core](http://asp.net/core), ASP.NET Framework and [Nancy](https://github.com/dsuryd/dotNetify-Nancy-demo).
-* Modern tooling: Visual Studio 2017, [NPM](https://www.npmjs.com/), [WebPack](https://webpack.github.io/).
-* __NEW:__ Powerful back-end infrastructure, including dependency injection and WebSocket request/response pipelines.
+* Powerful back-end infrastructure, including dependency injection, WebSocket request/response pipelines, and modern tooling like VS2017 and Webpack.
 
 ## Documentation
 
@@ -40,7 +41,7 @@ ASP.NET Core:
 *PM> Install-Package DotNetify.Core -pre*  
 *PM> Install-Package DotNetify.SignalR -pre*  
 
-ASP.NET 4.5:
+ASP.NET Framework:
 
 *PM> Install-Package DotNetify*  
 
