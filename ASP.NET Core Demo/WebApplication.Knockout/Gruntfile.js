@@ -179,9 +179,7 @@ module.exports = function (grunt) {
                {
                   src: [
                      "../../src/dotnetify-hub.js",
-                     "../../src/react/dotnetify-react.js",
-                     "../../src/react/dotnetify-react.router.js",
-                     "../../src/react/dotnetify-react.scope.js"
+                     "../../src/react/dotnetify-react.js"
                   ],
                   dest: "../../dist/dotnetify-react.min.js"
                },
