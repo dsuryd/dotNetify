@@ -29,7 +29,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
       define(['jquery', 'signalR'], factory);
    }
    else {
-      factory(jQuery, signalR, _window);
+      factory(jQuery, _window.signalR, _window);
    }
 }
    (function ($, defaultSignalR, window) {
