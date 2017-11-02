@@ -227,7 +227,7 @@ limitations under the License.
 
       // Add plugin functions.
       dotnetify.react.router = {
-         version: "1.0.5-beta",
+         version: "1.0.6-beta",
 
          // URL path that will be parsed when performing routing.
          urlPath: document.location.pathname,
@@ -706,6 +706,7 @@ limitations under the License.
             }
          })(iVM);
 
+         // Returns the URL for an anchor tag.
          iVM.$route = function (iRoute, iTarget) {
             var vm = this;
             var state = vm.State();
@@ -784,11 +785,21 @@ limitations under the License.
 
          }.bind(iVM);
 
+         // Handles click event from anchor tags.
          iVM.$handleRoute = function (iEvent) {
             iEvent.preventDefault();
             var path = iEvent.currentTarget.pathname;
             if (path == null || path == "")
                throw new Error("The event passed to $handleRoute has no path name.");
+
+            dotnetify.react.router.pushState({}, "", path);
+         }.bind(iVM);
+
+         // Executes the given route.
+         iVM.$routeTo = function (iRoute) {
+            var path = iVM.$route(iRoute);
+            if (path == null || path == "")
+               throw new Error("The route passed to $routeTo is invalid.");
 
             dotnetify.react.router.pushState({}, "", path);
          }.bind(iVM);
@@ -811,7 +822,7 @@ limitations under the License.
                      return;
                   }
                   if (typeof props.onClick === "function")
-                     props.onClick();
+                     props.onClick(event);
                   return props.vm.$handleRoute(event);
                }
             },
@@ -832,7 +843,7 @@ limitations under the License.
          getDOMNode: function getDOMNode() { return this.elem; },
          render: function render() {
             var _this = this;
-            return React.createElement(
+            return _React.createElement(
                "div",
                $.extend({ id: this.props.id, ref: function (el) { return _this.elem = el; } }, this.props, { dangerouslySetInnerHTML: this.initialHtml }),
                this.props.children
