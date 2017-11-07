@@ -62,7 +62,7 @@ limitations under the License.
                var initialPop = !Path.history.initial.popped && location.href == Path.history.initial.URL;
                Path.history.initial.popped = true;
                if (initialPop) return;
-               Path.dispatch(document.location.pathname);
+               Path.dispatch(document.location.pathname === "/" ? "" : document.location.pathname);
             },
             'listen': function (fallback) {
                Path.history.supported = !!(window.history && window.history.pushState);
@@ -792,7 +792,7 @@ limitations under the License.
             if (path == null || path == "")
                throw new Error("The event passed to $handleRoute has no path name.");
 
-            dotnetify.react.router.pushState({}, "", path);
+            setTimeout(function () { dotnetify.react.router.pushState({}, "", path) }, 0);
          }.bind(iVM);
 
          // Executes the given route.
@@ -801,7 +801,7 @@ limitations under the License.
             if (path == null || path == "")
                throw new Error("The route passed to $routeTo is invalid.");
 
-            dotnetify.react.router.pushState({}, "", path);
+            setTimeout(function () { dotnetify.react.router.pushState({}, "", path) }, 0);
          }.bind(iVM);
       }
 
