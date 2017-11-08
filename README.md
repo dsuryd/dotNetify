@@ -6,7 +6,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-* Latest: ***React SPA template now available - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).***
+* Latest: ***React SPA template for .NET Core 2.0 now available - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).***
 * v2.0.7-beta: integrates with SignalR .NET Core 2.0 (alpha2) - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v2.0.7-beta%2F2.2.2-pre).
 * v2.0.6-beta: supports React Native - [see demo](https://github.com/dsuryd/dotnetify-react-native-demo).
 
