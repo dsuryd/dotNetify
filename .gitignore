@@ -113,3 +113,7 @@
 /ASP.NET Demo/WebApplication.Knockout/Bin
 /ASP.NET Demo/WebApplication.Knockout/obj
 /ASP.NET Demo/WebApplication.Knockout/Scripts/lib
+/ASP.NET Core Demo/UnitTests/bin/Debug/netcoreapp2.0
+/ASP.NET Core Demo/UnitTests/obj
+/ASP.NET Demo/UnitTest/bin
+/ASP.NET Demo/UnitTest/obj
