@@ -1,12 +1,14 @@
 # &nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
+[![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/) 
 
 DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket. 
 
 ## What's New
 
-* Latest: ***integrates with SignalR .NET Core 2.0 (alpha2)*** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v2.0.7-beta%2F2.2.2-pre).
+* Latest: ***React SPA template for .NET Core 2.0 now available - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).***
+* v2.0.7-beta: integrates with SignalR .NET Core 2.0 (alpha2) - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v2.0.7-beta%2F2.2.2-pre).
 * v2.0.6-beta: supports React Native - [see demo](https://github.com/dsuryd/dotnetify-react-native-demo).
 
 ## Features
