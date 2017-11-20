@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace DotNetify
@@ -36,24 +37,20 @@ namespace DotNetify
       void SetFactoryMethod(Func<Type, object[], object> factoryMethod);
 
       /// <summary>
-      /// Register an assembly that has the view model classes.
+      /// Register view model classes in an assembly that are subtypes of BaseVM.
       /// </summary>
       void RegisterAssembly(Assembly assembly);
       void RegisterAssembly(string assemblyName);
-   }
 
-   public class DotNetifyConfiguration : IDotNetifyConfiguration
-   {
-      public TimeSpan? VMControllerCacheExpiration { get; set; }
+      /// <summary>
+      /// Register view model classes in an assembly that are subtypes of a certain type.
+      /// </summary>
+      void RegisterAssembly<T>(Assembly assembly) where T : INotifyPropertyChanged;
+      void RegisterAssembly<T>(string assemblyName) where T : INotifyPropertyChanged;
 
-      public void SetFactoryMethod(Func<Type, object[], object> factoryMethod) => VMController.CreateInstance = (type, args) => factoryMethod(type, args);
-
-      public void RegisterAssembly(Assembly assembly) => VMController.RegisterAssembly(assembly);
-
-      public void RegisterAssembly(string assemblyName) => VMController.RegisterAssembly(Assembly.Load(new AssemblyName(assemblyName)));
-
-      public void RegisterEntryAssembly() => VMController.RegisterAssembly(Assembly.GetEntryAssembly());
-
-      public bool HasAssembly => VMController._registeredAssemblies.Count > 0;
+      /// <summary>
+      /// Register a specific view model class type.
+      /// </summary>
+      IDotNetifyConfiguration Register<T>() where T : INotifyPropertyChanged;
    }
 }

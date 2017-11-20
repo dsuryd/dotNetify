@@ -43,11 +43,7 @@ namespace DotNetify
       /// <summary>
       /// When disposed, fire the Disposed event.
       /// </summary>
-      public virtual void Dispose()
-      {
-         if (Disposed != null)
-            Disposed(this, null);
-      }
+      public virtual void Dispose() => Disposed?.Invoke(this, null);
 
       /// <summary>
       /// Property accessor. Use this for observable properties.

@@ -56,7 +56,7 @@ namespace DotNetify.Routing
       /// <summary>
       /// View model type associated with the view. Set this only for server-side routing.
       /// </summary>
-      [BaseVM.Ignore]
+      [Ignore]
       public Type VMType { get; set; }
 
       /// <summary>

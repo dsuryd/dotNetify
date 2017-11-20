@@ -77,7 +77,7 @@ namespace DotNetify
          var property = base.CreateProperty(member, memberSerialization);
 
          // Don't serialize properties that are decorated with [Ignore] or whose name are in the given list.
-         if (member.GetCustomAttribute(typeof(BaseVM.IgnoreAttribute)) != null)
+         if (member.GetCustomAttribute(typeof(IgnoreAttribute)) != null)
             property.Ignored = true;
          else if (_ignoredPropertyNames != null && _ignoredPropertyNames.Contains(property.PropertyName))
             property.Ignored = true;

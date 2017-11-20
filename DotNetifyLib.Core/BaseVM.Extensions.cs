@@ -19,8 +19,10 @@ using System.Linq.Expressions;
 
 namespace DotNetify
 {
-   public static class CRUDExtension
+   public static class BaseVMExtensions
    {
+      #region CRUD
+
       /// <summary>
       /// Used in CRUD operations to add a new item to the list.
       /// </summary>
@@ -30,7 +32,7 @@ namespace DotNetify
       public static void AddList<T>(this BaseVM vm, Expression<Func<T>> expression, object item)
       {
          var propName = ((MemberExpression)expression.Body).Member.Name;
-         vm.AddList( propName, item );
+         vm.AddList(propName, item);
       }
 
       public static void AddList<T>(this BaseVM vm, string propName, T item) => vm.ChangedProperties[propName + "_add"] = item;
@@ -62,5 +64,7 @@ namespace DotNetify
       }
 
       public static void RemoveList<T>(this BaseVM vm, string propName, T itemKey) => vm.ChangedProperties[propName + "_remove"] = itemKey;
+
+      #endregion
    }
 }

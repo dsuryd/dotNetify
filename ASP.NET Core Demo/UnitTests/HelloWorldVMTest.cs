@@ -1,8 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using DotNetify;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace UnitTests
 {

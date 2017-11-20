@@ -43,11 +43,7 @@ namespace DotNetify
       /// <summary>
       /// When disposed, fire the Disposed event.
       /// </summary>
-      public virtual void Dispose()
-      {
-         if (Disposed != null)
-            Disposed(this, null);
-      }
+      public virtual void Dispose() => Disposed?.Invoke(this, null);
 
       /// <summary>
       /// Property accessor. Use this for observable properties.
@@ -79,10 +75,7 @@ namespace DotNetify
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
       /// <param name="expression">Expression containing property name, to avoid hardcoding it.</param>
-      protected void Changed<T>(Expression<Func<T>> expression)
-      {
-         Changed(((MemberExpression)expression.Body).Member.Name);
-      }
+      protected void Changed<T>(Expression<Func<T>> expression) => Changed(((MemberExpression)expression.Body).Member.Name);
 
       /// <summary>
       /// Fires property changed event.
