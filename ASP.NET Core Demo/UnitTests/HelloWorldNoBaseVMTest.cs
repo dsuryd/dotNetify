@@ -1,7 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
-using DotNetify;
 using System.ComponentModel;
+using DotNetify;
 
 namespace UnitTests
 {
@@ -16,7 +17,6 @@ namespace UnitTests
          private string _lastName;
 
          public event PropertyChangedEventHandler PropertyChanged;
-
          
          public string FirstName
          {
@@ -24,7 +24,7 @@ namespace UnitTests
             set
             {
                _firstName = value;
-               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FullName)));
+               this.Changed(nameof(FullName));
             }
          }
 
@@ -34,7 +34,7 @@ namespace UnitTests
             set
             {
                _lastName = value;
-               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FullName)));
+               this.Changed(nameof(FullName));
             }
          }
 

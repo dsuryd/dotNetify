@@ -33,7 +33,7 @@ namespace DotNetify
    /// <summary>
    /// Base class for all DotNetify view models.  
    /// </summary>
-   public partial class BaseVM : Observable
+   public partial class BaseVM : Observable, IPushUpdates
    {
       private ConcurrentDictionary<string, object> _changedProperties = new ConcurrentDictionary<string, object>();
       private List<string> _ignoredProperties = null;
@@ -90,6 +90,9 @@ namespace DotNetify
                vm.PropertyChanged -= OnPropertyChanged;
                (vm as IDisposable).Dispose();
             };
+
+         if (vm is IPushUpdates)
+            (vm as IPushUpdates).RequestPushUpdates += (sender, e) => RequestPushUpdates?.Invoke(this, e);
       }
 
       /// <summary>

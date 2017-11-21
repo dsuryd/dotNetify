@@ -21,7 +21,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Input;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace DotNetify
 {
@@ -41,8 +40,10 @@ namespace DotNetify
       /// <returns>Serialized string.</returns>
       public string Serialize()
       {
-         List<string> ignoredPropertyNames = IgnoredProperties;
-         return Serialize(_vmInstance, new VMContractResolver(ignoredPropertyNames));
+         if (_vmInstance is ISerializable)
+            return (_vmInstance as ISerializable).Serialize();
+
+         return Serialize(_vmInstance, IgnoredProperties);
       }
 
       /// <summary>
@@ -51,6 +52,9 @@ namespace DotNetify
       /// <returns>Serialized string.</returns>
       public string SerializeChangedProperties()
       {
+         if (_vmInstance is ISerializable)
+            return (_vmInstance as ISerializable).SerializeChangedProperties();
+
          var changedProperties = new Dictionary<string, object>(ChangedProperties);
          return changedProperties.Count > 0 ? Serialize(changedProperties) : string.Empty;
       }
@@ -60,24 +64,39 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmPath">View model property path.</param>
       /// <param name="newValue">New value.</param>
-      public void Deserialize(string vmPath, string newValue)
+      public bool DeserializeProperty(string vmPath, string newValue)
       {
-         if (!Deserialize(_vmInstance, vmPath, newValue))
+         if (_vmInstance is ISerializable)
+            return (_vmInstance as ISerializable).DeserializeProperty(vmPath, newValue);
+
+         bool success = Deserialize(_vmInstance, vmPath, newValue);
+         if (success)
+         {
+            // Don't include the property we just updated in the ChangedProperties of the view model
+            // unless the value is changed internally, so that we don't send the same value back to the client
+            // during PushUpdates call by this VMController.
+            var changedProperties = ChangedProperties;
+            if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? string.Empty).ToString() == newValue)
+               changedProperties.TryRemove(vmPath, out object value);
+         }
+         else
             // If we cannot resolve the property path, forward the info to the instance to give it a chance to resolve it.
             OnUnresolvedUpdate(vmPath, newValue);
+
+         return success;
       }
 
       /// <summary>
       /// Serializes a view model into JSON-formatted string.
       /// </summary>
       /// <param name="viewModel">View model to serialize.</param>
-      /// <param name="contractResolver">Optional JSON contract resolver.</param>
+      /// <param name="ignoredPropertyNames">Names of properties that are not be serialized.</param>
       /// <returns>Serialized view model.</returns>
-      protected virtual string Serialize(object viewModel, IContractResolver contractResolver = null)
+      protected virtual string Serialize(object viewModel, List<string> ignoredPropertyNames = null)
       {
          try
          {
-            return JsonConvert.SerializeObject(viewModel, new JsonSerializerSettings { ContractResolver = contractResolver ?? new VMContractResolver() });
+            return JsonConvert.SerializeObject(viewModel, new JsonSerializerSettings { ContractResolver = new VMContractResolver(ignoredPropertyNames) });
          }
          catch (Exception ex)
          {
@@ -157,16 +176,6 @@ namespace DotNetify
                      var typeConverter = TypeDescriptor.GetConverter(propInfo.PropertyType);
                      if (typeConverter != null)
                         propInfo.SetValue(vmObject, typeConverter.ConvertFromString(newValue));
-                  }
-
-                  // Don't include the property we just updated in the ChangedProperties of the view model
-                  // unless the value is changed internally, so that we don't send the same value back to the client
-                  // during PushUpdates call by this VMController.
-                  var changedProperties = ChangedProperties;
-                  if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? string.Empty).ToString() == newValue)
-                  {
-                     object value;
-                     changedProperties.TryRemove(vmPath, out value);
                   }
                }
             }

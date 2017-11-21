@@ -321,7 +321,7 @@ namespace DotNetify
       /// <param name="newValue">New value.</param>
       protected virtual void UpdateVM(BaseVM vmInstance, string vmPath, string newValue)
       {
-         vmInstance.Deserialize(vmPath, newValue);
+         vmInstance.DeserializeProperty(vmPath, newValue);
       }
 
       /// <summary>

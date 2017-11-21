@@ -15,7 +15,9 @@ limitations under the License.
  */
 
 using System;
+using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace DotNetify
 {
@@ -66,5 +68,41 @@ namespace DotNetify
       public static void RemoveList<T>(this BaseVM vm, string propName, T itemKey) => vm.ChangedProperties[propName + "_remove"] = itemKey;
 
       #endregion
+
+      /// <summary>
+      /// Raises PropertyChanged event.
+      /// </summary>
+      /// <param name="source">Event source.</param>
+      /// <param name="propertyName">Property that changed.</param>
+      public static void Changed(this INotifyPropertyChanged source, string propertyName) =>
+         RaiseEvent(source, nameof(INotifyPropertyChanged.PropertyChanged), new PropertyChangedEventArgs(propertyName));
+
+      /// <summary>
+      /// Raises RequestPushUpdates event.
+      /// </summary>
+      /// <param name="source">Event source.</param>
+      /// <param name="propertyName">Property that changed.</param>
+      public static void PushUpdates(this IPushUpdates source) => RaiseEvent(source, nameof(IPushUpdates.RequestPushUpdates), EventArgs.Empty);
+
+      /// <summary>
+      /// Raises event using reflection.
+      /// </summary>
+      /// <param name="source">Event source.</param>
+      /// <param name="eventName">Event name.</param>
+      /// <param name="eventArgs">Event arguments.</param>
+      internal static void RaiseEvent<TEventArgs>(this object source, string eventName, TEventArgs eventArgs) where TEventArgs : EventArgs
+      {
+         var eventDelegate = (MulticastDelegate)source
+            .GetType()
+            .GetTypeInfo()
+            .GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic)
+            .GetValue(source);
+
+         if (eventDelegate != null)
+         {
+            foreach (var handler in eventDelegate.GetInvocationList())
+               handler.GetMethodInfo().Invoke(handler.Target, new object[] { source, eventArgs });
+         }
+      }
    }
 }
