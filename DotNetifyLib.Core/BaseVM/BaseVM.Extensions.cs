@@ -74,7 +74,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="source">Event source.</param>
       /// <param name="propertyName">Property that changed.</param>
-      public static void Changed(this INotifyPropertyChanged source, string propertyName) =>
+      public static INotifyPropertyChanged Changed(this INotifyPropertyChanged source, string propertyName) =>
          RaiseEvent(source, nameof(INotifyPropertyChanged.PropertyChanged), new PropertyChangedEventArgs(propertyName));
 
       /// <summary>
@@ -90,7 +90,7 @@ namespace DotNetify
       /// <param name="source">Event source.</param>
       /// <param name="eventName">Event name.</param>
       /// <param name="eventArgs">Event arguments.</param>
-      internal static void RaiseEvent<TEventArgs>(this object source, string eventName, TEventArgs eventArgs) where TEventArgs : EventArgs
+      internal static T RaiseEvent<T, TEventArgs>(this T source, string eventName, TEventArgs eventArgs) where TEventArgs : EventArgs
       {
          var eventDelegate = (MulticastDelegate)source
             .GetType()
@@ -103,6 +103,7 @@ namespace DotNetify
             foreach (var handler in eventDelegate.GetInvocationList())
                handler.GetMethodInfo().Invoke(handler.Target, new object[] { source, eventArgs });
          }
+         return source;
       }
    }
 }

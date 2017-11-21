@@ -27,72 +27,15 @@ namespace DotNetify
    /// <summary>
    /// Base class for all DotNetify view models.  
    /// </summary>
-   public partial class BaseVM
+   public class VMSerializer : ISerializer, IDeserializer
    {
-      /// <summary>
-      /// Exception that gets thrown a JSON view model update from the client cannot be resolved.
-      /// </summary>
-      public class UnresolvedVMUpdateException : Exception { }
-
-      /// <summary>
-      /// Serializes the instance into JSON-formatted string.
-      /// </summary>
-      /// <returns>Serialized string.</returns>
-      public string Serialize()
-      {
-         if (_vmInstance is ISerializable)
-            return (_vmInstance as ISerializable).Serialize();
-
-         return Serialize(_vmInstance, IgnoredProperties);
-      }
-
-      /// <summary>
-      /// Serializes only changed properties into JSON-formatted string.
-      /// </summary>
-      /// <returns>Serialized string.</returns>
-      public string SerializeChangedProperties()
-      {
-         if (_vmInstance is ISerializable)
-            return (_vmInstance as ISerializable).SerializeChangedProperties();
-
-         var changedProperties = new Dictionary<string, object>(ChangedProperties);
-         return changedProperties.Count > 0 ? Serialize(changedProperties) : string.Empty;
-      }
-
-      /// <summary>
-      /// Deserializes a property value of the instance.
-      /// </summary>
-      /// <param name="vmPath">View model property path.</param>
-      /// <param name="newValue">New value.</param>
-      public bool DeserializeProperty(string vmPath, string newValue)
-      {
-         if (_vmInstance is ISerializable)
-            return (_vmInstance as ISerializable).DeserializeProperty(vmPath, newValue);
-
-         bool success = Deserialize(_vmInstance, vmPath, newValue);
-         if (success)
-         {
-            // Don't include the property we just updated in the ChangedProperties of the view model
-            // unless the value is changed internally, so that we don't send the same value back to the client
-            // during PushUpdates call by this VMController.
-            var changedProperties = ChangedProperties;
-            if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? string.Empty).ToString() == newValue)
-               changedProperties.TryRemove(vmPath, out object value);
-         }
-         else
-            // If we cannot resolve the property path, forward the info to the instance to give it a chance to resolve it.
-            OnUnresolvedUpdate(vmPath, newValue);
-
-         return success;
-      }
-
       /// <summary>
       /// Serializes a view model into JSON-formatted string.
       /// </summary>
       /// <param name="viewModel">View model to serialize.</param>
       /// <param name="ignoredPropertyNames">Names of properties that are not be serialized.</param>
       /// <returns>Serialized view model.</returns>
-      protected virtual string Serialize(object viewModel, List<string> ignoredPropertyNames = null)
+      public string Serialize(object viewModel, List<string> ignoredPropertyNames)
       {
          try
          {
@@ -106,18 +49,17 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Deserializes a property value of view model.
+      /// Deserializes a property value of a view model.
       /// </summary>
-      /// <param name="viewModel">View model to deserialize to.</param>
+      /// <param name="viewModel">View model to deserialize the property to.</param>
       /// <param name="vmPath">View model property path.</param>
       /// <param name="newValue">New value.</param>
       /// <returns>True if the value was deserialized.</returns>
-      protected virtual bool Deserialize(object viewModel, string vmPath, string newValue)
+      public bool Deserialize(object viewModel, string vmPath, string newValue)
       {
          try
          {
-            object vmObject = _vmInstance;
-            var vmType = vmObject.GetType();
+            var vmType = viewModel.GetType();
             var path = vmPath.Split('.');
             for (int i = 0; i < path.Length; i++)
             {
@@ -141,41 +83,41 @@ namespace DotNetify
                      if (methodInfo == null)
                         return false;
 
-                     vmObject = methodInfo.Invoke(vmObject, new object[] { key });
-                     if (vmObject == null)
+                     viewModel = methodInfo.Invoke(viewModel, new object[] { key });
+                     if (viewModel == null)
                         return false;
 
-                     vmType = vmObject.GetType();
+                     vmType = viewModel.GetType();
                      i++;
                   }
                   else
                   {
-                     vmObject = propInfo.GetValue(vmObject);
-                     vmType = vmObject != null ? vmObject.GetType() : propInfo.PropertyType;
+                     viewModel = propInfo.GetValue(viewModel);
+                     vmType = viewModel != null ? viewModel.GetType() : propInfo.PropertyType;
                   }
                }
-               else if (typeof(ICommand).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType) && vmObject != null)
+               else if (typeof(ICommand).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType) && viewModel != null)
                {
                   // If the property type is ICommand, execute the command.
-                  (propInfo.GetValue(vmObject) as ICommand)?.Execute(newValue);
+                  (propInfo.GetValue(viewModel) as ICommand)?.Execute(newValue);
                }
                else if (propType.IsSubclassOf(typeof(MulticastDelegate)) && propType.GetMethod(nameof(Action.Invoke)).ReturnType == typeof(void))
                {
                   // If the property type is Action, wrap the action in a Command object and execute it.
                   var argTypes = propType.GetGenericArguments();
                   var cmdType = argTypes.Length > 0 ? typeof(Command<>).MakeGenericType(argTypes) : typeof(Command);
-                  (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(vmObject) }) as ICommand)?.Execute(newValue);
+                  (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommand)?.Execute(newValue);
                }
-               else if (propInfo.SetMethod != null && vmObject != null)
+               else if (propInfo.SetMethod != null && viewModel != null)
                {
                   // Update the new value to the property.
                   if (propType.IsClass && propInfo.PropertyType != typeof(string))
-                     propInfo.SetValue(vmObject, JsonConvert.DeserializeObject(newValue, propInfo.PropertyType));
+                     propInfo.SetValue(viewModel, JsonConvert.DeserializeObject(newValue, propInfo.PropertyType));
                   else
                   {
                      var typeConverter = TypeDescriptor.GetConverter(propInfo.PropertyType);
                      if (typeConverter != null)
-                        propInfo.SetValue(vmObject, typeConverter.ConvertFromString(newValue));
+                        propInfo.SetValue(viewModel, typeConverter.ConvertFromString(newValue));
                   }
                }
             }

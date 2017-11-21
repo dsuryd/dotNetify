@@ -31,13 +31,19 @@ namespace DotNetify
    public class IgnoreAttribute : Attribute { }
 
    /// <summary>
+   /// Exception that gets thrown a JSON view model update from the client cannot be resolved.
+   /// </summary>
+   public class UnresolvedVMUpdateException : Exception { }
+
+   /// <summary>
    /// Base class for all DotNetify view models.  
    /// </summary>
-   public partial class BaseVM : Observable, IPushUpdates
+   public partial class BaseVM : Observable, IPushUpdates, ISerializer, IDeserializer
    {
-      private ConcurrentDictionary<string, object> _changedProperties = new ConcurrentDictionary<string, object>();
+      private readonly ConcurrentDictionary<string, object> _changedProperties = new ConcurrentDictionary<string, object>();
+      private readonly VMSerializer _vmSerializer = new VMSerializer();
+      private readonly INotifyPropertyChanged _vmInstance = null;
       private List<string> _ignoredProperties = null;
-      private INotifyPropertyChanged _vmInstance = null;
 
       /// <summary>
       /// Occurs when the view model wants to push updates to the client.
@@ -103,7 +109,7 @@ namespace DotNetify
       /// <param name="vmInstanceId">Optional view model instance identifier.</param>
       /// <param name="vmNamespace">Optional view model type namespace.</param>
       /// <returns></returns>
-      public static BaseVM Create(IEnumerable<Type> registeredTypes, string vmTypeName, string vmInstanceId = null, string vmNamespace = null)
+      internal static BaseVM Create(IEnumerable<Type> registeredTypes, string vmTypeName, string vmInstanceId = null, string vmNamespace = null)
       {
          Type vmType = vmNamespace != null ?
             registeredTypes.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}") :
@@ -143,7 +149,7 @@ namespace DotNetify
       /// <summary>
       /// Accepts all changed properties so they won't marked as changed anymore.
       /// </summary>
-      public void AcceptChangedProperties() => _changedProperties.Clear();
+      internal void AcceptChangedProperties() => _changedProperties.Clear();
 
       /// <summary>
       /// Override this method if the derived type is a master view model.  The VMController
@@ -208,6 +214,69 @@ namespace DotNetify
       /// Push property changed updates to the client.
       /// </summary>
       public void PushUpdates() => RequestPushUpdates?.Invoke(this, null);
+
+      /// <summary>
+      /// Serializes the instance into JSON-formatted string.
+      /// </summary>
+      /// <returns>Serialized string.</returns>
+      internal string Serialize()
+      {
+         var serializer = _vmInstance is ISerializer ? _vmInstance as ISerializer : this;
+         return serializer.Serialize(_vmInstance, IgnoredProperties);
+      }
+
+      /// <summary>
+      /// Serializes only changed properties into JSON-formatted string.
+      /// </summary>
+      /// <returns>Serialized string.</returns>
+      internal string SerializeChangedProperties()
+      {
+         var serializer = _vmInstance is ISerializer ? _vmInstance as ISerializer : this;
+         var changedProperties = new Dictionary<string, object>(ChangedProperties);
+         return changedProperties.Count > 0 ? serializer.Serialize(changedProperties, null) : string.Empty;
+      }
+
+      /// <summary>
+      /// Deserializes a property value of the instance.
+      /// </summary>
+      /// <param name="vmPath">View model property path.</param>
+      /// <param name="newValue">New value.</param>
+      internal bool DeserializeProperty(string vmPath, string newValue)
+      {
+         var deserializer = _vmInstance is IDeserializer ? _vmInstance as IDeserializer : this;
+         bool success = deserializer.Deserialize(_vmInstance, vmPath, newValue);
+         if (success)
+         {
+            // Don't include the property we just updated in the ChangedProperties of the view model
+            // unless the value is changed internally, so that we don't send the same value back to the client
+            // during PushUpdates call by this VMController.
+            var changedProperties = ChangedProperties;
+            if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? string.Empty).ToString() == newValue)
+               changedProperties.TryRemove(vmPath, out object value);
+         }
+         else
+            // If we cannot resolve the property path, forward the info to the instance to give it a chance to resolve it.
+            OnUnresolvedUpdate(vmPath, newValue);
+
+         return success;
+      }
+
+      /// <summary>
+      /// Serializes an object.
+      /// </summary>
+      /// <param name="instance">Object to serialize.</param>
+      /// <param name="ignoredPropertyNames">Names of properties that should not be serialized.</param>
+      /// <returns>Serialized string.</returns>
+      public virtual string Serialize(object instance, List<string> ignoredPropertyNames) => _vmSerializer.Serialize(instance, ignoredPropertyNames);
+
+      /// <summary>
+      /// Deserializes a property value of an object.
+      /// </summary>
+      /// <param name="instance">Object to deserialize the property to.</param>
+      /// <param name="propertyPath">Property path.</param>
+      /// <param name="newValue">New value.</param>
+      /// <returns>True if the property value was deserialized.</returns>
+      public virtual bool Deserialize(object instance, string propertyPath, string newValue) => _vmSerializer.Deserialize(instance, propertyPath, newValue);
 
       /// <summary>
       /// Handles property changed event.

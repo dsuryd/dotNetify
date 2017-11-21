@@ -14,31 +14,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System.Collections.Generic;
+
 namespace DotNetify
 {
    /// <summary>
-   /// Allows a non-subtype of BaseVM to implement its own serialization.
+   /// Provides serialization for view models.
    /// </summary>
-   public interface ISerializable
+   public interface ISerializer
    {
       /// <summary>
-      /// Serializes public properties of the instance.
+      /// Serializes an object.
       /// </summary>
+      /// <param name="instance">Object to serialize.</param>
+      /// <param name="ignoredPropertyNames">Names of properties that should not be serialized.</param>
       /// <returns>Serialized string.</returns>
-      string Serialize();
+      string Serialize(object instance, List<string> ignoredPropertyNames);
+   }
 
+   /// <summary>
+   /// Provides deserialization for view models.
+   /// </summary>
+   public interface IDeserializer
+   {
       /// <summary>
-      /// Serializes public properties of the instance that have been changed since the last serialization.
+      /// Deserializes a property value of an object.
       /// </summary>
-      /// <returns>Serialized string.</returns>
-      string SerializeChangedProperties();
-
-      /// <summary>
-      /// Deserializes a property value of the instance.
-      /// </summary>
-      /// <param name="vmPath">View model property path.</param>
+      /// <param name="instance">Object to deserialize the property to.</param>
+      /// <param name="propertyPath">Property path.</param>
       /// <param name="newValue">New value.</param>
       /// <returns>True if the property value was deserialized.</returns>
-      bool DeserializeProperty(string vmPath, string newValue);
+      bool Deserialize(object instance, string propertyPath, string newValue);
    }
 }
