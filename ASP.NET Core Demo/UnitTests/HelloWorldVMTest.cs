@@ -70,5 +70,23 @@ namespace UnitTests
          Assert.IsNotNull(_response.VMData);
          Assert.AreEqual("John Doe", _response.VMData["FullName"]);
       }
+
+      [TestMethod]
+      public void HelloWorldVM_Dispose()
+      {
+         bool dispose = false;
+         var vm = new HelloWorldVM();
+         vm.Disposed += (sender, e) => dispose = true;
+
+         var baseDelegate = VMController.CreateInstance;
+         VMController.CreateInstance = (type, args) => type == typeof(HelloWorldVM) ? vm : baseDelegate(type, args);
+         VMController.Register<HelloWorldVM>();
+
+         var vmController = new VMController(_response.Handler);
+         vmController.OnRequestVM("conn1", typeof(HelloWorldVM).Name);
+
+         vmController.OnDisposeVM("conn1", typeof(HelloWorldVM).Name);
+         Assert.IsTrue(dispose);
+      }
    }
 }

@@ -14,8 +14,8 @@ namespace UnitTests
       {
          public long Data { get; set; }
 
-         public event PropertyChangedEventHandler PropertyChanged;
-         public event EventHandler RequestPushUpdates;
+         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+         public event EventHandler RequestPushUpdates = delegate { };
 
          public LiveChartNoBaseVM()
          {

@@ -11,12 +11,13 @@ namespace UnitTests
    {
       private ResponseStub _response = new ResponseStub();
 
-      private class HelloWorldNoBaseVM  : INotifyPropertyChanged
+      private class HelloWorldNoBaseVM  : INotifyPropertyChanged, IDisposable
       {
          private string _firstName;
          private string _lastName;
 
-         public event PropertyChangedEventHandler PropertyChanged;
+         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+         public event EventHandler Disposed;
          
          public string FirstName
          {
@@ -39,6 +40,8 @@ namespace UnitTests
          }
 
          public string FullName => $"{FirstName} {LastName}";
+
+         public void Dispose() => Disposed?.Invoke(this, EventArgs.Empty);
       }
 
       [TestMethod]
@@ -76,6 +79,24 @@ namespace UnitTests
 
          Assert.IsNotNull(_response.VMData);
          Assert.AreEqual("John Doe", _response.VMData["FullName"]);
+      }
+
+      [TestMethod]
+      public void HelloWorldNoBaseVM_Dispose()
+      {
+         bool dispose = false;
+         var vm = new HelloWorldNoBaseVM();
+         vm.Disposed += (sender, e) => dispose = true;
+
+         var baseDelegate = VMController.CreateInstance;
+         VMController.CreateInstance = (type, args) => type == typeof(HelloWorldNoBaseVM) ? vm : baseDelegate(type, args);
+         VMController.Register<HelloWorldNoBaseVM>();
+
+         var vmController = new VMController(_response.Handler);
+         vmController.OnRequestVM("conn1", typeof(HelloWorldNoBaseVM).Name);
+
+         vmController.OnDisposeVM("conn1", typeof(HelloWorldNoBaseVM).Name);
+         Assert.IsTrue(dispose);
       }
    }
 }
