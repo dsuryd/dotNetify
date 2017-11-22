@@ -33,7 +33,11 @@ namespace DotNetify
    /// <summary>
    /// Exception that gets thrown a JSON view model update from the client cannot be resolved.
    /// </summary>
-   public class UnresolvedVMUpdateException : Exception { }
+   public class UnresolvedVMUpdateException : Exception
+   {
+      public string PropertyPath { get; set; }
+      public string Value { get; set; }
+   }
 
    /// <summary>
    /// Base class for all DotNetify view models.  
@@ -61,8 +65,7 @@ namespace DotNetify
       /// Gets a list of ignored properties.
       /// </summary>
       [Ignore]
-      public List<string> IgnoredProperties => _ignoredProperties = _ignoredProperties
-         ?? VMTypeInfo.GetProperties()
+      public List<string> IgnoredProperties => _ignoredProperties = _ignoredProperties ?? VMTypeInfo.GetProperties()
             .Where(i => i.GetCustomAttribute(typeof(IgnoreAttribute)) != null)
             .Select(j => j.Name)
             .ToList();
@@ -163,7 +166,16 @@ namespace DotNetify
       /// <param name="vmInstanceId">View model instance identifier.</param>
       /// <param name="iVMArg">View model's initialization argument.</param> 
       /// <returns>View model instance.</returns>
-      public virtual BaseVM GetSubVM(string vmTypeName, string vmInstanceId) => string.IsNullOrEmpty(vmInstanceId) ? GetSubVM(vmTypeName) : null;
+      public virtual BaseVM GetSubVM(string vmTypeName, string vmInstanceId)
+      {
+         if (_vmInstance is IMasterVM)
+         {
+            var subVM = (_vmInstance as IMasterVM).GetSubVM(vmTypeName, vmInstanceId);
+            return subVM is BaseVM ? subVM as BaseVM : subVM != null ? new BaseVM(subVM) : null;
+         }
+
+         return string.IsNullOrEmpty(vmInstanceId) ? GetSubVM(vmTypeName) : null;
+      }
 
       /// <summary>
       /// Overload of GetSubVM that only accepts view model type name.
@@ -188,17 +200,13 @@ namespace DotNetify
       /// Override this method to access new instances of subordinates view models as soon as they're created.
       /// </summary>
       /// <param name="subVM">Sub-view model instance.</param>
-      public virtual void OnSubVMCreated(BaseVM subVM)
-      {
-      }
+      public virtual void OnSubVMCreated(BaseVM subVM) => (_vmInstance as IMasterVM)?.OnSubVMCreated(subVM._vmInstance);
 
       /// <summary>
       /// Override this method to access instances of subordinates view models before they're disposed.
       /// </summary>
       /// <param name="subVM">Sub-view model instance.</param>
-      public virtual void OnSubVMDisposing(BaseVM subVM)
-      {
-      }
+      public virtual void OnSubVMDisposing(BaseVM subVM) => (_vmInstance as IMasterVM)?.OnSubVMDisposing(subVM._vmInstance);
 
       /// <summary>
       /// Override this method to handle a value update from a property path that cannot
@@ -208,6 +216,8 @@ namespace DotNetify
       /// <param name="value">New value.</param>
       public virtual void OnUnresolvedUpdate(string vmPath, string value)
       {
+         if (_vmInstance != this)
+            throw new UnresolvedVMUpdateException() { PropertyPath = vmPath, Value = value };
       }
 
       /// <summary>
@@ -221,7 +231,7 @@ namespace DotNetify
       /// <returns>Serialized string.</returns>
       internal string Serialize()
       {
-         var serializer = _vmInstance is ISerializer ? _vmInstance as ISerializer : this;
+         var serializer = _vmInstance as ISerializer ?? this;
          return serializer.Serialize(_vmInstance, IgnoredProperties);
       }
 
@@ -231,7 +241,7 @@ namespace DotNetify
       /// <returns>Serialized string.</returns>
       internal string SerializeChangedProperties()
       {
-         var serializer = _vmInstance is ISerializer ? _vmInstance as ISerializer : this;
+         var serializer = _vmInstance as ISerializer ?? this;
          var changedProperties = new Dictionary<string, object>(ChangedProperties);
          return changedProperties.Count > 0 ? serializer.Serialize(changedProperties, null) : string.Empty;
       }
@@ -243,7 +253,7 @@ namespace DotNetify
       /// <param name="newValue">New value.</param>
       internal bool DeserializeProperty(string vmPath, string newValue)
       {
-         var deserializer = _vmInstance is IDeserializer ? _vmInstance as IDeserializer : this;
+         var deserializer = _vmInstance as IDeserializer ?? this;
          bool success = deserializer.Deserialize(_vmInstance, vmPath, newValue);
          if (success)
          {

@@ -98,11 +98,9 @@ namespace DotNetify
             .GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic)
             .GetValue(source);
 
-         if (eventDelegate != null)
-         {
-            foreach (var handler in eventDelegate.GetInvocationList())
-               handler.GetMethodInfo().Invoke(handler.Target, new object[] { source, eventArgs });
-         }
+         foreach (var handler in eventDelegate?.GetInvocationList())
+            handler.GetMethodInfo().Invoke(handler.Target, new object[] { source, eventArgs });
+
          return source;
       }
    }
