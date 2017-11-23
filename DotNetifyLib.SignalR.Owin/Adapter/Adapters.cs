@@ -59,37 +59,6 @@ namespace DotNetify
       }
    }
 
-   public interface IMemoryCache
-   {
-      bool TryGetValue<T>(string key, out T cachedValue) where T : class;
-      object Get(string key);
-      void Set<T>(string key, T cachedValue, MemoryCacheEntryOptions options = null) where T : class;
-      void Remove(string key);
-   }
-
-   public class MemoryCacheEntryOptions
-   {
-      private TimeSpan _slidingExpiration;
-      private Action<string, object, object, object> _callback;
-
-      public void SetSlidingExpiration(TimeSpan value) => _slidingExpiration = value;
-
-      public MemoryCacheEntryOptions RegisterPostEvictionCallback(Action<string, object, object, object> callback)
-      {
-         _callback = callback;
-         return this;
-      }
-
-      public CacheItemPolicy GetCacheItemPolicy()
-      {
-         return new CacheItemPolicy
-         {
-            SlidingExpiration = _slidingExpiration,
-            RemovedCallback = i => _callback(i.CacheItem.Key, i.CacheItem.Value, null, null)
-         };
-      }
-   }
-
    public class MemoryCacheAdapter : IMemoryCache
    {
       private MemoryCache _cache = new MemoryCache("DotNetify");
@@ -109,7 +78,11 @@ namespace DotNetify
 
       public void Set<T>(string key, T cachedValue, MemoryCacheEntryOptions options = null) where T : class
       {
-         _cache.Set(key, cachedValue, options?.GetCacheItemPolicy());
+         var policy = new CacheItemPolicy { RemovedCallback = i => options.Callback(i.CacheItem.Key, i.CacheItem.Value, null, null) };
+         if (options.SlidingExpiration.HasValue)
+            policy.SlidingExpiration = options.SlidingExpiration.Value;
+
+         _cache.Set(key, cachedValue, policy);
       }
 
       public void Remove(string key)

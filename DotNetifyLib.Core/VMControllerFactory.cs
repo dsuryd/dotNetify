@@ -15,7 +15,6 @@ limitations under the License.
  */
 
 using System;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace DotNetify
 {

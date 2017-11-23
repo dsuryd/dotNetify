@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DotNetify</RootNamespace>
     <AssemblyName>DotNetify</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -76,50 +76,32 @@
     <Compile Include="Adapter\IServiceProvider.cs" />
     <Compile Include="Adapter\TinyIoCServiceProvider.cs" />
     <Compile Include="Adapter\TinyIoCThreadScopeExtensions.cs" />
-    <Compile Include="SignalR\DeveloperLoggingMiddleware.cs" />
-    <Compile Include="SignalR\Extensions\AppBuilderExtensions.cs" />
-    <Compile Include="BaseVM.CRUDExtension.cs" />
-    <Compile Include="BaseVM.cs" />
-    <Compile Include="Command.cs" />
-    <Compile Include="SignalR\DotNetifyHub.cs" />
-    <Compile Include="SignalR\DotNetifyHubContext.cs" />
-    <Compile Include="SignalR\Extensions\ServiceCollectionExtensions.cs" />
-    <Compile Include="SignalR\HubPipeline.cs" />
-    <Compile Include="SignalR\HubPrincipalAccessor.cs" />
-    <Compile Include="IDotNetifyConfiguration.cs" />
-    <Compile Include="IVMControllerFactory.cs" />
+    <Compile Include="DeveloperLoggingMiddleware.cs" />
+    <Compile Include="Extensions\AppBuilderExtensions.cs" />
+    <Compile Include="DotNetifyHub.cs" />
+    <Compile Include="DotNetifyHubContext.cs" />
+    <Compile Include="Extensions\ServiceCollectionExtensions.cs" />
+    <Compile Include="HubPipeline.cs" />
+    <Compile Include="HubPrincipalAccessor.cs" />
     <Compile Include="Adapter\Adapters.cs" />
-    <Compile Include="Routing\RoutingState.cs" />
-    <Compile Include="Routing\IRoutable.cs" />
-    <Compile Include="Observable.cs" />
-    <Compile Include="Routing\RoutableExtension.cs" />
-    <Compile Include="Routing\RouteTemplate.cs" />
-    <Compile Include="Routing\Route.cs" />
-    <Compile Include="Security\AuthorizeAttribute.cs" />
-    <Compile Include="Security\IPrincipalAccessor.cs" />
-    <Compile Include="SignalR\IMiddleware.cs" />
-    <Compile Include="SignalR\IVMFilter.cs" />
-    <Compile Include="SignalR\Security\AuthorizeFilter.cs" />
-    <Compile Include="SignalR\Security\ExtractHeadersMiddleware.cs" />
-    <Compile Include="SignalR\Security\JwtBearerAuthenticationMiddleware.cs" />
-    <Compile Include="SignalR\VMContext.cs" />
+    <Compile Include="IMiddleware.cs" />
+    <Compile Include="IVMFilter.cs" />
+    <Compile Include="Security\AuthorizeFilter.cs" />
+    <Compile Include="Security\ExtractHeadersMiddleware.cs" />
+    <Compile Include="Security\JwtBearerAuthenticationMiddleware.cs" />
+    <Compile Include="VMContext.cs" />
     <Compile Include="Adapter\TinyIoC.cs" />
-    <Compile Include="VMController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VMContractResolver.cs" />
-    <Compile Include="VMControllerFactory.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Scripts\jquery-1.11.3.intellisense.js" />
-    <Content Include="Scripts\jquery-1.11.3.js" />
-    <Content Include="Scripts\jquery-1.11.3.min.js" />
-    <Content Include="Scripts\jquery.signalR-2.2.2.js" />
-    <Content Include="Scripts\jquery.signalR-2.2.2.min.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="Scripts\jquery-1.11.3.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetifyLib.Core\DotNetifyLib.Core.csproj">
+      <Project>{bad3f752-ec12-452c-a569-01f3f150290d}</Project>
+      <Name>DotNetifyLib.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

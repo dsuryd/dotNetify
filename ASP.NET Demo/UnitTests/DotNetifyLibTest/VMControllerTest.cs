@@ -54,7 +54,7 @@ namespace UnitTest
 
       static VMControllerTest()
       {
-         VMController.RegisterAssembly(typeof(UnitTestVM).Assembly);
+         VMController.RegisterAssembly<BaseVM>(typeof(UnitTestVM).Assembly);
       }
 
       public void TestResponse(string connectionId, string vmId, string vmData)

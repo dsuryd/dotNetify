@@ -10,7 +10,7 @@ using ViewModels;
 namespace UnitTest.ViewModelsTest
 {
    [TestClass]
-   public class BetterListVMTest
+   public class SimpleListVMTest
    {
       private string _connectionId;
       private string _vmId;
@@ -45,25 +45,25 @@ namespace UnitTest.ViewModelsTest
       [TestInitialize]
       public void Initialize()
       {
-         VMController.RegisterAssembly(typeof(BetterListVM).Assembly);
+         VMController.RegisterAssembly<BaseVM>(typeof(SimpleListVM).Assembly);
 
          var baseDelegate = VMController.CreateInstance;
          VMController.CreateInstance = (type, args) =>
          {
-            if (type == typeof(BetterListVM))
-               return new BetterListVM(_model);
+            if (type == typeof(SimpleListVM))
+               return new SimpleListVM(_model);
             return baseDelegate(type, args);
          };
       }
 
       [TestMethod]
-      public void BetterListVM_Create()
+      public void SimpleListVM_Create()
       {
          var vmController = new VMController(TestResponse);
-         vmController.OnRequestVM("conn1", typeof(BetterListVM).Name);
+         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
 
-         var update = new Dictionary<string, object>() { { "Add", "{ \"FirstName\": \"Peter\", \"LastName\": \"Chen\"}" } };
-         vmController.OnUpdateVM("conn1", typeof(BetterListVM).Name, update);
+         var update = new Dictionary<string, object>() { { "FirstName", "Peter" }, { "LastName", "Chen" }, { "Add", "true" } };
+         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, update);
 
          var employee = _model.GetAllRecords().Last();
          Assert.AreEqual("Peter", employee.FirstName);
@@ -71,10 +71,10 @@ namespace UnitTest.ViewModelsTest
       }
 
       [TestMethod]
-      public void BetterListVM_Read()
+      public void SimpleListVM_Read()
       {
          var vmController = new VMController(TestResponse);
-         vmController.OnRequestVM("conn1", typeof(BetterListVM).Name);
+         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
 
          var vmEmployees = GetVMProperty<List<EmployeeRecord>>("Employees");
          Assert.IsNotNull(vmEmployees);
@@ -88,22 +88,22 @@ namespace UnitTest.ViewModelsTest
       }
 
       [TestMethod]
-      public void BetterListVM_Update()
+      public void SimpleListVM_Update()
       {
          var vmController = new VMController(TestResponse);
-         vmController.OnRequestVM("conn1", typeof(BetterListVM).Name);
+         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
 
          var update = new Dictionary<string, object>() { { "Employees.$1.FirstName", "Teddy" } };
-         vmController.OnUpdateVM("conn1", typeof(BetterListVM).Name, update);
+         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, update);
 
          update = new Dictionary<string, object>() { { "Employees.$1.LastName", "Lee" } };
-         vmController.OnUpdateVM("conn1", typeof(BetterListVM).Name, update);
+         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, update);
 
          update = new Dictionary<string, object>() { { "Employees.$3.FirstName", "Beth" } };
-         vmController.OnUpdateVM("conn1", typeof(BetterListVM).Name, update);
+         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, update);
 
          update = new Dictionary<string, object>() { { "Employees.$3.LastName", "Larson" } };
-         vmController.OnUpdateVM("conn1", typeof(BetterListVM).Name, update);
+         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, update);
 
          var employee = _model.GetAllRecords().First();
          Assert.AreEqual("Teddy", employee.FirstName);
@@ -115,17 +115,17 @@ namespace UnitTest.ViewModelsTest
       }
 
       [TestMethod]
-      public void BetterListVM_Delete()
+      public void SimpleListVM_Delete()
       {
          var vmController = new VMController(TestResponse);
-         vmController.OnRequestVM("conn1", typeof(BetterListVM).Name);
+         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
 
          var employees = _model.GetAllRecords();
          Assert.AreEqual(3, employees.Count);
          Assert.IsTrue(employees.Exists(i => i.Id == 2));
 
          var update = new Dictionary<string, object>() { { "Remove", "2" } };
-         vmController.OnUpdateVM("conn1", typeof(BetterListVM).Name, update);
+         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, update);
 
          Assert.AreEqual(2, employees.Count);
          Assert.IsFalse(employees.Exists( i => i.Id == 2));

@@ -44,7 +44,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -96,9 +95,9 @@
     <EmbeddedResource Include="Properties\Resources.ja-jp.resx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DotNetifyLib\DotNetifyLib.csproj">
-      <Project>{329f210e-0721-462c-a368-14121dcee135}</Project>
-      <Name>DotNetifyLib</Name>
+    <ProjectReference Include="..\..\DotNetifyLib.Core\DotNetifyLib.Core.csproj">
+      <Project>{bad3f752-ec12-452c-a569-01f3f150290d}</Project>
+      <Name>DotNetifyLib.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

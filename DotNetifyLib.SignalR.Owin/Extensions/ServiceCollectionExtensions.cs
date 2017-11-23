@@ -24,7 +24,10 @@ namespace DotNetify
    {
       public static IServiceCollection AddDotNetify(this IServiceCollection services)
       {
-         // Use ASP.NET Core DI to inject the dotNetify's view model controller factory to the dotNetify's SignalR hub.
+         // Add memory cache.
+         services.AddSingleton<IMemoryCache, MemoryCacheAdapter>();
+
+         // Use built-in DI to inject the dotNetify's view model controller factory to the dotNetify's SignalR hub.
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
 
          // Add service to get the hub principal.

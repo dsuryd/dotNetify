@@ -16,7 +16,7 @@
       "jquery": { exports: "$" },
       "knockout": { exports: "ko" },
       "bootstrap": ["jquery"],
-      "signalr": { deps: ["jquery"], exports: "$.connection" },
+      "signalR": { deps: ["jquery"], exports: "$.connection" },
       "binder-polymer": ["binder"]
    }
 });

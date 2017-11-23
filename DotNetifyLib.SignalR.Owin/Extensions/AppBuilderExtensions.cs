@@ -30,10 +30,6 @@ namespace DotNetify
       {
          var provider = appBuilder.ApplicationServices;
 
-         // Make sure all the required services are there.
-         if (provider.GetService<IMemoryCache>() == null)
-            throw new InvalidOperationException("No service of type IMemoryCache has been registered. Please add the service by calling 'IServiceCollection.AddMemoryCache()' in the startup class.");
-
          var vmControllerFactory = provider.GetService<IVMControllerFactory>();
          if (vmControllerFactory == null)
             throw new InvalidOperationException("Please call 'IServiceCollection.AddDotNetify()' inside the ConfigureServices() of the startup class.");

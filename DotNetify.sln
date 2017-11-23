@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{9C5BEB91-E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication", "ASP.NET Demo\WebApplication.Knockout\WebApplication.csproj", "{6F3D2D41-9730-4FF3-839C-F03FDDB74670}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetifyLib", "DotNetifyLib\DotNetifyLib.csproj", "{329F210E-0721-462C-A368-14121DCEE135}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetifyLib.SignalR.Owin", "DotNetifyLib.SignalR.Owin\DotNetifyLib.SignalR.Owin.csproj", "{329F210E-0721-462C-A368-14121DCEE135}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModels", "ASP.NET Demo\ViewModels\ViewModels.csproj", "{D777B14B-C36D-48A8-B5A8-2F5B0FCEB0CC}"
 EndProject
@@ -79,7 +79,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "typings", "typings", "{EFE1
 		dist\typings\dotnetify.d.ts = dist\typings\dotnetify.d.ts
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "ASP.NET Demo\UnitTest\UnitTest.csproj", "{A9D45EF3-F162-4E15-BCE5-E2F2501D9079}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "ASP.NET Demo\UnitTests\UnitTests.csproj", "{A9D45EF3-F162-4E15-BCE5-E2F2501D9079}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "ASP.NET Core Demo\UnitTests\UnitTests.csproj", "{0C49A5E5-CFF9-4436-8135-D8C5C53ED004}"
 EndProject

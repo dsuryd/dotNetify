@@ -117,3 +117,7 @@
 /ASP.NET Core Demo/UnitTests/obj
 /ASP.NET Demo/UnitTest/bin
 /ASP.NET Demo/UnitTest/obj
+/ASP.NET Demo/UnitTests/bin/Debug
+/ASP.NET Demo/UnitTests/obj/Debug
+/DotNetifyLib.SignalR.Owin/bin/Debug
+/DotNetifyLib.SignalR.Owin/obj/Debug

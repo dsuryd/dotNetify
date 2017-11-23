@@ -28,7 +28,7 @@ namespace UnitTest.ViewModelsTest
       [TestMethod]
       public void HelloWorldVM()
       {
-         VMController.RegisterAssembly(typeof(HelloWorldVM).Assembly);
+         VMController.RegisterAssembly<BaseVM>(typeof(HelloWorldVM).Assembly);
 
          var vmController = new VMController(TestResponse);
          vmController.OnRequestVM("conn1", typeof(HelloWorldVM).Name);

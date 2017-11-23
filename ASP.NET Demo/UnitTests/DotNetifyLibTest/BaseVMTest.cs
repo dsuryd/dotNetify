@@ -33,7 +33,7 @@ namespace UnitTest
             set { Set(value); }
          }
 
-         [Ignore]
+         [DotNetify.Ignore]
          public string IgnoreMe { get; set; }
 
          public override BaseVM GetSubVM(string vmTypeName)

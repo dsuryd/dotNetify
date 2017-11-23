@@ -29,7 +29,7 @@ namespace UnitTest.ViewModelsTest
       [ClassInitialize]
       public static void Initialize(TestContext testContext)
       {
-         VMController.RegisterAssembly(typeof(ControlTypesVM).Assembly);
+         VMController.RegisterAssembly<BaseVM>(typeof(ControlTypesVM).Assembly);
       }
 
       [TestMethod]
