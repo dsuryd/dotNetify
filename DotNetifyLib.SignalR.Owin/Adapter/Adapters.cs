@@ -78,9 +78,13 @@ namespace DotNetify
 
       public void Set<T>(string key, T cachedValue, MemoryCacheEntryOptions options = null) where T : class
       {
-         var policy = new CacheItemPolicy { RemovedCallback = i => options.Callback(i.CacheItem.Key, i.CacheItem.Value, null, null) };
-         if (options.SlidingExpiration.HasValue)
-            policy.SlidingExpiration = options.SlidingExpiration.Value;
+         var policy = new CacheItemPolicy();
+         if (options != null)
+         {
+            policy.RemovedCallback = i => options.Callback(i.CacheItem.Key, i.CacheItem.Value, null, null);
+            if (options.SlidingExpiration.HasValue)
+               policy.SlidingExpiration = options.SlidingExpiration.Value;
+         }
 
          _cache.Set(key, cachedValue, policy);
       }
