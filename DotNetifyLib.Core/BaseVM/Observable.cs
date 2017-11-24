@@ -15,20 +15,25 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace DotNetify
 {
+   using PropertyDictionary = ConcurrentDictionary<string, object>;
+   using PropertyStack = ConcurrentStack<string>;
+
    /// <summary>
    /// Base class for objects that want to provide notification if their property values changed.
    /// </summary>
    public class Observable : INotifyPropertyChanged, IDisposable
    {
-      protected Dictionary<string, object> _propertyValues = new Dictionary<string, object>();
-      protected Stack<string> _propertyChangedStack = new Stack<string>();
+      protected PropertyDictionary _propertyValues = new PropertyDictionary();
+      protected PropertyStack _propertyChangedStack = new PropertyStack();
 
       /// <summary>
       /// Occurs when a property value is changed.
@@ -89,7 +94,7 @@ namespace DotNetify
          if (PropertyChanged != null)
          {
             // Use a stack to keep track of things to avoid any circular loop situation that might arise.
-            if (_propertyChangedStack.Contains(propertyName))
+            if (_propertyChangedStack.Any(x => x == propertyName))
                return;
 
             _propertyChangedStack.Push(propertyName);
@@ -99,7 +104,7 @@ namespace DotNetify
             }
             finally
             {
-               _propertyChangedStack.Pop();
+               _propertyChangedStack.TryPop(out string prop);
             }
          }
       }

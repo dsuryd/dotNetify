@@ -95,6 +95,7 @@ namespace UnitTest
          var vm = new TestVM();
 
          bool request = false;
+         vm.String = "Hello";
          vm.RequestPushUpdates += (sender, e) => request = true;
          vm.PushUpdates();
 

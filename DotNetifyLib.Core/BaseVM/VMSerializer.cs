@@ -27,7 +27,7 @@ namespace DotNetify
    /// <summary>
    /// Base class for all DotNetify view models.  
    /// </summary>
-   public class VMSerializer : ISerializer, IDeserializer
+   public sealed class VMSerializer : ISerializer, IDeserializer
    {
       /// <summary>
       /// Serializes a view model into JSON-formatted string.

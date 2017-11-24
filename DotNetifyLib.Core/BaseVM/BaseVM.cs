@@ -22,9 +22,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 
 namespace DotNetify
 {
+   using PropertyDictionary = ConcurrentDictionary<string, object>;
+
    /// <summary>
    /// Attribute to prevent a property from being sent to the client.
    /// </summary>
@@ -44,10 +47,14 @@ namespace DotNetify
    /// </summary>
    public partial class BaseVM : Observable, IPushUpdates, ISerializer, IDeserializer
    {
-      private readonly ConcurrentDictionary<string, object> _changedProperties = new ConcurrentDictionary<string, object>();
-      private readonly VMSerializer _vmSerializer = new VMSerializer();
-      private readonly INotifyPropertyChanged _vmInstance = null;
-      private List<string> _ignoredProperties = null;
+      private readonly Queue<PropertyDictionary> _propertyDictionaries = new Queue<PropertyDictionary>(Enumerable.Range(0, 2).Select(_ => new PropertyDictionary()));
+      private readonly INotifyPropertyChanged _vmInstance;
+      private PropertyDictionary _changedProperties;
+      private List<string> _ignoredProperties;
+
+      private static readonly VMSerializer _vmSerializer = new VMSerializer();
+      protected ISerializer _serializer = _vmSerializer;
+      protected IDeserializer _deserializer = _vmSerializer;
 
       /// <summary>
       /// Occurs when the view model wants to push updates to the client.
@@ -73,7 +80,7 @@ namespace DotNetify
       /// <summary>
       /// View model's type information.
       /// </summary>
-      private TypeInfo VMTypeInfo => _vmInstance.GetType().GetTypeInfo();
+      protected TypeInfo VMTypeInfo => _vmInstance.GetType().GetTypeInfo();
 
       /// <summary>
       /// Default constructor.
@@ -82,6 +89,7 @@ namespace DotNetify
       {
          _vmInstance = this;
          PropertyChanged += OnPropertyChanged;
+         _changedProperties = _propertyDictionaries.Dequeue();
       }
 
       /// <summary>
@@ -92,6 +100,7 @@ namespace DotNetify
       {
          _vmInstance = vm;
          vm.PropertyChanged += OnPropertyChanged;
+         _changedProperties = _propertyDictionaries.Dequeue();
 
          if (vm is IDisposable)
             Disposed += (sender, e) =>
@@ -152,7 +161,20 @@ namespace DotNetify
       /// <summary>
       /// Accepts all changed properties so they won't marked as changed anymore.
       /// </summary>
-      internal void AcceptChangedProperties() => _changedProperties.Clear();
+      /// <returns>Accepted changed properties.</returns>
+      internal IDictionary<string, object> AcceptChangedProperties()
+      {
+         IDictionary<string, object> result = null;
+         lock (_propertyDictionaries)
+         {
+            var changedProperties = Interlocked.Exchange(ref _changedProperties, _propertyDictionaries.Dequeue());
+            if (changedProperties.Count > 0)
+               result = new Dictionary<string, object>(changedProperties);
+            changedProperties.Clear();
+            _propertyDictionaries.Enqueue(changedProperties);
+         }
+         return result;
+      }
 
       /// <summary>
       /// Override this method if the derived type is a master view model.  The VMController
@@ -223,7 +245,11 @@ namespace DotNetify
       /// <summary>
       /// Push property changed updates to the client.
       /// </summary>
-      public void PushUpdates() => RequestPushUpdates?.Invoke(this, null);
+      public void PushUpdates()
+      {
+         if (ChangedProperties.Any())
+            RequestPushUpdates?.Invoke(this, null);
+      }
 
       /// <summary>
       /// Serializes the instance into JSON-formatted string.
@@ -241,9 +267,10 @@ namespace DotNetify
       /// <returns>Serialized string.</returns>
       internal string SerializeChangedProperties()
       {
+         IDictionary<string, object> changedProperties = AcceptChangedProperties();
+
          var serializer = _vmInstance as ISerializer ?? this;
-         var changedProperties = new Dictionary<string, object>(ChangedProperties);
-         return changedProperties.Count > 0 ? serializer.Serialize(changedProperties, null) : string.Empty;
+         return changedProperties != null ? serializer.Serialize(changedProperties, null) : string.Empty;
       }
 
       /// <summary>
@@ -277,7 +304,7 @@ namespace DotNetify
       /// <param name="instance">Object to serialize.</param>
       /// <param name="ignoredPropertyNames">Names of properties that should not be serialized.</param>
       /// <returns>Serialized string.</returns>
-      public virtual string Serialize(object instance, List<string> ignoredPropertyNames) => _vmSerializer.Serialize(instance, ignoredPropertyNames);
+      public virtual string Serialize(object instance, List<string> ignoredPropertyNames) => _serializer.Serialize(instance, ignoredPropertyNames);
 
       /// <summary>
       /// Deserializes a property value of an object.
@@ -286,7 +313,7 @@ namespace DotNetify
       /// <param name="propertyPath">Property path.</param>
       /// <param name="newValue">New value.</param>
       /// <returns>True if the property value was deserialized.</returns>
-      public virtual bool Deserialize(object instance, string propertyPath, string newValue) => _vmSerializer.Deserialize(instance, propertyPath, newValue);
+      public virtual bool Deserialize(object instance, string propertyPath, string newValue) => _deserializer.Deserialize(instance, propertyPath, newValue);
 
       /// <summary>
       /// Handles property changed event.

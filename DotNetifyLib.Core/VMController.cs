@@ -340,9 +340,6 @@ namespace DotNetify
                   ResponseVMFilter.Invoke(kvp.Key, vmInstance, vmData, filteredData =>
                   {
                      _vmResponse(kvp.Value.ConnectionId, kvp.Key, (string)filteredData);
-
-                     // After the changes are forwarded, accept the changes so they won't be marked as changed anymore.
-                     vmInstance.AcceptChangedProperties();
                   });
                }
             }
