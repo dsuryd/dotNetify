@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Input;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
@@ -39,7 +40,8 @@ namespace DotNetify
       {
          try
          {
-            return JsonConvert.SerializeObject(viewModel, new JsonSerializerSettings { ContractResolver = new VMContractResolver(ignoredPropertyNames) });
+            var jObject = JObject.FromObject(viewModel, new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) });
+            return JsonConvert.SerializeObject(jObject);
          }
          catch (Exception ex)
          {
@@ -96,7 +98,11 @@ namespace DotNetify
                      vmType = viewModel != null ? viewModel.GetType() : propInfo.PropertyType;
                   }
                }
-               else if (typeof(ICommand).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType) && viewModel != null)
+               else if (viewModel == null)
+               {
+                  return false;
+               }
+               else if (typeof(ICommand).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType))
                {
                   // If the property type is ICommand, execute the command.
                   (propInfo.GetValue(viewModel) as ICommand)?.Execute(newValue);
@@ -108,17 +114,16 @@ namespace DotNetify
                   var cmdType = argTypes.Length > 0 ? typeof(Command<>).MakeGenericType(argTypes) : typeof(Command);
                   (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommand)?.Execute(newValue);
                }
-               else if (propInfo.SetMethod != null && viewModel != null)
+               else if (typeof(IReactiveProperty).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType))
+               {
+                  // If the property type is ReactiveProperty, set the new value into the object.
+                  var reactiveProp = propInfo.GetValue(viewModel) as IReactiveProperty;
+                  reactiveProp.Value = ConvertFromString(reactiveProp.PropertyType, newValue);
+               }
+               else if (propInfo.SetMethod != null)
                {
                   // Update the new value to the property.
-                  if (propType.IsClass && propInfo.PropertyType != typeof(string))
-                     propInfo.SetValue(viewModel, JsonConvert.DeserializeObject(newValue, propInfo.PropertyType));
-                  else
-                  {
-                     var typeConverter = TypeDescriptor.GetConverter(propInfo.PropertyType);
-                     if (typeConverter != null)
-                        propInfo.SetValue(viewModel, typeConverter.ConvertFromString(newValue));
-                  }
+                  propInfo.SetValue(viewModel, ConvertFromString(propInfo.PropertyType, newValue));
                }
             }
          }
@@ -130,5 +135,14 @@ namespace DotNetify
 
          return true;
       }
+
+      /// <summary>
+      /// Converts a string to an object.
+      /// </summary>
+      /// <param name="type">Type of the object.</param>
+      /// <param name="value">String value.</param>
+      /// <returns>Converted value.</returns>
+      private object ConvertFromString(Type type, string value) =>
+         type.GetTypeInfo().IsClass && type != typeof(string) ? JsonConvert.DeserializeObject(value, type) : TypeDescriptor.GetConverter(type)?.ConvertFromString(value);
    }
 }

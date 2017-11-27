@@ -92,14 +92,17 @@ namespace DotNetify
       /// <param name="eventArgs">Event arguments.</param>
       internal static T RaiseEvent<T, TEventArgs>(this T source, string eventName, TEventArgs eventArgs) where TEventArgs : EventArgs
       {
-         var eventDelegate = (MulticastDelegate)source
-            .GetType()
-            .GetTypeInfo()
-            .GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic)
+         Type type = source.GetType();
+         while (type.GetTypeInfo().GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic) == null && type.GetTypeInfo().BaseType != null)
+            type = type.GetTypeInfo().BaseType;
+
+         var eventDelegate = (MulticastDelegate)type.GetTypeInfo()
+            .GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic)?
             .GetValue(source);
 
-         foreach (var handler in eventDelegate?.GetInvocationList())
-            handler.GetMethodInfo().Invoke(handler.Target, new object[] { source, eventArgs });
+         if (eventDelegate != null)
+            foreach (var handler in eventDelegate?.GetInvocationList())
+               handler.GetMethodInfo().Invoke(handler.Target, new object[] { source, eventArgs });
 
          return source;
       }

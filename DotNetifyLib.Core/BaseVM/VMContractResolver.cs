@@ -31,33 +31,45 @@ namespace DotNetify
       private List<string> _ignoredPropertyNames;
 
       /// <summary>
-      /// Converter for properties of ICommand type which simply serialize the value to null.
+      /// Converter for properties of ICommand type which simply serializes the value to null.
       /// </summary>
       protected class CommandConverter : JsonConverter
       {
          /// <summary>
          /// Determines whether this instance can convert the specified object type.
          /// </summary>
-         public override bool CanConvert(Type objectType)
-         {
-            return typeof(ICommand).GetTypeInfo().IsAssignableFrom(objectType);
-         }
+         public override bool CanConvert(Type objectType) => typeof(ICommand).GetTypeInfo().IsAssignableFrom(objectType);
 
          /// <summary>
-         /// Reads the JSON representation of the object.
+         /// Reads the JSON representation of the object; not used.
          /// </summary>
-         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-         {
-            throw new NotImplementedException();
-         }
+         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => throw new NotImplementedException();
 
          /// <summary>
-         /// Writes the JSON representation of the object.
+         /// Writes null value to the JSON output.
          /// </summary>
-         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-         {
-            writer.WriteNull();
-         }
+         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => writer.WriteNull();
+      }
+
+      /// <summary>
+      /// Converter for properties of ReactiveProperty type which serializes the property value.
+      /// </summary>
+      protected class ReactivePropertyConverter : JsonConverter
+      {
+         /// <summary>
+         /// Determines whether this instance can convert the specified object type.
+         /// </summary>
+         public override bool CanConvert(Type objectType) => objectType.GetTypeInfo().IsGenericType && typeof(IReactiveProperty).GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo().GetGenericTypeDefinition());
+
+         /// <summary>
+         /// Reads the JSON representation of the object; not used.
+         /// </summary>
+         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => throw new NotImplementedException();
+
+         /// <summary>
+         /// Writes the property value to the JSON output.
+         /// </summary>
+         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => writer.WriteValue((value as IReactiveProperty).Value);
       }
 
       /// <summary>
@@ -92,6 +104,8 @@ namespace DotNetify
       {
          if (typeof(ICommand).GetTypeInfo().IsAssignableFrom(objectType))
             return new CommandConverter();
+         else if (typeof(IReactiveProperty).GetTypeInfo().IsAssignableFrom(objectType))
+            return new ReactivePropertyConverter();
          else
          {
             var typeInfo = objectType.GetTypeInfo();
