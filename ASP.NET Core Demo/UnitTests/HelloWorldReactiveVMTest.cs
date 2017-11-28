@@ -37,12 +37,11 @@ namespace UnitTests
       public void ReactiveVM_Request()
       {
          var vmController = new MockVMController<HelloWorldReactiveVM>();
-         var vm = vmController.RequestVM();
+         var response = vmController.RequestVM();
 
-         Assert.IsNotNull(vm);
-         Assert.AreEqual("Hello", (string) vm.FirstName);
-         Assert.AreEqual("World", (string)vm.LastName);
-         Assert.AreEqual("Hello World", vm.GetProperty<string>("FullName"));
+         Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
+         Assert.AreEqual("World", response.GetVMProperty<string>("LastName"));
+         Assert.AreEqual("Hello World", response.GetVMProperty<string>("FullName"));
       }
 
       [TestMethod]

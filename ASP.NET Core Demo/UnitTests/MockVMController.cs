@@ -7,7 +7,7 @@ using DotNetify;
 
 namespace UnitTests
 {
-   public class ResponseStub
+   public class Response
    {
       private string _connectionId;
       private string _vmId;
@@ -24,14 +24,12 @@ namespace UnitTests
       }
 
       public T GetVM<T>() where T : INotifyPropertyChanged => JsonConvert.DeserializeObject<T>(_vmData);
-      public T GetVMProperty<T>(string propName) where T : class => VMData[propName].ToObject(typeof(T)) as T;
-
-      public Dictionary<string, object> MockAction(string actionName, string actionValue) => new Dictionary<string, object>() { { actionName, actionValue } };
+      public T GetVMProperty<T>(string propName) => (T) VMData[propName]?.ToObject(typeof(T));
    }
 
    public class MockVMController<TViewModel> where TViewModel : INotifyPropertyChanged
    {
-      private readonly ResponseStub _response = new ResponseStub();
+      private readonly Response _response = new Response();
       private readonly string _vmId;
       private readonly VMController _vmController;
 
@@ -54,22 +52,16 @@ namespace UnitTests
          });
       }
 
-      public TViewModel RequestVM()
-      {
-         _vmController.OnRequestVM("conn1", _vmId);
-         return _response.GetVM<TViewModel>();
-      }
-
-      public ResponseStub RequestVMRaw()
+      public Response RequestVM()
       {
          _vmController.OnRequestVM("conn1", _vmId);
          return _response;
       }
 
-      public T RequestVM<T>(string vmId) where T : INotifyPropertyChanged
+      public Response RequestVM(string vmId)
       {
          _vmController.OnRequestVM("conn1", vmId);
-         return _response.GetVM<T>();
+         return _response;
       }
 
       public JObject UpdateVM(Dictionary<string, object> update, string vmId = null)

@@ -64,12 +64,11 @@ namespace UnitTests
       public void HelloWorldNoBaseVM_Request()
       {
          var vmController = new MockVMController<HelloWorldNoBaseVM>();
-         var vm = vmController.RequestVM();
+         var response = vmController.RequestVM();
 
-         Assert.IsNotNull(vm);
-         Assert.AreEqual("Hello", vm.FirstName);
-         Assert.AreEqual("World", vm.LastName);
-         Assert.AreEqual("Hello World", vm.FullName);
+         Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
+         Assert.AreEqual("World", response.GetVMProperty<string>("LastName"));
+         Assert.AreEqual("Hello World", response.GetVMProperty<string>("FullName"));
       }
 
       [TestMethod]

@@ -39,17 +39,16 @@ namespace UnitTests
       public void MasterDetailsVM_Request()
       {
          var vmController = new MockVMController<MasterVM>(_masterVM);
-         var vm = vmController.RequestVM<DetailsVM>(_detailsVMId);
+         var response = vmController.RequestVM(_detailsVMId);
 
-         Assert.IsNotNull(vm);
-         Assert.AreEqual(int.MaxValue, vm.Value);
+         Assert.AreEqual(int.MaxValue, response.GetVMProperty<int>("Value"));
       }
 
       [TestMethod]
       public void MasterDetailsVM_Update()
       {
          var vmController = new MockVMController<MasterVM>(_masterVM);
-         vmController.RequestVM<DetailsVM>(_detailsVMId);
+         vmController.RequestVM(_detailsVMId);
 
          var update = new Dictionary<string, object>() { { "Value", "99" } };
          vmController.UpdateVM(update, _detailsVMId);
@@ -65,7 +64,7 @@ namespace UnitTests
          _masterVM.SubVMCreated += (sender, e) => { subVM = sender; subVMCreated = true; };
 
          var vmController = new MockVMController<MasterVM>(_masterVM);
-         vmController.RequestVM<DetailsVM>(_detailsVMId);
+         vmController.RequestVM(_detailsVMId);
 
          Assert.IsTrue(subVMCreated);
          Assert.IsTrue(subVM is DetailsVM);
@@ -79,7 +78,7 @@ namespace UnitTests
          _masterVM.SubVMDisposing += (sender, e) => { subVM = sender; subVMDisposing = true; };
 
          var vmController = new MockVMController<MasterVM>(_masterVM);
-         vmController.RequestVM<DetailsVM>(_detailsVMId);
+         vmController.RequestVM(_detailsVMId);
 
          vmController.DisposeVM(_detailsVMId);
          Assert.IsTrue(subVMDisposing);

@@ -9,7 +9,7 @@ namespace UnitTests
    [TestClass]
    public class SimpleListVMTest
    {
-      private ResponseStub _response = new ResponseStub();
+      private Response _response = new Response();
       private EmployeeService _employeeService = new EmployeeService();
       private SimpleListVM _simpleListVM;
 
@@ -137,7 +137,7 @@ namespace UnitTests
       public void SimpleListVM_Create()
       {
          var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
-         vmController.RequestVMRaw();
+         vmController.RequestVM();
 
          vmController.UpdateVM(new Dictionary<string, object>() { { "Add", "Peter Chen" } });
 
@@ -151,7 +151,7 @@ namespace UnitTests
       {
          var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
          var vmEmployees = vmController
-            .RequestVMRaw()
+            .RequestVM()
             .GetVMProperty<List<EmployeeRecord>>("Employees");
 
          Assert.IsNotNull(vmEmployees);
@@ -168,7 +168,7 @@ namespace UnitTests
       public void SimpleListVM_Update()
       {
          var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
-         var vmEmployees = vmController.RequestVMRaw();
+         var vmEmployees = vmController.RequestVM();
 
          vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, FirstName: 'Teddy' }" } });
          vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
@@ -189,7 +189,7 @@ namespace UnitTests
       public void SimpleListVM_Delete()
       {
          var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
-         var vmEmployees = vmController.RequestVMRaw();
+         var vmEmployees = vmController.RequestVM();
 
          var employees = _employeeService.GetAll();
          Assert.AreEqual(3, employees.Count);
