@@ -180,12 +180,25 @@ namespace DotNetify
       /// Adds a runtime property.
       /// </summary>
       /// <param name="propertyName">Property name.</param>
-      public void AddProperty<T>(string propertyName)
+      public void AddProperty<T>(string propertyName, T value = default(T))
       {
          if (_propertyValues.ContainsKey(propertyName))
             throw new InvalidOperationException($"{propertyName} already exists.");
 
-         Set(default(T), propertyName);
+         Set(value, propertyName);
+      }
+
+      /// <summary>
+      /// Gets a runtime property.
+      /// </summary>
+      /// <param name="propertyName">Property name.</param>
+      /// <returns>Property value.</returns>
+      public T GetProperty<T>(string propertyName)
+      {
+         if (!_propertyValues.ContainsKey(propertyName))
+            throw new InvalidOperationException($"{propertyName} doesn't exist.");
+
+         return Get<T>(propertyName);
       }
 
       /// <summary>
@@ -337,7 +350,7 @@ namespace DotNetify
             return;
 
          // Mark property as changed, to allow the server view model to forward changes back to the client view model.
-         _changedProperties[e.PropertyName] = VMTypeInfo.GetProperty(e.PropertyName).GetValue(_vmInstance);
+         _changedProperties[e.PropertyName] = _propertyValues.ContainsKey(e.PropertyName) ? _propertyValues[e.PropertyName] : VMTypeInfo.GetProperty(e.PropertyName)?.GetValue(_vmInstance);
       }
    }
 }

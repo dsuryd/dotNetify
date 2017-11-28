@@ -16,21 +16,17 @@ namespace UnitTests
       {
          public ReactiveProperty<string> FirstName { get; set; } = "Hello";
          public ReactiveProperty<string> LastName { get; set; } = "World";
-         public ReactiveProperty<string> FullName { get; set; } = "";
-         public ReactiveProperty<DateTime> ServerTime { get; set; } = DateTime.MinValue;
 
          public HelloWorldReactiveVM()
          {
-            FullName
-               .SubscribeTo(Rx.Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
-               .OnChanged(() => Changed(nameof(FullName)));
+            this.AddReactiveProperty<string>("FullName")
+               .SubscribeTo(Rx.Observable.CombineLatest(FirstName, LastName, FullNameDelegate));
          }
 
          public HelloWorldReactiveVM(bool live) : this()
          {
-            ServerTime
+            this.AddReactiveProperty("ServerTime", DateTime.MinValue)
                .SubscribeTo(Rx.Observable.Interval(TimeSpan.FromMilliseconds(200)).Select(_ => DateTime.Now).StartWith(now))
-               .OnChanged(() => Changed(nameof(ServerTime)))
                .OnChanged(() => PushUpdates());
          }
 
@@ -46,7 +42,7 @@ namespace UnitTests
          Assert.IsNotNull(vm);
          Assert.AreEqual("Hello", (string) vm.FirstName);
          Assert.AreEqual("World", (string)vm.LastName);
-         Assert.AreEqual("Hello World", (string) vm.FullName);
+         Assert.AreEqual("Hello World", vm.GetProperty<string>("FullName"));
       }
 
       [TestMethod]

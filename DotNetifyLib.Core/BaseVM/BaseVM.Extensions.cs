@@ -69,6 +69,8 @@ namespace DotNetify
 
       #endregion
 
+      #region Events
+
       /// <summary>
       /// Raises PropertyChanged event.
       /// </summary>
@@ -105,6 +107,23 @@ namespace DotNetify
                handler.GetMethodInfo().Invoke(handler.Target, new object[] { source, eventArgs });
 
          return source;
+      }
+
+      #endregion
+
+      /// <summary>
+      /// Adds a runtime reactive property.
+      /// </summary>
+      /// <param name="vm">View model to add the property to.</param>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="propertyValue">Property value.</param>
+      /// <returns>Reactive property.</returns>
+      public static ReactiveProperty<T> AddReactiveProperty<T>(this BaseVM vm, string propertyName, T propertyValue = default(T))
+      {
+         var prop = new ReactiveProperty<T>(propertyValue);
+         prop.OnChanged(() => vm.Changed(propertyName));
+         vm.AddProperty(propertyName, prop);
+         return prop;
       }
    }
 }

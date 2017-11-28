@@ -59,7 +59,7 @@ namespace DotNetify
       protected T Get<T>([CallerMemberName] string propertyName = null)
       {
          if (_propertyValues.ContainsKey(propertyName))
-            return (T)_propertyValues[propertyName];
+            return _propertyValues[propertyName] is IReactiveProperty ? (T) (_propertyValues[propertyName] as IReactiveProperty).Value : (T) _propertyValues[propertyName];
          return default(T);
       }
 
