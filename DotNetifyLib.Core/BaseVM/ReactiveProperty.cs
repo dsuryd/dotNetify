@@ -47,7 +47,7 @@ namespace DotNetify
       /// <summary>
       /// Occurs when the property value changed.
       /// </summary>
-      public event EventHandler Changed;
+      public event EventHandler<T> Changed;
 
       /// <summary>
       /// Gets or sets the property value.
@@ -119,7 +119,7 @@ namespace DotNetify
       public void OnNext(T value)
       {
          _value = value;
-         Changed?.Invoke(this, EventArgs.Empty);
+         Changed?.Invoke(this, value);
          _subject.OnNext(value);
       }
 

@@ -177,6 +177,18 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Adds a runtime property.
+      /// </summary>
+      /// <param name="propertyName">Property name.</param>
+      public void AddProperty<T>(string propertyName)
+      {
+         if (_propertyValues.ContainsKey(propertyName))
+            throw new InvalidOperationException($"{propertyName} already exists.");
+
+         Set(default(T), propertyName);
+      }
+
+      /// <summary>
       /// Override this method if the derived type is a master view model.  The VMController
       /// will call this method to get instances of any view model whose view falls within
       /// this master view in the HTML markup.  The master view model can use this opportunity

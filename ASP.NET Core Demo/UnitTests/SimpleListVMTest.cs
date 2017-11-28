@@ -11,6 +11,7 @@ namespace UnitTests
    {
       private ResponseStub _response = new ResponseStub();
       private EmployeeService _employeeService = new EmployeeService();
+      private SimpleListVM _simpleListVM;
 
       private class EmployeeRecord
       {
@@ -129,18 +130,16 @@ namespace UnitTests
       [TestInitialize]
       public void Initialize()
       {
-         VMController.Register<SimpleListVM>();
-
-         var baseDelegate = VMController.CreateInstance;
-         VMController.CreateInstance = (type, args) => type == typeof(SimpleListVM) ? new SimpleListVM(_employeeService) : baseDelegate(type, args);
+         _simpleListVM = new SimpleListVM(_employeeService);
       }
 
       [TestMethod]
       public void SimpleListVM_Create()
       {
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
-         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, _response.MockAction("Add", "Peter Chen"));
+         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         vmController.RequestVMRaw();
+
+         vmController.UpdateVM(new Dictionary<string, object>() { { "Add", "Peter Chen" } });
 
          var employee = _employeeService.GetAll().Last();
          Assert.AreEqual("Peter", employee.FirstName);
@@ -150,10 +149,11 @@ namespace UnitTests
       [TestMethod]
       public void SimpleListVM_Read()
       {
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
+         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmEmployees = vmController
+            .RequestVMRaw()
+            .GetVMProperty<List<EmployeeRecord>>("Employees");
 
-         var vmEmployees = _response.GetVMProperty<List<EmployeeRecord>>("Employees");
          Assert.IsNotNull(vmEmployees);
          Assert.AreEqual(3, vmEmployees.Count);
          Assert.AreEqual("John", vmEmployees[0].FirstName);
@@ -167,14 +167,14 @@ namespace UnitTests
       [TestMethod]
       public void SimpleListVM_Update()
       {
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
+         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmEmployees = vmController.RequestVMRaw();
 
-         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, _response.MockAction("Update", "{ Id: 1, FirstName: 'Teddy' }"));
-         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, _response.MockAction("Update", "{ Id: 1, LastName: 'Lee' }"));
+         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, FirstName: 'Teddy' }" } });
+         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
 
-         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, _response.MockAction("Update", "{ Id: 3, FirstName: 'Beth' }"));
-         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, _response.MockAction("Update", "{ Id: 3, LastName: 'Larson' }"));
+         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 3, FirstName: 'Beth' }" } });
+         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 3, LastName: 'Larson' }" } });
 
          var employee = _employeeService.GetById(1);
          Assert.AreEqual("Teddy", employee.FirstName);
@@ -188,14 +188,14 @@ namespace UnitTests
       [TestMethod]
       public void SimpleListVM_Delete()
       {
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(SimpleListVM).Name);
+         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmEmployees = vmController.RequestVMRaw();
 
          var employees = _employeeService.GetAll();
          Assert.AreEqual(3, employees.Count);
          Assert.IsTrue(employees.Exists(i => i.Id == 2));
 
-         vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, _response.MockAction("Remove", "2"));
+         vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
 
          employees = _employeeService.GetAll();
          Assert.AreEqual(2, employees.Count);

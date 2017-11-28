@@ -1,14 +1,15 @@
+using DotNetify;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using DotNetify;
+using System.Collections.Generic;
 
 namespace UnitTests
 {
    [TestClass]
    public class MasterDetailsVMTest
    {
-      private ResponseStub _response = new ResponseStub();
       private MasterVM _masterVM = new MasterVM();
+      private string _detailsVMId = $"{nameof(MasterVM)}.{nameof(DetailsVM)}";
 
       private class MasterVM : BaseVM
       {
@@ -32,20 +33,14 @@ namespace UnitTests
       {
          VMController.Register<MasterVM>();
          VMController.Register<DetailsVM>();
-
-         var baseDelegate = VMController.CreateInstance;
-         VMController.CreateInstance = (type, args) => type == typeof(MasterVM) ? _masterVM : baseDelegate(type, args);
       }
 
       [TestMethod]
       public void MasterDetailsVM_Request()
       {
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", $"{nameof(MasterVM)}.{nameof(DetailsVM)}");
+         var vmController = new MockVMController<MasterVM>(_masterVM);
+         var vm = vmController.RequestVM<DetailsVM>(_detailsVMId);
 
-         Assert.AreEqual($"{nameof(MasterVM)}.{nameof(DetailsVM)}", _response.VMId);
-
-         var vm = _response.GetVM<DetailsVM>();
          Assert.IsNotNull(vm);
          Assert.AreEqual(int.MaxValue, vm.Value);
       }
@@ -53,9 +48,11 @@ namespace UnitTests
       [TestMethod]
       public void MasterDetailsVM_Update()
       {
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", $"{nameof(MasterVM)}.{nameof(DetailsVM)}");
-         vmController.OnUpdateVM("conn1", $"{nameof(MasterVM)}.{nameof(DetailsVM)}", _response.MockAction("Value", "99"));
+         var vmController = new MockVMController<MasterVM>(_masterVM);
+         vmController.RequestVM<DetailsVM>(_detailsVMId);
+
+         var update = new Dictionary<string, object>() { { "Value", "99" } };
+         vmController.UpdateVM(update, _detailsVMId);
 
          Assert.AreEqual(99, (_masterVM.GetSubVM(nameof(DetailsVM)) as DetailsVM).Value);
       }
@@ -67,8 +64,8 @@ namespace UnitTests
          bool subVMCreated = false;
          _masterVM.SubVMCreated += (sender, e) => { subVM = sender; subVMCreated = true; };
 
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", $"{nameof(MasterVM)}.{nameof(DetailsVM)}");
+         var vmController = new MockVMController<MasterVM>(_masterVM);
+         vmController.RequestVM<DetailsVM>(_detailsVMId);
 
          Assert.IsTrue(subVMCreated);
          Assert.IsTrue(subVM is DetailsVM);
@@ -81,10 +78,10 @@ namespace UnitTests
          bool subVMDisposing = false;
          _masterVM.SubVMDisposing += (sender, e) => { subVM = sender; subVMDisposing = true; };
 
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", $"{nameof(MasterVM)}.{nameof(DetailsVM)}");
+         var vmController = new MockVMController<MasterVM>(_masterVM);
+         vmController.RequestVM<DetailsVM>(_detailsVMId);
 
-         vmController.OnDisposeVM("conn1", $"{nameof(MasterVM)}.{nameof(DetailsVM)}");
+         vmController.DisposeVM(_detailsVMId);
          Assert.IsTrue(subVMDisposing);
          Assert.IsTrue(subVM is DetailsVM);
       }

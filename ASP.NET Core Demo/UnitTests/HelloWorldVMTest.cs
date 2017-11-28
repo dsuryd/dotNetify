@@ -1,14 +1,15 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using DotNetify;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Reactive.Linq;
+using Rx = System.Reactive.Linq;
 
 namespace UnitTests
 {
    [TestClass]
    public class HelloWorldVMTest
    {
-      private ResponseStub _response = new ResponseStub();
-
       private class HelloWorldVM : BaseVM
       {
          public string FirstName
@@ -31,19 +32,33 @@ namespace UnitTests
             }
          }
 
+         public long Data
+         {
+            get => Get<long>();
+            set => Set(value);
+         }
+
          public string FullName => $"{FirstName} {LastName}";
+
+         public HelloWorldVM()
+         { }
+
+         public HelloWorldVM(bool live) : this()
+         {
+            Rx.Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(value =>
+            {
+               Data = value;
+               PushUpdates();
+            });
+         }
       }
 
       [TestMethod]
       public void HelloWorldVM_Request()
       {
-         VMController.Register<HelloWorldVM>();
+         var vmController = new MockVMController<HelloWorldVM>();
+         var vm = vmController.RequestVM();
 
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(HelloWorldVM).Name);
-
-         Assert.AreEqual(typeof(HelloWorldVM).Name, _response.VMId);
-         var vm = _response.GetVM<HelloWorldVM>();
          Assert.IsNotNull(vm);
          Assert.AreEqual("Hello", vm.FirstName);
          Assert.AreEqual("World", vm.LastName);
@@ -53,22 +68,17 @@ namespace UnitTests
       [TestMethod]
       public void HelloWorldVM_Update()
       {
-         VMController.Register<HelloWorldVM>();
-
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(HelloWorldVM).Name);
+         var vmController = new MockVMController<HelloWorldVM>();
+         vmController.RequestVM();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         vmController.OnUpdateVM("conn1", typeof(HelloWorldVM).Name, update);
-
-         Assert.IsNotNull(_response.VMData);
-         Assert.AreEqual("John World", _response.VMData["FullName"]);
+         var response1 = vmController.UpdateVM(update);
 
          update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         vmController.OnUpdateVM("conn1", typeof(HelloWorldVM).Name, update);
+         var response2 = vmController.UpdateVM(update);
 
-         Assert.IsNotNull(_response.VMData);
-         Assert.AreEqual("John Doe", _response.VMData["FullName"]);
+         Assert.AreEqual("John World", response1["FullName"]);
+         Assert.AreEqual("John Doe", response2["FullName"]);
       }
 
       [TestMethod]
@@ -78,15 +88,24 @@ namespace UnitTests
          var vm = new HelloWorldVM();
          vm.Disposed += (sender, e) => dispose = true;
 
-         var baseDelegate = VMController.CreateInstance;
-         VMController.CreateInstance = (type, args) => type == typeof(HelloWorldVM) ? vm : baseDelegate(type, args);
-         VMController.Register<HelloWorldVM>();
+         var vmController = new MockVMController<HelloWorldVM>(vm);
+         vmController.RequestVM();
 
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(HelloWorldVM).Name);
-
-         vmController.OnDisposeVM("conn1", typeof(HelloWorldVM).Name);
+         vmController.DisposeVM();
          Assert.IsTrue(dispose);
+      }
+
+      [TestMethod]
+      public void HelloWorldVM_PushUpdates()
+      {
+         int updateCounter = 0;
+
+         var vmController = new MockVMController<HelloWorldVM>(new HelloWorldVM(true));
+         vmController.OnResponse += (sender, e) => updateCounter++;
+         vmController.RequestVM();
+
+         System.Threading.Thread.Sleep(1000);
+         Assert.IsTrue(updateCounter >= 5);
       }
    }
 }

@@ -1,24 +1,25 @@
+using DotNetify;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using DotNetify;
+using System.Reactive.Linq;
+using Rx = System.Reactive.Linq;
 
 namespace UnitTests
 {
    [TestClass]
    public class HelloWorldNoBaseVMTest
    {
-      private ResponseStub _response = new ResponseStub();
-
-      private class HelloWorldNoBaseVM  : INotifyPropertyChanged, IDisposable
+      private class HelloWorldNoBaseVM : INotifyPropertyChanged, IPushUpdates, IDisposable
       {
          private string _firstName;
          private string _lastName;
 
          public event PropertyChangedEventHandler PropertyChanged = delegate { };
+         public event EventHandler RequestPushUpdates = delegate { };
          public event EventHandler Disposed;
-         
+
          public string FirstName
          {
             get => _firstName ?? "Hello";
@@ -39,7 +40,22 @@ namespace UnitTests
             }
          }
 
+         public long Data { get; set; }
+
          public string FullName => $"{FirstName} {LastName}";
+
+         public HelloWorldNoBaseVM()
+         { }
+
+         public HelloWorldNoBaseVM(bool live) : this()
+         {
+            Rx.Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(value =>
+            {
+               Data = value;
+               this.Changed(nameof(Data));
+               this.PushUpdates();
+            });
+         }
 
          public void Dispose() => Disposed?.Invoke(this, EventArgs.Empty);
       }
@@ -47,13 +63,9 @@ namespace UnitTests
       [TestMethod]
       public void HelloWorldNoBaseVM_Request()
       {
-         VMController.Register<HelloWorldNoBaseVM>();
+         var vmController = new MockVMController<HelloWorldNoBaseVM>();
+         var vm = vmController.RequestVM();
 
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(HelloWorldNoBaseVM).Name);
-
-         Assert.AreEqual(typeof(HelloWorldNoBaseVM).Name, _response.VMId);
-         var vm = _response.GetVM<HelloWorldNoBaseVM>();
          Assert.IsNotNull(vm);
          Assert.AreEqual("Hello", vm.FirstName);
          Assert.AreEqual("World", vm.LastName);
@@ -63,22 +75,17 @@ namespace UnitTests
       [TestMethod]
       public void HelloWorldNoBaseVM_Update()
       {
-         VMController.Register<HelloWorldNoBaseVM>();
-
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(HelloWorldNoBaseVM).Name);
+         var vmController = new MockVMController<HelloWorldNoBaseVM>();
+         vmController.RequestVM();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         vmController.OnUpdateVM("conn1", typeof(HelloWorldNoBaseVM).Name, update);
-
-         Assert.IsNotNull(_response.VMData);
-         Assert.AreEqual("John World", _response.VMData["FullName"]);
+         var response1 = vmController.UpdateVM(update);
 
          update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         vmController.OnUpdateVM("conn1", typeof(HelloWorldNoBaseVM).Name, update);
+         var response2 = vmController.UpdateVM(update);
 
-         Assert.IsNotNull(_response.VMData);
-         Assert.AreEqual("John Doe", _response.VMData["FullName"]);
+         Assert.AreEqual("John World", response1["FullName"]);
+         Assert.AreEqual("John Doe", response2["FullName"]);
       }
 
       [TestMethod]
@@ -88,15 +95,24 @@ namespace UnitTests
          var vm = new HelloWorldNoBaseVM();
          vm.Disposed += (sender, e) => dispose = true;
 
-         var baseDelegate = VMController.CreateInstance;
-         VMController.CreateInstance = (type, args) => type == typeof(HelloWorldNoBaseVM) ? vm : baseDelegate(type, args);
-         VMController.Register<HelloWorldNoBaseVM>();
+         var vmController = new MockVMController<HelloWorldNoBaseVM>(vm);
+         vmController.RequestVM();
 
-         var vmController = new VMController(_response.Handler);
-         vmController.OnRequestVM("conn1", typeof(HelloWorldNoBaseVM).Name);
-
-         vmController.OnDisposeVM("conn1", typeof(HelloWorldNoBaseVM).Name);
+         vmController.DisposeVM();
          Assert.IsTrue(dispose);
+      }
+
+      [TestMethod]
+      public void HelloWorldNoBaseVM_PushUpdates()
+      {
+         int updateCounter = 0;
+
+         var vmController = new MockVMController<HelloWorldNoBaseVM>(new HelloWorldNoBaseVM(true));
+         vmController.OnResponse += (sender, e) => updateCounter++;
+         vmController.RequestVM();
+
+         System.Threading.Thread.Sleep(1000);
+         Assert.IsTrue(updateCounter >= 5);
       }
    }
 }
