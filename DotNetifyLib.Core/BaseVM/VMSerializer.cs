@@ -40,8 +40,13 @@ namespace DotNetify
       {
          try
          {
-            var jObject = JObject.FromObject(viewModel, new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) });
-            return JsonConvert.SerializeObject(jObject);
+            var serializer = new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) };
+            var vmJObject = JObject.FromObject(viewModel, serializer);
+
+            if (viewModel is BaseVM)
+               vmJObject.Merge(JObject.FromObject((viewModel as BaseVM).GetProperties(), serializer), new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+
+            return vmJObject.ToString();
          }
          catch (Exception ex)
          {

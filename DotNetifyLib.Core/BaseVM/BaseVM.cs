@@ -202,6 +202,12 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Gets all properties kept by the base Observable.
+      /// </summary>
+      /// <returns>Properties.</returns>
+      internal PropertyDictionary GetProperties() => _propertyValues;
+
+      /// <summary>
       /// Override this method if the derived type is a master view model.  The VMController
       /// will call this method to get instances of any view model whose view falls within
       /// this master view in the HTML markup.  The master view model can use this opportunity
