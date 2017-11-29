@@ -6,6 +6,7 @@
    "files": [
       "dist/*.js",
       "dist/*.ts",
+      "dist/typings",
       "README.*",
       "LICENSE.*"
    ],
