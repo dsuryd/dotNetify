@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -118,11 +119,11 @@ namespace DotNetify
       /// <param name="propertyName">Property name.</param>
       /// <param name="propertyValue">Property value.</param>
       /// <returns>Reactive property.</returns>
-      public static ReactiveProperty<T> AddReactiveProperty<T>(this BaseVM vm, string propertyName, T propertyValue = default(T))
+      public static ReactiveProperty<T> AddReactiveProperty<T>(this IReactiveProperties vm, string propertyName, T propertyValue = default(T))
       {
-         var prop = new ReactiveProperty<T>(propertyValue);
-         prop.OnChanged(() => vm.Changed(propertyName));
-         vm.AddProperty(propertyName, prop);
+         var prop = new ReactiveProperty<T>(propertyName, propertyValue);
+         vm.RuntimeProperties = vm.RuntimeProperties ?? new List<IReactiveProperty>();
+         vm.RuntimeProperties.Add(prop);
          return prop;
       }
    }

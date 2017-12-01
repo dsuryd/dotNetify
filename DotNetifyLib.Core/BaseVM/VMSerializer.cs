@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using Newtonsoft.Json;
@@ -43,8 +44,9 @@ namespace DotNetify
             var serializer = new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) };
             var vmJObject = JObject.FromObject(viewModel, serializer);
 
-            if (viewModel is BaseVM)
-               vmJObject.Merge(JObject.FromObject((viewModel as BaseVM).GetProperties(), serializer), new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+            if (viewModel is IReactiveProperties) 
+               vmJObject.Merge(JObject.FromObject((viewModel as IReactiveProperties).RuntimeProperties.ToDictionary(prop => prop.Name, prop => prop.Value), serializer), 
+                  new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
 
             return vmJObject.ToString();
          }
@@ -71,7 +73,7 @@ namespace DotNetify
             for (int i = 0; i < path.Length; i++)
             {
                var propName = path[i];
-               var propInfo = vmType.GetTypeInfo().GetProperty(propName);
+               var propInfo = PropertyInfoHelper.Find(viewModel, propName);
                if (propInfo == null)
                   return false;
 
@@ -100,7 +102,7 @@ namespace DotNetify
                   else
                   {
                      viewModel = propInfo.GetValue(viewModel);
-                     vmType = viewModel != null ? viewModel.GetType() : propInfo.PropertyType;
+                     vmType = viewModel?.GetType() ?? propInfo.PropertyType;
                   }
                }
                else if (viewModel == null)

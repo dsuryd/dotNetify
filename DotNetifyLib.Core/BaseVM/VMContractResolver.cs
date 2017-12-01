@@ -69,7 +69,7 @@ namespace DotNetify
          /// <summary>
          /// Writes the property value to the JSON output.
          /// </summary>
-         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => writer.WriteValue((value as IReactiveProperty).Value);
+         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => serializer.Serialize(writer, (value as IReactiveProperty).Value);
       }
 
       /// <summary>

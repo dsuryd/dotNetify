@@ -22,15 +22,20 @@ namespace DotNetify
    /// <summary>
    /// Defines a view model property that supports Reactive extensions.
    /// </summary>
-   public interface IReactiveProperty
+   public interface IReactiveProperty : INotifyPropertyChanged
    {
       /// <summary>
-      /// Gets the property value.
+      /// Property name.
+      /// </summary>
+      string Name { get; }
+
+      /// <summary>
+      /// Property value.
       /// </summary>
       object Value { get; set; }
 
       /// <summary>
-      /// Gets the property type.
+      /// Property type.
       /// </summary>
       Type PropertyType { get; }
    }
@@ -44,22 +49,24 @@ namespace DotNetify
       private T _value;
       private IDisposable _subscription;
 
-      /// <summary>
-      /// Occurs when the property value changed.
-      /// </summary>
-      public event EventHandler<T> Changed;
+      public event PropertyChangedEventHandler PropertyChanged;
 
       /// <summary>
-      /// Gets or sets the property value.
+      /// Property name.
+      /// </summary>
+      public string Name { get; }
+
+      /// <summary>
+      /// Property value.
       /// </summary>
       public object Value
       {
          get => _value;
-         set => OnNext((T) value);
+         set => OnNext((T)value);
       }
 
       /// <summary>
-      /// Gets the property type.
+      /// Property type.
       /// </summary>
       public Type PropertyType => typeof(T);
 
@@ -81,12 +88,21 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Constructor accepting property name and initial property value.
+      /// </summary>
+      /// <param name="value">Initial value.</param>
+      public ReactiveProperty(string name, T value) : this(value)
+      {
+         Name = name;
+      }
+
+      /// <summary>
       /// Disposes the Rx subject.
       /// </summary>
       public void Dispose()
       {
-         _subject.Dispose();
          _subscription?.Dispose();
+         _subject.Dispose();
       }
 
       /// <summary>
@@ -119,8 +135,8 @@ namespace DotNetify
       public void OnNext(T value)
       {
          _value = value;
-         Changed?.Invoke(this, value);
          _subject.OnNext(value);
+         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Name));
       }
 
       /// <summary>
@@ -140,17 +156,6 @@ namespace DotNetify
             throw new InvalidOperationException("This property is already subscribed to an observable!");
 
          _subscription = observable.Subscribe(this);
-         return this;
-      }
-
-      /// <summary>
-      /// Raises the view model's PropertyChanged event when the value changed.
-      /// </summary>
-      /// <param name="viewModel">View model.</param>
-      /// <param name="propertyName">Name of the view model property.</param>
-      public ReactiveProperty<T> OnChanged(Action action)
-      {
-         Changed += (sender, e) => action?.Invoke();
          return this;
       }
    }

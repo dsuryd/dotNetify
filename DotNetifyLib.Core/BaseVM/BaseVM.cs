@@ -45,7 +45,7 @@ namespace DotNetify
    /// <summary>
    /// Base class for all DotNetify view models.  
    /// </summary>
-   public partial class BaseVM : Observable, IPushUpdates, ISerializer, IDeserializer
+   public partial class BaseVM : ObservableObject, IReactiveProperties, IPushUpdates, ISerializer, IDeserializer
    {
       private readonly Queue<PropertyDictionary> _propertyDictionaries = new Queue<PropertyDictionary>(Enumerable.Range(0, 2).Select(_ => new PropertyDictionary()));
       private readonly INotifyPropertyChanged _vmInstance;
@@ -61,6 +61,12 @@ namespace DotNetify
       /// This event is handled by the VMController. 
       /// </summary>
       public event EventHandler RequestPushUpdates;
+
+      /// <summary>
+      /// Runtime reactive properties.
+      /// </summary>
+      [Ignore]
+      public IList<IReactiveProperty> RuntimeProperties { get; set; } = new List<IReactiveProperty>();
 
       /// <summary>
       /// Gets properties that have been changed after the last accept command.
@@ -102,6 +108,22 @@ namespace DotNetify
          vm.PropertyChanged += OnPropertyChanged;
          _changedProperties = _propertyDictionaries.Dequeue();
 
+         if (vm is IReactiveProperties && (vm as IReactiveProperties).RuntimeProperties != null)
+         {
+            var runtimeProperties = (vm as IReactiveProperties).RuntimeProperties.Where(prop => !string.IsNullOrWhiteSpace(prop.Name)).ToList();
+            runtimeProperties.ForEach(prop =>
+            {
+               prop.PropertyChanged += OnPropertyChanged;
+               RuntimeProperties.Add(prop);
+               AddProperty(prop.Name, prop);
+            });
+            Disposed += (sender, e) => runtimeProperties.ForEach(prop => prop.PropertyChanged -= OnPropertyChanged);
+            IgnoredProperties.Add(nameof(IReactiveProperties.RuntimeProperties));
+         }
+
+         if (vm is IPushUpdates)
+            (vm as IPushUpdates).RequestPushUpdates += (sender, e) => RequestPushUpdates?.Invoke(this, e);
+
          if (vm is IDisposable)
             Disposed += (sender, e) =>
             {
@@ -109,8 +131,8 @@ namespace DotNetify
                (vm as IDisposable).Dispose();
             };
 
-         if (vm is IPushUpdates)
-            (vm as IPushUpdates).RequestPushUpdates += (sender, e) => RequestPushUpdates?.Invoke(this, e);
+         if (vm is IBaseVMAccessor)
+            (vm as IBaseVMAccessor).OnInitialized?.Invoke(this);
       }
 
       /// <summary>
@@ -177,35 +199,32 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Adds a runtime reactive property.
+      /// </summary>
+      /// <param name="vm">View model to add the property to.</param>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="propertyValue">Property value.</param>
+      /// <returns>Reactive property.</returns>
+      public ReactiveProperty<T> AddReactiveProperty<T>(string propertyName, T propertyValue = default(T))
+      {
+         var prop = new ReactiveProperty<T>(propertyName, propertyValue);
+         prop.Subscribe(_ => Changed(propertyName));
+         RuntimeProperties.Add(prop);
+         AddProperty(propertyName, prop);
+         return prop;
+      }
+
+      /// <summary>
       /// Adds a runtime property.
       /// </summary>
       /// <param name="propertyName">Property name.</param>
-      public void AddProperty<T>(string propertyName, T value = default(T))
+      internal void AddProperty<T>(string propertyName, T value = default(T))
       {
          if (_propertyValues.ContainsKey(propertyName))
             throw new InvalidOperationException($"{propertyName} already exists.");
 
          Set(value, propertyName);
       }
-
-      /// <summary>
-      /// Gets a runtime property.
-      /// </summary>
-      /// <param name="propertyName">Property name.</param>
-      /// <returns>Property value.</returns>
-      public T GetProperty<T>(string propertyName)
-      {
-         if (!_propertyValues.ContainsKey(propertyName))
-            throw new InvalidOperationException($"{propertyName} doesn't exist.");
-
-         return Get<T>(propertyName);
-      }
-
-      /// <summary>
-      /// Gets all properties kept by the base Observable.
-      /// </summary>
-      /// <returns>Properties.</returns>
-      internal PropertyDictionary GetProperties() => _propertyValues;
 
       /// <summary>
       /// Override this method if the derived type is a master view model.  The VMController
