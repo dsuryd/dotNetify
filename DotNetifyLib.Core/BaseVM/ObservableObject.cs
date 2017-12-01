@@ -16,7 +16,6 @@ limitations under the License.
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Linq;
@@ -30,7 +29,7 @@ namespace DotNetify
    /// <summary>
    /// Base class for objects that want to provide notification if their property values changed.
    /// </summary>
-   public class Observable : INotifyPropertyChanged, IDisposable
+   public class ObservableObject : INotifyPropertyChanged, IDisposable
    {
       protected PropertyDictionary _propertyValues = new PropertyDictionary();
       protected PropertyStack _propertyChangedStack = new PropertyStack();
@@ -48,7 +47,13 @@ namespace DotNetify
       /// <summary>
       /// When disposed, fire the Disposed event.
       /// </summary>
-      public virtual void Dispose() => Disposed?.Invoke(this, null);
+      public virtual void Dispose()
+      {
+         foreach (IDisposable value in _propertyValues.Values.Where(x => x is IDisposable))
+            value.Dispose();
+
+         Disposed?.Invoke(this, null);
+      }
 
       /// <summary>
       /// Property accessor. Use this for observable properties.

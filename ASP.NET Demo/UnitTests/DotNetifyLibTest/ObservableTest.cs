@@ -13,7 +13,7 @@ namespace UnitTest
          public int Int { get; set; }
       }
 
-      private class TestObservable : Observable
+      private class TestObservable : ObservableObject
       {
          public string String
          {

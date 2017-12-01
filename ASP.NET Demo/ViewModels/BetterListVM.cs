@@ -24,7 +24,7 @@ namespace ViewModels
       /// The class that holds employee info to send to the browser.  It inherits from Observable because the names
       /// properties can be edited on the browser, and we would like to be notified of the change when that happens.
       /// </summary>
-      public class EmployeeInfo : Observable
+      public class EmployeeInfo : ObservableObject
       {
          public int Id { get; set; }
 
