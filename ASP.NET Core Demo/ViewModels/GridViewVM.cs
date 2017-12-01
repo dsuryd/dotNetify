@@ -34,7 +34,7 @@ namespace ViewModels
       /// because the client can edit the names properties and we would like to be notified of the 
       /// changes if that happens.
       /// </summary>
-      public class EmployeeInfo : Observable
+      public class EmployeeInfo : ObservableObject
       {
          public int Id { get; set; }
 
