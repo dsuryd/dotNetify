@@ -45,8 +45,8 @@ namespace DotNetify
    /// </summary>
    public sealed class ReactiveProperty<T> : IReactiveProperty, IObservable<T>, IObserver<T>, IDisposable
    {
-      private readonly BehaviorSubject<T> _subject;
       private T _value;
+      private readonly BehaviorSubject<T> _subject;
       private IDisposable _subscription;
 
       public event PropertyChangedEventHandler PropertyChanged;
@@ -62,7 +62,11 @@ namespace DotNetify
       public object Value
       {
          get => _value;
-         set => OnNext((T)value);
+         set
+         {
+            _value = (T)value;
+            _subject.OnNext(_value);
+         }
       }
 
       /// <summary>
@@ -150,6 +154,7 @@ namespace DotNetify
       /// Subscribes to an observable.
       /// </summary>
       /// <param name="observable">Observable.</param>
+      /// <returns>This object.</returns>
       public ReactiveProperty<T> SubscribeTo(IObservable<T> observable)
       {
          if (_subscription != null)
@@ -158,5 +163,11 @@ namespace DotNetify
          _subscription = observable.Subscribe(this);
          return this;
       }
+
+      /// <summary>
+      /// Returns string representation of the property value.
+      /// </summary>
+      /// <returns>Property value as string.</returns>
+      public override string ToString() => _value.ToString();
    }
 }

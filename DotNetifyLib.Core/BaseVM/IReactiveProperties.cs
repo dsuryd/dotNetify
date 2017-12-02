@@ -27,6 +27,6 @@ namespace DotNetify
       /// <summary>
       /// Runtime reactive properties.
       /// </summary>
-      IList<IReactiveProperty> RuntimeProperties { get; set; }
+      IList<IReactiveProperty> RuntimeProperties { get; }
    }
 }
