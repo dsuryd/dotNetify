@@ -25,6 +25,11 @@ namespace UnitTests
 
       public T GetVM<T>() where T : INotifyPropertyChanged => JsonConvert.DeserializeObject<T>(_vmData);
       public T GetVMProperty<T>(string propName) => (T) VMData[propName]?.ToObject(typeof(T));
+      public void Reset()
+      {
+         _vmId = string.Empty;
+         _vmData = string.Empty;
+      }
    }
 
    public class MockVMController<TViewModel> where TViewModel : INotifyPropertyChanged
@@ -54,18 +59,21 @@ namespace UnitTests
 
       public Response RequestVM()
       {
+         _response.Reset();
          _vmController.OnRequestVM("conn1", _vmId);
          return _response;
       }
 
       public Response RequestVM(string vmId)
       {
+         _response.Reset();
          _vmController.OnRequestVM("conn1", vmId);
          return _response;
       }
 
       public JObject UpdateVM(Dictionary<string, object> update, string vmId = null)
       {
+         _response.Reset();
          _vmController.OnUpdateVM("conn1", vmId ?? _vmId, update);
          return _response.VMData;
       }

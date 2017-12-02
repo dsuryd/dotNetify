@@ -17,7 +17,7 @@ namespace UnitTests
          public event EventHandler RequestPushUpdates = delegate { };
          public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-         public IList<IReactiveProperty> RuntimeProperties { get; set; }
+         public IList<IReactiveProperty> RuntimeProperties { get; } = new List<IReactiveProperty>();
 
          public HelloWorldReactiveNoBaseVM()
          {

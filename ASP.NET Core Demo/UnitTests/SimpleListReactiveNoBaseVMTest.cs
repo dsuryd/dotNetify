@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using DotNetify;
 using System.ComponentModel;
 
 namespace UnitTests
 {
    [TestClass]
-   public class SimpleListNoBaseVMTest
+   public class SimpleListReactiveNoBaseVMTest
    {
       private Response _response = new Response();
       private EmployeeService _employeeService = new EmployeeService();
@@ -51,7 +52,7 @@ namespace UnitTests
          public void Delete(int id) => _employeeRecords.Remove(id);
       }
 
-      private class SimpleListNoBaseVM : INotifyPropertyChanged, IBaseVMAccessor
+      private class SimpleListNoBaseVM : INotifyPropertyChanged, IReactiveProperties, IBaseVMAccessor
       {
          private readonly EmployeeService _employeeService;
 
@@ -62,69 +63,8 @@ namespace UnitTests
             public string LastName { get; set; }
          }
 
-         public IEnumerable<EmployeeInfo> Employees => _employeeService.GetAll().Select(i => new EmployeeInfo
-         {
-            Id = i.Id,
-            FirstName = i.FirstName,
-            LastName = i.LastName
-         });
-
-         public string Employees_itemKey => nameof(EmployeeInfo.Id);
-
-         public Action<string> Add => fullName =>
-         {
-            var names = fullName.Split(new char[] { ' ' }, 2);
-            var newRecord = new EmployeeRecord
-            {
-               FirstName = names.First(),
-               LastName = names.Length > 1 ? names.Last() : ""
-            };
-
-            this.AddList(nameof(Employees), new EmployeeInfo
-            {
-               Id = _employeeService.Add(newRecord),
-               FirstName = newRecord.FirstName,
-               LastName = newRecord.LastName
-            });
-         };
-
-         public Action<EmployeeInfo> Update => changes =>
-         {
-            var record = _employeeService.GetById(changes.Id);
-            if (record != null)
-            {
-               record.FirstName = changes.FirstName ?? record.FirstName;
-               record.LastName = changes.LastName ?? record.LastName;
-               _employeeService.Update(record);
-               ShowNotification = true;
-            }
-         };
-
-         public Action<int> Remove => id =>
-         {
-            _employeeService.Delete(id);
-            this.RemoveList(nameof(Employees), id);
-         };
-
-         private bool _showNotification;
-
-         public bool ShowNotification
-         {
-            get
-            {
-               var value = _showNotification;
-               _showNotification = false;
-               return value;
-            }
-            set
-            {
-               _showNotification = value;
-               this.Changed(nameof(ShowNotification));
-            }
-         }
-
          public Action<BaseVM> OnInitialized { get; }
-
+         public IList<IReactiveProperty> RuntimeProperties { get; } = new List<IReactiveProperty>();
          public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
          private Action<string, object> AddList { get; set; }
@@ -141,6 +81,56 @@ namespace UnitTests
                UpdateList = (propName, value) => baseVM.UpdateList(propName, value);
                RemoveList = (propName, value) => baseVM.RemoveList(propName, value);
             };
+
+            this.AddReactiveProperty<IEnumerable<EmployeeInfo>>("Employees").SubscribeTo(
+               Observable.Return(_employeeService
+                  .GetAll()
+                  .Select(i => new EmployeeInfo
+                  {
+                     Id = i.Id,
+                     FirstName = i.FirstName,
+                     LastName = i.LastName
+                  }))
+            );
+
+            this.AddReactiveProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
+
+            this.AddReactiveProperty<string>("Add").Skip(1).Subscribe(fullName =>
+            {
+               var names = fullName.Split(new char[] { ' ' }, 2);
+               var newRecord = new EmployeeRecord
+               {
+                  FirstName = names.First(),
+                  LastName = names.Length > 1 ? names.Last() : ""
+               };
+
+               AddList("Employees", new EmployeeInfo
+               {
+                  Id = _employeeService.Add(newRecord),
+                  FirstName = newRecord.FirstName,
+                  LastName = newRecord.LastName
+               });
+            });
+
+            this.AddReactiveProperty<EmployeeInfo>("Update").Skip(1).Subscribe(changes =>
+            {
+               var record = _employeeService.GetById(changes.Id);
+               if (record != null)
+               {
+                  record.FirstName = changes.FirstName ?? record.FirstName;
+                  record.LastName = changes.LastName ?? record.LastName;
+                  _employeeService.Update(record);
+               }
+            });
+
+            var removeCommand = this.AddReactiveProperty<int>("Remove");
+            removeCommand.Skip(1).Subscribe(id =>
+            {
+               _employeeService.Delete(id);
+               RemoveList("Employees", id);
+            });
+
+            this.AddReactiveProperty<bool>("ShowNotification").SubscribeTo(removeCommand.Select(_ => true));
          }
       }
 
@@ -151,7 +141,7 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void SimpleListVM_Create()
+      public void SimpleListNoBaseVM_Create()
       {
          var vmController = new MockVMController<SimpleListNoBaseVM>(_simpleListVM);
          vmController.RequestVM();
@@ -164,7 +154,7 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void SimpleListVM_Read()
+      public void SimpleListNoBaseVM_Read()
       {
          var vmController = new MockVMController<SimpleListNoBaseVM>(_simpleListVM);
          var vmEmployees = vmController
@@ -182,7 +172,7 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void SimpleListVM_Update()
+      public void SimpleListNoBaseVM_Update()
       {
          var vmController = new MockVMController<SimpleListNoBaseVM>(_simpleListVM);
          var vmEmployees = vmController.RequestVM();
@@ -203,7 +193,7 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void SimpleListVM_Delete()
+      public void SimpleListNoBaseVM_Delete()
       {
          var vmController = new MockVMController<SimpleListNoBaseVM>(_simpleListVM);
          var vmEmployees = vmController.RequestVM();
@@ -212,11 +202,30 @@ namespace UnitTests
          Assert.AreEqual(3, employees.Count);
          Assert.IsTrue(employees.Exists(i => i.Id == 2));
 
-         vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
+         var response = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
 
          employees = _employeeService.GetAll();
          Assert.AreEqual(2, employees.Count);
          Assert.IsFalse(employees.Exists(i => i.Id == 2));
+      }
+
+      [TestMethod]
+      public void SimpleListNoBaseVM_ShowNotification()
+      {
+         var vmController = new MockVMController<SimpleListNoBaseVM>(_simpleListVM);
+         var vmEmployees = vmController.RequestVM();
+
+         var employees = _employeeService.GetAll();
+         Assert.AreEqual(3, employees.Count);
+
+         var response = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
+         Assert.AreEqual(true, response["ShowNotification"]);
+
+         var response2 = vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
+         Assert.AreEqual(null, response2);
+
+         var response3 = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "1" } });
+         Assert.AreEqual(true, response3["ShowNotification"]);
       }
    }
 }

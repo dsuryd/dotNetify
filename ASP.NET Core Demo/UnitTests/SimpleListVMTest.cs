@@ -95,14 +95,14 @@ namespace UnitTests
                record.FirstName = changes.FirstName ?? record.FirstName;
                record.LastName = changes.LastName ?? record.LastName;
                _employeeService.Update(record);
-               ShowNotification = true;
-            }
+}
          };
 
          public Action<int> Remove => id =>
          {
             _employeeService.Delete(id);
             this.RemoveList(nameof(Employees), id);
+            ShowNotification = true;
          };
 
          private bool _showNotification;
@@ -200,6 +200,25 @@ namespace UnitTests
          employees = _employeeService.GetAll();
          Assert.AreEqual(2, employees.Count);
          Assert.IsFalse(employees.Exists(i => i.Id == 2));
+      }
+
+      [TestMethod]
+      public void SimpleListVM_ShowNotification()
+      {
+         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmEmployees = vmController.RequestVM();
+
+         var employees = _employeeService.GetAll();
+         Assert.AreEqual(3, employees.Count);
+
+         var response = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
+         Assert.AreEqual(true, response["ShowNotification"]);
+
+         var response2 = vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
+         Assert.AreEqual(null, response2);
+
+         var response3 = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "1" } });
+         Assert.AreEqual(true, response3["ShowNotification"]);
       }
    }
 }
