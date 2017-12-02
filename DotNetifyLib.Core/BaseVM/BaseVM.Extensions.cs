@@ -122,9 +122,16 @@ namespace DotNetify
       public static ReactiveProperty<T> AddReactiveProperty<T>(this IReactiveProperties vm, string propertyName, T propertyValue = default(T))
       {
          var prop = new ReactiveProperty<T>(propertyName, propertyValue);
-         vm.RuntimeProperties = vm.RuntimeProperties ?? new List<IReactiveProperty>();
          vm.RuntimeProperties.Add(prop);
          return prop;
       }
+
+      /// <summary>
+      /// Whether a property has changed.
+      /// </summary>
+      /// <param name="vm">View model.</param>
+      /// <param name="propertyName">Property name.</param>
+      /// <returns>True if the view model property has changed.</returns>
+      public static bool HasChanged(this BaseVM vm, string propertyName) => vm.ChangedProperties.ContainsKey(propertyName);
    }
 }
