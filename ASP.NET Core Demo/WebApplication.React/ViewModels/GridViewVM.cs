@@ -220,7 +220,7 @@ namespace ViewModels
       {
          // ChangedProperties is a base class property that contains a list of changed properties.
          // Here it's used to check whether user has changed the SelectedPage property value by clicking a pagination button.
-         if (this.ChangedProperties.ContainsKey(nameof(SelectedPage)))
+         if (this.HasChanged(nameof(SelectedPage)))
             return employees.Skip(_recordsPerPage * (SelectedPage - 1)).Take(_recordsPerPage);
          else
          {
