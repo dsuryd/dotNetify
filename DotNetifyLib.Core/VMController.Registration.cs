@@ -30,7 +30,7 @@ namespace DotNetify
       /// <summary>
       /// List of known view model classes.
       /// </summary>
-      protected internal static List<Type> _vmTypes = new List<Type>();
+      internal static List<TypeHelper> _vmTypes = new List<TypeHelper>();
 
       /// <summary>
       /// List of registered assemblies.
@@ -87,6 +87,15 @@ namespace DotNetify
          Type vmType = typeof(T);
          if (!_vmTypes.Any(i => i == vmType))
             _vmTypes.Add(vmType);
+      }
+
+      /// <summary>
+      /// Registers a runtime view model type.
+      /// </summary>
+      public static void Register(string typeName, Func<object[], INotifyPropertyChanged> factory)
+      {
+         if (!_vmTypes.Any(i => i.FullName == typeName))
+            _vmTypes.Add(new TypeHelper(typeName, factory));
       }
    }
 }

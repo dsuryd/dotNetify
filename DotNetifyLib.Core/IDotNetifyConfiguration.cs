@@ -52,5 +52,10 @@ namespace DotNetify
       /// Register a specific view model class type.
       /// </summary>
       IDotNetifyConfiguration Register<T>() where T : INotifyPropertyChanged;
+
+      /// <summary>
+      /// Register a specific runtime view model class type.
+      /// </summary>
+      IDotNetifyConfiguration Register(string typeName, Func<object[], INotifyPropertyChanged> factory);
    }
 }

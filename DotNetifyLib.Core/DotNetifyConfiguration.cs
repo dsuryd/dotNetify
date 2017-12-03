@@ -65,6 +65,15 @@ namespace DotNetify
          return this;
       }
 
+      /// <summary>
+      /// Register a specific runtime view model class type.
+      /// </summary>
+      public IDotNetifyConfiguration Register(string typeName, Func<object[], INotifyPropertyChanged> factory)
+      {
+         VMController.Register(typeName, factory);
+         return this;
+      }
+
       #region Methods for internal use
 
       /// <summary>
