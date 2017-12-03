@@ -46,7 +46,7 @@ namespace DotNetify
    public sealed class ReactiveProperty<T> : IReactiveProperty, IObservable<T>, IObserver<T>, IDisposable
    {
       private T _value;
-      private readonly BehaviorSubject<T> _subject;
+      private readonly SubjectBase<T> _subject;
       private IDisposable _subscription;
 
       public event PropertyChangedEventHandler PropertyChanged;
@@ -74,11 +74,15 @@ namespace DotNetify
       /// </summary>
       public Type PropertyType => typeof(T);
 
+      #region Constructors
+
       /// <summary>
       /// Default constructor.
       /// </summary>
-      public ReactiveProperty() : this(default(T))
+      public ReactiveProperty()
       {
+         _value = default(T);
+         _subject = new Subject<T>();
       }
 
       /// <summary>
@@ -92,13 +96,25 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Constructor accepting property name.
+      /// </summary>
+      /// <param name="name">Property name.</param>
+      public ReactiveProperty(string name) : this()
+      {
+         Name = name;
+      }
+
+      /// <summary>
       /// Constructor accepting property name and initial property value.
       /// </summary>
+      /// <param name="name">Property name.</param>
       /// <param name="value">Initial value.</param>
       public ReactiveProperty(string name, T value) : this(value)
       {
          Name = name;
       }
+
+      #endregion
 
       /// <summary>
       /// Disposes the Rx subject.

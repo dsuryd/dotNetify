@@ -113,15 +113,29 @@ namespace DotNetify
       #endregion
 
       /// <summary>
+      /// Adds a runtime reactive property with initial property value.
+      /// </summary>
+      /// <param name="vm">View model to add the property to.</param>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="propertyValue">Property value.</param>
+      /// <returns>Reactive property.</returns>
+      public static ReactiveProperty<T> AddProperty<T>(this IReactiveProperties vm, string propertyName, T propertyValue)
+      {
+         var prop = new ReactiveProperty<T>(propertyName, propertyValue);
+         vm.RuntimeProperties.Add(prop);
+         return prop;
+      }
+
+      /// <summary>
       /// Adds a runtime reactive property.
       /// </summary>
       /// <param name="vm">View model to add the property to.</param>
       /// <param name="propertyName">Property name.</param>
       /// <param name="propertyValue">Property value.</param>
       /// <returns>Reactive property.</returns>
-      public static ReactiveProperty<T> AddReactiveProperty<T>(this IReactiveProperties vm, string propertyName, T propertyValue = default(T))
+      public static ReactiveProperty<T> AddProperty<T>(this IReactiveProperties vm, string propertyName)
       {
-         var prop = new ReactiveProperty<T>(propertyName, propertyValue);
+         var prop = new ReactiveProperty<T>(propertyName);
          vm.RuntimeProperties.Add(prop);
          return prop;
       }

@@ -64,10 +64,10 @@ namespace UnitTests
          return _response;
       }
 
-      public Response RequestVM(string vmId)
+      public Response RequestVM(string vmId, object vmArg = null)
       {
          _response.Reset();
-         _vmController.OnRequestVM("conn1", vmId);
+         _vmController.OnRequestVM("conn1", vmId, vmArg);
          return _response;
       }
 

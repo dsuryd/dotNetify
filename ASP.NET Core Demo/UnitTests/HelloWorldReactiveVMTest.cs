@@ -18,13 +18,13 @@ namespace UnitTests
 
          public HelloWorldReactiveVM()
          {
-            AddReactiveProperty<string>("FullName")
+            AddProperty<string>("FullName")
                .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate));
          }
 
          public HelloWorldReactiveVM(bool live) : this()
          {
-            AddReactiveProperty("ServerTime", DateTime.MinValue)
+            AddProperty("ServerTime", DateTime.MinValue)
                .SubscribeTo(Observable.Interval(TimeSpan.FromMilliseconds(200)).Select(_ => DateTime.Now).StartWith(now))
                .Subscribe(_ => PushUpdates());
          }

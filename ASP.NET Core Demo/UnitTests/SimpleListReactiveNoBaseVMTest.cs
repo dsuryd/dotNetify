@@ -82,7 +82,7 @@ namespace UnitTests
                RemoveList = (propName, value) => baseVM.RemoveList(propName, value);
             };
 
-            this.AddReactiveProperty<IEnumerable<EmployeeInfo>>("Employees").SubscribeTo(
+            this.AddProperty<IEnumerable<EmployeeInfo>>("Employees").SubscribeTo(
                Observable.Return(_employeeService
                   .GetAll()
                   .Select(i => new EmployeeInfo
@@ -93,9 +93,9 @@ namespace UnitTests
                   }))
             );
 
-            this.AddReactiveProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
+            this.AddProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
 
-            this.AddReactiveProperty<string>("Add").Skip(1).Subscribe(fullName =>
+            this.AddProperty<string>("Add").Subscribe(fullName =>
             {
                var names = fullName.Split(new char[] { ' ' }, 2);
                var newRecord = new EmployeeRecord
@@ -112,7 +112,7 @@ namespace UnitTests
                });
             });
 
-            this.AddReactiveProperty<EmployeeInfo>("Update").Skip(1).Subscribe(changes =>
+            this.AddProperty<EmployeeInfo>("Update").Subscribe(changes =>
             {
                var record = _employeeService.GetById(changes.Id);
                if (record != null)
@@ -123,14 +123,14 @@ namespace UnitTests
                }
             });
 
-            var removeCommand = this.AddReactiveProperty<int>("Remove");
-            removeCommand.Skip(1).Subscribe(id =>
+            var removeCommand = this.AddProperty<int>("Remove");
+            removeCommand.Subscribe(id =>
             {
                _employeeService.Delete(id);
                RemoveList("Employees", id);
             });
 
-            this.AddReactiveProperty<bool>("ShowNotification").SubscribeTo(removeCommand.Select(_ => true));
+            this.AddProperty<bool>("ShowNotification").SubscribeTo(removeCommand.Select(_ => true));
          }
       }
 

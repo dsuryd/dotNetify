@@ -115,7 +115,7 @@ namespace DotNetify
             {
                prop.PropertyChanged += OnPropertyChanged;
                RuntimeProperties.Add(prop);
-               AddProperty(prop.Name, prop);
+               Set(prop, prop.Name);
             });
             Disposed += (sender, e) => runtimeProperties.ForEach(prop => prop.PropertyChanged -= OnPropertyChanged);
             IgnoredProperties.Add(nameof(IReactiveProperties.RuntimeProperties));
@@ -143,9 +143,9 @@ namespace DotNetify
       /// <param name="vmInstanceId">Optional view model instance identifier.</param>
       /// <param name="vmNamespace">Optional view model type namespace.</param>
       /// <returns></returns>
-      internal static BaseVM Create(IEnumerable<Type> registeredTypes, string vmTypeName, string vmInstanceId = null, string vmNamespace = null)
+      internal static BaseVM Create(IEnumerable<TypeHelper> registeredTypes, string vmTypeName, string vmInstanceId = null, string vmNamespace = null)
       {
-         Type vmType = vmNamespace != null ?
+         TypeHelper vmType = vmNamespace != null ?
             registeredTypes.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}") :
             registeredTypes.FirstOrDefault(i => i.Name == vmTypeName);
 
@@ -156,7 +156,7 @@ namespace DotNetify
          {
             if (vmInstanceId != null)
             {
-               var instance = VMController.CreateInstance(vmType, new object[] { vmInstanceId }) as INotifyPropertyChanged;
+               var instance = vmType.CreateInstance(new object[] { vmInstanceId }) as INotifyPropertyChanged;
                if (instance != null)
                   return instance is BaseVM ? instance as BaseVM : new BaseVM(instance);
             }
@@ -168,7 +168,7 @@ namespace DotNetify
 
          try
          {
-            var instance = VMController.CreateInstance(vmType, null) as INotifyPropertyChanged;
+            var instance = vmType.CreateInstance(null) as INotifyPropertyChanged;
             if (instance != null)
                return instance is BaseVM ? instance as BaseVM : new BaseVM(instance);
          }
@@ -205,25 +205,30 @@ namespace DotNetify
       /// <param name="propertyName">Property name.</param>
       /// <param name="propertyValue">Property value.</param>
       /// <returns>Reactive property.</returns>
-      public ReactiveProperty<T> AddReactiveProperty<T>(string propertyName, T propertyValue = default(T))
-      {
-         var prop = new ReactiveProperty<T>(propertyName, propertyValue);
-         prop.Subscribe(_ => Changed(propertyName));
-         RuntimeProperties.Add(prop);
-         AddProperty(propertyName, prop);
-         return prop;
-      }
+      public ReactiveProperty<T> AddProperty<T>(string propertyName) => AddProperty(typeof(T), new ReactiveProperty<T>(propertyName));
 
       /// <summary>
-      /// Adds a runtime property.
+      /// Adds a runtime reactive property.
+      /// </summary>
+      /// <param name="vm">View model to add the property to.</param>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="propertyValue">Property value.</param>
+      /// <returns>Reactive property.</returns>
+      public ReactiveProperty<T> AddProperty<T>(string propertyName, T propertyValue) => AddProperty(typeof(T), new ReactiveProperty<T>(propertyName, propertyValue));
+
+      /// <summary>
+      /// Adds a runtime observable property.
       /// </summary>
       /// <param name="propertyName">Property name.</param>
-      internal void AddProperty<T>(string propertyName, T value = default(T))
+      private ReactiveProperty<T> AddProperty<T>(Type propertyType, ReactiveProperty<T> property)
       {
-         if (_propertyValues.ContainsKey(propertyName))
-            throw new InvalidOperationException($"{propertyName} already exists.");
+         if (_propertyValues.ContainsKey(property.Name))
+            throw new InvalidOperationException($"{property.Name} already exists.");
 
-         Set(value, propertyName);
+         property.Subscribe(_ => Changed(property.Name));
+         RuntimeProperties.Add(property);
+         Set(property, property.Name);
+         return property;
       }
 
       /// <summary>

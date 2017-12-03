@@ -21,16 +21,16 @@ namespace UnitTests
 
          public HelloWorldReactiveNoBaseVM()
          {
-            var firstName = this.AddReactiveProperty("FirstName", "Hello");
-            var lastName = this.AddReactiveProperty("LastName", "World");
+            var firstName = this.AddProperty("FirstName", "Hello");
+            var lastName = this.AddProperty("LastName", "World");
 
-            this.AddReactiveProperty<string>("FullName")
+            this.AddProperty<string>("FullName")
                .SubscribeTo(Observable.CombineLatest(firstName, lastName, FullNameDelegate));
          }
 
          public HelloWorldReactiveNoBaseVM(bool live) : this()
          {
-            this.AddReactiveProperty("ServerTime", DateTime.MinValue)
+            this.AddProperty("ServerTime", DateTime.MinValue)
                .SubscribeTo(Observable.Interval(TimeSpan.FromMilliseconds(200)).Select(_ => DateTime.Now).StartWith(now))
                .Subscribe(_ => this.PushUpdates());
          }

@@ -32,7 +32,7 @@ namespace ViewModels
          _employeeService = new EmployeeService(7);
 
          // List of employees.
-         AddReactiveProperty<IEnumerable<EmployeeInfo>>("Employees").SubscribeTo(
+         AddProperty<IEnumerable<EmployeeInfo>>("Employees").SubscribeTo(
             Observable.Return(_employeeService
                .GetAll()
                .Select(i => new EmployeeInfo
@@ -45,10 +45,10 @@ namespace ViewModels
 
          // If you use CRUD methods on a list, you must set the item key prop name of that list
          // by defining a string property that starts with that list's prop name, followed by "_itemKey".
-         AddReactiveProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
+         AddProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
 
          // When the Add button is clicked, this property will receive the new employee full name input.
-         this.AddReactiveProperty<string>("Add").Skip(1).Subscribe(fullName =>
+         this.AddProperty<string>("Add").Skip(1).Subscribe(fullName =>
          {
             var names = fullName.Split(new char[] { ' ' }, 2);
             var newRecord = new EmployeeModel
@@ -66,10 +66,10 @@ namespace ViewModels
          });
 
          // Property to show notification when changes have been saved.
-         var showNotification = AddReactiveProperty<bool>("ShowNotification");
+         var showNotification = AddProperty<bool>("ShowNotification");
 
          // When a list item is edited, this property will receive the edited item.
-         AddReactiveProperty<EmployeeInfo>("Update").Skip(1).Subscribe(changes =>
+         AddProperty<EmployeeInfo>("Update").Skip(1).Subscribe(changes =>
          {
             /// Real world app would do database update operation here.
             var record = _employeeService.GetById(changes.Id);
@@ -84,7 +84,7 @@ namespace ViewModels
          });
 
          // When the Remove button is clicked, this property will receive the employee Id to remove.
-         AddReactiveProperty<int>("Remove").Skip(1).Subscribe(id =>
+         AddProperty<int>("Remove").Skip(1).Subscribe(id =>
          {
             _employeeService.Delete(id);
 
