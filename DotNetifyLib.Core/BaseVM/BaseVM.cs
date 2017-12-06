@@ -45,7 +45,7 @@ namespace DotNetify
    /// <summary>
    /// Base class for all DotNetify view models.  
    /// </summary>
-   public partial class BaseVM : ObservableObject, IReactiveProperties, IPushUpdates, ISerializer, IDeserializer
+   public class BaseVM : ObservableObject, IReactiveProperties, IPushUpdates, ISerializer, IDeserializer
    {
       private readonly Queue<PropertyDictionary> _propertyDictionaries = new Queue<PropertyDictionary>(Enumerable.Range(0, 2).Select(_ => new PropertyDictionary()));
       private readonly INotifyPropertyChanged _vmInstance;
@@ -102,7 +102,7 @@ namespace DotNetify
       /// Constructor to create a wrapper for a view model that doesn't inherit from BaseVM.
       /// </summary>
       /// <param name="vm">View model instance.</param>
-      public BaseVM(INotifyPropertyChanged vm) : base()
+      internal BaseVM(INotifyPropertyChanged vm) : base()
       {
          _vmInstance = vm;
          vm.PropertyChanged += OnPropertyChanged;
