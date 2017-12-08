@@ -19,3 +19,4 @@ var JobQueueVM = (function () {
     };
     return JobQueueVM;
 }());
+//# sourceMappingURL=JobQueue.js.map

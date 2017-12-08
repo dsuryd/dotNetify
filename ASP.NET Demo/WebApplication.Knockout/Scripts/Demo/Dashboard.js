@@ -25,3 +25,4 @@ var DashboardPanelVM = (function () {
     };
     return DashboardPanelVM;
 }());
+//# sourceMappingURL=Dashboard.js.map

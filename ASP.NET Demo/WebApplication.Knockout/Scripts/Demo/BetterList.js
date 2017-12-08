@@ -37,3 +37,4 @@ var BetterListVM = (function () {
     };
     return BetterListVM;
 }());
+//# sourceMappingURL=BetterList.js.map

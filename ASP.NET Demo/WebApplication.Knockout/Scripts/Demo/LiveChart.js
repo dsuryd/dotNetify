@@ -33,3 +33,4 @@ var LiveChartVM = (function () {
     };
     return LiveChartVM;
 }());
+//# sourceMappingURL=LiveChart.js.map
