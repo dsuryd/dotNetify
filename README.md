@@ -7,11 +7,9 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-* Latest: ***React SPA template for .NET Core 2.0 now available - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).***
-* v2.0.7-beta: integrates with SignalR .NET Core 2.0 (alpha2) - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v2.0.7-beta%2F2.2.2-pre).
-* v2.0.6-beta: supports React Native - [see demo](https://github.com/dsuryd/dotnetify-react-native-demo).
-
-*In progress:  Rx integration + runtime properties support.*
+* nuget v2.3.0-pre: ***Reactive programming support*** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/nuget_v.2.3.0-pre) | [documentation](http://www.dotnetify.net/react/Reactive).
+* React SPA template for .NET Core 2.0 - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
+* npm v2.0.7-beta: integrates with SignalR .NET Core 2.0 (alpha2) - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v2.0.7-beta%2F2.2.2-pre).
 
 ## Features
 
@@ -25,15 +23,15 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
 
-## React Code Example   
+## React/React Native Code Example   
 
 * Real-time "Hello World" with Visual Studio 2017 + WebPack: [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).   
-* Real-time "Hello World" with create-react-app + Node.js + .NET Core: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).  
-Includes example using ***Electron*** to build cross-platform desktop app.
+* Real-time "Hello World" with create-react-app + Node.js + .NET Core: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).  Includes example using ***Electron*** to build cross-platform desktop app.
+* React Native example: [dotnetify-react-native-demo](https://github.com/dsuryd/dotnetify-react-native-demo).
 
 ## Knockout Code Example
 
-* Real-time live chart: [Live Chart Example](https://github.com/dsuryd/dotnetify-knockout-demo/tree/master/LiveChart).    
+* Live chart: [Live Chart Example](https://github.com/dsuryd/dotnetify-knockout-demo/tree/master/LiveChart).    
 * Mobile app example: [Web/Mobile App Template](https://github.com/dsuryd/dotnetify-knockout-demo/tree/master/MobileApp).
 
 ## Installation
