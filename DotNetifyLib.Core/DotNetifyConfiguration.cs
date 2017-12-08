@@ -39,12 +39,12 @@ namespace DotNetify
       /// <summary>
       /// Register view model classes in an assembly that are subtypes of BaseVM.
       /// </summary>
-      public void RegisterAssembly(Assembly assembly) => VMController.RegisterAssembly<BaseVM>(assembly);
+      public void RegisterAssembly(Assembly assembly) => VMController.RegisterAssembly(assembly);
 
       /// <summary>
       /// Register view model classes in an assembly that are subtypes of BaseVM.
       /// </summary>
-      public void RegisterAssembly(string assemblyName) => VMController.RegisterAssembly<BaseVM>(Assembly.Load(new AssemblyName(assemblyName)));
+      public void RegisterAssembly(string assemblyName) => VMController.RegisterAssembly(Assembly.Load(new AssemblyName(assemblyName)));
 
       /// <summary>
       /// Register view model classes in an assembly that are subtypes of a certain type.
@@ -79,7 +79,12 @@ namespace DotNetify
       /// <summary>
       /// Registers view model classes in the entry assembly.
       /// </summary>
-      public void RegisterEntryAssembly() => VMController.RegisterAssembly<BaseVM>(Assembly.GetEntryAssembly());
+      public void RegisterEntryAssembly()
+      {
+         var entryAssembly = Assembly.GetEntryAssembly();
+         if (entryAssembly != null)
+            VMController.RegisterAssembly(entryAssembly);
+      }
 
       /// <summary>
       /// Whether anything has been registered.

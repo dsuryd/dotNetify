@@ -55,6 +55,12 @@ namespace DotNetify
       /// Registers all view model types in an assembly.
       /// </summary>
       /// <param name="vmAssembly">Assembly.</param>
+      public static void RegisterAssembly(Assembly vmAssembly) => RegisterAssembly<BaseVM>(vmAssembly);
+
+      /// <summary>
+      /// Registers all view model types in an assembly.
+      /// </summary>
+      /// <param name="vmAssembly">Assembly.</param>
       public static void RegisterAssembly<T>(Assembly vmAssembly) where T : INotifyPropertyChanged
       {
          if (vmAssembly == null)
