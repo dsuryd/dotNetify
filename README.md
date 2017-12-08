@@ -45,7 +45,8 @@ ASP.NET Core:
 
 ASP.NET Framework:
 
-*PM> Install-Package DotNetify*  
+*PM> Install-Package DotNetify.Core -pre*  
+*PM> Install-Package DotNetify.SignalR.Owin -pre*  
 
 Read the website on how to configure your project ([React](http://dotnetify.net/react/Installation) | [Knockout](http://dotnetify.net/index/Installing)).
 
