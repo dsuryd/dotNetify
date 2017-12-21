@@ -44,4 +44,3 @@ var GridViewVM = (function () {
     GridViewVM.prototype.select = function (iItem) { this.SelectedId(iItem.Id()); };
     return GridViewVM;
 }());
-//# sourceMappingURL=GridView.js.map

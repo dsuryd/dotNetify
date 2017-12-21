@@ -31,4 +31,3 @@ var LinkedTreeViewVM = (function (_super) {
     };
     return LinkedTreeViewVM;
 }(TreeViewVM));
-//# sourceMappingURL=CompositeView.js.map
