@@ -1,0 +1,155 @@
+﻿using DotNetify;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace UnitTests
+{
+   [TestClass]
+   public class HubExceptionMiddlewareTest
+   {
+      private class ExceptionOnRequestVM : BaseVM
+      {
+         public string Property => throw new ArgumentNullException();
+      }
+
+      private class ExceptionOnUpdateVM : BaseVM
+      {
+         public string Property
+         {
+            get => "hello";
+            set => throw new ArgumentNullException();
+         }
+      }
+
+      private class ExceptionOnDisposeVM : BaseVM
+      {
+         public string Property { get; set; }
+         public override void Dispose() => throw new ArgumentOutOfRangeException();
+      }
+
+      private class JsonSerializationExceptionMiddleware : IExceptionMiddleware
+      {
+         public Task<Exception> OnException(HubCallerContext context, Exception exception)
+         {
+            if (exception is JsonSerializationException)
+               return Task.FromResult((Exception)new ApplicationException());
+            return Task.FromResult(exception);
+         }
+      }
+
+      private class ArgumentNullExceptionMiddleware : IExceptionMiddleware
+      {
+         public Task<Exception> OnException(HubCallerContext context, Exception exception)
+         {
+            if (exception is ArgumentNullException)
+               return Task.FromResult((Exception)new InvalidOperationException());
+            return Task.FromResult(exception);
+         }
+      }
+
+      private class ExceptionOnDisposeMiddleware : IExceptionMiddleware
+      {
+         public static Exception Exception { get; set; }
+         public Task<Exception> OnException(HubCallerContext context, Exception exception)
+         {
+            Exception = exception;
+            return Task.FromResult(exception);
+         }
+      }
+
+      [TestMethod]
+      public void ExceptionOnRequest()
+      {
+         VMController.Register<ExceptionOnRequestVM>();
+         var hub = new MockDotNetifyHub().Create();
+
+         string exceptionType = null;
+         hub.ClientResponse += (sender, e) =>
+         {
+            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
+            exceptionType = exception.ExceptionType;
+         };
+
+         hub.RequestVM(nameof(ExceptionOnRequestVM), null);
+         Assert.AreEqual(nameof(JsonSerializationException), exceptionType);
+      }
+
+      [TestMethod]
+      public void ExceptionOnRequest_ExceptionMiddleware()
+      {
+         VMController.Register<ExceptionOnRequestVM>();
+         var hub = new MockDotNetifyHub()
+            .UseMiddleware<JsonSerializationExceptionMiddleware>()
+            .UseMiddleware<ArgumentNullExceptionMiddleware>()
+            .Create();
+
+         string exceptionType = null;
+         hub.ClientResponse += (sender, e) =>
+         {
+            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
+            exceptionType = exception.ExceptionType;
+         };
+
+         hub.RequestVM(nameof(ExceptionOnRequestVM));
+         Assert.AreEqual(nameof(ApplicationException), exceptionType);
+      }
+
+      [TestMethod]
+      public void ExceptionOnUpdate()
+      {
+         VMController.Register<ExceptionOnUpdateVM>();
+         var hub = new MockDotNetifyHub().Create();
+
+         string exceptionType = null;
+         hub.ClientResponse += (sender, e) =>
+         {
+            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
+            exceptionType = exception.ExceptionType;
+         };
+
+         hub.RequestVM(nameof(ExceptionOnUpdateVM));
+         hub.UpdateVM(nameof(ExceptionOnUpdateVM), new Dictionary<string, object> { { "Property", "" } });
+         Assert.AreEqual(nameof(ArgumentNullException), exceptionType);
+      }
+
+      [TestMethod]
+      public void ExceptionOnUpdate_ExceptionMiddleware()
+      {
+         VMController.Register<ExceptionOnUpdateVM>();
+         var hub = new MockDotNetifyHub()
+            .UseMiddleware<JsonSerializationExceptionMiddleware>()
+            .UseMiddleware<ArgumentNullExceptionMiddleware>()
+            .Create();
+
+         string exceptionType = null;
+         hub.ClientResponse += (sender, e) =>
+         {
+            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
+            exceptionType = exception.ExceptionType;
+         };
+
+         hub.RequestVM(nameof(ExceptionOnUpdateVM));
+         hub.UpdateVM(nameof(ExceptionOnUpdateVM), new Dictionary<string, object> { { "Property", "" } });
+         Assert.AreEqual(nameof(InvalidOperationException), exceptionType);
+      }
+
+      [TestMethod]
+      [ExpectedException(typeof(ArgumentOutOfRangeException))]
+      public void ExceptionOnDispose_ExceptionMiddleware()
+      {
+         VMController.Register<ExceptionOnDisposeVM>();
+         var hub = new MockDotNetifyHub()
+            .UseMiddleware<ExceptionOnDisposeMiddleware>()
+            .Create();
+
+         hub.RequestVM(nameof(ExceptionOnDisposeVM));
+         hub.DisposeVM(nameof(ExceptionOnDisposeVM));
+
+         throw ExceptionOnDisposeMiddleware.Exception;
+      }
+   }
+}

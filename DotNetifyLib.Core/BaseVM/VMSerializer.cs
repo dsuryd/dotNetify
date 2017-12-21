@@ -53,7 +53,7 @@ namespace DotNetify
          catch (Exception ex)
          {
             Trace.Fail(ex.ToString());
-            return string.Empty;
+            throw ex;
          }
       }
 
@@ -137,7 +137,7 @@ namespace DotNetify
          catch (Exception ex)
          {
             Trace.Fail(ex.ToString());
-            return false;
+            throw ex;
          }
 
          return true;
