@@ -137,7 +137,7 @@ namespace DotNetify
          try
          {
             _callerContext = Context;
-            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Request_VM), vmId, vmData, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Update_VM), vmId, vmData, null, Principal);
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
