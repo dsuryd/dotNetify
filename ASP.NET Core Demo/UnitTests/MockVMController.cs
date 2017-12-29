@@ -43,7 +43,7 @@ namespace UnitTests
       public MockVMController(TViewModel vmInstance = default(TViewModel))
       {
          if (vmInstance?.Equals(default(TViewModel)) == false)
-            VMController.CreateInstance = (type, args) => type == typeof(TViewModel) ? vmInstance : throw new InvalidOperationException();
+            VMController.CreateInstance = (type, args) => type == typeof(TViewModel) ? vmInstance : Activator.CreateInstance(type, args);
          else
             VMController.CreateInstance = (type, args) => Activator.CreateInstance(type, args);
 

@@ -62,13 +62,13 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void ExceptionOnRequest()
+      public void ExceptionMiddleware_ExceptionOnRequest_NotIntercepted()
       {
          VMController.Register<ExceptionOnRequestVM>();
          var hub = new MockDotNetifyHub().Create();
 
          string exceptionType = null;
-         hub.ClientResponse += (sender, e) =>
+         hub.Response += (sender, e) =>
          {
             dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
             exceptionType = exception.ExceptionType;
@@ -79,7 +79,7 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void ExceptionOnRequest_ExceptionMiddleware()
+      public void ExceptionMiddleware_ExceptionOnRequest_ExceptionIntercepted()
       {
          VMController.Register<ExceptionOnRequestVM>();
          var hub = new MockDotNetifyHub()
@@ -88,7 +88,7 @@ namespace UnitTests
             .Create();
 
          string exceptionType = null;
-         hub.ClientResponse += (sender, e) =>
+         hub.Response += (sender, e) =>
          {
             dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
             exceptionType = exception.ExceptionType;
@@ -99,13 +99,13 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void ExceptionOnUpdate()
+      public void ExceptionMiddleware_ExceptionOnUpdate_NotIntercepted()
       {
          VMController.Register<ExceptionOnUpdateVM>();
          var hub = new MockDotNetifyHub().Create();
 
          string exceptionType = null;
-         hub.ClientResponse += (sender, e) =>
+         hub.Response += (sender, e) =>
          {
             dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
             exceptionType = exception.ExceptionType;
@@ -117,7 +117,7 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void ExceptionOnUpdate_ExceptionMiddleware()
+      public void ExceptionMiddleware_ExceptionOnUpdate_ExceptionIntercepted()
       {
          VMController.Register<ExceptionOnUpdateVM>();
          var hub = new MockDotNetifyHub()
@@ -126,7 +126,7 @@ namespace UnitTests
             .Create();
 
          string exceptionType = null;
-         hub.ClientResponse += (sender, e) =>
+         hub.Response += (sender, e) =>
          {
             dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
             exceptionType = exception.ExceptionType;
@@ -139,7 +139,7 @@ namespace UnitTests
 
       [TestMethod]
       [ExpectedException(typeof(ArgumentOutOfRangeException))]
-      public void ExceptionOnDispose_ExceptionMiddleware()
+      public void ExceptionMiddleware_ExceptionOnDispose_ExceptionIntercepted()
       {
          VMController.Register<ExceptionOnDisposeVM>();
          var hub = new MockDotNetifyHub()
