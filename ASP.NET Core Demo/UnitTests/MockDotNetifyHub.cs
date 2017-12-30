@@ -114,5 +114,7 @@ namespace UnitTests
       public void Response_VM(string vmId, string vmData) => Response?.Invoke(this, Tuple.Create(vmId, vmData));
 
       public void DisposeVM(string vmId) => _hub.Dispose_VM(vmId);
+
+      public void OnDisconnected() => _hub.OnDisconnectedAsync(new Exception());
    }
 }

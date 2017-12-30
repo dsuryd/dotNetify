@@ -14,7 +14,7 @@ namespace UnitTests
    [TestClass]
    public class HubMiddlewareTest
    {
-      private class TestVM : BaseVM
+      private class MiddlewareTestVM : BaseVM
       {
          public string Property { get; set; } = "Hello";
       }
@@ -82,7 +82,7 @@ namespace UnitTests
       [TestMethod]
       public void Middleware_RequestIntercepted()
       {
-         VMController.Register<TestVM>();
+         VMController.Register<MiddlewareTestVM>();
          var hub = new MockDotNetifyHub()
             .UseMiddleware<ExtractHeadersMiddleware>()
             .UseMiddleware<JwtBearerAuthenticationMiddleware>()
@@ -103,7 +103,7 @@ namespace UnitTests
          {
             var callType = context.CallType;
             var connectionId = context.CallerContext.ConnectionId;
-            var testVMPropValue = (context.Data as JObject)[nameof(TestVM.Property)];
+            var testVMPropValue = (context.Data as JObject)[nameof(MiddlewareTestVM.Property)];
             var authToken = (context.Headers as JObject)["Authorization"].ToString();
             var principalName = context.Principal.Identity.Name;
             var pipelineData = new Dictionary<string, object>(context.PipelineData);
@@ -124,7 +124,7 @@ namespace UnitTests
          {
             var callType = context.CallType;
             var connectionId = context.CallerContext.ConnectionId;
-            var testVMPropValue = (context.Data as JObject)[nameof(TestVM.Property)];
+            var testVMPropValue = (context.Data as JObject)[nameof(MiddlewareTestVM.Property)];
             var authToken = (context.Headers as JObject)["Authorization"].ToString();
             var principalName = context.Principal.Identity.Name;
             var pipelineData = new Dictionary<string, object>(context.PipelineData);
@@ -140,9 +140,9 @@ namespace UnitTests
             };
          };
 
-         hub.RequestVM(nameof(TestVM), _vmArg);
+         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
 
-         Assert.AreEqual(nameof(TestVM), vmName);
+         Assert.AreEqual(nameof(MiddlewareTestVM), vmName);
          Assert.AreEqual("World", vmData.Property.ToString());
          middleware1Assertions();
          middleware2Assertions();
@@ -151,7 +151,7 @@ namespace UnitTests
       [TestMethod]
       public void Middleware_UpdateIntercepted()
       {
-         VMController.Register<TestVM>();
+         VMController.Register<MiddlewareTestVM>();
          var hub = new MockDotNetifyHub()
             .UseMiddleware<ExtractHeadersMiddleware>()
             .UseMiddleware<JwtBearerAuthenticationMiddleware>()
@@ -166,7 +166,7 @@ namespace UnitTests
                return;
 
             var connectionId = context.CallerContext.ConnectionId;
-            var testVMPropValue = (context.Data as Dictionary<string, object>)[nameof(TestVM.Property)];
+            var testVMPropValue = (context.Data as Dictionary<string, object>)[nameof(MiddlewareTestVM.Property)];
             var authToken = (context.Headers as JObject)["Authorization"].ToString();
             var principalName = context.Principal.Identity.Name;
             var pipelineData = new Dictionary<string, object>(context.PipelineData);
@@ -188,7 +188,7 @@ namespace UnitTests
                return;
 
             var connectionId = context.CallerContext.ConnectionId;
-            var testVMPropValue = (context.Data as Dictionary<string, object>)[nameof(TestVM.Property)];
+            var testVMPropValue = (context.Data as Dictionary<string, object>)[nameof(MiddlewareTestVM.Property)];
             var authToken = (context.Headers as JObject)["Authorization"].ToString();
             var principalName = context.Principal.Identity.Name;
             var pipelineData = new Dictionary<string, object>(context.PipelineData);
@@ -203,8 +203,8 @@ namespace UnitTests
             };
          };
 
-         hub.RequestVM(nameof(TestVM), _vmArg);
-         hub.UpdateVM(nameof(TestVM), new Dictionary<string, object> { { "Property", "Goodbye" } });
+         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
+         hub.UpdateVM(nameof(MiddlewareTestVM), new Dictionary<string, object> { { "Property", "Goodbye" } });
 
          middleware1Assertions();
          middleware2Assertions();
@@ -213,7 +213,7 @@ namespace UnitTests
       [TestMethod]
       public void Middleware_DisposeIntercepted()
       {
-         VMController.Register<TestVM>();
+         VMController.Register<MiddlewareTestVM>();
          var hub = new MockDotNetifyHub()
             .UseMiddleware<ExtractHeadersMiddleware>()
             .UseMiddleware<JwtBearerAuthenticationMiddleware>()
@@ -261,8 +261,8 @@ namespace UnitTests
             };
          };
 
-         hub.RequestVM(nameof(TestVM), _vmArg);
-         hub.DisposeVM(nameof(TestVM));
+         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
+         hub.DisposeVM(nameof(MiddlewareTestVM));
 
          middleware1Assertions();
          middleware2Assertions();

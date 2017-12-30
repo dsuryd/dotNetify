@@ -61,6 +61,14 @@ namespace UnitTests
          }
       }
 
+      private class OperationCancelledMiddleware : IMiddleware
+      {
+         public Task Invoke(DotNetifyHubContext context, NextDelegate next)
+         {
+            throw new OperationCanceledException();
+         }
+      }
+
       [TestMethod]
       public void ExceptionMiddleware_ExceptionOnRequest_NotIntercepted()
       {
@@ -150,6 +158,21 @@ namespace UnitTests
          hub.DisposeVM(nameof(ExceptionOnDisposeVM));
 
          throw ExceptionOnDisposeMiddleware.Exception;
+      }
+
+      [TestMethod]
+      public void ExceptionMiddleware_OperationCancelled_NoResponse()
+      {
+         VMController.Register<ExceptionOnDisposeVM>();
+         var hub = new MockDotNetifyHub()
+            .UseMiddleware<OperationCancelledMiddleware>()
+            .Create();
+
+         bool responseSent = false;
+         hub.Response += (sender, e) => responseSent = true;
+
+         hub.RequestVM(nameof(ExceptionOnDisposeVM));
+         Assert.IsFalse(responseSent);
       }
    }
 }
