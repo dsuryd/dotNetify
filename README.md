@@ -11,6 +11,8 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 * React SPA template for .NET Core 2.0 - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
 * npm v2.0.7-beta: integrates with SignalR .NET Core 2.0 (alpha2) - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v2.0.7-beta%2F2.2.2-pre).
 
+> While you're here, also check out the companion project [dotNetify-Elements](https://github.com/dsuryd/dotNetify-Elements) (work in progress).
+
 ## Features
 
 * Simple and lightweight - no heavy JS client-side framework, and no REST APIs.
