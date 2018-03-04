@@ -37,7 +37,7 @@ module.exports = function (grunt) {
                   flatten: true
                },
                {
-                  src: "node_modules/@aspnet/signalr-client/dist/browser/signalr-clientES5-1.0.0-alpha2-final.js",
+                  src: "node_modules/@aspnet/signalr/dist/browser/signalr.js",
                   dest: "../WebApplication.Knockout/wwwroot/lib",
                   expand: true,
                   filter: "isFile",

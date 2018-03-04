@@ -58,7 +58,7 @@ namespace WebApplication.Core
 
          // Required by dotNetify.
          app.UseWebSockets();
-         app.UseSignalR(routes => routes.MapHub<DotNetifyHub>("dotnetify"));
+         app.UseSignalR(routes => routes.MapHub<DotNetifyHub>("/dotnetify"));
 
          app.UseDotNetify(config => {
 

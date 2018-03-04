@@ -22,7 +22,7 @@ namespace DotNetify
    {
       public static HubRouteBuilder MapDotNetifyHub(this HubRouteBuilder routes)
       {
-         routes.MapHub<DotNetifyHub>("dotnetify");
+         routes.MapHub<DotNetifyHub>("/dotnetify");
          return routes;
       }
    }

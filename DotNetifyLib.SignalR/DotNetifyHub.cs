@@ -189,7 +189,7 @@ namespace DotNetify
       internal void Response_VM(string connectionId, string vmId, string vmData)
       {
          if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
-            _globalHubContext.Clients.Client(connectionId).InvokeAsync(nameof(Response_VM), new object[] { vmId, vmData });
+            _globalHubContext.Clients.Client(connectionId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
       }
 
       #endregion

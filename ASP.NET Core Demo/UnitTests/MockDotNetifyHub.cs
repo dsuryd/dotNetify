@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using DotNetify;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -52,14 +53,18 @@ namespace UnitTests
          public IClientProxy All => null;
          public IClientProxy AllExcept(IReadOnlyList<string> excludedIds) => null;
          public IClientProxy Client(string connectionId) => MockClientProxy;
+         public IClientProxy Clients(IReadOnlyList<string> connectionIds) => MockClientProxy;
          public IClientProxy Group(string groupName) => null;
+         public IClientProxy GroupExcept(string groupName, IReadOnlyList<string> excludeIds) => null;
+         public IClientProxy Groups(IReadOnlyList<string> groupNames) => null;
          public IClientProxy User(string userId) => null;
+         public IClientProxy Users(IReadOnlyList<string> userIds) => null;
       }
 
       private class MockClientProxy : IClientProxy
       {
          public MockDotNetifyHub Hub { get; set; }
-         public Task InvokeAsync(string method, object[] args)
+         public Task SendAsync(string method, object[] args)
          {
             Hub.GetType().GetMethod(method).Invoke(Hub, args);
             return Task.CompletedTask;
@@ -71,7 +76,7 @@ namespace UnitTests
          private string _mockConnectionId;
          private ClaimsPrincipal _mockPrincipal = new ClaimsPrincipal();
 
-         public MockHubConnectionContext(string connectionId) : base(null, null) {
+         public MockHubConnectionContext(string connectionId) : base(null, TimeSpan.FromMinutes(1), new LoggerFactory()) {
             _mockConnectionId = connectionId;
          }
 

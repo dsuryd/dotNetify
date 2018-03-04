@@ -35,7 +35,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
    (function ($, defaultSignalR, window) {
 
       dotnetifyHub = $.extend(dotnetifyHub, {
-         version: "1.1.0-beta",
+         version: "1.1.1-beta",
          type: null,
          _init: false,
 
@@ -53,7 +53,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
             dotnetifyHub.type = "netcore";
 
             Object.defineProperty(dotnetifyHub, "isConnected", {
-               get: function () { return dotnetifyHub._connection && dotnetifyHub._connection.connection.connectionState === 2 },
+               get: function () { return dotnetifyHub._connection && dotnetifyHub._connection.connection.connectionState === 1 },
             });
 
             dotnetifyHub = $.extend(dotnetifyHub, {
