@@ -9,6 +9,7 @@
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
     <ToolsVersionPromptShown>2.3</ToolsVersionPromptShown>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>

@@ -19,7 +19,8 @@ namespace UnitTests
          public HelloWorldReactiveVM()
          {
             AddProperty<string>("FullName")
-               .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate));
+               .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
+               .SubscribedBy(AddProperty<int>("NameLength"), x => x.Select(name => name.Length));
          }
 
          public HelloWorldReactiveVM(bool live) : this()
@@ -57,6 +58,9 @@ namespace UnitTests
 
          Assert.AreEqual("John World", response1["FullName"]);
          Assert.AreEqual("John Doe", response2["FullName"]);
+
+         Assert.AreEqual(10, response1["NameLength"]);
+         Assert.AreEqual(8, response2["NameLength"]);
       }
 
       [TestMethod]

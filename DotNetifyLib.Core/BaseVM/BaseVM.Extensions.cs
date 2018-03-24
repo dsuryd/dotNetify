@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2015 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@ limitations under the License.
  */
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -68,7 +67,7 @@ namespace DotNetify
 
       public static void RemoveList<T>(this BaseVM vm, string propName, T itemKey) => vm.ChangedProperties[propName + "_remove"] = itemKey;
 
-      #endregion
+      #endregion CRUD
 
       #region Events
 
@@ -110,7 +109,9 @@ namespace DotNetify
          return source;
       }
 
-      #endregion
+      #endregion Events
+
+      #region Reactive
 
       /// <summary>
       /// Adds a runtime reactive property with initial property value.
@@ -139,6 +140,22 @@ namespace DotNetify
          vm.RuntimeProperties.Add(prop);
          return prop;
       }
+
+      /// <summary>
+      /// Initiates subscription to a reactive property.
+      /// </summary>
+      /// <param name="prop">Property to subscribe to.</param>
+      /// <param name="subscriber">Subscriber.</param>
+      /// <param name="mapper">Function to map the property's data type to the subscriber's.</param>
+      /// <returns>Property.</returns>
+      public static ReactiveProperty<TSource> SubscribedBy<TSource, TTarget>(this ReactiveProperty<TSource> prop,
+         ReactiveProperty<TTarget> subscriber, Func<IObservable<TSource>, IObservable<TTarget>> mapper)
+      {
+         subscriber.SubscribeTo(mapper(prop));
+         return prop;
+      }
+
+      #endregion Reactive
 
       /// <summary>
       /// Whether a property has changed.
