@@ -73,7 +73,6 @@ namespace UnitTest
 
          Assert.IsNotNull(vm.ChangedProperties);
          Assert.AreEqual(0, vm.ChangedProperties.Count);
-
       }
 
       [TestMethod]
@@ -87,6 +86,10 @@ namespace UnitTest
          Assert.IsFalse(vm.IgnoredProperties.Contains("Bool"));
          vm.Ignore(() => vm.Bool);
          Assert.IsTrue(vm.IgnoredProperties.Contains("Bool"));
+
+         Assert.IsFalse(vm.IgnoredProperties.Contains(nameof(TestVM.Double)));
+         vm.Ignore(nameof(TestVM.Double));
+         Assert.IsTrue(vm.IgnoredProperties.Contains(nameof(TestVM.Double)));
       }
 
       [TestMethod]

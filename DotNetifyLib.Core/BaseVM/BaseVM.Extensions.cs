@@ -148,11 +148,11 @@ namespace DotNetify
       /// <param name="subscriber">Subscriber.</param>
       /// <param name="mapper">Function to map the property's data type to the subscriber's.</param>
       /// <returns>Property.</returns>
-      public static ReactiveProperty<TSource> SubscribedBy<TSource, TTarget>(this ReactiveProperty<TSource> prop,
+      public static ReactiveProperty<TSource> SubscribedBy<TSource, TTarget>(this ReactiveProperty<TSource> property,
          ReactiveProperty<TTarget> subscriber, Func<IObservable<TSource>, IObservable<TTarget>> mapper)
       {
-         subscriber.SubscribeTo(mapper(prop));
-         return prop;
+         subscriber.SubscribeTo(mapper(property));
+         return property;
       }
 
       #endregion Reactive

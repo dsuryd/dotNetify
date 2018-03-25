@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2015 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ namespace DotNetify
    }
 
    /// <summary>
-   /// Base class for all DotNetify view models.  
+   /// Base class for all DotNetify view models.
    /// </summary>
    public class BaseVM : ObservableObject, IReactiveProperties, IPushUpdates, ISerializer, IDeserializer
    {
@@ -58,7 +58,7 @@ namespace DotNetify
 
       /// <summary>
       /// Occurs when the view model wants to push updates to the client.
-      /// This event is handled by the VMController. 
+      /// This event is handled by the VMController.
       /// </summary>
       public event EventHandler RequestPushUpdates;
 
@@ -232,16 +232,42 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Adds a runtime reactive property for internal server-side use.
+      /// </summary>
+      /// <param name="vm">View model to add the property to.</param>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="propertyValue">Property value.</param>
+      /// <returns>Reactive property.</returns>
+      public ReactiveProperty<T> AddInternalProperty<T>(string propertyName)
+      {
+         Ignore(propertyName);
+         return AddProperty(typeof(T), new ReactiveProperty<T>(propertyName));
+      }
+
+      /// <summary>
+      /// Adds a runtime reactive property for internal server-side use.
+      /// </summary>
+      /// <param name="vm">View model to add the property to.</param>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="propertyValue">Property value.</param>
+      /// <returns>Reactive property.</returns>
+      public ReactiveProperty<T> AddInternalProperty<T>(string propertyName, T propertyValue)
+      {
+         Ignore(propertyName);
+         return AddProperty(typeof(T), new ReactiveProperty<T>(propertyName, propertyValue));
+      }
+
+      /// <summary>
       /// Override this method if the derived type is a master view model.  The VMController
       /// will call this method to get instances of any view model whose view falls within
       /// this master view in the HTML markup.  The master view model can use this opportunity
-      /// to do its own initialization of those subordinate view models, and/or arranging 
-      /// communication among them. If null is returned, the VMController will create the 
+      /// to do its own initialization of those subordinate view models, and/or arranging
+      /// communication among them. If null is returned, the VMController will create the
       /// instance itself.
       /// </summary>
       /// <param name="vmTypeName">View model type name.</param>
       /// <param name="vmInstanceId">View model instance identifier.</param>
-      /// <param name="iVMArg">View model's initialization argument.</param> 
+      /// <param name="iVMArg">View model's initialization argument.</param>
       /// <returns>View model instance.</returns>
       public virtual BaseVM GetSubVM(string vmTypeName, string vmInstanceId)
       {
@@ -266,11 +292,16 @@ namespace DotNetify
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
       /// <param name="expression">Expression containing property name, to avoid hardcoding it.</param>
-      public void Ignore<T>(Expression<Func<T>> expression)
+      public void Ignore<T>(Expression<Func<T>> expression) => Ignore(((MemberExpression)expression.Body).Member.Name);
+
+      /// <summary>
+      /// Prevent a property from being bound.
+      /// </summary>
+      /// <param name="propertyName">Property name to ignore.</param>
+      public void Ignore(string propertyName)
       {
-         var propertyName = ((MemberExpression)expression.Body).Member.Name;
-         if (!_ignoredProperties.Contains(propertyName))
-            _ignoredProperties.Add(propertyName);
+         if (!IgnoredProperties.Contains(propertyName))
+            IgnoredProperties.Add(propertyName);
       }
 
       /// <summary>

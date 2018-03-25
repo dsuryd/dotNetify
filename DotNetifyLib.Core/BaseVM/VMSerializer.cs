@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ using Newtonsoft.Json.Linq;
 namespace DotNetify
 {
    /// <summary>
-   /// Base class for all DotNetify view models.  
+   /// Base class for all DotNetify view models.
    /// </summary>
    public sealed class VMSerializer : ISerializer, IDeserializer
    {
@@ -44,9 +44,15 @@ namespace DotNetify
             var serializer = new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) };
             var vmJObject = JObject.FromObject(viewModel, serializer);
 
-            if (viewModel is IReactiveProperties) 
-               vmJObject.Merge(JObject.FromObject((viewModel as IReactiveProperties).RuntimeProperties.ToDictionary(prop => prop.Name, prop => prop.Value), serializer), 
-                  new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+            if (viewModel is IReactiveProperties)
+               vmJObject.Merge(JObject.FromObject(
+                  (viewModel as IReactiveProperties)
+                     .RuntimeProperties
+                     .Where(prop => !ignoredPropertyNames.Contains(prop.Name))
+                     .ToDictionary(prop => prop.Name, prop => prop.Value),
+                  serializer
+               ),
+               new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
 
             return vmJObject.ToString();
          }
@@ -83,7 +89,7 @@ namespace DotNetify
                {
                   // Path that starts with $ sign means it is a key to an IEnumerable property.
                   // By convention we expect a method whose name is in this format:
-                  // <IEnumerable property name>_get (for example: ListContent_get) 
+                  // <IEnumerable property name>_get (for example: ListContent_get)
                   // to get the object whose key matches the given value in the path.
                   if (path[i + 1].StartsWith("$"))
                   {

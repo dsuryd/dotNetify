@@ -20,7 +20,12 @@ namespace UnitTests
          {
             AddProperty<string>("FullName")
                .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
-               .SubscribedBy(AddProperty<int>("NameLength"), x => x.Select(name => name.Length));
+               .SubscribedBy(
+                  AddProperty<int>("NameLength"), x => x.Select(name => name.Length)
+               );
+
+            AddInternalProperty<string>("Internal1");
+            AddInternalProperty("Internal2", 0);
          }
 
          public HelloWorldReactiveVM(bool live) : this()
@@ -88,6 +93,17 @@ namespace UnitTests
 
          System.Threading.Thread.Sleep(1000);
          Assert.IsTrue(updateCounter >= 4);
+      }
+
+      [TestMethod]
+      public void HelloWorldReactiveVM_Internal()
+      {
+         var vmController = new MockVMController<HelloWorldReactiveVM>();
+         var response = vmController.RequestVM();
+
+         // Internal properties should not be sent to the client.
+         Assert.IsNull(response.VMData["Internal1"]);
+         Assert.IsNull(response.VMData["Internal2"]);
       }
    }
 }
