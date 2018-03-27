@@ -23,6 +23,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace DotNetify
 {
@@ -374,8 +375,21 @@ namespace DotNetify
             // unless the value is changed internally, so that we don't send the same value back to the client
             // during PushUpdates call by this VMController.
             var changedProperties = ChangedProperties;
-            if (changedProperties.ContainsKey(vmPath) && (changedProperties[vmPath] ?? string.Empty).ToString() == newValue)
-               changedProperties.TryRemove(vmPath, out object value);
+            if (changedProperties.ContainsKey(vmPath))
+            {
+               var changedPropertyValue = changedProperties[vmPath] is IReactiveProperty ?
+                  (changedProperties[vmPath] as IReactiveProperty).Value : changedProperties[vmPath];
+
+               var changedValue = changedPropertyValue?.ToString() ?? string.Empty;
+               bool hasChanged = changedValue != newValue;
+
+               // If property is an array type, use Json serializer to compare the values.
+               if (hasChanged && changedPropertyValue?.GetType().IsArray == true)
+                  hasChanged = JsonConvert.SerializeObject(changedPropertyValue) != JsonConvert.SerializeObject(JsonConvert.DeserializeObject(newValue));
+
+               if (!hasChanged)
+                  changedProperties.TryRemove(vmPath, out object value);
+            }
          }
          else
             // If we cannot resolve the property path, forward the info to the instance to give it a chance to resolve it.
