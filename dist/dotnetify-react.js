@@ -69,7 +69,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-         version: "1.0.5-beta",
+         version: "1.0.6-beta",
          viewModels: {},
          plugins: {},
 
@@ -430,7 +430,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
             }
             var match = this.State()[iListName].filter(function (i) { return i[key] == iNewItem[key] });
             if (match.length > 0) {
-               console.error("[" + this.$vmId + "] couldn't add item to '" + listName + "' because the key already exists");
+               console.error("[" + this.$vmId + "] couldn't add item to '" + iListName + "' because the key already exists");
                return;
             }
          }
