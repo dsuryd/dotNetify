@@ -18,6 +18,7 @@ using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reactive.Linq;
 
 namespace DotNetify
 {
@@ -144,7 +145,7 @@ namespace DotNetify
       /// <summary>
       /// Initiates subscription to a reactive property.
       /// </summary>
-      /// <param name="prop">Property to subscribe to.</param>
+      /// <param name="property">Property to subscribe to.</param>
       /// <param name="subscriber">Subscriber.</param>
       /// <param name="mapper">Function to map the property's data type to the subscriber's.</param>
       /// <returns>Property.</returns>
@@ -152,6 +153,20 @@ namespace DotNetify
          ReactiveProperty<TTarget> subscriber, Func<IObservable<TSource>, IObservable<TTarget>> mapper)
       {
          subscriber.SubscribeTo(mapper(property));
+         return property;
+      }
+
+      /// <summary>
+      /// Initiates subscription to a reactive property.
+      /// </summary>
+      /// <param name="property">Property to subscribe to.</param>
+      /// <param name="subscriber">Subscriber.</param>
+      /// <param name="mapper">Function to map the property's data type to the subscriber's.</param>
+      /// <returns>Property.</returns>
+      public static ReactiveProperty<TSource> SubscribedBy<TSource, TTarget>(this ReactiveProperty<TSource> property,
+         ReactiveProperty<TTarget> subscriber, Func<TSource, TTarget> mapper)
+      {
+         subscriber.SubscribeTo(property.Select(value => mapper(value)));
          return property;
       }
 
