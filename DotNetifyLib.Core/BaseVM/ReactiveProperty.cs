@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+
 using System;
 using System.ComponentModel;
 using System.Reactive.Subjects;
@@ -114,7 +115,7 @@ namespace DotNetify
          Name = name;
       }
 
-      #endregion
+      #endregion Constructors
 
       /// <summary>
       /// Disposes the Rx subject.
@@ -174,10 +175,19 @@ namespace DotNetify
       public ReactiveProperty<T> SubscribeTo(IObservable<T> observable)
       {
          if (_subscription != null)
-            throw new InvalidOperationException("This property is already subscribed to an observable!");
+            throw new InvalidOperationException($"Property '{Name}' is already subscribed to an observable!");
 
          _subscription = observable.Subscribe(this);
          return this;
+      }
+
+      /// <summary>
+      /// Unsubscribes current subscription.
+      /// </summary>
+      public void Unsubscribe()
+      {
+         _subscription?.Dispose();
+         _subscription = null;
       }
 
       /// <summary>
