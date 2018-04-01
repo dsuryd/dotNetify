@@ -79,7 +79,7 @@ namespace DotNetify
             for (int i = 0; i < path.Length; i++)
             {
                var propName = path[i];
-               var propInfo = PropertyInfoHelper.Find(viewModel, propName);
+               var propInfo = viewModel != null ? PropertyInfoHelper.Find(viewModel, propName) : null;
                if (propInfo == null)
                   return false;
 
