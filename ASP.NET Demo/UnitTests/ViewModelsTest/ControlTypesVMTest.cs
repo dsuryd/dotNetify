@@ -16,7 +16,11 @@ namespace UnitTest.ViewModelsTest
       private string _vmId;
       private string _vmData;
 
-      private T GetVM<T>() where T : class { return JsonConvert.DeserializeObject<T>(_vmData); }
+      private T GetVM<T>() where T : class
+      {
+         return JsonConvert.DeserializeObject<T>(_vmData);
+      }
+
       private JObject VMData => (JObject)JsonConvert.DeserializeObject(_vmData);
 
       public void TestResponse(string connectionId, string vmId, string vmData)

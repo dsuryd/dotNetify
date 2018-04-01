@@ -15,8 +15,12 @@ namespace UnitTest.ViewModelsTest
       private string _vmId;
       private string _vmData;
 
-      private T GetVM<T>() where T : class { return JsonConvert.DeserializeObject<T>(_vmData); }
-      private JObject VMData => (JObject) JsonConvert.DeserializeObject(_vmData);
+      private T GetVM<T>() where T : class
+      {
+         return JsonConvert.DeserializeObject<T>(_vmData);
+      }
+
+      private JObject VMData => (JObject)JsonConvert.DeserializeObject(_vmData);
 
       public void TestResponse(string connectionId, string vmId, string vmData)
       {
@@ -41,7 +45,7 @@ namespace UnitTest.ViewModelsTest
          Assert.AreEqual("Hello World", vm.FullName);
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         vmController.OnUpdateVM("conn1", typeof(HelloWorldVM).Name, update );
+         vmController.OnUpdateVM("conn1", typeof(HelloWorldVM).Name, update);
 
          Assert.IsNotNull(VMData);
          Assert.AreEqual("John World", VMData["FullName"]);

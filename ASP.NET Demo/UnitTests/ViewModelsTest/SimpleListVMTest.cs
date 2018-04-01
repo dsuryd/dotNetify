@@ -18,7 +18,11 @@ namespace UnitTest.ViewModelsTest
       private TestEmployeeModel _model = new TestEmployeeModel();
 
       private JObject VMData => (JObject)JsonConvert.DeserializeObject(_vmData);
-      private T GetVMProperty<T>(string propName) where T : class { return VMData[propName].ToObject(typeof(T)) as T; }
+
+      private T GetVMProperty<T>(string propName) where T : class
+      {
+         return VMData[propName].ToObject(typeof(T)) as T;
+      }
 
       private class TestEmployeeModel : EmployeeModel
       {
@@ -128,7 +132,7 @@ namespace UnitTest.ViewModelsTest
          vmController.OnUpdateVM("conn1", typeof(SimpleListVM).Name, update);
 
          Assert.AreEqual(2, employees.Count);
-         Assert.IsFalse(employees.Exists( i => i.Id == 2));
+         Assert.IsFalse(employees.Exists(i => i.Id == 2));
       }
    }
 }
