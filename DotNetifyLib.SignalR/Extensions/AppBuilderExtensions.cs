@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,12 @@ namespace DotNetify
       private readonly static List<Tuple<Type, object[]>> _middlewareTypes = new List<Tuple<Type, object[]>>();
       private readonly static List<Tuple<Type, object[]>> _filterTypes = new List<Tuple<Type, object[]>>();
 
+      /// <summary>
+      /// Includes dotNetify in the application request pipeline.
+      /// </summary>
+      /// <param name="appBuilder">Application builder.</param>
+      /// <param name="config">Delegate to provide custom configuration.</param>
+      /// <returns></returns>
       public static IApplicationBuilder UseDotNetify(this IApplicationBuilder appBuilder, Action<IDotNetifyConfiguration> config = null)
       {
          var provider = appBuilder.ApplicationServices;
@@ -36,12 +42,14 @@ namespace DotNetify
          if (vmControllerFactory == null)
             throw new InvalidOperationException("Please call 'IServiceCollection.AddDotNetify()' inside the ConfigureServices() of the startup class.");
 
+         var scopedServiceProvider = provider.GetService<IHubServiceProvider>();
+
          // Use ASP.NET Core DI to provide view model instances by default.
          Func<Type, object[], object> factoryMethod = (type, args) =>
          {
             try
             {
-               return ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
+               return ActivatorUtilities.CreateInstance(scopedServiceProvider.ServiceProvider ?? provider, type, args ?? new object[] { });
             }
             catch (Exception ex)
             {
@@ -77,7 +85,18 @@ namespace DotNetify
          return appBuilder;
       }
 
+      /// <summary>
+      /// Includes a middleware to the dotNetify's pipeline.
+      /// </summary>
+      /// <param name="dotNetifyConfig">DotNetify configuration.</param>
+      /// <param name="args">Middleware arguments.</param>
       public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline => _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+
+      /// <summary>
+      /// Includes a view model filter to the dotNetify's pipeline.
+      /// </summary>
+      /// <param name="dotNetifyConfig">DotNetify configuration.</param>
+      /// <param name="args">View model filter arguments.</param>
       public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter => _filterTypes.Add(Tuple.Create(typeof(T), args));
    }
 }

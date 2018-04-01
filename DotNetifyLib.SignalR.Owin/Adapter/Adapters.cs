@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,7 @@ namespace DotNetify
 
          // Register dotNetify dependencies to the provided DI container.
          builder.ApplicationServices.AddSingleton<IMemoryCache, MemoryCacheAdapter>();
+         builder.ApplicationServices.AddSingleton<IVMServiceScopeFactory>(_ => new ServiceScopeFactoryAdapter(serviceProvider));
          builder.ApplicationServices.AddDotNetify();
 
          // Configure dotNetify.
@@ -59,6 +60,9 @@ namespace DotNetify
       }
    }
 
+   /// <summary>
+   /// Implements memory cache.
+   /// </summary>
    public class MemoryCacheAdapter : IMemoryCache
    {
       private MemoryCache _cache = new MemoryCache("DotNetify");
@@ -94,5 +98,36 @@ namespace DotNetify
          _cache.Remove(key);
          Removed?.Invoke(this, key);
       }
+   }
+
+   /// <summary>
+   /// Implements the dependency injection service scope.
+   /// </summary>
+   public class ServiceScopeFactoryAdapter : IVMServiceScopeFactory
+   {
+      private readonly System.IServiceProvider _serviceProvider;
+
+      internal class ServiceScope : IVMServiceScope
+      {
+         private readonly System.IServiceProvider _serviceProvider;
+
+         public ServiceScope(System.IServiceProvider serviceProvider)
+         {
+            _serviceProvider = serviceProvider;
+         }
+
+         public System.IServiceProvider ServiceProvider => _serviceProvider;
+
+         public void Dispose()
+         {
+         }
+      }
+
+      public ServiceScopeFactoryAdapter(System.IServiceProvider serviceProvider)
+      {
+         _serviceProvider = serviceProvider;
+      }
+
+      public IVMServiceScope CreateScope() => new ServiceScope(_serviceProvider);
    }
 }

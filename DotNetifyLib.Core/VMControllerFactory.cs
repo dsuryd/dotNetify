@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,9 +24,14 @@ namespace DotNetify
    public class VMControllerFactory : IVMControllerFactory
    {
       /// <summary>
-      /// View model controllers by the client connection Ids.
+      /// For caching view model controllers by the client connection Ids.
       /// </summary>
       private readonly IMemoryCache _controllersCache;
+
+      /// <summary>
+      /// For creating dependency injection service scope.
+      /// </summary>
+      private readonly IVMServiceScopeFactory _serviceScopeFactory;
 
       /// <summary>
       /// How long to keep a view model controller in memory after it hasn't been accessed for a while. Default to never expire.
@@ -42,16 +47,15 @@ namespace DotNetify
       /// Constructor.
       /// </summary>
       /// <param name="memoryCache">Memory cache for storing the view model controllers.</param>
-      public VMControllerFactory(IMemoryCache memoryCache)
+      /// <param name="serviceScopeFactory">Factory for dependency injection service scope.</param>
+      public VMControllerFactory(IMemoryCache memoryCache, IVMServiceScopeFactory serviceScopeFactory)
       {
-         if (memoryCache == null)
-            throw new ArgumentNullException("No service of type IMemoryCache has been registered.");
-
-         _controllersCache = memoryCache;
+         _controllersCache = memoryCache ?? throw new ArgumentNullException("No service of type IMemoryCache has been registered.");
+         _serviceScopeFactory = serviceScopeFactory;
       }
 
       /// <summary>
-      /// Creates a view model controller and assigns it a key. 
+      /// Creates a view model controller and assigns it a key.
       /// On subsequent calls, use the same key to return the same object.
       /// </summary>
       /// <param name="key">Identifies the object.</param>
@@ -60,10 +64,9 @@ namespace DotNetify
       {
          var cache = _controllersCache;
 
-         Lazy<VMController> cachedValue;
-         if (!cache.TryGetValue(key, out cachedValue))
+         if (!cache.TryGetValue(key, out Lazy<VMController> cachedValue))
          {
-            cachedValue = new Lazy<VMController>(() => new VMController(ResponseDelegate));
+            cachedValue = new Lazy<VMController>(() => new VMController(ResponseDelegate, _serviceScopeFactory.CreateScope()));
             cache.Set(key, cachedValue, GetCacheEntryOptions());
          }
          return cachedValue?.Value;

@@ -12,6 +12,7 @@ namespace UnitTests
    {
       private DotNetifyHub _hub;
       private MemoryCache _memoryCache = new MemoryCache();
+      private IVMServiceScopeFactory _serviceScopeFactory = new ServiceScopeFactory();
       private List<Tuple<Type, Func<IMiddlewarePipeline>>> _middlewareFactories = new List<Tuple<Type, Func<IMiddlewarePipeline>>>();
       private Dictionary<Type, Func<IVMFilter>> _vmFilterFactories = new Dictionary<Type, Func<IVMFilter>>();
       private Func<Type, object[], object> _factoryMethod = (type, args) => VMController.CreateInstance(type, args);
@@ -40,6 +41,11 @@ namespace UnitTests
          }
       }
 
+      private class ServiceScopeFactory : IVMServiceScopeFactory
+      {
+         public IVMServiceScope CreateScope() => null;
+      }
+
       private class MockHubContext : IHubContext<DotNetifyHub>
       {
          public IHubClients MockHubClients { get; set; }
@@ -51,19 +57,28 @@ namespace UnitTests
       {
          public IClientProxy MockClientProxy { get; set; }
          public IClientProxy All => null;
+
          public IClientProxy AllExcept(IReadOnlyList<string> excludedIds) => null;
+
          public IClientProxy Client(string connectionId) => MockClientProxy;
+
          public IClientProxy Clients(IReadOnlyList<string> connectionIds) => MockClientProxy;
+
          public IClientProxy Group(string groupName) => null;
+
          public IClientProxy GroupExcept(string groupName, IReadOnlyList<string> excludeIds) => null;
+
          public IClientProxy Groups(IReadOnlyList<string> groupNames) => null;
+
          public IClientProxy User(string userId) => null;
+
          public IClientProxy Users(IReadOnlyList<string> userIds) => null;
       }
 
       private class MockClientProxy : IClientProxy
       {
          public MockDotNetifyHub Hub { get; set; }
+
          public Task SendAsync(string method, object[] args)
          {
             Hub.GetType().GetMethod(method).Invoke(Hub, args);
@@ -76,7 +91,8 @@ namespace UnitTests
          private string _mockConnectionId;
          private ClaimsPrincipal _mockPrincipal = new ClaimsPrincipal();
 
-         public MockHubConnectionContext(string connectionId) : base(null, TimeSpan.FromMinutes(1), new LoggerFactory()) {
+         public MockHubConnectionContext(string connectionId) : base(null, TimeSpan.FromMinutes(1), new LoggerFactory())
+         {
             _mockConnectionId = connectionId;
          }
 
@@ -87,7 +103,8 @@ namespace UnitTests
       public MockDotNetifyHub Create()
       {
          _hub = new DotNetifyHub(
-            new VMControllerFactory(_memoryCache) { ResponseDelegate = ResponseVM },
+            new VMControllerFactory(_memoryCache, _serviceScopeFactory) { ResponseDelegate = ResponseVM },
+            new HubServiceProvider(),
             new HubPrincipalAccessor(),
             new HubPipeline(_middlewareFactories, _vmFilterFactories),
             new MockHubContext() { MockHubClients = new MockHubClients { MockClientProxy = new MockClientProxy { Hub = this } } })

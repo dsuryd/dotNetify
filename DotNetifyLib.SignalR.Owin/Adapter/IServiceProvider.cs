@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,20 +21,23 @@ namespace DotNetify
    public interface IServiceCollection
    {
       IServiceCollection AddSingleton<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface;
+
       IServiceCollection AddSingleton<TInterface>(Func<object, TInterface> factory) where TInterface : class;
-      IServiceCollection AddSingleton<TImpl>() where TImpl: class;
+
+      IServiceCollection AddSingleton<TImpl>() where TImpl : class;
 
       IServiceCollection AddTransient<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface;
+
       IServiceCollection AddTransient<TImpl>() where TImpl : class;
 
       IServiceCollection AddScoped<TInterface, TImpl>() where TInterface : class where TImpl : class, TInterface;
+
       IServiceCollection AddScoped<TImpl>() where TImpl : class;
    }
 
-   public interface IServiceProvider : IServiceCollection
+   public interface IServiceProvider : IServiceCollection, System.IServiceProvider
    {
       T GetService<T>() where T : class;
-      object GetService(Type type);
    }
 
    public class ActivatorUtilities
@@ -50,7 +53,7 @@ namespace DotNetify
                instance = Activator.CreateInstance(type, args);
             return instance ?? provider.GetService(type);
          }
-         catch(Exception)
+         catch (Exception)
          {
             return Activator.CreateInstance(type, args);
          }

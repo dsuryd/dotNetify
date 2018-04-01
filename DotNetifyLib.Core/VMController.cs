@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,9 +53,14 @@ namespace DotNetify
       /// <param name="vmAction">View model action.</param>
       public delegate void FilterDelegate(string vmId, BaseVM vm, object data, Action<object> vmAction);
 
-      #endregion
+      #endregion Delegates
 
       #region Fields
+
+      /// <summary>
+      /// Dependency injection service scope.
+      /// </summary>
+      private readonly IVMServiceScope _serviceScope;
 
       /// <summary>
       /// This class encapsulates a view model information.
@@ -83,7 +88,7 @@ namespace DotNetify
       /// </summary>
       protected internal readonly VMResponseDelegate _vmResponse;
 
-      #endregion
+      #endregion Fields
 
       #region Filters
 
@@ -102,7 +107,12 @@ namespace DotNetify
       /// </summary>
       public FilterDelegate ResponseVMFilter { get; set; }
 
-      #endregion
+      #endregion Filters
+
+      /// <summary>
+      /// Provides scoped dependency injection service provider.
+      /// </summary>
+      public IServiceProvider ServiceProvider => _serviceScope?.ServiceProvider;
 
       // Default constructor.
       public VMController()
@@ -116,11 +126,11 @@ namespace DotNetify
       /// Constructor.
       /// </summary>
       /// <param name="vmResponse">Function invoked by the view model to provide response back to the client.</param>
-      public VMController(VMResponseDelegate vmResponse) : this()
+      /// <param name="serviceScope">Dependency injection service scope.</param>
+      public VMController(VMResponseDelegate vmResponse, IVMServiceScope serviceScope = null) : this()
       {
-         _vmResponse = vmResponse;
-         if (_vmResponse == null)
-            throw new ArgumentNullException();
+         _vmResponse = vmResponse ?? throw new ArgumentNullException(nameof(vmResponse));
+         _serviceScope = serviceScope;
       }
 
       /// <summary>
@@ -133,6 +143,8 @@ namespace DotNetify
             kvp.Value.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
             kvp.Value.Instance.Dispose();
          }
+
+         _serviceScope?.Dispose();
       }
 
       /// <summary>
@@ -239,7 +251,7 @@ namespace DotNetify
                VMInfo vmInfo;
                if (_activeVMs.TryRemove(id, out vmInfo))
                {
-                  // If the view model is within a master view model's scope, notify the 
+                  // If the view model is within a master view model's scope, notify the
                   // master view model that the view model is being disposed.
                   if (id.Contains('.'))
                   {

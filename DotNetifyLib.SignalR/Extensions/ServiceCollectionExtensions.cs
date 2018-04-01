@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,11 +28,17 @@ namespace DotNetify
          // Add memory cache.
          services.AddSingleton<IMemoryCache, MemoryCacheAdapter>();
 
-         // Use ASP.NET Core DI to inject the dotNetify's view model controller factory to the dotNetify's SignalR hub.
+         // Add view model controller factory, to be injected to dotNetify's signalR hub.
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
+
+         // Add the dependency injection service scope factory for view model controllers.
+         services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
 
          // Add service to get the hub principal.
          services.AddSingleton<IPrincipalAccessor, HubPrincipalAccessor>();
+
+         // Add service to get the service provider for the view models.
+         services.AddSingleton<IHubServiceProvider, HubServiceProvider>();
 
          // Add service to run middleware and filters.
          services.AddTransient<IHubPipeline, HubPipeline>();

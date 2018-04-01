@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2016-2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@ namespace DotNetify
    public class DotNetifyHub : Hub
    {
       private readonly IVMControllerFactory _vmControllerFactory;
+      private readonly IHubServiceProvider _serviceProvider;
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IHubPipeline _hubPipeline;
       private DotNetifyHubContext _hubContext;
@@ -62,6 +63,9 @@ namespace DotNetify
             vmController.UpdateVMFilter = RunUpdatingVMFilters;
             vmController.ResponseVMFilter = RunRespondingVMFilters;
 
+            if (_serviceProvider is HubServiceProvider)
+               (_serviceProvider as HubServiceProvider).ServiceProvider = vmController.ServiceProvider;
+
             return vmController;
          }
       }
@@ -70,13 +74,20 @@ namespace DotNetify
       /// Constructor for dependency injection.
       /// </summary>
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
-      /// <param name="principalAccessor">Allow to pass the hub principal.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
       /// <param name="globalHubContext">Provides access to hubs.</param>
-      public DotNetifyHub(IVMControllerFactory vmControllerFactory, IPrincipalAccessor principalAccessor, IHubPipeline hubPipeline, IHubContext<DotNetifyHub> globalHubContext)
+      public DotNetifyHub(
+         IVMControllerFactory vmControllerFactory,
+         IHubServiceProvider serviceProvider,
+         IPrincipalAccessor principalAccessor,
+         IHubPipeline hubPipeline,
+         IHubContext<DotNetifyHub> globalHubContext)
       {
          _vmControllerFactory = vmControllerFactory;
          _vmControllerFactory.ResponseDelegate = Response_VM;
+         _serviceProvider = serviceProvider;
          _principalAccessor = principalAccessor;
          _hubPipeline = hubPipeline;
          _globalHubContext = globalHubContext;
@@ -176,7 +187,7 @@ namespace DotNetify
          }
       }
 
-      #endregion
+      #endregion Client Requests
 
       #region Server Responses
 
@@ -192,7 +203,7 @@ namespace DotNetify
             _globalHubContext.Clients.Client(connectionId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
       }
 
-      #endregion
+      #endregion Server Responses
 
       /// <summary>
       /// Runs the view model filter.
