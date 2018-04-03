@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,8 @@ namespace DotNetify
       /// </summary>
       internal static List<TypeHelper> _vmTypes = new List<TypeHelper>();
 
+      internal static AggregateException _registrationException;
+
       /// <summary>
       /// List of registered assemblies.
       /// </summary>
@@ -49,7 +51,21 @@ namespace DotNetify
       /// </summary>
       public static T Create<T>(object[] args = null) where T : class => CreateInstance(typeof(T), args) as T;
 
-      #endregion
+      #endregion Factory Method
+
+      /// <summary>
+      /// Gets known view model types.
+      /// </summary>
+      internal static List<TypeHelper> VMTypes
+      {
+         get
+         {
+            // If there's deferred exception on registering assemblies, throw it now.
+            if (_registrationException != null)
+               throw _registrationException;
+            return _vmTypes;
+         }
+      }
 
       /// <summary>
       /// Registers all view model types in an assembly.
@@ -71,6 +87,11 @@ namespace DotNetify
 
          _registeredAssemblies.Add(vmAssembly.FullName);
 
+         // Check the assembly for two things:
+         // 1) it doesn't contain duplicate view models fom existing registered assemblies.
+         // 2) it actually has a view model.
+         // If there's exception, it will be deferred until the first view model is accessed.
+         List<Exception> exceptions = new List<Exception>();
          bool hasVMTypes = false;
          foreach (Type vmType in vmAssembly.GetExportedTypes().Where(i => typeof(T).GetTypeInfo().IsAssignableFrom(i)))
          {
@@ -78,11 +99,14 @@ namespace DotNetify
             if (!_vmTypes.Any(i => i == vmType))
                _vmTypes.Add(vmType);
             else
-               throw new Exception($"ERROR: View model '{vmType.Name}' was already registered by another assembly!");
+               exceptions.Add(new Exception($"ERROR: View model '{vmType.Name}' was already registered by another assembly!"));
          }
 
          if (!hasVMTypes)
-            throw new Exception($"ERROR: Assembly '{vmAssembly.GetName().Name}' does not define any view model!");
+            exceptions.Add(new Exception($"ERROR: Assembly '{vmAssembly.GetName().Name}' does not define any view model!"));
+
+         if (exceptions.Count > 0)
+            _registrationException = new AggregateException(exceptions);
       }
 
       /// <summary>
