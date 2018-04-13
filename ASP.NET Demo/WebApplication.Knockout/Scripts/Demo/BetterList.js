@@ -1,4 +1,4 @@
-var BetterListVM = (function () {
+var BetterListVM = /** @class */ (function () {
     function BetterListVM() {
         this._firstName = "";
         this._lastName = "";

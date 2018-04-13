@@ -7,14 +7,14 @@ using DotNetify;
 namespace ViewModels
 {
    /// <summary>
-   /// This view model demonstrates simple CRUD operation on a list. 
+   /// This view model demonstrates simple CRUD operation on a list.
    /// </summary>
    public class SimpleListVM : BaseVM
    {
       private readonly EmployeeService _employeeService;
 
       /// <summary>
-      /// The class that holds employee info to send to the browser.  
+      /// The class that holds employee info to send to the browser.
       /// </summary>
       public class EmployeeInfo
       {
@@ -48,7 +48,7 @@ namespace ViewModels
          AddProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
 
          // When the Add button is clicked, this property will receive the new employee full name input.
-         this.AddProperty<string>("Add").Skip(1).Subscribe(fullName =>
+         this.AddProperty<string>("Add").Subscribe(fullName =>
          {
             var names = fullName.Split(new char[] { ' ' }, 2);
             var newRecord = new EmployeeModel
@@ -69,7 +69,7 @@ namespace ViewModels
          var showNotification = AddProperty<bool>("ShowNotification");
 
          // When a list item is edited, this property will receive the edited item.
-         AddProperty<EmployeeInfo>("Update").Skip(1).Subscribe(changes =>
+         AddProperty<EmployeeInfo>("Update").Subscribe(changes =>
          {
             /// Real world app would do database update operation here.
             var record = _employeeService.GetById(changes.Id);
@@ -84,7 +84,7 @@ namespace ViewModels
          });
 
          // When the Remove button is clicked, this property will receive the employee Id to remove.
-         AddProperty<int>("Remove").Skip(1).Subscribe(id =>
+         AddProperty<int>("Remove").Subscribe(id =>
          {
             _employeeService.Delete(id);
 

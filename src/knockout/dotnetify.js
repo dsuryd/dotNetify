@@ -35,7 +35,7 @@ var dotNetify = {};
 
       dotnetify = $.extend(dotnetify,
          {
-            version: "1.1.5",
+            version: "1.2.0",
 
             // SignalR hub options.
             hub: dotnetifyHub,
@@ -64,6 +64,12 @@ var dotNetify = {};
                   dotnetifyHub.init(dotnetify.hubPath, dotnetify.hubServerUrl, dotnetify.hubLib);
 
                   dotnetifyHub.client.response_VM = function (iVMId, iVMData) {
+
+                     // SignalR .NET Core is sending an array of arguments.
+                     if (Array.isArray(iVMId)) {
+                        iVMData = iVMId[1];
+                        iVMId = iVMId[0];
+                     }
 
                      // Report unauthorized access.
                      if (iVMData == "403") {

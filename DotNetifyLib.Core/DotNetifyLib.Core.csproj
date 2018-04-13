@@ -9,7 +9,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>2.3.2-pre</Version>
+    <Version>3.0.0-pre</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Simple, lightweight, yet powerful way to build reactive, real-time web apps. Library for .NET Core.</Description>
     <Authors>Dicky Suryadi</Authors>

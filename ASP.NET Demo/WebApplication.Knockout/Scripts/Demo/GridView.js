@@ -1,4 +1,4 @@
-var GridViewVM = (function () {
+var GridViewVM = /** @class */ (function () {
     function GridViewVM() {
     }
     // Inject local observables into each ListHeader's item to implement sorting.

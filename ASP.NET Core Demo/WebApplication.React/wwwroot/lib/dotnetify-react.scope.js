@@ -35,7 +35,7 @@ limitations under the License.
       // injects properties and dispatch functions into the component.
       dotnetify.react.Scope = createReactClass({
          displayName: "Scope",
-         version: "1.0.2",
+         version: "1.1.0",
 
          propTypes: { vm: PropTypes.string },
          contextTypes: { scoped: PropTypes.func },

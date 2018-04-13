@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var LinkedTreeViewVM = (function (_super) {
+var LinkedTreeViewVM = /** @class */ (function (_super) {
     __extends(LinkedTreeViewVM, _super);
     function LinkedTreeViewVM() {
         return _super !== null && _super.apply(this, arguments) || this;

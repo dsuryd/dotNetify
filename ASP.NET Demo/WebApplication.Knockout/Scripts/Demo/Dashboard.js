@@ -1,4 +1,4 @@
-var DashboardPanelVM = (function () {
+var DashboardPanelVM = /** @class */ (function () {
     function DashboardPanelVM() {
     }
     DashboardPanelVM.prototype.clearAll = function () { $("#DisplayArea").empty(); };

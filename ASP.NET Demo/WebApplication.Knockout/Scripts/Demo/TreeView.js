@@ -1,4 +1,4 @@
-var TreeViewVM = (function () {
+var TreeViewVM = /** @class */ (function () {
     function TreeViewVM() {
     }
     TreeViewVM.prototype.isSelected = function (iItem) { return this.SelectedId() == iItem.Id(); };

@@ -69,7 +69,7 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
       });
 
       dotnetify.react = $.extend(dotnetify.hasOwnProperty("react") ? dotnetify.react : {}, {
-         version: "1.0.6-beta",
+         version: "1.1.0",
          viewModels: {},
          plugins: {},
 
@@ -82,6 +82,12 @@ var dotnetify = typeof dotnetify === "undefined" ? {} : dotnetify;
 
                // Setup SignalR server method handler.
                dotnetifyHub.client.response_VM = function (iVMId, iVMData) {
+
+                  // SignalR .NET Core is sending an array of arguments.
+                  if (Array.isArray(iVMId)) {
+                     iVMData = iVMId[1];
+                     iVMId = iVMId[0];
+                  }
 
                   var vm = self.viewModels.hasOwnProperty(iVMId) ? self.viewModels[iVMId] : null;
 

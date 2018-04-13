@@ -1,4 +1,4 @@
-var LiveChartVM = (function () {
+var LiveChartVM = /** @class */ (function () {
     function LiveChartVM() {
     }
     LiveChartVM.prototype.updateChart = function (iItem, iElement) {

@@ -1,7 +1,7 @@
 /* @license
  * Copyright (c) .NET Foundation. All rights reserved.
  * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-*/
+ */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -1228,8 +1228,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var HttpError = /** @class */ (function (_super) {
     __extends(HttpError, _super);
     function HttpError(errorMessage, statusCode) {
-        var _this = _super.call(this, errorMessage) || this;
+        var _newTarget = this.constructor;
+        var _this = this;
+        var trueProto = _newTarget.prototype;
+        _this = _super.call(this, errorMessage) || this;
         _this.statusCode = statusCode;
+        // Workaround issue in Typescript compiler
+        // https://github.com/Microsoft/TypeScript/issues/13965#issuecomment-278570200
+        _this.__proto__ = trueProto;
         return _this;
     }
     return HttpError;
@@ -1238,8 +1244,15 @@ exports.HttpError = HttpError;
 var TimeoutError = /** @class */ (function (_super) {
     __extends(TimeoutError, _super);
     function TimeoutError(errorMessage) {
+        var _newTarget = this.constructor;
         if (errorMessage === void 0) { errorMessage = "A timeout occurred."; }
-        return _super.call(this, errorMessage) || this;
+        var _this = this;
+        var trueProto = _newTarget.prototype;
+        _this = _super.call(this, errorMessage) || this;
+        // Workaround issue in Typescript compiler
+        // https://github.com/Microsoft/TypeScript/issues/13965#issuecomment-278570200
+        _this.__proto__ = trueProto;
+        return _this;
     }
     return TimeoutError;
 }(Error));
@@ -1250,6 +1263,22 @@ exports.TimeoutError = TimeoutError;
 unwrapExports(Errors);
 var Errors_1 = Errors.HttpError;
 var Errors_2 = Errors.TimeoutError;
+
+var ILogger = createCommonjsModule(function (module, exports) {
+Object.defineProperty(exports, "__esModule", { value: true });
+var LogLevel;
+(function (LogLevel) {
+    LogLevel[LogLevel["Trace"] = 0] = "Trace";
+    LogLevel[LogLevel["Information"] = 1] = "Information";
+    LogLevel[LogLevel["Warning"] = 2] = "Warning";
+    LogLevel[LogLevel["Error"] = 3] = "Error";
+    LogLevel[LogLevel["None"] = 4] = "None";
+})(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
+
+});
+
+unwrapExports(ILogger);
+var ILogger_1 = ILogger.LogLevel;
 
 var HttpClient_1 = createCommonjsModule(function (module, exports) {
 var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
@@ -1271,6 +1300,7 @@ var __assign = (commonjsGlobal && commonjsGlobal.__assign) || Object.assign || f
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 var HttpResponse = /** @class */ (function () {
     function HttpResponse(statusCode, statusText, content) {
@@ -1295,16 +1325,21 @@ var HttpClient = /** @class */ (function () {
 exports.HttpClient = HttpClient;
 var DefaultHttpClient = /** @class */ (function (_super) {
     __extends(DefaultHttpClient, _super);
-    function DefaultHttpClient() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function DefaultHttpClient(logger) {
+        var _this = _super.call(this) || this;
+        _this.logger = logger;
+        return _this;
     }
     DefaultHttpClient.prototype.send = function (request) {
+        var _this = this;
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.open(request.method, request.url, true);
+            xhr.withCredentials = true;
             xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             if (request.headers) {
-                request.headers.forEach(function (value, header) { return xhr.setRequestHeader(header, value); });
+                Object.keys(request.headers)
+                    .forEach(function (header) { return xhr.setRequestHeader(header, request.headers[header]); });
             }
             if (request.responseType) {
                 xhr.responseType = request.responseType;
@@ -1329,9 +1364,11 @@ var DefaultHttpClient = /** @class */ (function (_super) {
                 }
             };
             xhr.onerror = function () {
+                _this.logger.log(ILogger.LogLevel.Warning, "Error from HTTP request. " + xhr.status + ": " + xhr.statusText);
                 reject(new Errors.HttpError(xhr.statusText, xhr.status));
             };
             xhr.ontimeout = function () {
+                _this.logger.log(ILogger.LogLevel.Warning, "Timeout from HTTP request.");
                 reject(new Errors.TimeoutError());
             };
             xhr.send(request.content || "");
@@ -1348,21 +1385,67 @@ var HttpClient_2 = HttpClient_1.HttpResponse;
 var HttpClient_3 = HttpClient_1.HttpClient;
 var HttpClient_4 = HttpClient_1.DefaultHttpClient;
 
-var ILogger = createCommonjsModule(function (module, exports) {
+var Loggers = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
-var LogLevel;
-(function (LogLevel) {
-    LogLevel[LogLevel["Trace"] = 0] = "Trace";
-    LogLevel[LogLevel["Information"] = 1] = "Information";
-    LogLevel[LogLevel["Warning"] = 2] = "Warning";
-    LogLevel[LogLevel["Error"] = 3] = "Error";
-    LogLevel[LogLevel["None"] = 4] = "None";
-})(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
+
+var NullLogger = /** @class */ (function () {
+    function NullLogger() {
+    }
+    NullLogger.prototype.log = function (logLevel, message) {
+    };
+    return NullLogger;
+}());
+exports.NullLogger = NullLogger;
+var ConsoleLogger = /** @class */ (function () {
+    function ConsoleLogger(minimumLogLevel) {
+        this.minimumLogLevel = minimumLogLevel;
+    }
+    ConsoleLogger.prototype.log = function (logLevel, message) {
+        if (logLevel >= this.minimumLogLevel) {
+            switch (logLevel) {
+                case ILogger.LogLevel.Error:
+                    console.error(ILogger.LogLevel[logLevel] + ": " + message);
+                    break;
+                case ILogger.LogLevel.Warning:
+                    console.warn(ILogger.LogLevel[logLevel] + ": " + message);
+                    break;
+                case ILogger.LogLevel.Information:
+                    console.info(ILogger.LogLevel[logLevel] + ": " + message);
+                    break;
+                default:
+                    console.log(ILogger.LogLevel[logLevel] + ": " + message);
+                    break;
+            }
+        }
+    };
+    return ConsoleLogger;
+}());
+exports.ConsoleLogger = ConsoleLogger;
+var LoggerFactory = /** @class */ (function () {
+    function LoggerFactory() {
+    }
+    LoggerFactory.createLogger = function (logging) {
+        if (logging === undefined) {
+            return new ConsoleLogger(ILogger.LogLevel.Information);
+        }
+        if (logging === null) {
+            return new NullLogger();
+        }
+        if (logging.log) {
+            return logging;
+        }
+        return new ConsoleLogger(logging);
+    };
+    return LoggerFactory;
+}());
+exports.LoggerFactory = LoggerFactory;
 
 });
 
-unwrapExports(ILogger);
-var ILogger_1 = ILogger.LogLevel;
+unwrapExports(Loggers);
+var Loggers_1 = Loggers.NullLogger;
+var Loggers_2 = Loggers.ConsoleLogger;
+var Loggers_3 = Loggers.LoggerFactory;
 
 var AbortController_1 = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1404,6 +1487,31 @@ exports.AbortController = AbortController;
 unwrapExports(AbortController_1);
 var AbortController_2 = AbortController_1.AbortController;
 
+var Utils = createCommonjsModule(function (module, exports) {
+Object.defineProperty(exports, "__esModule", { value: true });
+var Arg = /** @class */ (function () {
+    function Arg() {
+    }
+    Arg.isRequired = function (val, name) {
+        if (val === null || val === undefined) {
+            throw new Error("The '" + name + "' argument is required.");
+        }
+    };
+    Arg.isIn = function (val, values, name) {
+        // TypeScript enums have keys for **both** the name and the value of each enum member on the type itself.
+        if (!(val in values)) {
+            throw new Error("Unknown " + name + " value: " + val + ".");
+        }
+    };
+    return Arg;
+}());
+exports.Arg = Arg;
+
+});
+
+unwrapExports(Utils);
+var Utils_1 = Utils.Arg;
+
 var Transports = createCommonjsModule(function (module, exports) {
 var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1444,19 +1552,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
 var TransportType;
 (function (TransportType) {
     TransportType[TransportType["WebSockets"] = 0] = "WebSockets";
     TransportType[TransportType["ServerSentEvents"] = 1] = "ServerSentEvents";
     TransportType[TransportType["LongPolling"] = 2] = "LongPolling";
 })(TransportType = exports.TransportType || (exports.TransportType = {}));
+var TransferFormat;
+(function (TransferFormat) {
+    TransferFormat[TransferFormat["Text"] = 1] = "Text";
+    TransferFormat[TransferFormat["Binary"] = 2] = "Binary";
+})(TransferFormat = exports.TransferFormat || (exports.TransferFormat = {}));
 var WebSocketTransport = /** @class */ (function () {
     function WebSocketTransport(accessTokenFactory, logger) {
         this.logger = logger;
         this.accessTokenFactory = accessTokenFactory || (function () { return null; });
     }
-    WebSocketTransport.prototype.connect = function (url, requestedTransferMode, connection) {
+    WebSocketTransport.prototype.connect = function (url, transferFormat, connection) {
         var _this = this;
+        Utils.Arg.isRequired(url, "url");
+        Utils.Arg.isRequired(transferFormat, "transferFormat");
+        Utils.Arg.isIn(transferFormat, TransferFormat, "transferFormat");
+        Utils.Arg.isRequired(connection, "connection");
+        if (typeof (WebSocket) === "undefined") {
+            throw new Error("'WebSocket' is not supported in your environment.");
+        }
+        this.logger.log(ILogger.LogLevel.Trace, "(WebSockets transport) Connecting");
         return new Promise(function (resolve, reject) {
             url = url.replace(/^http/, "ws");
             var token = _this.accessTokenFactory();
@@ -1464,19 +1586,19 @@ var WebSocketTransport = /** @class */ (function () {
                 url += (url.indexOf("?") < 0 ? "?" : "&") + ("access_token=" + encodeURIComponent(token));
             }
             var webSocket = new WebSocket(url);
-            if (requestedTransferMode == 2 /* Binary */) {
+            if (transferFormat === TransferFormat.Binary) {
                 webSocket.binaryType = "arraybuffer";
             }
             webSocket.onopen = function (event) {
                 _this.logger.log(ILogger.LogLevel.Information, "WebSocket connected to " + url);
                 _this.webSocket = webSocket;
-                resolve(requestedTransferMode);
+                resolve();
             };
             webSocket.onerror = function (event) {
-                reject();
+                reject(event.error);
             };
             webSocket.onmessage = function (message) {
-                _this.logger.log(ILogger.LogLevel.Trace, "(WebSockets transport) data received: " + message.data);
+                _this.logger.log(ILogger.LogLevel.Trace, "(WebSockets transport) data received. " + getDataDetail(message.data) + ".");
                 if (_this.onreceive) {
                     _this.onreceive(message.data);
                 }
@@ -1496,6 +1618,7 @@ var WebSocketTransport = /** @class */ (function () {
     };
     WebSocketTransport.prototype.send = function (data) {
         if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
+            this.logger.log(ILogger.LogLevel.Trace, "(WebSockets transport) sending data. " + getDataDetail(data) + ".");
             this.webSocket.send(data);
             return Promise.resolve();
         }
@@ -1517,23 +1640,31 @@ var ServerSentEventsTransport = /** @class */ (function () {
         this.accessTokenFactory = accessTokenFactory || (function () { return null; });
         this.logger = logger;
     }
-    ServerSentEventsTransport.prototype.connect = function (url, requestedTransferMode, connection) {
+    ServerSentEventsTransport.prototype.connect = function (url, transferFormat, connection) {
         var _this = this;
+        Utils.Arg.isRequired(url, "url");
+        Utils.Arg.isRequired(transferFormat, "transferFormat");
+        Utils.Arg.isIn(transferFormat, TransferFormat, "transferFormat");
+        Utils.Arg.isRequired(connection, "connection");
         if (typeof (EventSource) === "undefined") {
-            Promise.reject("EventSource not supported by the browser.");
+            throw new Error("'EventSource' is not supported in your environment.");
         }
+        this.logger.log(ILogger.LogLevel.Trace, "(SSE transport) Connecting");
         this.url = url;
         return new Promise(function (resolve, reject) {
+            if (transferFormat !== TransferFormat.Text) {
+                reject(new Error("The Server-Sent Events transport only supports the 'Text' transfer format"));
+            }
             var token = _this.accessTokenFactory();
             if (token) {
                 url += (url.indexOf("?") < 0 ? "?" : "&") + ("access_token=" + encodeURIComponent(token));
             }
-            var eventSource = new EventSource(url);
+            var eventSource = new EventSource(url, { withCredentials: true });
             try {
                 eventSource.onmessage = function (e) {
                     if (_this.onreceive) {
                         try {
-                            _this.logger.log(ILogger.LogLevel.Trace, "(SSE transport) data received: " + e.data);
+                            _this.logger.log(ILogger.LogLevel.Trace, "(SSE transport) data received. " + getDataDetail(e.data) + ".");
                             _this.onreceive(e.data);
                         }
                         catch (error) {
@@ -1545,7 +1676,7 @@ var ServerSentEventsTransport = /** @class */ (function () {
                     }
                 };
                 eventSource.onerror = function (e) {
-                    reject();
+                    reject(new Error(e.message || "Error occurred"));
                     // don't report an error if the transport did not start successfully
                     if (_this.eventSource && _this.onclose) {
                         _this.onclose(new Error(e.message || "Error occurred"));
@@ -1555,7 +1686,7 @@ var ServerSentEventsTransport = /** @class */ (function () {
                     _this.logger.log(ILogger.LogLevel.Information, "SSE connected to " + _this.url);
                     _this.eventSource = eventSource;
                     // SSE is a text protocol
-                    resolve(1 /* Text */);
+                    resolve();
                 };
             }
             catch (e) {
@@ -1566,7 +1697,7 @@ var ServerSentEventsTransport = /** @class */ (function () {
     ServerSentEventsTransport.prototype.send = function (data) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, send(this.httpClient, this.url, this.accessTokenFactory, data)];
+                return [2 /*return*/, send(this.logger, "SSE", this.httpClient, this.url, this.accessTokenFactory, data)];
             });
         });
     };
@@ -1587,34 +1718,40 @@ var LongPollingTransport = /** @class */ (function () {
         this.logger = logger;
         this.pollAbort = new AbortController_1.AbortController();
     }
-    LongPollingTransport.prototype.connect = function (url, requestedTransferMode, connection) {
+    LongPollingTransport.prototype.connect = function (url, transferFormat, connection) {
+        Utils.Arg.isRequired(url, "url");
+        Utils.Arg.isRequired(transferFormat, "transferFormat");
+        Utils.Arg.isIn(transferFormat, TransferFormat, "transferFormat");
+        Utils.Arg.isRequired(connection, "connection");
         this.url = url;
+        this.logger.log(ILogger.LogLevel.Trace, "(LongPolling transport) Connecting");
         // Set a flag indicating we have inherent keep-alive in this transport.
         connection.features.inherentKeepAlive = true;
-        if (requestedTransferMode === 2 /* Binary */ && (typeof new XMLHttpRequest().responseType !== "string")) {
+        if (transferFormat === TransferFormat.Binary && (typeof new XMLHttpRequest().responseType !== "string")) {
             // This will work if we fix: https://github.com/aspnet/SignalR/issues/742
             throw new Error("Binary protocols over XmlHttpRequest not implementing advanced features are not supported.");
         }
-        this.poll(this.url, requestedTransferMode);
-        return Promise.resolve(requestedTransferMode);
+        this.poll(this.url, transferFormat);
+        return Promise.resolve();
     };
-    LongPollingTransport.prototype.poll = function (url, transferMode) {
+    LongPollingTransport.prototype.poll = function (url, transferFormat) {
         return __awaiter(this, void 0, void 0, function () {
             var pollOptions, token, pollUrl, response, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         pollOptions = {
-                            timeout: 120000,
                             abortSignal: this.pollAbort.signal,
-                            headers: new Map(),
+                            headers: {},
+                            timeout: 90000,
                         };
-                        if (transferMode === 2 /* Binary */) {
+                        if (transferFormat === TransferFormat.Binary) {
                             pollOptions.responseType = "arraybuffer";
                         }
                         token = this.accessTokenFactory();
                         if (token) {
-                            pollOptions.headers.set("Authorization", "Bearer " + token);
+                            // tslint:disable-next-line:no-string-literal
+                            pollOptions.headers["Authorization"] = "Bearer " + token;
                         }
                         _a.label = 1;
                     case 1:
@@ -1646,7 +1783,7 @@ var LongPollingTransport = /** @class */ (function () {
                         else {
                             // Process the response
                             if (response.content) {
-                                this.logger.log(ILogger.LogLevel.Trace, "(LongPolling transport) data received: " + response.content);
+                                this.logger.log(ILogger.LogLevel.Trace, "(LongPolling transport) data received. " + getDataDetail(response.content) + ".");
                                 if (this.onreceive) {
                                     this.onreceive(response.content);
                                 }
@@ -1680,7 +1817,7 @@ var LongPollingTransport = /** @class */ (function () {
     LongPollingTransport.prototype.send = function (data) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, send(this.httpClient, this.url, this.accessTokenFactory, data)];
+                return [2 /*return*/, send(this.logger, "LongPolling", this.httpClient, this.url, this.accessTokenFactory, data)];
             });
         });
     };
@@ -1691,23 +1828,34 @@ var LongPollingTransport = /** @class */ (function () {
     return LongPollingTransport;
 }());
 exports.LongPollingTransport = LongPollingTransport;
-function send(httpClient, url, accessTokenFactory, content) {
+function getDataDetail(data) {
+    var length = null;
+    if (data instanceof ArrayBuffer) {
+        length = "Binary data of length " + data.byteLength;
+    }
+    else if (typeof data === "string") {
+        length = "String data of length " + data.length;
+    }
+    return length;
+}
+function send(logger, transportName, httpClient, url, accessTokenFactory, content) {
     return __awaiter(this, void 0, void 0, function () {
-        var headers, token;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var headers, token, response, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     token = accessTokenFactory();
                     if (token) {
-                        headers = new Map();
-                        headers.set("Authorization", "Bearer " + accessTokenFactory());
+                        headers = (_a = {}, _a["Authorization"] = "Bearer " + accessTokenFactory(), _a);
                     }
+                    logger.log(ILogger.LogLevel.Trace, "(" + transportName + " transport) sending data. " + getDataDetail(content) + ".");
                     return [4 /*yield*/, httpClient.post(url, {
                             content: content,
-                            headers: headers
+                            headers: headers,
                         })];
                 case 1:
-                    _a.sent();
+                    response = _b.sent();
+                    logger.log(ILogger.LogLevel.Trace, "(" + transportName + " transport) request complete. Response status: " + response.statusCode + ".");
                     return [2 /*return*/];
             }
         });
@@ -1718,69 +1866,10 @@ function send(httpClient, url, accessTokenFactory, content) {
 
 unwrapExports(Transports);
 var Transports_1 = Transports.TransportType;
-var Transports_2 = Transports.WebSocketTransport;
-var Transports_3 = Transports.ServerSentEventsTransport;
-var Transports_4 = Transports.LongPollingTransport;
-
-var Loggers = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-
-var NullLogger = /** @class */ (function () {
-    function NullLogger() {
-    }
-    NullLogger.prototype.log = function (logLevel, message) {
-    };
-    return NullLogger;
-}());
-exports.NullLogger = NullLogger;
-var ConsoleLogger = /** @class */ (function () {
-    function ConsoleLogger(minimumLogLevel) {
-        this.minimumLogLevel = minimumLogLevel;
-    }
-    ConsoleLogger.prototype.log = function (logLevel, message) {
-        if (logLevel >= this.minimumLogLevel) {
-            switch (logLevel) {
-                case ILogger.LogLevel.Error:
-                    console.error(ILogger.LogLevel[logLevel] + ": " + message);
-                    break;
-                case ILogger.LogLevel.Warning:
-                    console.warn(ILogger.LogLevel[logLevel] + ": " + message);
-                    break;
-                case ILogger.LogLevel.Information:
-                    console.info(ILogger.LogLevel[logLevel] + ": " + message);
-                    break;
-                default:
-                    console.log(ILogger.LogLevel[logLevel] + ": " + message);
-                    break;
-            }
-        }
-    };
-    return ConsoleLogger;
-}());
-exports.ConsoleLogger = ConsoleLogger;
-var LoggerFactory;
-(function (LoggerFactory) {
-    function createLogger(logging) {
-        if (logging === undefined) {
-            return new ConsoleLogger(ILogger.LogLevel.Information);
-        }
-        if (logging === null) {
-            return new NullLogger();
-        }
-        if (logging.log) {
-            return logging;
-        }
-        return new ConsoleLogger(logging);
-    }
-    LoggerFactory.createLogger = createLogger;
-})(LoggerFactory = exports.LoggerFactory || (exports.LoggerFactory = {}));
-
-});
-
-unwrapExports(Loggers);
-var Loggers_1 = Loggers.NullLogger;
-var Loggers_2 = Loggers.ConsoleLogger;
-var Loggers_3 = Loggers.LoggerFactory;
+var Transports_2 = Transports.TransferFormat;
+var Transports_3 = Transports.WebSocketTransport;
+var Transports_4 = Transports.ServerSentEventsTransport;
+var Transports_5 = Transports.LongPollingTransport;
 
 var HttpConnection_1 = createCommonjsModule(function (module, exports) {
 var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -1823,131 +1912,231 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
 var HttpConnection = /** @class */ (function () {
     function HttpConnection(url, options) {
         if (options === void 0) { options = {}; }
         this.features = {};
+        Utils.Arg.isRequired(url, "url");
         this.logger = Loggers.LoggerFactory.createLogger(options.logger);
         this.baseUrl = this.resolveUrl(url);
         options = options || {};
         options.accessTokenFactory = options.accessTokenFactory || (function () { return null; });
-        this.httpClient = options.httpClient || new HttpClient_1.DefaultHttpClient();
+        this.httpClient = options.httpClient || new HttpClient_1.DefaultHttpClient(this.logger);
         this.connectionState = 2 /* Disconnected */;
         this.options = options;
     }
-    HttpConnection.prototype.start = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (this.connectionState !== 2 /* Disconnected */) {
-                    return [2 /*return*/, Promise.reject(new Error("Cannot start a connection that is not in the 'Disconnected' state."))];
-                }
-                this.connectionState = 0 /* Connecting */;
-                this.startPromise = this.startInternal();
-                return [2 /*return*/, this.startPromise];
-            });
-        });
+    HttpConnection.prototype.start = function (transferFormat) {
+        Utils.Arg.isRequired(transferFormat, "transferFormat");
+        Utils.Arg.isIn(transferFormat, Transports.TransferFormat, "transferFormat");
+        this.logger.log(ILogger.LogLevel.Trace, "Starting connection with transfer format '" + Transports.TransferFormat[transferFormat] + "'.");
+        if (this.connectionState !== 2 /* Disconnected */) {
+            return Promise.reject(new Error("Cannot start a connection that is not in the 'Disconnected' state."));
+        }
+        this.connectionState = 0 /* Connecting */;
+        this.startPromise = this.startInternal(transferFormat);
+        return this.startPromise;
     };
-    HttpConnection.prototype.startInternal = function () {
+    HttpConnection.prototype.startInternal = function (transferFormat) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var headers, token, negotiatePayload, negotiateResponse, requestedTransferMode, _a, e_1;
+            var token, headers, negotiateResponse, e_1, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _b.trys.push([0, 5, , 6]);
-                        if (!(this.options.transport === Transports.TransportType.WebSockets)) return [3 /*break*/, 1];
+                        _b.trys.push([0, 6, , 7]);
+                        if (!(this.options.transport === Transports.TransportType.WebSockets)) return [3 /*break*/, 2];
                         // No need to add a connection ID in this case
                         this.url = this.baseUrl;
-                        this.transport = this.createTransport(this.options.transport, [Transports.TransportType[Transports.TransportType.WebSockets]]);
-                        return [3 /*break*/, 3];
+                        this.transport = this.constructTransport(Transports.TransportType.WebSockets);
+                        // We should just call connect directly in this case.
+                        // No fallback or negotiate in this case.
+                        return [4 /*yield*/, this.transport.connect(this.url, transferFormat, this)];
                     case 1:
-                        headers = void 0;
-                        token = this.options.accessTokenFactory();
-                        if (token) {
-                            headers = new Map();
-                            headers.set("Authorization", "Bearer " + token);
-                        }
-                        return [4 /*yield*/, this.httpClient.post(this.resolveNegotiateUrl(this.baseUrl), {
-                                content: "",
-                                headers: headers
-                            })];
+                        // We should just call connect directly in this case.
+                        // No fallback or negotiate in this case.
+                        _b.sent();
+                        return [3 /*break*/, 5];
                     case 2:
-                        negotiatePayload = _b.sent();
-                        negotiateResponse = JSON.parse(negotiatePayload.content);
-                        this.connectionId = negotiateResponse.connectionId;
+                        token = this.options.accessTokenFactory();
+                        headers = void 0;
+                        if (token) {
+                            headers = (_a = {}, _a["Authorization"] = "Bearer " + token, _a);
+                        }
+                        return [4 /*yield*/, this.getNegotiationResponse(headers)];
+                    case 3:
+                        negotiateResponse = _b.sent();
                         // the user tries to stop the the connection when it is being started
-                        if (this.connectionState == 2 /* Disconnected */) {
+                        if (this.connectionState === 2 /* Disconnected */) {
                             return [2 /*return*/];
                         }
-                        if (this.connectionId) {
-                            this.url = this.baseUrl + (this.baseUrl.indexOf("?") === -1 ? "?" : "&") + ("id=" + this.connectionId);
-                            this.transport = this.createTransport(this.options.transport, negotiateResponse.availableTransports);
-                        }
-                        _b.label = 3;
-                    case 3:
+                        return [4 /*yield*/, this.createTransport(this.options.transport, negotiateResponse, transferFormat, headers)];
+                    case 4:
+                        _b.sent();
+                        _b.label = 5;
+                    case 5:
                         this.transport.onreceive = this.onreceive;
                         this.transport.onclose = function (e) { return _this.stopConnection(true, e); };
-                        requestedTransferMode = this.features.transferMode === 2 /* Binary */
-                            ? 2 /* Binary */
-                            : 1 /* Text */;
-                        _a = this.features;
-                        return [4 /*yield*/, this.transport.connect(this.url, requestedTransferMode, this)];
-                    case 4:
-                        _a.transferMode = _b.sent();
                         // only change the state if we were connecting to not overwrite
                         // the state if the connection is already marked as Disconnected
                         this.changeState(0 /* Connecting */, 1 /* Connected */);
-                        return [3 /*break*/, 6];
-                    case 5:
+                        return [3 /*break*/, 7];
+                    case 6:
                         e_1 = _b.sent();
-                        this.logger.log(ILogger.LogLevel.Error, "Failed to start the connection. " + e_1);
+                        this.logger.log(ILogger.LogLevel.Error, "Failed to start the connection: " + e_1);
                         this.connectionState = 2 /* Disconnected */;
                         this.transport = null;
                         throw e_1;
-                    case 6:
-                        ;
-                        return [2 /*return*/];
+                    case 7: return [2 /*return*/];
                 }
             });
         });
     };
-    HttpConnection.prototype.createTransport = function (transport, availableTransports) {
-        if ((transport === null || transport === undefined) && availableTransports.length > 0) {
-            transport = Transports.TransportType[availableTransports[0]];
+    HttpConnection.prototype.getNegotiationResponse = function (headers) {
+        return __awaiter(this, void 0, void 0, function () {
+            var negotiateUrl, response, e_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        negotiateUrl = this.resolveNegotiateUrl(this.baseUrl);
+                        this.logger.log(ILogger.LogLevel.Trace, "Sending negotiation request: " + negotiateUrl);
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.httpClient.post(negotiateUrl, {
+                                content: "",
+                                headers: headers,
+                            })];
+                    case 2:
+                        response = _a.sent();
+                        return [2 /*return*/, JSON.parse(response.content)];
+                    case 3:
+                        e_2 = _a.sent();
+                        this.logger.log(ILogger.LogLevel.Error, "Failed to complete negotiation with the server: " + e_2);
+                        throw e_2;
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    HttpConnection.prototype.updateConnectionId = function (negotiateResponse) {
+        this.connectionId = negotiateResponse.connectionId;
+        this.url = this.baseUrl + (this.baseUrl.indexOf("?") === -1 ? "?" : "&") + ("id=" + this.connectionId);
+    };
+    HttpConnection.prototype.createTransport = function (requestedTransport, negotiateResponse, requestedTransferFormat, headers) {
+        return __awaiter(this, void 0, void 0, function () {
+            var transports, _i, transports_1, endpoint, transport, ex_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.updateConnectionId(negotiateResponse);
+                        if (!this.isITransport(requestedTransport)) return [3 /*break*/, 2];
+                        this.logger.log(ILogger.LogLevel.Trace, "Connection was provided an instance of ITransport, using that directly.");
+                        this.transport = requestedTransport;
+                        return [4 /*yield*/, this.transport.connect(this.url, requestedTransferFormat, this)];
+                    case 1:
+                        _a.sent();
+                        // only change the state if we were connecting to not overwrite
+                        // the state if the connection is already marked as Disconnected
+                        this.changeState(0 /* Connecting */, 1 /* Connected */);
+                        return [2 /*return*/];
+                    case 2:
+                        transports = negotiateResponse.availableTransports;
+                        _i = 0, transports_1 = transports;
+                        _a.label = 3;
+                    case 3:
+                        if (!(_i < transports_1.length)) return [3 /*break*/, 9];
+                        endpoint = transports_1[_i];
+                        this.connectionState = 0 /* Connecting */;
+                        transport = this.resolveTransport(endpoint, requestedTransport, requestedTransferFormat);
+                        if (!(typeof transport === "number")) return [3 /*break*/, 8];
+                        this.transport = this.constructTransport(transport);
+                        if (!(negotiateResponse.connectionId === null)) return [3 /*break*/, 5];
+                        return [4 /*yield*/, this.getNegotiationResponse(headers)];
+                    case 4:
+                        negotiateResponse = _a.sent();
+                        this.updateConnectionId(negotiateResponse);
+                        _a.label = 5;
+                    case 5:
+                        _a.trys.push([5, 7, , 8]);
+                        return [4 /*yield*/, this.transport.connect(this.url, requestedTransferFormat, this)];
+                    case 6:
+                        _a.sent();
+                        this.changeState(0 /* Connecting */, 1 /* Connected */);
+                        return [2 /*return*/];
+                    case 7:
+                        ex_1 = _a.sent();
+                        this.logger.log(ILogger.LogLevel.Error, "Failed to start the transport '" + Transports.TransportType[transport] + "': " + ex_1);
+                        this.connectionState = 2 /* Disconnected */;
+                        negotiateResponse.connectionId = null;
+                        return [3 /*break*/, 8];
+                    case 8:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 9: throw new Error("Unable to initialize any of the available transports.");
+                }
+            });
+        });
+    };
+    HttpConnection.prototype.constructTransport = function (transport) {
+        switch (transport) {
+            case Transports.TransportType.WebSockets:
+                return new Transports.WebSocketTransport(this.options.accessTokenFactory, this.logger);
+            case Transports.TransportType.ServerSentEvents:
+                return new Transports.ServerSentEventsTransport(this.httpClient, this.options.accessTokenFactory, this.logger);
+            case Transports.TransportType.LongPolling:
+                return new Transports.LongPollingTransport(this.httpClient, this.options.accessTokenFactory, this.logger);
+            default:
+                throw new Error("Unknown transport: " + transport + ".");
         }
-        if (transport === Transports.TransportType.WebSockets && availableTransports.indexOf(Transports.TransportType[transport]) >= 0) {
-            return new Transports.WebSocketTransport(this.options.accessTokenFactory, this.logger);
+    };
+    HttpConnection.prototype.resolveTransport = function (endpoint, requestedTransport, requestedTransferFormat) {
+        var transport = Transports.TransportType[endpoint.transport];
+        if (transport === null || transport === undefined) {
+            this.logger.log(ILogger.LogLevel.Trace, "Skipping transport '" + endpoint.transport + "' because it is not supported by this client.");
         }
-        if (transport === Transports.TransportType.ServerSentEvents && availableTransports.indexOf(Transports.TransportType[transport]) >= 0) {
-            return new Transports.ServerSentEventsTransport(this.httpClient, this.options.accessTokenFactory, this.logger);
+        else {
+            var transferFormats = endpoint.transferFormats.map(function (s) { return Transports.TransferFormat[s]; });
+            if (!requestedTransport || transport === requestedTransport) {
+                if (transferFormats.indexOf(requestedTransferFormat) >= 0) {
+                    if ((transport === Transports.TransportType.WebSockets && typeof WebSocket === "undefined") ||
+                        (transport === Transports.TransportType.ServerSentEvents && typeof EventSource === "undefined")) {
+                        this.logger.log(ILogger.LogLevel.Trace, "Skipping transport '" + Transports.TransportType[transport] + "' because it is not supported in your environment.'");
+                    }
+                    else {
+                        this.logger.log(ILogger.LogLevel.Trace, "Selecting transport '" + Transports.TransportType[transport] + "'");
+                        return transport;
+                    }
+                }
+                else {
+                    this.logger.log(ILogger.LogLevel.Trace, "Skipping transport '" + Transports.TransportType[transport] + "' because it does not support the requested transfer format '" + Transports.TransferFormat[requestedTransferFormat] + "'.");
+                }
+            }
+            else {
+                this.logger.log(ILogger.LogLevel.Trace, "Skipping transport '" + Transports.TransportType[transport] + "' because it was disabled by the client.");
+            }
         }
-        if (transport === Transports.TransportType.LongPolling && availableTransports.indexOf(Transports.TransportType[transport]) >= 0) {
-            return new Transports.LongPollingTransport(this.httpClient, this.options.accessTokenFactory, this.logger);
-        }
-        if (this.isITransport(transport)) {
-            return transport;
-        }
-        throw new Error("No available transports found.");
+        return null;
     };
     HttpConnection.prototype.isITransport = function (transport) {
         return typeof (transport) === "object" && "connect" in transport;
     };
     HttpConnection.prototype.changeState = function (from, to) {
-        if (this.connectionState == from) {
+        if (this.connectionState === from) {
             this.connectionState = to;
             return true;
         }
         return false;
     };
     HttpConnection.prototype.send = function (data) {
-        if (this.connectionState != 1 /* Connected */) {
-            throw new Error("Cannot send data if the connection is not in the 'Connected' State");
+        if (this.connectionState !== 1 /* Connected */) {
+            throw new Error("Cannot send data if the connection is not in the 'Connected' State.");
         }
         return this.transport.send(data);
     };
     HttpConnection.prototype.stop = function (error) {
         return __awaiter(this, void 0, void 0, function () {
-            var previousState, e_2;
+            var previousState, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -1961,10 +2150,10 @@ var HttpConnection = /** @class */ (function () {
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 3:
-                        e_2 = _a.sent();
+                        e_3 = _a.sent();
                         return [3 /*break*/, 4];
                     case 4:
-                        this.stopConnection(/*raiseClosed*/ previousState == 1 /* Connected */, error);
+                        this.stopConnection(/*raiseClosed*/ previousState === 1 /* Connected */, error);
                         return [2 /*return*/];
                 }
             });
@@ -1991,7 +2180,7 @@ var HttpConnection = /** @class */ (function () {
         if (url.lastIndexOf("https://", 0) === 0 || url.lastIndexOf("http://", 0) === 0) {
             return url;
         }
-        if (typeof window === 'undefined' || !window || !window.document) {
+        if (typeof window === "undefined" || !window || !window.document) {
             throw new Error("Cannot resolve '" + url + "'.");
         }
         var parser = window.document.createElement("a");
@@ -1999,11 +2188,11 @@ var HttpConnection = /** @class */ (function () {
         var baseUrl = (!parser.protocol || parser.protocol === ":")
             ? window.document.location.protocol + "//" + (parser.host || window.document.location.host)
             : parser.protocol + "//" + parser.host;
-        if (!url || url[0] != '/') {
-            url = '/' + url;
+        if (!url || url[0] !== "/") {
+            url = "/" + url;
         }
         var normalizedUrl = baseUrl + url;
-        this.logger.log(ILogger.LogLevel.Information, "Normalizing '" + url + "' to '" + normalizedUrl + "'");
+        this.logger.log(ILogger.LogLevel.Information, "Normalizing '" + url + "' to '" + normalizedUrl + "'.");
         return normalizedUrl;
     };
     HttpConnection.prototype.resolveNegotiateUrl = function (url) {
@@ -2024,6 +2213,126 @@ exports.HttpConnection = HttpConnection;
 
 unwrapExports(HttpConnection_1);
 var HttpConnection_2 = HttpConnection_1.HttpConnection;
+
+var TextMessageFormat_1 = createCommonjsModule(function (module, exports) {
+Object.defineProperty(exports, "__esModule", { value: true });
+var TextMessageFormat = /** @class */ (function () {
+    function TextMessageFormat() {
+    }
+    TextMessageFormat.write = function (output) {
+        return "" + output + TextMessageFormat.RecordSeparator;
+    };
+    TextMessageFormat.parse = function (input) {
+        if (input[input.length - 1] !== TextMessageFormat.RecordSeparator) {
+            throw new Error("Message is incomplete.");
+        }
+        var messages = input.split(TextMessageFormat.RecordSeparator);
+        messages.pop();
+        return messages;
+    };
+    TextMessageFormat.RecordSeparatorCode = 0x1e;
+    TextMessageFormat.RecordSeparator = String.fromCharCode(TextMessageFormat.RecordSeparatorCode);
+    return TextMessageFormat;
+}());
+exports.TextMessageFormat = TextMessageFormat;
+
+});
+
+unwrapExports(TextMessageFormat_1);
+var TextMessageFormat_2 = TextMessageFormat_1.TextMessageFormat;
+
+var JsonHubProtocol_1 = createCommonjsModule(function (module, exports) {
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+exports.JSON_HUB_PROTOCOL_NAME = "json";
+var JsonHubProtocol = /** @class */ (function () {
+    function JsonHubProtocol() {
+        this.name = exports.JSON_HUB_PROTOCOL_NAME;
+        this.version = 1;
+        this.transferFormat = Transports.TransferFormat.Text;
+    }
+    JsonHubProtocol.prototype.parseMessages = function (input, logger) {
+        if (!input) {
+            return [];
+        }
+        if (logger === null) {
+            logger = new Loggers.NullLogger();
+        }
+        // Parse the messages
+        var messages = TextMessageFormat_1.TextMessageFormat.parse(input);
+        var hubMessages = [];
+        for (var _i = 0, messages_1 = messages; _i < messages_1.length; _i++) {
+            var message = messages_1[_i];
+            var parsedMessage = JSON.parse(message);
+            if (typeof parsedMessage.type !== "number") {
+                throw new Error("Invalid payload.");
+            }
+            switch (parsedMessage.type) {
+                case 1 /* Invocation */:
+                    this.isInvocationMessage(parsedMessage);
+                    break;
+                case 2 /* StreamItem */:
+                    this.isStreamItemMessage(parsedMessage);
+                    break;
+                case 3 /* Completion */:
+                    this.isCompletionMessage(parsedMessage);
+                    break;
+                case 6 /* Ping */:
+                    // Single value, no need to validate
+                    break;
+                case 7 /* Close */:
+                    // All optional values, no need to validate
+                    break;
+                default:
+                    // Future protocol changes can add message types, old clients can ignore them
+                    logger.log(ILogger.LogLevel.Information, "Unknown message type '" + parsedMessage.type + "' ignored.");
+                    continue;
+            }
+            hubMessages.push(parsedMessage);
+        }
+        return hubMessages;
+    };
+    JsonHubProtocol.prototype.writeMessage = function (message) {
+        return TextMessageFormat_1.TextMessageFormat.write(JSON.stringify(message));
+    };
+    JsonHubProtocol.prototype.isInvocationMessage = function (message) {
+        this.assertNotEmptyString(message.target, "Invalid payload for Invocation message.");
+        if (message.invocationId !== undefined) {
+            this.assertNotEmptyString(message.invocationId, "Invalid payload for Invocation message.");
+        }
+    };
+    JsonHubProtocol.prototype.isStreamItemMessage = function (message) {
+        this.assertNotEmptyString(message.invocationId, "Invalid payload for StreamItem message.");
+        if (message.item === undefined) {
+            throw new Error("Invalid payload for StreamItem message.");
+        }
+    };
+    JsonHubProtocol.prototype.isCompletionMessage = function (message) {
+        if (message.result && message.error) {
+            throw new Error("Invalid payload for Completion message.");
+        }
+        if (!message.result && message.error) {
+            this.assertNotEmptyString(message.error, "Invalid payload for Completion message.");
+        }
+        this.assertNotEmptyString(message.invocationId, "Invalid payload for Completion message.");
+    };
+    JsonHubProtocol.prototype.assertNotEmptyString = function (value, errorMessage) {
+        if (typeof value !== "string" || value === "") {
+            throw new Error(errorMessage);
+        }
+    };
+    return JsonHubProtocol;
+}());
+exports.JsonHubProtocol = JsonHubProtocol;
+
+});
+
+unwrapExports(JsonHubProtocol_1);
+var JsonHubProtocol_2 = JsonHubProtocol_1.JSON_HUB_PROTOCOL_NAME;
+var JsonHubProtocol_3 = JsonHubProtocol_1.JsonHubProtocol;
 
 var Observable = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2085,119 +2394,6 @@ unwrapExports(Observable);
 var Observable_1 = Observable.Subscription;
 var Observable_2 = Observable.Subject;
 
-var TextMessageFormat_1 = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var TextMessageFormat = /** @class */ (function () {
-    function TextMessageFormat() {
-    }
-    TextMessageFormat.write = function (output) {
-        return "" + output + TextMessageFormat.RecordSeparator;
-    };
-    TextMessageFormat.parse = function (input) {
-        if (input[input.length - 1] != TextMessageFormat.RecordSeparator) {
-            throw new Error("Message is incomplete.");
-        }
-        var messages = input.split(TextMessageFormat.RecordSeparator);
-        messages.pop();
-        return messages;
-    };
-    TextMessageFormat.RecordSeparator = String.fromCharCode(0x1e);
-    return TextMessageFormat;
-}());
-exports.TextMessageFormat = TextMessageFormat;
-
-});
-
-unwrapExports(TextMessageFormat_1);
-var TextMessageFormat_2 = TextMessageFormat_1.TextMessageFormat;
-
-var JsonHubProtocol_1 = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-
-exports.JSON_HUB_PROTOCOL_NAME = "json";
-var JsonHubProtocol = /** @class */ (function () {
-    function JsonHubProtocol() {
-        this.name = exports.JSON_HUB_PROTOCOL_NAME;
-        this.type = 1 /* Text */;
-    }
-    JsonHubProtocol.prototype.parseMessages = function (input) {
-        if (!input) {
-            return [];
-        }
-        // Parse the messages
-        var messages = TextMessageFormat_1.TextMessageFormat.parse(input);
-        var hubMessages = [];
-        for (var i = 0; i < messages.length; ++i) {
-            hubMessages.push(JSON.parse(messages[i]));
-        }
-        return hubMessages;
-    };
-    JsonHubProtocol.prototype.writeMessage = function (message) {
-        return TextMessageFormat_1.TextMessageFormat.write(JSON.stringify(message));
-    };
-    return JsonHubProtocol;
-}());
-exports.JsonHubProtocol = JsonHubProtocol;
-
-});
-
-unwrapExports(JsonHubProtocol_1);
-var JsonHubProtocol_2 = JsonHubProtocol_1.JSON_HUB_PROTOCOL_NAME;
-var JsonHubProtocol_3 = JsonHubProtocol_1.JsonHubProtocol;
-
-var Base64EncodedHubProtocol_1 = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var Base64EncodedHubProtocol = /** @class */ (function () {
-    function Base64EncodedHubProtocol(protocol) {
-        this.wrappedProtocol = protocol;
-        this.name = this.wrappedProtocol.name;
-        this.type = 1 /* Text */;
-    }
-    Base64EncodedHubProtocol.prototype.parseMessages = function (input) {
-        // The format of the message is `size:message;`
-        var pos = input.indexOf(":");
-        if (pos == -1 || input[input.length - 1] != ';') {
-            throw new Error("Invalid payload.");
-        }
-        var lenStr = input.substring(0, pos);
-        if (!/^[0-9]+$/.test(lenStr)) {
-            throw new Error("Invalid length: '" + lenStr + "'");
-        }
-        var messageSize = parseInt(lenStr, 10);
-        // 2 accounts for ':' after message size and trailing ';'
-        if (messageSize != input.length - pos - 2) {
-            throw new Error("Invalid message size.");
-        }
-        var encodedMessage = input.substring(pos + 1, input.length - 1);
-        // atob/btoa are browsers APIs but they can be polyfilled. If this becomes problematic we can use
-        // base64-js module
-        var s = atob(encodedMessage);
-        var payload = new Uint8Array(s.length);
-        for (var i = 0; i < payload.length; i++) {
-            payload[i] = s.charCodeAt(i);
-        }
-        return this.wrappedProtocol.parseMessages(payload.buffer);
-    };
-    Base64EncodedHubProtocol.prototype.writeMessage = function (message) {
-        var payload = new Uint8Array(this.wrappedProtocol.writeMessage(message));
-        var s = "";
-        for (var i = 0; i < payload.byteLength; i++) {
-            s += String.fromCharCode(payload[i]);
-        }
-        // atob/btoa are browsers APIs but they can be polyfilled. If this becomes problematic we can use
-        // base64-js module
-        var encodedMessage = btoa(s);
-        return encodedMessage.length.toString() + ":" + encodedMessage + ";";
-    };
-    return Base64EncodedHubProtocol;
-}());
-exports.Base64EncodedHubProtocol = Base64EncodedHubProtocol;
-
-});
-
-unwrapExports(Base64EncodedHubProtocol_1);
-var Base64EncodedHubProtocol_2 = Base64EncodedHubProtocol_1.Base64EncodedHubProtocol;
-
 var HubConnection_1 = createCommonjsModule(function (module, exports) {
 var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2242,7 +2438,6 @@ exports.JsonHubProtocol = JsonHubProtocol_1.JsonHubProtocol;
 
 
 
-
 var DEFAULT_TIMEOUT_IN_MS = 30 * 1000;
 var HubConnection = /** @class */ (function () {
     function HubConnection(urlOrConnection, options) {
@@ -2250,6 +2445,7 @@ var HubConnection = /** @class */ (function () {
         var _this = this;
         options = options || {};
         this.timeoutInMilliseconds = options.timeoutInMilliseconds || DEFAULT_TIMEOUT_IN_MS;
+        this.protocol = options.protocol || new JsonHubProtocol_1.JsonHubProtocol();
         if (typeof urlOrConnection === "string") {
             this.connection = new HttpConnection_1.HttpConnection(urlOrConnection, options);
         }
@@ -2257,45 +2453,106 @@ var HubConnection = /** @class */ (function () {
             this.connection = urlOrConnection;
         }
         this.logger = Loggers.LoggerFactory.createLogger(options.logger);
-        this.protocol = options.protocol || new JsonHubProtocol_1.JsonHubProtocol();
         this.connection.onreceive = function (data) { return _this.processIncomingData(data); };
         this.connection.onclose = function (error) { return _this.connectionClosed(error); };
-        this.callbacks = new Map();
-        this.methods = new Map();
+        this.callbacks = {};
+        this.methods = {};
         this.closedCallbacks = [];
         this.id = 0;
     }
     HubConnection.prototype.processIncomingData = function (data) {
-        if (this.timeoutHandle !== undefined) {
-            clearTimeout(this.timeoutHandle);
+        this.cleanupTimeout();
+        if (!this.receivedHandshakeResponse) {
+            data = this.processHandshakeResponse(data);
+            this.receivedHandshakeResponse = true;
         }
-        // Parse the messages
-        var messages = this.protocol.parseMessages(data);
-        for (var i = 0; i < messages.length; ++i) {
-            var message = messages[i];
-            switch (message.type) {
-                case 1 /* Invocation */:
-                    this.invokeClientMethod(message);
-                    break;
-                case 2 /* StreamItem */:
-                case 3 /* Completion */:
-                    var callback = this.callbacks.get(message.invocationId);
-                    if (callback != null) {
-                        if (message.type === 3 /* Completion */) {
-                            this.callbacks.delete(message.invocationId);
+        // Data may have all been read when processing handshake response
+        if (data) {
+            // Parse the messages
+            var messages = this.protocol.parseMessages(data, this.logger);
+            for (var _i = 0, messages_1 = messages; _i < messages_1.length; _i++) {
+                var message = messages_1[_i];
+                switch (message.type) {
+                    case 1 /* Invocation */:
+                        this.invokeClientMethod(message);
+                        break;
+                    case 2 /* StreamItem */:
+                    case 3 /* Completion */:
+                        var callback = this.callbacks[message.invocationId];
+                        if (callback != null) {
+                            if (message.type === 3 /* Completion */) {
+                                delete this.callbacks[message.invocationId];
+                            }
+                            callback(message);
                         }
-                        callback(message);
-                    }
-                    break;
-                case 6 /* Ping */:
-                    // Don't care about pings
-                    break;
-                default:
-                    this.logger.log(ILogger.LogLevel.Warning, "Invalid message type: " + data);
-                    break;
+                        break;
+                    case 6 /* Ping */:
+                        // Don't care about pings
+                        break;
+                    case 7 /* Close */:
+                        this.logger.log(ILogger.LogLevel.Information, "Close message received from server.");
+                        this.connection.stop(message.error ? new Error("Server returned an error on close: " + message.error) : null);
+                        break;
+                    default:
+                        this.logger.log(ILogger.LogLevel.Warning, "Invalid message type: " + message.type);
+                        break;
+                }
             }
         }
         this.configureTimeout();
+    };
+    HubConnection.prototype.processHandshakeResponse = function (data) {
+        var responseMessage;
+        var messageData;
+        var remainingData;
+        try {
+            if (data instanceof ArrayBuffer) {
+                // Format is binary but still need to read JSON text from handshake response
+                var binaryData = new Uint8Array(data);
+                var separatorIndex = binaryData.indexOf(TextMessageFormat_1.TextMessageFormat.RecordSeparatorCode);
+                if (separatorIndex === -1) {
+                    throw new Error("Message is incomplete.");
+                }
+                // content before separator is handshake response
+                // optional content after is additional messages
+                var responseLength = separatorIndex + 1;
+                messageData = String.fromCharCode.apply(null, binaryData.slice(0, responseLength));
+                remainingData = (binaryData.byteLength > responseLength) ? binaryData.slice(responseLength).buffer : null;
+            }
+            else {
+                var textData = data;
+                var separatorIndex = textData.indexOf(TextMessageFormat_1.TextMessageFormat.RecordSeparator);
+                if (separatorIndex === -1) {
+                    throw new Error("Message is incomplete.");
+                }
+                // content before separator is handshake response
+                // optional content after is additional messages
+                var responseLength = separatorIndex + 1;
+                messageData = textData.substring(0, responseLength);
+                remainingData = (textData.length > responseLength) ? textData.substring(responseLength) : null;
+            }
+            // At this point we should have just the single handshake message
+            var messages = TextMessageFormat_1.TextMessageFormat.parse(messageData);
+            responseMessage = JSON.parse(messages[0]);
+        }
+        catch (e) {
+            var message = "Error parsing handshake response: " + e;
+            this.logger.log(ILogger.LogLevel.Error, message);
+            var error = new Error(message);
+            this.connection.stop(error);
+            throw error;
+        }
+        if (responseMessage.error) {
+            var message = "Server returned handshake error: " + responseMessage.error;
+            this.logger.log(ILogger.LogLevel.Error, message);
+            this.connection.stop(new Error(message));
+        }
+        else {
+            this.logger.log(ILogger.LogLevel.Trace, "Server handshake complete.");
+        }
+        // multiple messages could have arrived with handshake
+        // return additional data to be parsed as usual, or null if all parsed
+        return remainingData;
     };
     HubConnection.prototype.configureTimeout = function () {
         var _this = this;
@@ -2311,7 +2568,7 @@ var HubConnection = /** @class */ (function () {
     };
     HubConnection.prototype.invokeClientMethod = function (invocationMessage) {
         var _this = this;
-        var methods = this.methods.get(invocationMessage.target.toLowerCase());
+        var methods = this.methods[invocationMessage.target.toLowerCase()];
         if (methods) {
             methods.forEach(function (m) { return m.apply(_this, invocationMessage.arguments); });
             if (invocationMessage.invocationId) {
@@ -2327,34 +2584,35 @@ var HubConnection = /** @class */ (function () {
     };
     HubConnection.prototype.connectionClosed = function (error) {
         var _this = this;
-        this.callbacks.forEach(function (callback) {
+        var callbacks = this.callbacks;
+        this.callbacks = {};
+        Object.keys(callbacks)
+            .forEach(function (key) {
+            var callback = callbacks[key];
             callback(undefined, error ? error : new Error("Invocation canceled due to connection being closed."));
         });
-        this.callbacks.clear();
-        this.closedCallbacks.forEach(function (c) { return c.apply(_this, [error]); });
         this.cleanupTimeout();
+        this.closedCallbacks.forEach(function (c) { return c.apply(_this, [error]); });
     };
     HubConnection.prototype.start = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var requestedTransferMode, actualTransferMode;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        requestedTransferMode = (this.protocol.type === 2 /* Binary */)
-                            ? 2 /* Binary */
-                            : 1 /* Text */;
-                        this.connection.features.transferMode = requestedTransferMode;
-                        return [4 /*yield*/, this.connection.start()];
+                        this.logger.log(ILogger.LogLevel.Trace, "Starting HubConnection.");
+                        this.receivedHandshakeResponse = false;
+                        return [4 /*yield*/, this.connection.start(this.protocol.transferFormat)];
                     case 1:
                         _a.sent();
-                        actualTransferMode = this.connection.features.transferMode;
-                        return [4 /*yield*/, this.connection.send(TextMessageFormat_1.TextMessageFormat.write(JSON.stringify({ protocol: this.protocol.name })))];
+                        this.logger.log(ILogger.LogLevel.Trace, "Sending handshake request.");
+                        // Handshake request is always JSON
+                        return [4 /*yield*/, this.connection.send(TextMessageFormat_1.TextMessageFormat.write(JSON.stringify({ protocol: this.protocol.name, version: this.protocol.version })))];
                     case 2:
+                        // Handshake request is always JSON
                         _a.sent();
                         this.logger.log(ILogger.LogLevel.Information, "Using HubProtocol '" + this.protocol.name + "'.");
-                        if (requestedTransferMode === 2 /* Binary */ && actualTransferMode === 1 /* Text */) {
-                            this.protocol = new Base64EncodedHubProtocol_1.Base64EncodedHubProtocol(this.protocol);
-                        }
+                        // defensively cleanup timeout in case we receive a message from the server before we finish start
+                        this.cleanupTimeout();
                         this.configureTimeout();
                         return [2 /*return*/];
                 }
@@ -2362,6 +2620,7 @@ var HubConnection = /** @class */ (function () {
         });
     };
     HubConnection.prototype.stop = function () {
+        this.logger.log(ILogger.LogLevel.Trace, "Stopping HubConnection.");
         this.cleanupTimeout();
         return this.connection.stop();
     };
@@ -2374,33 +2633,32 @@ var HubConnection = /** @class */ (function () {
         var invocationDescriptor = this.createStreamInvocation(methodName, args);
         var subject = new Observable.Subject(function () {
             var cancelInvocation = _this.createCancelInvocation(invocationDescriptor.invocationId);
-            var message = _this.protocol.writeMessage(cancelInvocation);
-            _this.callbacks.delete(invocationDescriptor.invocationId);
-            return _this.connection.send(message);
+            var cancelMessage = _this.protocol.writeMessage(cancelInvocation);
+            delete _this.callbacks[invocationDescriptor.invocationId];
+            return _this.connection.send(cancelMessage);
         });
-        this.callbacks.set(invocationDescriptor.invocationId, function (invocationEvent, error) {
+        this.callbacks[invocationDescriptor.invocationId] = function (invocationEvent, error) {
             if (error) {
                 subject.error(error);
                 return;
             }
             if (invocationEvent.type === 3 /* Completion */) {
-                var completionMessage = invocationEvent;
-                if (completionMessage.error) {
-                    subject.error(new Error(completionMessage.error));
+                if (invocationEvent.error) {
+                    subject.error(new Error(invocationEvent.error));
                 }
                 else {
                     subject.complete();
                 }
             }
             else {
-                subject.next(invocationEvent.item);
+                subject.next((invocationEvent.item));
             }
-        });
+        };
         var message = this.protocol.writeMessage(invocationDescriptor);
         this.connection.send(message)
             .catch(function (e) {
             subject.error(e);
-            _this.callbacks.delete(invocationDescriptor.invocationId);
+            delete _this.callbacks[invocationDescriptor.invocationId];
         });
         return subject;
     };
@@ -2421,7 +2679,7 @@ var HubConnection = /** @class */ (function () {
         }
         var invocationDescriptor = this.createInvocation(methodName, args, false);
         var p = new Promise(function (resolve, reject) {
-            _this.callbacks.set(invocationDescriptor.invocationId, function (invocationEvent, error) {
+            _this.callbacks[invocationDescriptor.invocationId] = function (invocationEvent, error) {
                 if (error) {
                     reject(error);
                     return;
@@ -2438,38 +2696,50 @@ var HubConnection = /** @class */ (function () {
                 else {
                     reject(new Error("Unexpected message type: " + invocationEvent.type));
                 }
-            });
+            };
             var message = _this.protocol.writeMessage(invocationDescriptor);
             _this.connection.send(message)
                 .catch(function (e) {
                 reject(e);
-                _this.callbacks.delete(invocationDescriptor.invocationId);
+                delete _this.callbacks[invocationDescriptor.invocationId];
             });
         });
         return p;
     };
-    HubConnection.prototype.on = function (methodName, method) {
-        if (!methodName || !method) {
+    HubConnection.prototype.on = function (methodName, newMethod) {
+        if (!methodName || !newMethod) {
             return;
         }
         methodName = methodName.toLowerCase();
-        if (!this.methods.has(methodName)) {
-            this.methods.set(methodName, []);
+        if (!this.methods[methodName]) {
+            this.methods[methodName] = [];
         }
-        this.methods.get(methodName).push(method);
+        // Preventing adding the same handler multiple times.
+        if (this.methods[methodName].indexOf(newMethod) !== -1) {
+            return;
+        }
+        this.methods[methodName].push(newMethod);
     };
     HubConnection.prototype.off = function (methodName, method) {
-        if (!methodName || !method) {
+        if (!methodName) {
             return;
         }
         methodName = methodName.toLowerCase();
-        var handlers = this.methods.get(methodName);
+        var handlers = this.methods[methodName];
         if (!handlers) {
             return;
         }
-        var removeIdx = handlers.indexOf(method);
-        if (removeIdx != -1) {
-            handlers.splice(removeIdx, 1);
+        if (method) {
+            var removeIdx = handlers.indexOf(method);
+            if (removeIdx !== -1) {
+                handlers.splice(removeIdx, 1);
+                if (handlers.length === 0) {
+                    delete this.methods[methodName];
+                }
+            }
+        }
+        else {
+            delete this.methods[methodName];
         }
     };
     HubConnection.prototype.onclose = function (callback) {
@@ -2485,19 +2755,19 @@ var HubConnection = /** @class */ (function () {
     HubConnection.prototype.createInvocation = function (methodName, args, nonblocking) {
         if (nonblocking) {
             return {
-                type: 1 /* Invocation */,
-                target: methodName,
                 arguments: args,
+                target: methodName,
+                type: 1 /* Invocation */,
             };
         }
         else {
             var id = this.id;
             this.id++;
             return {
-                type: 1 /* Invocation */,
+                arguments: args,
                 invocationId: id.toString(),
                 target: methodName,
-                arguments: args,
+                type: 1 /* Invocation */,
             };
         }
     };
@@ -2505,16 +2775,16 @@ var HubConnection = /** @class */ (function () {
         var id = this.id;
         this.id++;
         return {
-            type: 4 /* StreamInvocation */,
+            arguments: args,
             invocationId: id.toString(),
             target: methodName,
-            arguments: args,
+            type: 4 /* StreamInvocation */,
         };
     };
     HubConnection.prototype.createCancelInvocation = function (id) {
         return {
-            type: 5 /* CancelInvocation */,
             invocationId: id,
+            type: 5 /* CancelInvocation */,
         };
     };
     return HubConnection;

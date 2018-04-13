@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using DotNetify;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
+using System.Threading;
 
 namespace UnitTests
 {
@@ -84,6 +86,12 @@ namespace UnitTests
             Hub.GetType().GetMethod(method).Invoke(Hub, args);
             return Task.CompletedTask;
          }
+
+         public Task SendCoreAsync(string method, object[] args)
+         {
+            Hub.GetType().GetMethod(method).Invoke(Hub, (object[])args[0]);
+            return Task.CompletedTask;
+         }
       }
 
       private class MockHubConnectionContext : HubConnectionContext
@@ -100,6 +108,33 @@ namespace UnitTests
          public override string ConnectionId => _mockConnectionId;
       }
 
+      private class MockHubCallerContext : HubCallerContext
+      {
+         private readonly HubConnectionContext _connectionContext;
+
+         public MockHubCallerContext(HubConnectionContext connectionContext) : base()
+         {
+            _connectionContext = connectionContext;
+         }
+
+         public override string ConnectionId => _connectionContext.ConnectionId;
+
+         public override string UserIdentifier => _connectionContext.User.Identity.Name;
+
+         public override ClaimsPrincipal User => _connectionContext.User;
+
+         public override IDictionary<object, object> Items => throw new NotImplementedException();
+
+         public override IFeatureCollection Features => throw new NotImplementedException();
+
+         public override CancellationToken ConnectionAborted => throw new NotImplementedException();
+
+         public override void Abort()
+         {
+            throw new NotImplementedException();
+         }
+      }
+
       public MockDotNetifyHub Create()
       {
          _hub = new DotNetifyHub(
@@ -109,7 +144,7 @@ namespace UnitTests
             new HubPipeline(_middlewareFactories, _vmFilterFactories),
             new MockHubContext() { MockHubClients = new MockHubClients { MockClientProxy = new MockClientProxy { Hub = this } } })
          {
-            Context = new HubCallerContext(new MockHubConnectionContext(ConnectionId))
+            Context = new MockHubCallerContext(new MockHubConnectionContext(ConnectionId))
          };
          return this;
       }

@@ -1,4 +1,4 @@
-var JobQueueVM = (function () {
+var JobQueueVM = /** @class */ (function () {
     function JobQueueVM() {
         this._jobID = "";
         this._jobOutput = "";
