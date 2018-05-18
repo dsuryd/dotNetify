@@ -35,7 +35,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
    (function ($, defaultSignalR, window) {
 
       dotnetifyHub = $.extend(dotnetifyHub, {
-         version: "1.1.1-beta",
+         version: "1.2.0",
          type: null,
          _init: false,
 
@@ -89,7 +89,7 @@ var dotnetifyHub = typeof dotnetifyHub === "undefined" ? {} : dotnetifyHub;
                   Object.keys(iHubOptions).forEach(function (key) { hubOptions[key] = iHubOptions[key] });
                   hubOptions.transport = iTransportArray.shift();
 
-                  dotnetifyHub._connection = new signalR.HubConnection(url, hubOptions);
+                  dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
                   dotnetifyHub._connection.on("response_vm", dotnetifyHub.client.response_VM);
                   dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 

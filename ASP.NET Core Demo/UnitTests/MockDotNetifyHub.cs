@@ -92,6 +92,11 @@ namespace UnitTests
             Hub.GetType().GetMethod(method).Invoke(Hub, (object[])args[0]);
             return Task.CompletedTask;
          }
+
+         public Task SendCoreAsync(string method, object[] args, CancellationToken cancellationToken = default(CancellationToken))
+         {
+            return SendCoreAsync(method, args);
+         }
       }
 
       private class MockHubConnectionContext : HubConnectionContext
