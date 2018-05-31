@@ -13,11 +13,12 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Dicky Suryadi</Authors>
     <Description>Simple, lightweight, yet powerful way to build reactive, real-time web apps. SignalR hub for ASP.NET Core.</Description>
-    <Copyright>Copyright 2015-</Copyright>
+    <Copyright>Copyright 2015-2018</Copyright>
     <PackageLicenseUrl>https://github.com/dsuryd/dotNetify/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>http://dotnetify.net/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageTags>netcore reactive realtime signalr mobile web websocket</PackageTags>
+    <PackageIconUrl>http://dotnetify.net/content/images/dotnetify_128.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>

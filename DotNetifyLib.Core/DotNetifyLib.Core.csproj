@@ -15,9 +15,10 @@
     <Authors>Dicky Suryadi</Authors>
     <PackageProjectUrl>http://dotnetify.net/</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/dsuryd/dotNetify/blob/master/LICENSE.md</PackageLicenseUrl>
-    <Copyright>Copyright 2015-</Copyright>
+    <Copyright>Copyright 2015-2018</Copyright>
     <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageTags>netcore reactive realtime signalr mobile web websocket</PackageTags>
+    <PackageIconUrl>http://dotnetify.net/content/images/dotnetify_128.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
