@@ -123,7 +123,7 @@ namespace DotNetify
       /// <returns>Reactive property.</returns>
       public static ReactiveProperty<T> AddProperty<T>(this IReactiveProperties vm, string propertyName, T propertyValue)
       {
-         var prop = new ReactiveProperty<T>(propertyName, propertyValue);
+         var prop = new ReactiveProperty<T>(vm, propertyName, propertyValue);
          vm.RuntimeProperties.Add(prop);
          return prop;
       }
@@ -137,7 +137,7 @@ namespace DotNetify
       /// <returns>Reactive property.</returns>
       public static ReactiveProperty<T> AddProperty<T>(this IReactiveProperties vm, string propertyName)
       {
-         var prop = new ReactiveProperty<T>(propertyName);
+         var prop = new ReactiveProperty<T>(vm, propertyName);
          vm.RuntimeProperties.Add(prop);
          return prop;
       }

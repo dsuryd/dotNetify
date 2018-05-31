@@ -70,6 +70,9 @@ namespace DotNetify
          }
       }
 
+      // View model that owns this property.
+      public IReactiveProperties ViewModel { get; }
+
       /// <summary>
       /// Property type.
       /// </summary>
@@ -97,21 +100,25 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Constructor accepting property name.
+      /// Constructor accepting property's view model and property name.
       /// </summary>
+      /// <param name="viewModel">View model that owns the property.</param>
       /// <param name="name">Property name.</param>
-      public ReactiveProperty(string name) : this()
+      public ReactiveProperty(IReactiveProperties viewModel, string name) : this()
       {
+         ViewModel = viewModel;
          Name = name;
       }
 
       /// <summary>
-      /// Constructor accepting property name and initial property value.
+      /// Constructor accepting property's view model, property name and initial property value.
       /// </summary>
+      /// <param name="viewModel">View model that owns the property.</param>
       /// <param name="name">Property name.</param>
       /// <param name="value">Initial value.</param>
-      public ReactiveProperty(string name, T value) : this(value)
+      public ReactiveProperty(IReactiveProperties viewModel, string name, T value) : this(value)
       {
+         ViewModel = viewModel;
          Name = name;
       }
 

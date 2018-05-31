@@ -1,6 +1,6 @@
 {
    "name": "dotnetify",
-   "version": "3.0.1-pre",
+   "version": "3.0.1",
    "description": "Simple, lightweight, yet powerful way to build realtime .NET web apps.",
    "main": "index.js",
    "files": [

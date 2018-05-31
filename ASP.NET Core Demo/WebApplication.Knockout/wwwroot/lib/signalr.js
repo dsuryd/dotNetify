@@ -1,4 +1,7 @@
-/* @license
+/** 
+ * @overview ASP.NET Core SignalR JavaScript Client.
+ * @version 1.0.0.
+ * @license
  * Copyright (c) .NET Foundation. All rights reserved.
  * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
  */
@@ -21,6 +24,208 @@ function unwrapExports (x) {
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = Object.setPrototypeOf ||
+    ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+    function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+
+function __extends(d, b) {
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = Object.assign || function __assign(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+    }
+    return t;
+};
+
+function __rest(s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
+            t[p[i]] = s[p[i]];
+    return t;
+}
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+function __param(paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+}
+
+function __metadata(metadataKey, metadataValue) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+function __exportStar(m, exports) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+
+function __values(o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+}
+
+function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+}
+
+function __spread() {
+    for (var ar = [], i = 0; i < arguments.length; i++)
+        ar = ar.concat(__read(arguments[i]));
+    return ar;
+}
+
+function __await(v) {
+    return this instanceof __await ? (this.v = v, this) : new __await(v);
+}
+
+function __asyncGenerator(thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);  }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+}
+
+function __asyncDelegator(o) {
+    var i, p;
+    return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
+    function verb(n, f) { if (o[n]) i[n] = function (v) { return (p = !p) ? { value: __await(o[n](v)), done: n === "return" } : f ? f(v) : v; }; }
+}
+
+function __asyncValues(o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator];
+    return m ? m.call(o) : typeof __values === "function" ? __values(o) : o[Symbol.iterator]();
+}
+
+function __makeTemplateObject(cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+}
+
+function __importStar(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result.default = mod;
+    return result;
+}
+
+function __importDefault(mod) {
+    return (mod && mod.__esModule) ? mod : { default: mod };
+}
+
+
+var tslib_1 = Object.freeze({
+	__extends: __extends,
+	__assign: __assign,
+	__rest: __rest,
+	__decorate: __decorate,
+	__param: __param,
+	__metadata: __metadata,
+	__awaiter: __awaiter,
+	__generator: __generator,
+	__exportStar: __exportStar,
+	__values: __values,
+	__read: __read,
+	__spread: __spread,
+	__await: __await,
+	__asyncGenerator: __asyncGenerator,
+	__asyncDelegator: __asyncDelegator,
+	__asyncValues: __asyncValues,
+	__makeTemplateObject: __makeTemplateObject,
+	__importStar: __importStar,
+	__importDefault: __importDefault
+});
 
 var es6Promise_auto = createCommonjsModule(function (module, exports) {
 /*!
@@ -1214,19 +1419,16 @@ return Promise$2;
 });
 
 var Errors = createCommonjsModule(function (module, exports) {
-var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
+
+/** Error thrown when an HTTP request fails. */
 var HttpError = /** @class */ (function (_super) {
-    __extends(HttpError, _super);
+    tslib_1.__extends(HttpError, _super);
+    /** Constructs a new instance of {@link HttpError}.
+     *
+     * @param {string} errorMessage A descriptive error message.
+     * @param {number} statusCode The HTTP status code represented by this error.
+     */
     function HttpError(errorMessage, statusCode) {
         var _newTarget = this.constructor;
         var _this = this;
@@ -1241,8 +1443,13 @@ var HttpError = /** @class */ (function (_super) {
     return HttpError;
 }(Error));
 exports.HttpError = HttpError;
+/** Error thrown when a timeout elapses. */
 var TimeoutError = /** @class */ (function (_super) {
-    __extends(TimeoutError, _super);
+    tslib_1.__extends(TimeoutError, _super);
+    /** Constructs a new instance of {@link TimeoutError}.
+     *
+     * @param {string} errorMessage A descriptive error message.
+     */
     function TimeoutError(errorMessage) {
         var _newTarget = this.constructor;
         if (errorMessage === void 0) { errorMessage = "A timeout occurred."; }
@@ -1267,14 +1474,25 @@ var Errors_2 = Errors.TimeoutError;
 var ILogger = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // These values are designed to match the ASP.NET Log Levels since that's the pattern we're emulating here.
+/** Indicates the severity of a log message.
+ *
+ * Log Levels are ordered in increasing severity. So `Debug` is more severe than `Trace`, etc.
+ */
 var LogLevel;
 (function (LogLevel) {
+    /** Log level for very low severity diagnostic messages. */
     LogLevel[LogLevel["Trace"] = 0] = "Trace";
+    /** Log level for low severity diagnostic messages. */
     LogLevel[LogLevel["Debug"] = 1] = "Debug";
+    /** Log level for informational diagnostic messages. */
     LogLevel[LogLevel["Information"] = 2] = "Information";
+    /** Log level for diagnostic messages that indicate a non-fatal problem. */
     LogLevel[LogLevel["Warning"] = 3] = "Warning";
+    /** Log level for diagnostic messages that indicate a failure in the current operation. */
     LogLevel[LogLevel["Error"] = 4] = "Error";
+    /** Log level for diagnostic messages that indicate a failure that will terminate the entire application. */
     LogLevel[LogLevel["Critical"] = 5] = "Critical";
+    /** The highest possible log level. Used when configuring logging to indicate that no log messages should be emitted. */
     LogLevel[LogLevel["None"] = 6] = "None";
 })(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
 
@@ -1284,27 +1502,11 @@ unwrapExports(ILogger);
 var ILogger_1 = ILogger.LogLevel;
 
 var HttpClient_1 = createCommonjsModule(function (module, exports) {
-var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (commonjsGlobal && commonjsGlobal.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 
 
+
+/** Represents an HTTP response. */
 var HttpResponse = /** @class */ (function () {
     function HttpResponse(statusCode, statusText, content) {
         this.statusCode = statusCode;
@@ -1314,28 +1516,35 @@ var HttpResponse = /** @class */ (function () {
     return HttpResponse;
 }());
 exports.HttpResponse = HttpResponse;
+/** Abstraction over an HTTP client.
+ *
+ * This class provides an abstraction over an HTTP client so that a different implementation can be provided on different platforms.
+ */
 var HttpClient = /** @class */ (function () {
     function HttpClient() {
     }
     HttpClient.prototype.get = function (url, options) {
-        return this.send(__assign({}, options, { method: "GET", url: url }));
+        return this.send(tslib_1.__assign({}, options, { method: "GET", url: url }));
     };
     HttpClient.prototype.post = function (url, options) {
-        return this.send(__assign({}, options, { method: "POST", url: url }));
+        return this.send(tslib_1.__assign({}, options, { method: "POST", url: url }));
     };
     HttpClient.prototype.delete = function (url, options) {
-        return this.send(__assign({}, options, { method: "DELETE", url: url }));
+        return this.send(tslib_1.__assign({}, options, { method: "DELETE", url: url }));
     };
     return HttpClient;
 }());
 exports.HttpClient = HttpClient;
+/** Default implementation of {@link HttpClient}. */
 var DefaultHttpClient = /** @class */ (function (_super) {
-    __extends(DefaultHttpClient, _super);
+    tslib_1.__extends(DefaultHttpClient, _super);
+    /** Creates a new instance of the {@link DefaultHttpClient}, using the provided {@link ILogger} to log messages. */
     function DefaultHttpClient(logger) {
         var _this = _super.call(this) || this;
         _this.logger = logger;
         return _this;
     }
+    /** @inheritDoc */
     DefaultHttpClient.prototype.send = function (request) {
         var _this = this;
         return new Promise(function (resolve, reject) {
@@ -1393,6 +1602,7 @@ var HttpClient_4 = HttpClient_1.DefaultHttpClient;
 
 var TextMessageFormat_1 = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
+// Not exported from index
 var TextMessageFormat = /** @class */ (function () {
     function TextMessageFormat() {
     }
@@ -1473,13 +1683,42 @@ exports.HandshakeProtocol = HandshakeProtocol;
 unwrapExports(HandshakeProtocol_1);
 var HandshakeProtocol_2 = HandshakeProtocol_1.HandshakeProtocol;
 
+var IHubProtocol = createCommonjsModule(function (module, exports) {
+Object.defineProperty(exports, "__esModule", { value: true });
+/** Defines the type of a Hub Message. */
+var MessageType;
+(function (MessageType) {
+    /** Indicates the message is an Invocation message and implements the {@link InvocationMessage} interface. */
+    MessageType[MessageType["Invocation"] = 1] = "Invocation";
+    /** Indicates the message is a StreamItem message and implements the {@link StreamItemMessage} interface. */
+    MessageType[MessageType["StreamItem"] = 2] = "StreamItem";
+    /** Indicates the message is a Completion message and implements the {@link CompletionMessage} interface. */
+    MessageType[MessageType["Completion"] = 3] = "Completion";
+    /** Indicates the message is a Stream Invocation message and implements the {@link StreamInvocationMessage} interface. */
+    MessageType[MessageType["StreamInvocation"] = 4] = "StreamInvocation";
+    /** Indicates the message is a Cancel Invocation message and implements the {@link CancelInvocationMessage} interface. */
+    MessageType[MessageType["CancelInvocation"] = 5] = "CancelInvocation";
+    /** Indicates the message is a Ping message and implements the {@link PingMessage} interface. */
+    MessageType[MessageType["Ping"] = 6] = "Ping";
+    /** Indicates the message is a Close message and implements the {@link CloseMessage} interface. */
+    MessageType[MessageType["Close"] = 7] = "Close";
+})(MessageType = exports.MessageType || (exports.MessageType = {}));
+
+});
+
+unwrapExports(IHubProtocol);
+var IHubProtocol_1 = IHubProtocol.MessageType;
+
 var Loggers = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
+/** A logger that does nothing when log messages are sent to it. */
 var NullLogger = /** @class */ (function () {
     function NullLogger() {
     }
+    /** @inheritDoc */
     NullLogger.prototype.log = function (logLevel, message) {
     };
+    /** The singleton instance of the {@link NullLogger}. */
     NullLogger.instance = new NullLogger();
     return NullLogger;
 }());
@@ -1491,42 +1730,8 @@ unwrapExports(Loggers);
 var Loggers_1 = Loggers.NullLogger;
 
 var Utils = createCommonjsModule(function (module, exports) {
-var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
 var Arg = /** @class */ (function () {
@@ -1576,9 +1781,9 @@ function formatArrayBuffer(data) {
 }
 exports.formatArrayBuffer = formatArrayBuffer;
 function sendMessage(logger, transportName, httpClient, url, accessTokenFactory, content, logMessageContent) {
-    return __awaiter(this, void 0, void 0, function () {
+    return tslib_1.__awaiter(this, void 0, void 0, function () {
         var headers, token, response, _a;
-        return __generator(this, function (_b) {
+        return tslib_1.__generator(this, function (_b) {
             switch (_b.label) {
                 case 0: return [4 /*yield*/, accessTokenFactory()];
                 case 1:
@@ -1705,46 +1910,14 @@ var Utils_7 = Utils.SubjectSubscription;
 var Utils_8 = Utils.ConsoleLogger;
 
 var HubConnection_1 = createCommonjsModule(function (module, exports) {
-var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
+
 var DEFAULT_TIMEOUT_IN_MS = 30 * 1000;
+/** Represents a connection to a SignalR Hub. */
 var HubConnection = /** @class */ (function () {
     function HubConnection(connection, logger, protocol) {
         var _this = this;
@@ -1771,10 +1944,14 @@ var HubConnection = /** @class */ (function () {
     HubConnection.create = function (connection, logger, protocol) {
         return new HubConnection(connection, logger, protocol);
     };
+    /** Starts the connection.
+     *
+     * @returns {Promise<void>} A Promise that resolves when the connection has been successfully established, or rejects with an error.
+     */
     HubConnection.prototype.start = function () {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var handshakeRequest;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         handshakeRequest = {
@@ -1799,11 +1976,22 @@ var HubConnection = /** @class */ (function () {
             });
         });
     };
+    /** Stops the connection.
+     *
+     * @returns {Promise<void>} A Promise that resolves when the connection has been successfully terminated, or rejects with an error.
+     */
     HubConnection.prototype.stop = function () {
         this.logger.log(ILogger.LogLevel.Debug, "Stopping HubConnection.");
         this.cleanupTimeout();
         return this.connection.stop();
     };
+    /** Invokes a streaming hub method on the server using the specified name and arguments.
+     *
+     * @typeparam T The type of the items returned by the server.
+     * @param {string} methodName The name of the server method to invoke.
+     * @param {any[]} args The arguments used to invoke the server method.
+     * @returns {IStreamResult<T>} An object that yields results from the server as they are received.
+     */
     HubConnection.prototype.stream = function (methodName) {
         var _this = this;
         var args = [];
@@ -1822,7 +2010,7 @@ var HubConnection = /** @class */ (function () {
                 subject.error(error);
                 return;
             }
-            if (invocationEvent.type === 3 /* Completion */) {
+            if (invocationEvent.type === IHubProtocol.MessageType.Completion) {
                 if (invocationEvent.error) {
                     subject.error(new Error(invocationEvent.error));
                 }
@@ -1842,6 +2030,15 @@ var HubConnection = /** @class */ (function () {
         });
         return subject;
     };
+    /** Invokes a hub method on the server using the specified name and arguments. Does not wait for a response from the receiver.
+     *
+     * The Promise returned by this method resolves when the client has sent the invocation to the server. The server may still
+     * be processing the invocation.
+     *
+     * @param {string} methodName The name of the server method to invoke.
+     * @param {any[]} args The arguments used to invoke the server method.
+     * @returns {Promise<void>} A Promise that resolves when the invocation has been successfully sent, or rejects with an error.
+     */
     HubConnection.prototype.send = function (methodName) {
         var args = [];
         for (var _i = 1; _i < arguments.length; _i++) {
@@ -1851,6 +2048,17 @@ var HubConnection = /** @class */ (function () {
         var message = this.protocol.writeMessage(invocationDescriptor);
         return this.connection.send(message);
     };
+    /** Invokes a hub method on the server using the specified name and arguments.
+     *
+     * The Promise returned by this method resolves when the server indicates it has finished invoking the method. When the promise
+     * resolves, the server has finished invoking the method. If the server method returns a result, it is produced as the result of
+     * resolving the Promise.
+     *
+     * @typeparam T The expected return type.
+     * @param {string} methodName The name of the server method to invoke.
+     * @param {any[]} args The arguments used to invoke the server method.
+     * @returns {Promise<T>} A Promise that resolves with the result of the server method (if any), or rejects with an error.
+     */
     HubConnection.prototype.invoke = function (methodName) {
         var _this = this;
         var args = [];
@@ -1864,7 +2072,7 @@ var HubConnection = /** @class */ (function () {
                     reject(error);
                     return;
                 }
-                if (invocationEvent.type === 3 /* Completion */) {
+                if (invocationEvent.type === IHubProtocol.MessageType.Completion) {
                     var completionMessage = invocationEvent;
                     if (completionMessage.error) {
                         reject(new Error(completionMessage.error));
@@ -1886,6 +2094,11 @@ var HubConnection = /** @class */ (function () {
         });
         return p;
     };
+    /** Registers a handler that will be invoked when the hub method with the specified method name is invoked.
+     *
+     * @param {string} methodName The name of the hub method to define.
+     * @param {Function} newMethod The handler that will be raised when the hub method is invoked.
+     */
     HubConnection.prototype.on = function (methodName, newMethod) {
         if (!methodName || !newMethod) {
             return;
@@ -1922,6 +2135,10 @@ var HubConnection = /** @class */ (function () {
             delete this.methods[methodName];
         }
     };
+    /** Registers a handler that will be invoked when the connection is closed.
+     *
+     * @param {Function} callback The handler that will be invoked when the connection is closed. Optionally receives a single argument containing the error that caused the connection to close (if any).
+     */
     HubConnection.prototype.onclose = function (callback) {
         if (callback) {
             this.closedCallbacks.push(callback);
@@ -1940,23 +2157,23 @@ var HubConnection = /** @class */ (function () {
             for (var _i = 0, messages_1 = messages; _i < messages_1.length; _i++) {
                 var message = messages_1[_i];
                 switch (message.type) {
-                    case 1 /* Invocation */:
+                    case IHubProtocol.MessageType.Invocation:
                         this.invokeClientMethod(message);
                         break;
-                    case 2 /* StreamItem */:
-                    case 3 /* Completion */:
+                    case IHubProtocol.MessageType.StreamItem:
+                    case IHubProtocol.MessageType.Completion:
                         var callback = this.callbacks[message.invocationId];
                         if (callback != null) {
-                            if (message.type === 3 /* Completion */) {
+                            if (message.type === IHubProtocol.MessageType.Completion) {
                                 delete this.callbacks[message.invocationId];
                             }
                             callback(message);
                         }
                         break;
-                    case 6 /* Ping */:
+                    case IHubProtocol.MessageType.Ping:
                         // Don't care about pings
                         break;
-                    case 7 /* Close */:
+                    case IHubProtocol.MessageType.Close:
                         this.logger.log(ILogger.LogLevel.Information, "Close message received from server.");
                         this.connection.stop(message.error ? new Error("Server returned an error on close: " + message.error) : null);
                         break;
@@ -2042,7 +2259,7 @@ var HubConnection = /** @class */ (function () {
             return {
                 arguments: args,
                 target: methodName,
-                type: 1 /* Invocation */,
+                type: IHubProtocol.MessageType.Invocation,
             };
         }
         else {
@@ -2052,7 +2269,7 @@ var HubConnection = /** @class */ (function () {
                 arguments: args,
                 invocationId: id.toString(),
                 target: methodName,
-                type: 1 /* Invocation */,
+                type: IHubProtocol.MessageType.Invocation,
             };
         }
     };
@@ -2063,13 +2280,13 @@ var HubConnection = /** @class */ (function () {
             arguments: args,
             invocationId: id.toString(),
             target: methodName,
-            type: 4 /* StreamInvocation */,
+            type: IHubProtocol.MessageType.StreamInvocation,
         };
     };
     HubConnection.prototype.createCancelInvocation = function (id) {
         return {
             invocationId: id,
-            type: 5 /* CancelInvocation */,
+            type: IHubProtocol.MessageType.CancelInvocation,
         };
     };
     return HubConnection;
@@ -2083,15 +2300,25 @@ var HubConnection_2 = HubConnection_1.HubConnection;
 
 var ITransport = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
+// This will be treated as a bit flag in the future, so we keep it using power-of-two values.
+/** Specifies a specific HTTP transport type. */
 var HttpTransportType;
 (function (HttpTransportType) {
-    HttpTransportType[HttpTransportType["WebSockets"] = 0] = "WebSockets";
-    HttpTransportType[HttpTransportType["ServerSentEvents"] = 1] = "ServerSentEvents";
-    HttpTransportType[HttpTransportType["LongPolling"] = 2] = "LongPolling";
+    /** Specifies no transport preference. */
+    HttpTransportType[HttpTransportType["None"] = 0] = "None";
+    /** Specifies the WebSockets transport. */
+    HttpTransportType[HttpTransportType["WebSockets"] = 1] = "WebSockets";
+    /** Specifies the Server-Sent Events transport. */
+    HttpTransportType[HttpTransportType["ServerSentEvents"] = 2] = "ServerSentEvents";
+    /** Specifies the Long Polling transport. */
+    HttpTransportType[HttpTransportType["LongPolling"] = 4] = "LongPolling";
 })(HttpTransportType = exports.HttpTransportType || (exports.HttpTransportType = {}));
+/** Specifies the transfer format for a connection. */
 var TransferFormat;
 (function (TransferFormat) {
+    /** Specifies that only text data will be transmitted over the connection. */
     TransferFormat[TransferFormat["Text"] = 1] = "Text";
+    /** Specifies that binary data will be transmitted over the connection. */
     TransferFormat[TransferFormat["Binary"] = 2] = "Binary";
 })(TransferFormat = exports.TransferFormat || (exports.TransferFormat = {}));
 
@@ -2106,6 +2333,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Rough polyfill of https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 // We don't actually ever use the API being polyfilled, we always use the polyfill because
 // it's a very new API right now.
+// Not exported from index.
 var AbortController = /** @class */ (function () {
     function AbortController() {
         this.isAborted = false;
@@ -2142,60 +2370,36 @@ unwrapExports(AbortController_1);
 var AbortController_2 = AbortController_1.AbortController;
 
 var LongPollingTransport_1 = createCommonjsModule(function (module, exports) {
-var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
 
 
+
 var SHUTDOWN_TIMEOUT = 5 * 1000;
+// Not exported from 'index', this type is internal.
 var LongPollingTransport = /** @class */ (function () {
-    function LongPollingTransport(httpClient, accessTokenFactory, logger, logMessageContent) {
+    function LongPollingTransport(httpClient, accessTokenFactory, logger, logMessageContent, shutdownTimeout) {
         this.httpClient = httpClient;
         this.accessTokenFactory = accessTokenFactory || (function () { return null; });
         this.logger = logger;
         this.pollAbort = new AbortController_1.AbortController();
         this.logMessageContent = logMessageContent;
+        this.shutdownTimeout = shutdownTimeout || SHUTDOWN_TIMEOUT;
     }
+    Object.defineProperty(LongPollingTransport.prototype, "pollAborted", {
+        // This is an internal type, not exported from 'index' so this is really just internal.
+        get: function () {
+            return this.pollAbort.aborted;
+        },
+        enumerable: true,
+        configurable: true
+    });
     LongPollingTransport.prototype.connect = function (url, transferFormat) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var pollOptions, token, closeError, pollUrl, response;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         Utils.Arg.isRequired(url, "url");
@@ -2252,9 +2456,9 @@ var LongPollingTransport = /** @class */ (function () {
         }
     };
     LongPollingTransport.prototype.poll = function (url, pollOptions, closeError) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var token, pollUrl, response, e_1;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, , 8, 9]);
@@ -2275,8 +2479,6 @@ var LongPollingTransport = /** @class */ (function () {
                         response = _a.sent();
                         if (response.statusCode === 204) {
                             this.logger.log(ILogger.LogLevel.Information, "(LongPolling transport) Poll terminated by server");
-                            // If we were on a timeout waiting for shutdown, unregister it.
-                            clearTimeout(this.shutdownTimeout);
                             this.running = false;
                         }
                         else if (response.statusCode !== 200) {
@@ -2320,6 +2522,12 @@ var LongPollingTransport = /** @class */ (function () {
                     case 6: return [3 /*break*/, 1];
                     case 7: return [3 /*break*/, 9];
                     case 8:
+                        // Indicate that we've stopped so the shutdown timer doesn't get registered.
+                        this.stopped = true;
+                        // Clean up the shutdown timer if it was registered
+                        if (this.shutdownTimer) {
+                            clearTimeout(this.shutdownTimer);
+                        }
                         // Fire our onclosed event
                         if (this.onclose) {
                             this.logger.log(ILogger.LogLevel.Trace, "(LongPolling transport) Firing onclose event. Error: " + (closeError || "<undefined>"));
@@ -2333,8 +2541,8 @@ var LongPollingTransport = /** @class */ (function () {
         });
     };
     LongPollingTransport.prototype.send = function (data) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
+            return tslib_1.__generator(this, function (_a) {
                 if (!this.running) {
                     return [2 /*return*/, Promise.reject(new Error("Cannot send until the transport is connected"))];
                 }
@@ -2343,10 +2551,10 @@ var LongPollingTransport = /** @class */ (function () {
         });
     };
     LongPollingTransport.prototype.stop = function () {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
             var deleteOptions, token, response;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, , 3, 4]);
@@ -2365,12 +2573,13 @@ var LongPollingTransport = /** @class */ (function () {
                         this.logger.log(ILogger.LogLevel.Trace, "(LongPolling transport) DELETE request accepted.");
                         return [3 /*break*/, 4];
                     case 3:
-                        // Abort the poll after 5 seconds if the server doesn't stop it.
-                        if (!this.pollAbort.aborted) {
-                            this.shutdownTimeout = setTimeout(SHUTDOWN_TIMEOUT, function () {
-                                _this.logger.log(ILogger.LogLevel.Warning, "(LongPolling transport) server did not terminate within 5 seconds after DELETE request, cancelling poll.");
+                        // Abort the poll after the shutdown timeout if the server doesn't stop the poll.
+                        if (!this.stopped) {
+                            this.shutdownTimer = setTimeout(function () {
+                                _this.logger.log(ILogger.LogLevel.Warning, "(LongPolling transport) server did not terminate after DELETE request, canceling poll.");
+                                // Abort any outstanding poll
                                 _this.pollAbort.abort();
-                            });
+                            }, this.shutdownTimeout);
                         }
                         return [7 /*endfinally*/];
                     case 4: return [2 /*return*/];
@@ -2388,42 +2597,8 @@ unwrapExports(LongPollingTransport_1);
 var LongPollingTransport_2 = LongPollingTransport_1.LongPollingTransport;
 
 var ServerSentEventsTransport_1 = createCommonjsModule(function (module, exports) {
-var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
 
@@ -2435,10 +2610,10 @@ var ServerSentEventsTransport = /** @class */ (function () {
         this.logMessageContent = logMessageContent;
     }
     ServerSentEventsTransport.prototype.connect = function (url, transferFormat) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
             var token;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         Utils.Arg.isRequired(url, "url");
@@ -2501,8 +2676,8 @@ var ServerSentEventsTransport = /** @class */ (function () {
         });
     };
     ServerSentEventsTransport.prototype.send = function (data) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
+            return tslib_1.__generator(this, function (_a) {
                 if (!this.eventSource) {
                     return [2 /*return*/, Promise.reject(new Error("Cannot send until the transport is connected"))];
                 }
@@ -2533,42 +2708,8 @@ unwrapExports(ServerSentEventsTransport_1);
 var ServerSentEventsTransport_2 = ServerSentEventsTransport_1.ServerSentEventsTransport;
 
 var WebSocketTransport_1 = createCommonjsModule(function (module, exports) {
-var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
 
@@ -2579,10 +2720,10 @@ var WebSocketTransport = /** @class */ (function () {
         this.logMessageContent = logMessageContent;
     }
     WebSocketTransport.prototype.connect = function (url, transferFormat) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
             var token;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         Utils.Arg.isRequired(url, "url");
@@ -2660,42 +2801,8 @@ unwrapExports(WebSocketTransport_1);
 var WebSocketTransport_2 = WebSocketTransport_1.WebSocketTransport;
 
 var HttpConnection_1 = createCommonjsModule(function (module, exports) {
-var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
 
@@ -2736,9 +2843,9 @@ var HttpConnection = /** @class */ (function () {
         return this.transport.send(data);
     };
     HttpConnection.prototype.stop = function (error) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var e_1;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.connectionState = 2 /* Disconnected */;
@@ -2766,10 +2873,10 @@ var HttpConnection = /** @class */ (function () {
         });
     };
     HttpConnection.prototype.startInternal = function (transferFormat) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
             var url, negotiateResponse, redirects, _loop_1, this_1, state_1, e_2;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         url = this.baseUrl;
@@ -2796,7 +2903,7 @@ var HttpConnection = /** @class */ (function () {
                         redirects = 0;
                         _loop_1 = function () {
                             var accessToken_1;
-                            return __generator(this, function (_a) {
+                            return tslib_1.__generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0: return [4 /*yield*/, this_1.getNegotiationResponse(url)];
                                     case 1:
@@ -2858,9 +2965,9 @@ var HttpConnection = /** @class */ (function () {
         });
     };
     HttpConnection.prototype.getNegotiationResponse = function (url) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var token, headers, negotiateUrl, response, e_3, _a;
-            return __generator(this, function (_b) {
+            return tslib_1.__generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, this.accessTokenFactory()];
                     case 1:
@@ -2896,9 +3003,9 @@ var HttpConnection = /** @class */ (function () {
         return url + (url.indexOf("?") === -1 ? "?" : "&") + ("id=" + connectionId);
     };
     HttpConnection.prototype.createTransport = function (url, requestedTransport, negotiateResponse, requestedTransferFormat) {
-        return __awaiter(this, void 0, void 0, function () {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
             var connectUrl, transports, _i, transports_1, endpoint, transport, ex_1;
-            return __generator(this, function (_a) {
+            return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         connectUrl = this.createConnectUrl(url, negotiateResponse.connectionId);
@@ -2969,7 +3076,7 @@ var HttpConnection = /** @class */ (function () {
         }
         else {
             var transferFormats = endpoint.transferFormats.map(function (s) { return ITransport.TransferFormat[s]; });
-            if (!requestedTransport || transport === requestedTransport) {
+            if (transportMatches(requestedTransport, transport)) {
                 if (transferFormats.indexOf(requestedTransferFormat) >= 0) {
                     if ((transport === ITransport.HttpTransportType.WebSockets && typeof WebSocket === "undefined") ||
                         (transport === ITransport.HttpTransportType.ServerSentEvents && typeof EventSource === "undefined")) {
@@ -2991,7 +3098,7 @@ var HttpConnection = /** @class */ (function () {
         return null;
     };
     HttpConnection.prototype.isITransport = function (transport) {
-        return typeof (transport) === "object" && "connect" in transport;
+        return transport && typeof (transport) === "object" && "connect" in transport;
     };
     HttpConnection.prototype.changeState = function (from, to) {
         if (this.connectionState === from) {
@@ -3001,8 +3108,8 @@ var HttpConnection = /** @class */ (function () {
         return false;
     };
     HttpConnection.prototype.stopConnection = function (error) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
+            return tslib_1.__generator(this, function (_a) {
                 this.transport = null;
                 // If we have a stopError, it takes precedence over the error from the transport
                 error = this.stopError || error;
@@ -3051,6 +3158,9 @@ var HttpConnection = /** @class */ (function () {
     return HttpConnection;
 }());
 exports.HttpConnection = HttpConnection;
+function transportMatches(requestedTransport, actualTransport) {
+    return !requestedTransport || ((actualTransport & requestedTransport) !== 0);
+}
 
 });
 
@@ -3063,14 +3173,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
-exports.JSON_HUB_PROTOCOL_NAME = "json";
+
+var JSON_HUB_PROTOCOL_NAME = "json";
+/** Implements the JSON Hub Protocol. */
 var JsonHubProtocol = /** @class */ (function () {
     function JsonHubProtocol() {
-        this.name = exports.JSON_HUB_PROTOCOL_NAME;
+        /** @inheritDoc */
+        this.name = JSON_HUB_PROTOCOL_NAME;
+        /** @inheritDoc */
         this.version = 1;
+        /** @inheritDoc */
         this.transferFormat = ITransport.TransferFormat.Text;
     }
+    /** Creates an array of {@link HubMessage} objects from the specified serialized representation.
+     *
+     * @param {string} input A string containing the serialized representation.
+     * @param {ILogger} logger A logger that will be used to log messages that occur during parsing.
+     */
     JsonHubProtocol.prototype.parseMessages = function (input, logger) {
+        // The interface does allow "ArrayBuffer" to be passed in, but this implementation does not. So let's throw a useful error.
+        if (typeof input !== "string") {
+            throw new Error("Invalid input for JSON hub protocol. Expected a string.");
+        }
         if (!input) {
             return [];
         }
@@ -3087,19 +3211,19 @@ var JsonHubProtocol = /** @class */ (function () {
                 throw new Error("Invalid payload.");
             }
             switch (parsedMessage.type) {
-                case 1 /* Invocation */:
+                case IHubProtocol.MessageType.Invocation:
                     this.isInvocationMessage(parsedMessage);
                     break;
-                case 2 /* StreamItem */:
+                case IHubProtocol.MessageType.StreamItem:
                     this.isStreamItemMessage(parsedMessage);
                     break;
-                case 3 /* Completion */:
+                case IHubProtocol.MessageType.Completion:
                     this.isCompletionMessage(parsedMessage);
                     break;
-                case 6 /* Ping */:
+                case IHubProtocol.MessageType.Ping:
                     // Single value, no need to validate
                     break;
-                case 7 /* Close */:
+                case IHubProtocol.MessageType.Close:
                     // All optional values, no need to validate
                     break;
                 default:
@@ -3111,6 +3235,11 @@ var JsonHubProtocol = /** @class */ (function () {
         }
         return hubMessages;
     };
+    /** Writes the specified {@link HubMessage} to a string and returns it.
+     *
+     * @param {HubMessage} message The message to write.
+     * @returns {string} A string containing the serialized representation of the message.
+     */
     JsonHubProtocol.prototype.writeMessage = function (message) {
         return TextMessageFormat_1.TextMessageFormat.write(JSON.stringify(message));
     };
@@ -3147,8 +3276,7 @@ exports.JsonHubProtocol = JsonHubProtocol;
 });
 
 unwrapExports(JsonHubProtocol_1);
-var JsonHubProtocol_2 = JsonHubProtocol_1.JSON_HUB_PROTOCOL_NAME;
-var JsonHubProtocol_3 = JsonHubProtocol_1.JsonHubProtocol;
+var JsonHubProtocol_2 = JsonHubProtocol_1.JsonHubProtocol;
 
 var HubConnectionBuilder_1 = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3157,6 +3285,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+/** A builder for configuring {@link HubConnection} instances. */
 var HubConnectionBuilder = /** @class */ (function () {
     function HubConnectionBuilder() {
     }
@@ -3185,11 +3314,19 @@ var HubConnectionBuilder = /** @class */ (function () {
         }
         return this;
     };
+    /** Configures the {@link HubConnection} to use the specified Hub Protocol.
+     *
+     * @param {IHubProtocol} protocol The {@link IHubProtocol} implementation to use.
+     */
     HubConnectionBuilder.prototype.withHubProtocol = function (protocol) {
         Utils.Arg.isRequired(protocol, "protocol");
         this.protocol = protocol;
         return this;
     };
+    /** Creates a {@link HubConnection} from the configuration options specified in this builder.
+     *
+     * @returns {HubConnection} The configured {@link HubConnection}.
+     */
     HubConnectionBuilder.prototype.build = function () {
         // If httpConnectionOptions has a logger, use it. Otherwise, override it with the one
         // provided to configureLogger
@@ -3218,38 +3355,55 @@ function isLogger(logger) {
 unwrapExports(HubConnectionBuilder_1);
 var HubConnectionBuilder_2 = HubConnectionBuilder_1.HubConnectionBuilder;
 
-var IHubProtocol = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-
-});
-
-unwrapExports(IHubProtocol);
-
 var cjs = createCommonjsModule(function (module, exports) {
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-// Everything that users need to access must be exported here. Including interfaces.
-__export(Errors);
-__export(HttpClient_1);
-__export(HubConnection_1);
-__export(HubConnectionBuilder_1);
-__export(IHubProtocol);
-__export(ILogger);
-__export(ITransport);
-__export(Loggers);
-__export(JsonHubProtocol_1);
+// Version token that will be replaced by the prepack command
+/** The version of the SignalR client. */
+exports.VERSION = "0.0.0-DEV_BUILD";
+
+exports.HttpError = Errors.HttpError;
+exports.TimeoutError = Errors.TimeoutError;
+
+exports.DefaultHttpClient = HttpClient_1.DefaultHttpClient;
+exports.HttpClient = HttpClient_1.HttpClient;
+exports.HttpResponse = HttpClient_1.HttpResponse;
+
+exports.HubConnection = HubConnection_1.HubConnection;
+
+exports.HubConnectionBuilder = HubConnectionBuilder_1.HubConnectionBuilder;
+
+exports.MessageType = IHubProtocol.MessageType;
+
+exports.LogLevel = ILogger.LogLevel;
+
+exports.HttpTransportType = ITransport.HttpTransportType;
+exports.TransferFormat = ITransport.TransferFormat;
+
+exports.NullLogger = Loggers.NullLogger;
+
+exports.JsonHubProtocol = JsonHubProtocol_1.JsonHubProtocol;
 
 });
 
 unwrapExports(cjs);
+var cjs_1 = cjs.VERSION;
+var cjs_2 = cjs.HttpError;
+var cjs_3 = cjs.TimeoutError;
+var cjs_4 = cjs.DefaultHttpClient;
+var cjs_5 = cjs.HttpClient;
+var cjs_6 = cjs.HttpResponse;
+var cjs_7 = cjs.HubConnection;
+var cjs_8 = cjs.HubConnectionBuilder;
+var cjs_9 = cjs.MessageType;
+var cjs_10 = cjs.LogLevel;
+var cjs_11 = cjs.HttpTransportType;
+var cjs_12 = cjs.TransferFormat;
+var cjs_13 = cjs.NullLogger;
+var cjs_14 = cjs.JsonHubProtocol;
 
 var browserIndex = createCommonjsModule(function (module, exports) {
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
+
 // This is where we add any polyfills we'll need for the browser. It is the entry module for browser-specific builds.
 
 // Copy from Array.prototype into Uint8Array to polyfill on IE. It's OK because the implementations of indexOf and slice use properties
@@ -3273,7 +3427,7 @@ if (!Uint8Array.prototype.forEach) {
         writable: true,
     });
 }
-__export(cjs);
+tslib_1.__exportStar(cjs, exports);
 
 });
 

@@ -206,7 +206,7 @@ namespace DotNetify
       /// <param name="propertyName">Property name.</param>
       /// <param name="propertyValue">Property value.</param>
       /// <returns>Reactive property.</returns>
-      public ReactiveProperty<T> AddProperty<T>(string propertyName) => AddProperty(typeof(T), new ReactiveProperty<T>(propertyName));
+      public ReactiveProperty<T> AddProperty<T>(string propertyName) => AddProperty(typeof(T), new ReactiveProperty<T>(this, propertyName));
 
       /// <summary>
       /// Adds a runtime reactive property.
@@ -215,7 +215,7 @@ namespace DotNetify
       /// <param name="propertyName">Property name.</param>
       /// <param name="propertyValue">Property value.</param>
       /// <returns>Reactive property.</returns>
-      public ReactiveProperty<T> AddProperty<T>(string propertyName, T propertyValue) => AddProperty(typeof(T), new ReactiveProperty<T>(propertyName, propertyValue));
+      public ReactiveProperty<T> AddProperty<T>(string propertyName, T propertyValue) => AddProperty(typeof(T), new ReactiveProperty<T>(this, propertyName, propertyValue));
 
       /// <summary>
       /// Adds a runtime observable property.
@@ -242,7 +242,7 @@ namespace DotNetify
       public ReactiveProperty<T> AddInternalProperty<T>(string propertyName)
       {
          Ignore(propertyName);
-         return AddProperty(typeof(T), new ReactiveProperty<T>(propertyName));
+         return AddProperty(typeof(T), new ReactiveProperty<T>(this, propertyName));
       }
 
       /// <summary>
@@ -255,7 +255,7 @@ namespace DotNetify
       public ReactiveProperty<T> AddInternalProperty<T>(string propertyName, T propertyValue)
       {
          Ignore(propertyName);
-         return AddProperty(typeof(T), new ReactiveProperty<T>(propertyName, propertyValue));
+         return AddProperty(typeof(T), new ReactiveProperty<T>(this, propertyName, propertyValue));
       }
 
       /// <summary>
