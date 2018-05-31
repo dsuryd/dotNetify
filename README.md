@@ -7,7 +7,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-* v3.0 Release: integrates with ***SignalR for ASP.NET Core 2.1*** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.0.1)
+* v3.0 Release: integrates with ***SignalR for ASP.NET Core 2.1***
 
 > While you're here, also check out the companion project [dotNetify-Elements](https://github.com/dsuryd/dotNetify-Elements) (work in progress).
 
