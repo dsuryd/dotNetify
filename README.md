@@ -40,13 +40,13 @@ Documentation and live demo can be found at [http://dotnetify.net](http://dotnet
 
 ASP.NET Core:
 
-*PM> Install-Package DotNetify.Core -pre*  
-*PM> Install-Package DotNetify.SignalR -pre*  
+*PM> Install-Package DotNetify.Core*  
+*PM> Install-Package DotNetify.SignalR*  
 
 ASP.NET Framework:
 
-*PM> Install-Package DotNetify.Core -pre*  
-*PM> Install-Package DotNetify.SignalR.Owin -pre*  
+*PM> Install-Package DotNetify.Core*  
+*PM> Install-Package DotNetify.SignalR.Owin*  
 
 Read the website on how to configure your project ([React](http://dotnetify.net/react/Installation) | [Knockout](http://dotnetify.net/index/Installing)).
 
