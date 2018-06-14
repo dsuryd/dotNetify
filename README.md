@@ -1,4 +1,6 @@
-# &nbsp;![alt tag](http://dotnetify.net/content/images/greendot.png) dotNetify 
+
+<p align="center"><img src="https://s33.postimg.cc/nssom6eov/Logo_do_Netify.png"></p>
+
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 [![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/) 
@@ -56,3 +58,5 @@ Licensed under the Apache License, Version 2.0.
 
 ## Contributing
 All contribution is welcome: star this project, let others know about it, report issues, submit pull requests!
+
+_Logo design by [area55git](https://github.com/area55git)._
