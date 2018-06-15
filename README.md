@@ -1,5 +1,5 @@
 
-<p align="center"><img src="http://dotnetify.net/content/images/dotnetify-logo.png"></p>
+<p align="center"><img width="400px" src="http://dotnetify.net/content/images/dotnetify-logo.png"></p>
 
 ![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
