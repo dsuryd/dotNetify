@@ -177,7 +177,7 @@ namespace DotNetify
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
-               VMController.OnDisposeVM(Context.ConnectionId, vmId);
+               VMController.OnDisposeVM(Context.ConnectionId, ctx.VMId);
                return Task.CompletedTask;
             });
          }
@@ -250,7 +250,7 @@ namespace DotNetify
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
-               RunVMFilters(vm, vmData, vmAction);
+               RunVMFilters(vm, ctx.Data, vmAction);
                return Task.CompletedTask;
             });
          }
