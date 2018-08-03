@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2016-2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -166,7 +166,13 @@ namespace DotNetify
       {
          try
          {
-            VMController.OnDisposeVM(Context.ConnectionId, vmId);
+            _hubContext = new DotNetifyHubContext(Context, nameof(Dispose_VM), vmId, null, null, Principal);
+            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
+            {
+               Principal = ctx.Principal;
+               VMController.OnDisposeVM(Context.ConnectionId, ctx.VMId);
+               return Task.CompletedTask;
+            });
          }
          catch (Exception ex)
          {
@@ -174,7 +180,7 @@ namespace DotNetify
          }
       }
 
-      #endregion
+      #endregion Client Requests
 
       #region Server Responses
 
@@ -190,7 +196,7 @@ namespace DotNetify
             Clients.Client(connectionId).Response_VM(vmId, vmData);
       }
 
-      #endregion
+      #endregion Server Responses
 
       /// <summary>
       /// Runs the view model filter.
@@ -237,7 +243,7 @@ namespace DotNetify
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
-               RunVMFilters(vm, vmData, vmAction);
+               RunVMFilters(vm, ctx.Data, vmAction);
                return Task.FromResult(0);
             });
          }

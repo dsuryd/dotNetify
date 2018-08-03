@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetify;
@@ -26,6 +27,7 @@ namespace UnitTests
             get { return false; }
             set { Changed(nameof(ResponseProperty)); }
          }
+
          public string ResponseProperty => "Triggered";
       }
 
@@ -43,7 +45,7 @@ namespace UnitTests
       {
          public event EventHandler<Tuple<T, VMContext>> Invoked;
 
-         public Task Invoke(T attribute, VMContext context, NextFilterDelegate next)
+         public virtual Task Invoke(T attribute, VMContext context, NextFilterDelegate next)
          {
             Invoked?.Invoke(this, Tuple.Create(attribute, context));
             return next.Invoke(context);
@@ -51,7 +53,21 @@ namespace UnitTests
       }
 
       private class CustomFilter1 : FilterBase<CustomFilter1Attribute> { }
-      private class CustomFilter2 : FilterBase<CustomFilter2Attribute> { }
+
+      private class CustomFilter2 : FilterBase<CustomFilter2Attribute>
+      {
+         public override Task Invoke(CustomFilter2Attribute attribute, VMContext context, NextFilterDelegate next)
+         {
+            if (context.HubContext.CallType == "Response_VM")
+            {
+               var data = JsonConvert.DeserializeObject<IDictionary<string, object>>(context.HubContext.Data.ToString());
+               foreach (var key in data.Keys.ToList())
+                  data[key] = data[key].ToString().ToUpper();
+               context.HubContext.Data = JsonConvert.SerializeObject(data);
+            }
+            return base.Invoke(attribute, context, next);
+         }
+      }
 
       private FilterTestVM _vm;
       private CustomFilter1 _filter1;
@@ -317,13 +333,19 @@ namespace UnitTests
          };
 
          hub.RequestVM(nameof(FilterTestVM), _vmArg);
+
+         string responsePropertyValue = null;
+         hub.Response += (sender, e) =>
+         {
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(e.Item2);
+            responsePropertyValue = data.ResponseProperty;
+         };
          hub.UpdateVM(nameof(FilterTestVM), new Dictionary<string, object> { { "TriggerProperty", true } });
 
          filter1Assertions();
          filter2Assertions();
+         Assert.AreEqual("TRIGGERED", responsePropertyValue);
       }
-
-
 
       [TestMethod]
       public void Filter_PushUpdateIntercepted()

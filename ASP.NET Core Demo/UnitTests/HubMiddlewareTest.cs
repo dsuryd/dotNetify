@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 using DotNetify;
 using DotNetify.Security;
 using Newtonsoft.Json.Linq;
@@ -17,6 +18,14 @@ namespace UnitTests
       private class MiddlewareTestVM : BaseVM
       {
          public string Property { get; set; } = "Hello";
+
+         public bool TriggerProperty
+         {
+            get { return false; }
+            set { Changed(nameof(ResponseProperty)); }
+         }
+
+         public string ResponseProperty => "Triggered";
       }
 
       private abstract class MiddlewareBase : IMiddleware
@@ -32,7 +41,23 @@ namespace UnitTests
       }
 
       private class CustomMiddleware1 : MiddlewareBase { }
+
       private class CustomMiddleware2 : MiddlewareBase { }
+
+      private class CustomMiddleware3 : IMiddleware
+      {
+         public Task Invoke(DotNetifyHubContext context, NextDelegate next)
+         {
+            if (context.CallType == "Response_VM")
+            {
+               var data = JsonConvert.DeserializeObject<IDictionary<string, object>>(context.Data.ToString());
+               foreach (var key in data.Keys.ToList())
+                  data[key] = data[key].ToString().ToUpper();
+               context.Data = JsonConvert.SerializeObject(data);
+            }
+            return next(context);
+         }
+      }
 
       private CustomMiddleware1 _middleware1;
       private CustomMiddleware2 _middleware2;
@@ -266,6 +291,29 @@ namespace UnitTests
 
          middleware1Assertions();
          middleware2Assertions();
+      }
+
+      [TestMethod]
+      public void Middleware_ResponseIntercepted()
+      {
+         VMController.Register<MiddlewareTestVM>();
+         var hub = new MockDotNetifyHub()
+            .UseMiddleware<ExtractHeadersMiddleware>()
+            .UseMiddleware<JwtBearerAuthenticationMiddleware>()
+            .UseMiddleware<CustomMiddleware3>()
+            .Create();
+
+         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
+
+         string responsePropertyValue = null;
+         hub.Response += (sender, e) =>
+         {
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(e.Item2);
+            responsePropertyValue = data.ResponseProperty;
+         };
+
+         hub.UpdateVM(nameof(MiddlewareTestVM), new Dictionary<string, object> { { "TriggerProperty", true } });
+         Assert.AreEqual("TRIGGERED", responsePropertyValue);
       }
    }
 }
