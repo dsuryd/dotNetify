@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>DotNetify.DevApp</RootNamespace>
+    <AssemblyName>DotNetify.DevApp.ViewModels</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Docs\Overview.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Docs\Overview.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetify.Elements" Version="0.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetifyLib.Core\DotNetifyLib.Core.csproj" />
+    <ProjectReference Include="..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
+  </ItemGroup>
+
+</Project>

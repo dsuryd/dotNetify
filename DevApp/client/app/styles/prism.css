@@ -1,0 +1,314 @@
+/**
+ * prism.js tomorrow night eighties for JavaScript, CoffeeScript, CSS and HTML
+ * Based on https://github.com/chriskempson/tomorrow-theme
+ * @author Rose Pritchard
+ */
+
+.prism-code {
+   display: block;
+   overflow-x: auto;
+   padding: 0.5em;
+   background: #1e1e1e;
+   color: #ccc;
+   border-radius: 4px;
+}
+
+code[class*="language-"] {
+   color: #ccc;
+   background: none;
+   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+   text-align: left;
+   white-space: pre;
+   word-spacing: normal;
+   word-break: normal;
+   word-wrap: normal;
+   line-height: 1.5;
+
+   -moz-tab-size: 4;
+   -o-tab-size: 4;
+   tab-size: 4;
+
+   -webkit-hyphens: none;
+   -moz-hyphens: none;
+   -ms-hyphens: none;
+   hyphens: none;
+}
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+   color: #797379;
+}
+
+.token.punctuation {
+   color: #b9b5b8;
+}
+
+.namespace {
+   opacity: .7;
+}
+
+.token.null,
+.token.operator,
+.token.boolean,
+.token.number {
+   color: #fd8b19;
+}
+.token.function {
+   color: #dcdcaa;
+}
+.token.property {
+   color: #fdcc59;
+}
+.token.class-name,
+.token.tag {
+   color: #4ec990;
+}
+.token.string {
+   color: #ce9178;
+}
+.token.selector {
+   color: #c85e7c;
+}
+.token.attr-name {
+   color: #9cdcfe;
+}
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+   color: #149b93;
+}
+
+.token.attr-value {
+   color: #ce8d69;
+}
+
+.token.keyword,
+.token.control,
+.token.directive,
+.token.unit {
+   color: #c586a1;
+}
+
+.token.statement,
+.token.regex,
+.token.atrule {
+   color: #149b93;
+}
+
+.token.placeholder,
+.token.variable {
+   color: #1290bf;
+}
+
+.token.important {
+   color: #dd464c;
+   font-weight: bold;
+}
+
+.token.entity {
+   cursor: help;
+}
+
+pre > code.highlight {
+   outline: .4em solid red;
+   outline-offset: .4em;
+}
+
+/**
+ * prism.js Coy theme for JavaScript, CoffeeScript, CSS and HTML
+ * Based on https://github.com/tshedor/workshop-wp-theme (Example: http://workshop.kansan.com/category/sessions/basics or http://workshop.timshedor.com/category/sessions/basics);
+ * @author Tim  Shedor
+ */
+
+.language-csharp .prism-code {
+   background: #fdfdfd;
+   color: black;
+}
+
+.theme-dark .language-csharp .prism-code {
+   filter: invert(100%);
+}
+
+.theme-dark pre > code.language-csharp .prism-code {
+   border-left: 10px solid #ca7334;
+   box-shadow: none;
+}
+
+code[class*="language-csharp"] {
+   color: black;
+   background: none;
+   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+   text-align: left;
+   white-space: pre;
+   word-spacing: normal;
+   word-break: normal;
+   word-wrap: normal;
+   line-height: 1.5;
+
+   -moz-tab-size: 4;
+   -o-tab-size: 4;
+   tab-size: 4;
+
+   -webkit-hyphens: none;
+   -moz-hyphens: none;
+   -ms-hyphens: none;
+   hyphens: none;
+}
+
+/* Code blocks */
+pre > .language-csharp .prism-code {
+   position: relative;
+   overflow: auto;
+}
+
+pre > code.language-csharp .prism-code {
+   position: relative;
+   border-left: 10px solid #358ccb;
+   box-shadow: -1px 0px 0px 0px #358ccb, 0px 0px 0px 1px #dfdfdf;
+   background-color: #fdfdfd;
+   background-image: linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
+   background-size: 3em 3em;
+   background-origin: content-box;
+   background-attachment: local;
+}
+
+code[class*="language-csharp"] {
+   max-height: inherit;
+   height: inherit;
+   padding: 0 1px;
+   display: block;
+   overflow: auto;
+}
+
+.language-csharp .token.comment,
+.language-csharp .token.block-comment,
+.language-csharp .token.prolog,
+.language-csharp .token.doctype,
+.language-csharp .token.cdata {
+   color: #7d8b99;
+}
+
+.language-csharp .token.punctuation {
+   color: #5f6364;
+}
+
+.language-csharp .token.property,
+.language-csharp .token.tag,
+.language-csharp .token.boolean,
+.language-csharp .token.number,
+.language-csharp .token.function-name,
+.language-csharp .token.constant,
+.language-csharp .token.symbol,
+.language-csharp .token.deleted {
+   color: #c92c2c;
+}
+
+.language-csharp .token.selector,
+.language-csharp .token.attr-name,
+.language-csharp .token.string,
+.language-csharp .token.char,
+.language-csharp .token.builtin,
+.language-csharp .token.inserted {
+   color: #2f9c0a;
+}
+
+.language-csharp .token.string,
+.language-csharp .token.char {
+   color: darkred;
+}
+
+.language-csharp .token.function {
+   color: black;
+}
+
+.language-csharp .token.operator,
+.language-csharp .token.entity,
+.language-csharp .token.url,
+.language-csharp .token.variable {
+   color: #a67f59;
+   background: rgba(255, 255, 255, 0.5);
+}
+
+.language-csharp .token.atrule,
+.language-csharp .token.attr-value,
+.language-csharp .token.keyword {
+   color: blue;
+}
+
+.language-csharp .token.class-name {
+   color: #1990b8;
+}
+
+.language-csharp .token.regex,
+.language-csharp .token.important {
+   color: #e90;
+}
+
+.language-csharp .language-csharpcss .token.string,
+.language-csharp .style .token.string {
+   color: #a67f59;
+   background: rgba(255, 255, 255, 0.5);
+}
+
+.language-csharp .token.important {
+   font-weight: normal;
+}
+
+.language-csharp .token.bold {
+   font-weight: bold;
+}
+.language-csharp .token.italic {
+   font-style: italic;
+}
+
+.language-csharp .token.entity {
+   cursor: help;
+}
+
+.language-csharp .namespace {
+   opacity: .7;
+}
+
+@media screen and (max-width: 767px) {
+   pre[class*="language-csharp"]:before,
+   pre[class*="language-csharp"]:after {
+      bottom: 14px;
+      box-shadow: none;
+   }
+}
+
+/* Plugin styles */
+.language-csharp .token.tab:not(:empty):before,
+.language-csharp .token.cr:before,
+.language-csharp .token.lf:before {
+   color: #e0d7d1;
+}
+
+/* Plugin styles: Line Numbers */
+pre[class*="language-csharp"].line-numbers {
+   padding-left: 0;
+}
+
+pre[class*="language-csharp"].line-numbers code {
+   padding-left: 3.8em;
+}
+
+pre[class*="language-csharp"].line-numbers .line-numbers-rows {
+   left: 0;
+}
+
+/* Plugin styles: Line Highlight */
+pre[class*="language-csharp"][data-line] {
+   padding-top: 0;
+   padding-bottom: 0;
+   padding-left: 0;
+}
+.language-csharp pre[data-line] code {
+   position: relative;
+   padding-left: 4em;
+}
+.language-csharp pre .line-highlight {
+   margin-top: 0;
+}

@@ -1,0 +1,14 @@
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\bin\Debug\netstandard2.0\DotNetify.DevApp.ViewModels.deps.json
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\bin\Debug\netstandard2.0\DotNetify.DevApp.ViewModels.dll
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\bin\Debug\netstandard2.0\DotNetifyLib.Core.dll
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\bin\Debug\netstandard2.0\DotNetifyLib.SignalR.dll
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\bin\Debug\netstandard2.0\DotNetifyLib.Core.pdb
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\bin\Debug\netstandard2.0\DotNetifyLib.SignalR.pdb
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\obj\Debug\netstandard2.0\DevApp.ViewModels.csprojAssemblyReference.cache
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\obj\Debug\netstandard2.0\DevApp.ViewModels.csproj.CoreCompileInputs.cache
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\obj\Debug\netstandard2.0\DevApp.ViewModels.AssemblyInfoInputs.cache
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\obj\Debug\netstandard2.0\DevApp.ViewModels.AssemblyInfo.cs
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\obj\Debug\netstandard2.0\DevApp.ViewModels.csproj.CopyComplete
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\bin\Debug\netstandard2.0\DotNetify.DevApp.ViewModels.pdb
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\obj\Debug\netstandard2.0\DotNetify.DevApp.ViewModels.dll
+D:\Work Stuff\Open Source\dotNetify\DevApp.ViewModels\obj\Debug\netstandard2.0\DotNetify.DevApp.ViewModels.pdb
