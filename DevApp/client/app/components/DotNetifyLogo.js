@@ -80,7 +80,7 @@ const twitterIconCss = `
 
 export const GitHubLink = _ => (
    <Panel padding="1rem 1rem .5rem 1rem; &:hover { background: #efefef; }">
-      <a href="https://github.com/dsuryd/dotNetify-Elements">
+      <a href="https://github.com/dsuryd/dotNetify">
          <Label icon={<GitHubIcon />} css="cursor: pointer">
             GitHub
          </Label>
