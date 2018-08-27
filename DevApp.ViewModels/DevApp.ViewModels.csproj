@@ -7,15 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Docs\Overview.md" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Docs\Overview.md" />
+    <EmbeddedResource Include="Docs\Examples\HelloWorld.md" />
+    <EmbeddedResource Include="Docs\Examples\ControlTypes.md" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DotNetify.Elements" Version="0.1.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>

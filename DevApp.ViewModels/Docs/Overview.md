@@ -1,6 +1,6 @@
 ﻿## Overview
 
-DotNetify makes it super easy to __connect your React/React Native app to a cross-platform .NET back-end__. It frees you up from having to write AJAX requests or Web APIs, and your app gets real-time two-way communication through WebSockets with [SignalR](https://docs.microsoft.com/en-us/aspnet/core/signalr/?view=aspnetcore-2.1) for free.
+DotNetify makes it super easy to connect your React/React Native app to a cross-platform .NET back-end. It frees you up from having to write AJAX requests or Web APIs, and your app gets real-time two-way communication through WebSockets with [SignalR](https://docs.microsoft.com/en-us/aspnet/core/signalr/?view=aspnetcore-2.1) for free.
 
 Whether in a brand-new ASP.NET Core project that runs on Windows, Linux, and Mac, or in an existing ASP.NET MVC codebase, you can use it right away with only a tiny footprint and get your app running in minutes! Need proof? Pick one and try it out:
 
@@ -161,7 +161,7 @@ To get started, you only need these essential APIs to add to your React componen
 - _vm_.__$dispatch__(_state_)
 - _vm_.__$destroy__()
 
-On the back-end, inherit from BaseVM and use:
+On the back-end, inherit from __BaseVM__ and use:
 - __Changed__(_propName_)
 - __PushUpdates__(): for real-time push.
 

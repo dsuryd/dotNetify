@@ -10,6 +10,7 @@ namespace DotNetify.DevApp
    {
       private enum Route
       {
+         Home,
          Overview,
          DataFlow,
          Reactive,
@@ -37,7 +38,8 @@ namespace DotNetify.DevApp
       {
          this.RegisterRoutes("", new List<RouteTemplate>
          {
-            new RouteTemplate(nameof(Route.Overview))       { UrlPattern = "", ViewUrl = nameof(Route.Overview) },
+            new RouteTemplate(nameof(Route.Home))           { UrlPattern = "", ViewUrl = nameof(Route.Overview) },
+            new RouteTemplate(nameof(Route.Overview))       { UrlPattern = "overview" },
             new RouteTemplate(nameof(Route.DataFlow))       { UrlPattern = "dataflow" },
             new RouteTemplate(nameof(Route.Reactive))       { UrlPattern = "reactive" },
             new RouteTemplate(nameof(Route.GetStarted))     { UrlPattern = "getstarted" },
