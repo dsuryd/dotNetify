@@ -24,6 +24,8 @@ namespace DotNetify.DevApp
          services.AddMemoryCache();
          services.AddSignalR();
          services.AddDotNetify();
+
+         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
       }
 
       public void Configure(IApplicationBuilder app)

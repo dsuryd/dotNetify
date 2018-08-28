@@ -1,10 +1,10 @@
-import React from "react";
-import dotnetify from "dotnetify";
-import styled from "styled-components";
-import RenderExample from "../../components/RenderExample";
+import React from 'react';
+import dotnetify from 'dotnetify';
+import styled from 'styled-components';
+import RenderExample from '../../components/RenderExample';
 
 const Container = styled.div`
-  > section {
+  > tr {
     display: flex;
     margin-bottom: 1.5rem;
 
@@ -53,22 +53,19 @@ class ControlTypes extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      TextBoxValue: "",
-      SearchBox: "",
+      TextBoxValue: '',
+      SearchBox: '',
       SearchResults: [],
       ShowMeCheckBox: true,
       EnableMeCheckBox: true,
-      SimpleDropDownValue: "",
+      SimpleDropDownValue: '',
       SimpleDropDownOptions: [],
-      DropDownValue: "",
+      DropDownValue: '',
       DropDownOptions: []
     };
 
     // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect(
-      "ControlTypesVM",
-      this
-    );
+    this.vm = dotnetify.react.connect('ControlTypesVM', this);
 
     // Set up function to dispatch state to the back-end with optimistic update.
     this.dispatchState = state => {
@@ -84,12 +81,12 @@ class ControlTypes extends React.Component {
   render() {
     return (
       <Container>
-        <section>
-          <div>
+        <tr>
+          <td>
             <b>Text box:</b>
             <label>(updates on losing focus)</label>
-          </div>
-          <div>
+          </td>
+          <td>
             <input
               type="text"
               className="form-control"
@@ -98,16 +95,16 @@ class ControlTypes extends React.Component {
               onChange={e => this.setState({ TextBoxValue: e.target.value })}
               onBlur={_ => this.dispatchState({ TextBoxValue: this.state.TextBoxValue })}
             />
-          </div>
-          <div>{this.state.TextBoxResult}</div>
-        </section>
+          </td>
+          <td>{this.state.TextBoxResult}</td>
+        </tr>
 
-        <section>
-          <div>
+        <tr>
+          <td>
             <b>Search box:</b>
             <label>(updates on keystroke)</label>
-          </div>
-          <div>
+          </td>
+          <td>
             <input
               type="text"
               className="form-control"
@@ -124,15 +121,15 @@ class ControlTypes extends React.Component {
                 ))}
               </ul>
             )}
-          </div>
-          <div />
-        </section>
+          </td>
+          <td />
+        </tr>
 
-        <section>
-          <div>
+        <tr>
+          <td>
             <b>Check box:</b>
-          </div>
-          <div>
+          </td>
+          <td>
             <label>
               <input
                 type="checkbox"
@@ -149,22 +146,22 @@ class ControlTypes extends React.Component {
               />
               <span>Enable me</span>
             </label>
-          </div>
-          <div>
+          </td>
+          <td>
             {this.state.ShowMeCheckBox && (
               <button className="btn btn-secondary" disabled={!this.state.EnableMeCheckBox}>
                 {this.state.CheckBoxResult}
               </button>
             )}
-          </div>
-        </section>
+          </td>
+        </tr>
 
-        <section>
-          <div>
+        <tr>
+          <td>
             <b>Simple drop-down list:</b>
             <label>(string data type)</label>
-          </div>
-          <div>
+          </td>
+          <td>
             <select
               value={this.state.SimpleDropDownValue}
               onChange={e => this.dispatchState({ SimpleDropDownValue: e.target.value })}
@@ -178,16 +175,16 @@ class ControlTypes extends React.Component {
                 </option>
               ))}
             </select>
-          </div>
-          <div>{this.state.SimpleDropDownResult}</div>
-        </section>
+          </td>
+          <td>{this.state.SimpleDropDownResult}</td>
+        </tr>
 
-        <section>
-          <div>
+        <tr>
+          <td>
             <b>Drop-down list:</b>
             <label>(object data type)</label>
-          </div>
-          <div>
+          </td>
+          <td>
             <select
               value={this.state.DropDownValue}
               onChange={e => this.dispatchState({ DropDownValue: e.target.value })}
@@ -201,20 +198,20 @@ class ControlTypes extends React.Component {
                 </option>
               ))}
             </select>
-          </div>
-          <div>{this.state.DropDownResult}</div>
-        </section>
+          </td>
+          <td>{this.state.DropDownResult}</td>
+        </tr>
 
-        <section>
-          <div>
+        <tr>
+          <td>
             <b>Radio button:</b>
-          </div>
-          <div>
+          </td>
+          <td>
             <label className={this.state.RadioButtonStyle}>
               <input
                 type="radio"
                 value="green"
-                checked={this.state.RadioButtonValue == "green"}
+                checked={this.state.RadioButtonValue == 'green'}
                 onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
               />
               &nbsp;Green
@@ -223,20 +220,20 @@ class ControlTypes extends React.Component {
               <input
                 type="radio"
                 value="yellow"
-                checked={this.state.RadioButtonValue == "yellow"}
+                checked={this.state.RadioButtonValue == 'yellow'}
                 onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
               />
               &nbsp;Yellow
             </label>
-          </div>
-          <div />
-        </section>
+          </td>
+          <td />
+        </tr>
 
-        <section>
-          <div>
+        <tr>
+          <td>
             <b>Button:</b>
-          </div>
-          <div>
+          </td>
+          <td>
             <button
               type="button"
               className="btn btn-primary"
@@ -244,16 +241,16 @@ class ControlTypes extends React.Component {
             >
               Click me
             </button>
-          </div>
-          <div>
+          </td>
+          <td>
             {this.state.ClickCount > 0 && (
               <span>
                 You clicked me <b>{this.state.ClickCount}</b>
                 &nbsp;times!
               </span>
             )}
-          </div>
-        </section>
+          </td>
+        </tr>
       </Container>
     );
   }
