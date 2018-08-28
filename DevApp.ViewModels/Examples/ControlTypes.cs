@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using DotNetify;
 using DotNetify.Elements;
 
 namespace DotNetify.DevApp
@@ -19,136 +20,126 @@ namespace DotNetify.DevApp
 
    public class ControlTypesVM : BaseVM
    {
-      private class FormData
+      // Text Box
+
+      public string TextBoxValue
       {
-         public string MyText { get; set; }
-         public decimal MyMoney { get; set; }
-         public DateTimeOffset MyDate { get; set; }
-         public string MyDropdown { get; set; }
-         public string[] MyMultiselect { get; set; }
-         public string MyTextArea { get; set; }
-         public string MyRadio { get; set; }
-         public string MyRadioToggle { get; set; }
-         public string[] MyCheckboxGroup { get; set; }
+         get => Get<string>() ?? "";
+         set
+         {
+            Set(value);
+            Changed(() => TextBoxResult);
+         }
       }
+      public string TextBoxPlaceHolder => "Type something here"; 
+      public string TextBoxResult => !string.IsNullOrEmpty(TextBoxValue) ? $"You typed: {TextBoxValue}" : null; 
 
-      public ControlTypesVM()
+      // Search Box
+
+      private List<string> Planets = new List<string> { "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Neptune", "Uranus" };
+      public string SearchBox
       {
-         AddProperty(nameof(FormData.MyText), "")
-             .WithAttribute(new TextFieldAttribute
-             {
-                Label = "Text:",
-                Placeholder = "Enter text"
-             });
-
-         AddProperty<decimal>(nameof(FormData.MyMoney))
-             .WithAttribute(new TextFieldAttribute
-             {
-                Label = "Money:",
-                Placeholder = "Enter amount",
-                Prefix = "$",
-                MaxLength = 11,
-                Mask = new NumberMask
-                {
-                   IncludeThousandsSeparator = true,
-                   AllowDecimal = true,
-                   DecimalLimit = 2
-                }
-             });
-
-         AddProperty(nameof(FormData.MyDate), DateTimeOffset.Now)
-             .WithAttribute(new DateFieldAttribute
-             {
-                Label = "Date:",
-                Min = DateTimeOffset.Now.AddMonths(-1),
-                Max = DateTimeOffset.Now.AddMonths(6)
-             });
-
-         AddProperty(nameof(FormData.MyDropdown), "D3")
-             .WithAttribute(new DropdownListAttribute
-             {
-                Label = "Dropdown list:",
-                Options = new Dictionary<string, string>
-                {
-                  { "D1", "Dropdown 1" },
-                  { "D2", "Dropdown 2" },
-                  { "D3", "Dropdown 3" },
-                  { "D4", "Dropdown 4" },
-                  { "D5", "Dropdown 5" }
-                }.ToArray()
-             });
-
-         AddProperty(nameof(FormData.MyMultiselect), new string[] { "M1", "M4" })
-             .WithAttribute(new DropdownListAttribute
-             {
-                Label = "Multiselect list:",
-                Options = new Dictionary<string, string>
-                {
-                  { "M1", "Multiselect 1" },
-                  { "M2", "Multiselect 2" },
-                  { "M3", "Multiselect 3" },
-                  { "M4", "Multiselect 4" },
-                  { "M5", "Multiselect 5" }
-                }.ToArray()
-             });
-
-         AddProperty(nameof(FormData.MyTextArea), "")
-             .WithAttribute(new TextAreaFieldAttribute { Label = "Text area:", Placeholder = "Enter text", Rows = 3 });
-
-         AddProperty(nameof(FormData.MyRadio), "R1")
-             .WithAttribute(new RadioGroupAttribute
-             {
-                Label = "Radio Group:",
-                Options = new Dictionary<string, string>
-                {
-                  { "R1", "Radio 1" },
-                  { "R2", "Radio 2" },
-                  { "R3", "Radio 3" }
-                }.ToArray()
-             });
-
-         AddProperty(nameof(FormData.MyRadioToggle), "R2")
-             .WithAttribute(new RadioGroupAttribute
-             {
-                Label = "Radio Toggle:",
-                Options = new Dictionary<string, string>
-                {
-                  { "R1", "Radio 1" },
-                  { "R2", "Radio 2" },
-                  { "R3", "Radio 3" }
-                }.ToArray()
-             });
-
-         AddProperty(nameof(FormData.MyCheckboxGroup), new string[] { "C1", "C3" })
-             .WithAttribute(new RadioGroupAttribute
-             {
-                Label = "Checkbox Group:",
-                Options = new Dictionary<string, string>
-                {
-                  { "C1", "Checkbox 1" },
-                  { "C2", "Checkbox 2" },
-                  { "C3", "Checkbox 3" }
-                }.ToArray()
-             });
-
-         AddProperty<string>("SubmitSuccess")
-            .SubscribeTo(
-               AddInternalProperty<FormData>("Submit").Select(data => SuccessMessage(data)));
+         get => Get<string>() ?? ""; 
+         set
+         {
+            Set(value);
+            Changed(() => SearchResults);
+         }
       }
+      public string SearchBoxPlaceHolder => "Type a planet"; 
+      public IEnumerable<string> SearchResults => Planets.Where(i => !string.IsNullOrEmpty(SearchBox) 
+        && i.ToLower().StartsWith(SearchBox.ToLower())
+        && i.ToLower() != SearchBox.ToLower()); 
 
-      private string SuccessMessage(FormData data) =>
-         // Written in Github-flavored markdown format:
-         $@"**Submitted:**<br/>
-         MyText: **{WhitespaceIfEmpty(data.MyText)}**<br/>
-         MyMoney: **{data.MyMoney}**<br/>
-         MyDate: **{data.MyDate}**<br/>
-         MyDropdown: **{data.MyDropdown}**<br/>
-         MyMultiselect: **{WhitespaceIfEmpty(string.Join(", ", data.MyMultiselect))}**<br/>
-         MyTextArea: **{WhitespaceIfEmpty(data.MyTextArea)}**<br/>
-         MyRadio: **{data.MyRadio}**<br/>
-         MyRadioToggle: **{data.MyRadioToggle}**<br/>
-         MyCheckboxGroup: **{WhitespaceIfEmpty(string.Join(", ", data.MyCheckboxGroup))}**";
+      // Check Box
 
-      private string WhitespaceIfEmpty(string text) => !string.IsNullOrEmpty(text) ? text : " ";
+      public bool ShowMeCheckBox
+      {
+         get => Get<bool?>() ?? true;
+         set
+         {
+            Set(value);
+            Changed(() => CheckBoxResult);
+         }
+      }
+      public bool EnableMeCheckBox
+      {
+         get => Get<bool?>() ?? true; 
+         set
+         {
+            Set(value);
+            Changed(() => CheckBoxResult);
+         }
+      }
+      public string CheckBoxResult => $"I am " + (EnableMeCheckBox ? "ENABLED" : "DISABLED"); 
+
+      // Simple Drop-down
+
+      public List<string> SimpleDropDownOptions => new List<string> { "One", "Two", "Three", "Four" }; 
+      public string SimpleDropDownValue
+      {
+         get => Get<string>() ?? "";
+         set
+         {
+            Set(value);
+            Changed(() => SimpleDropDownResult);
+         }
+      }
+      public string SimpleDropDownResult => !string.IsNullOrEmpty(SimpleDropDownValue) ? $"You selected: {SimpleDropDownValue}" : null; 
+
+      // Drop Down Objects
+
+      public class DropDownItem
+      {
+         public int Id { get; set; }
+         public string Text { get; set; }
+      }
+      public string DropDownCaption => "Select an item ..."; 
+      public List<DropDownItem> DropDownOptions
+      {
+         get => new List<DropDownItem>
+         {
+            new DropDownItem { Id = 1, Text = "Object One" },
+            new DropDownItem { Id = 2, Text = "Object Two" },
+            new DropDownItem { Id = 3, Text = "Object Three" },
+            new DropDownItem { Id = 4, Text = "Object Four" }
+         };
+      }
+      public int DropDownValue
+      {
+         get => Get<int>(); 
+         set
+         {
+            Set(value);
+            Changed(() => DropDownResult);
+         }
+      }
+      public string DropDownResult => DropDownValue > 0 ? $"You selected: {DropDownOptions.First(i => i.Id == DropDownValue).Text}" : null; 
+
+      // Radio Buttons
+
+      public string RadioButtonValue
+      {
+         get => Get<string>() ?? "green"; 
+         set
+         {
+            Set(value);
+            Changed(() => RadioButtonStyle);
+         }
+      }
+      public string RadioButtonStyle => RadioButtonValue == "green" ? "label-success" : "label-warning";
+
+      // Button
+
+      public bool ButtonClicked
+      {
+         get => false;
+         set => ClickCount++;
+      }
+      public int ClickCount
+      {
+         get => Get<int>(); 
+         set => Set(value); 
+      }
    }
 }
