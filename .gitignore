@@ -3,6 +3,8 @@
 ################################################################################
 
 /.vs
+/DevApp.ViewModels/bin
+/DevApp.ViewModels/obj
 /DotNetifyLib.Core/bin
 /DotNetifyLib.Core/obj
 /DotNetifyLib/bin
