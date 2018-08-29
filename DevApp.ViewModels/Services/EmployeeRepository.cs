@@ -20,7 +20,7 @@ namespace DotNetify.DevApp
 
    public interface IEmployeeRepository
    {
-      IEnumerable<Employee> GetAll();
+      IEnumerable<Employee> GetAll(int count);
 
       Employee Get(int id);
 
@@ -33,9 +33,9 @@ namespace DotNetify.DevApp
 
    public class EmployeeRepository : IEmployeeRepository
    {
-      private IList<Employee> _mockData = GenerateMockData();
+      private IList<Employee> _mockData;
 
-      public IEnumerable<Employee> GetAll() => _mockData;
+      public IEnumerable<Employee> GetAll(int count) => _mockData ?? GenerateMockData(count);
 
       public Employee Get(int id) => _mockData.FirstOrDefault(x => x.Id == id);
 
@@ -70,16 +70,19 @@ namespace DotNetify.DevApp
          _mockData.Remove(employee);
       }
 
-      private static IList<Employee> GenerateMockData()
+      private IList<Employee> GenerateMockData(int count)
       {
          int id = 0;
-         return new Faker<Employee>()
+         var list = new Faker<Employee>()
             .CustomInstantiator(f => new Employee { Id = ++id })
             .RuleFor(o => o.FirstName, f => f.Person.FirstName)
             .RuleFor(o => o.LastName, f => f.Person.LastName)
             .RuleFor(o => o.ReportTo, f => f.Person.FullName)
             .RuleFor(o => o.Phone, f => f.Phone.PhoneNumber("(###) ###-####"))
-            .Generate(100);
+            .Generate(count);
+
+         _mockData = list;
+         return list;
       }
    }
 }

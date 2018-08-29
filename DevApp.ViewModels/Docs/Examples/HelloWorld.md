@@ -4,6 +4,7 @@
 import React from "react";
 import dotnetify from "dotnetify";
 import styled from "styled-components";
+import TextBox from './components/TextBox';
 
 const Container = styled.div`
   /*...styles...*/
@@ -51,6 +52,12 @@ class HelloWorld extends React.Component {
     );
   }
 }
+```
+
+##### TextBox.js
+
+```jsx
+import React from 'react';
 
 class TextBox extends React.Component {
   state = { changed: false };
@@ -81,6 +88,8 @@ class TextBox extends React.Component {
     );
   }
 }
+
+export default TextBox;
 ```
 
 ##### HelloWorldVM.cs

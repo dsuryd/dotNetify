@@ -1,11 +1,13 @@
 import React from "react";
 import dotnetify from "dotnetify";
 import styled from "styled-components";
+import TextBox from './components/TextBox';
 import RenderExample from "../../components/RenderExample";
 
 const Container = styled.div`
   > section {
     display: flex;
+    max-width: 1268px;
     margin-bottom: 1rem;
     > * {
       flex: 1;
@@ -53,36 +55,6 @@ class HelloWorld extends React.Component {
           Full name is <b>{this.state.FullName}</b>
         </footer>
       </Container>
-    );
-  }
-}
-
-class TextBox extends React.Component {
-  state = { changed: false };
-
-  handleChange = event => {
-    this.setState({ changed: true });
-    this.props.onChange(event.target.value);
-  };
-
-  handleBlur = () => {
-    if (this.state.changed) this.props.onUpdate(this.props.value);
-    this.setState({ changed: false });
-  };
-
-  render() {
-    return (
-      <div>
-        <label>{this.props.label}</label>
-        <input
-          type="text"
-          className="form-control"
-          value={this.props.value}
-          placeholder={this.props.placeholder}
-          onChange={this.handleChange}
-          onBlur={this.handleBlur}
-        />
-      </div>
     );
   }
 }

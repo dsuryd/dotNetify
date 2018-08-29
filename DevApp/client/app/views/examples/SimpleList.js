@@ -1,15 +1,36 @@
-import React from 'react';
-import dotnetify from 'dotnetify';
-import styled from 'styled-components';
-import RenderExample from '../../components/RenderExample';
+import React from "react";
+import dotnetify from "dotnetify";
+import styled from "styled-components";
+import TextBox from "./components/TextBox";
+import InlineEdit from "./components/InlineEdit";
+import RenderExample from "../../components/RenderExample";
 
 const Container = styled.div`
-  > section {
+  > header {
     display: flex;
+    align-items: center;
     margin-bottom: 1rem;
     > * {
-      flex: 1;
       margin-right: 1rem;
+    }
+  }
+  > table {
+    width: 100%;
+    max-width: 1268px;
+    td,
+    th {
+      padding: 0.5rem 0;
+      padding-right: 2rem;
+      border-bottom: 1px solid #ddd;
+      width: 25%;
+    }
+    td:last-child > div {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    tr:hover {
+      background: #efefef;
     }
   }
 `;
@@ -17,13 +38,21 @@ const Container = styled.div`
 class SimpleList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { Employees: [], newName: "" };
 
     // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect('SimpleListVM', this);
+    this.vm = dotnetify.react.connect(
+      "SimpleListVM",
+      this
+    );
 
     // Set up function to dispatch state to the back-end.
-    this.dispatchState = state => this.vm.$dispatch(state);
+    this.dispatch = state => this.vm.$dispatch(state);
+
+    this.dispatchState = state => {
+      this.setState(state);
+      this.vm.$dispatch(state);
+    };
   }
 
   componentWillUnmount() {
@@ -31,7 +60,53 @@ class SimpleList extends React.Component {
   }
 
   render() {
-    return <Container />;
+    return (
+      <Container>
+        <header>
+          <span>Add:</span>
+          <TextBox
+            placeholder="Type full name here"
+            value={this.state.newName}
+            onChange={value => this.setState({ newName: value })}
+            onUpdate={value => {
+              this.dispatch({ Add: value });
+              this.setState({ newName: "" });
+            }}
+          />
+        </header>
+        <table>
+          <tbody>
+            <tr>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th />
+            </tr>
+            {this.state.Employees.map(employee => (
+              <tr key={employee.Id}>
+                <td>
+                  <InlineEdit
+                    text={employee.FirstName}
+                    onChange={value => this.dispatch({ Id: employee.Id, FirstName: value })}
+                  />
+                </td>
+                <td>
+                  {" "}
+                  <InlineEdit
+                    text={employee.LastName}
+                    onChange={value => this.dispatch({ Id: employee.Id, LastName: value })}
+                  />
+                </td>
+                <td>
+                  <div onClick={_ => this.dispatch({ Remove: employee.Id })}>
+                    <i className="material-icons">clear</i>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Container>
+    );
   }
 }
 
