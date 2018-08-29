@@ -18,7 +18,6 @@ namespace DotNetify.DevApp
          HelloWorld,
          ControlTypes,
          SimpleList,
-         GridView,
          CompositeView,
          LiveChart,
          BookStore,
@@ -46,7 +45,6 @@ namespace DotNetify.DevApp
             new RouteTemplate(nameof(Route.HelloWorld))     { UrlPattern = "examples/helloworld" },
             new RouteTemplate(nameof(Route.ControlTypes))   { UrlPattern = "examples/controltypes" },
             new RouteTemplate(nameof(Route.SimpleList))     { UrlPattern = "examples/simplelist" },
-            new RouteTemplate(nameof(Route.GridView))       { UrlPattern = "examples/gridview" },
             new RouteTemplate(nameof(Route.CompositeView))  { UrlPattern = "examples/compositeview" },
             new RouteTemplate(nameof(Route.LiveChart))      { UrlPattern = "examples/livechart" },
             new RouteTemplate(nameof(Route.BookStore))      { UrlPattern = "examples/bookstore" },
@@ -84,7 +82,6 @@ namespace DotNetify.DevApp
                   Label = "Further Examples",
                   Routes = new NavRoute[]
                   {
-                     new NavRoute("Grid View",        this.GetRoute(nameof(Route.GridView))),
                      new NavRoute("Composite View",   this.GetRoute(nameof(Route.CompositeView))),
                      new NavRoute("Live Chart",       this.GetRoute(nameof(Route.LiveChart))),
                      new NavRoute("Book Store",       this.GetRoute(nameof(Route.BookStore))),

@@ -1,11 +1,12 @@
-import React from "react";
-import dotnetify from "dotnetify";
-import styled from "styled-components";
-import TextBox from "./components/TextBox";
-import InlineEdit from "./components/InlineEdit";
-import RenderExample from "../../components/RenderExample";
+import React from 'react';
+import dotnetify from 'dotnetify';
+import styled from 'styled-components';
+import TextBox from './components/TextBox';
+import InlineEdit from './components/InlineEdit';
+import RenderExample from '../../components/RenderExample';
 
 const Container = styled.div`
+  padding: 0 1rem;
   > header {
     display: flex;
     align-items: center;
@@ -15,6 +16,7 @@ const Container = styled.div`
     }
   }
   > table {
+    font-size: unset;
     width: 100%;
     max-width: 1268px;
     td,
@@ -22,12 +24,16 @@ const Container = styled.div`
       padding: 0.5rem 0;
       padding-right: 2rem;
       border-bottom: 1px solid #ddd;
-      width: 25%;
+      width: 50%;
     }
-    td:last-child > div {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
+    td:last-child,
+    th:last-child {
+      width: 5rem;
+      > div {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
     }
     tr:hover {
       background: #efefef;
@@ -38,13 +44,10 @@ const Container = styled.div`
 class SimpleList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { Employees: [], newName: "" };
+    this.state = { Employees: [], newName: '' };
 
     // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect(
-      "SimpleListVM",
-      this
-    );
+    this.vm = dotnetify.react.connect('SimpleListVM', this);
 
     // Set up function to dispatch state to the back-end.
     this.dispatch = state => this.vm.$dispatch(state);
@@ -70,7 +73,7 @@ class SimpleList extends React.Component {
             onChange={value => this.setState({ newName: value })}
             onUpdate={value => {
               this.dispatch({ Add: value });
-              this.setState({ newName: "" });
+              this.setState({ newName: '' });
             }}
           />
         </header>
@@ -90,7 +93,7 @@ class SimpleList extends React.Component {
                   />
                 </td>
                 <td>
-                  {" "}
+                  {' '}
                   <InlineEdit
                     text={employee.LastName}
                     onChange={value => this.dispatch({ Id: employee.Id, LastName: value })}

@@ -7,16 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Docs\Examples\AFITop100.json" />
     <EmbeddedResource Include="Docs\Overview.md" />
     <EmbeddedResource Include="Docs\Examples\HelloWorld.md" />
     <EmbeddedResource Include="Docs\Examples\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Examples\SimpleList.md" />
+    <EmbeddedResource Include="Docs\Examples\CompositeView.md" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DotNetify.Elements" Version="0.1.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    <PackageReference Include="Bogus" Version="22.1.3" />        
+    <PackageReference Include="Bogus" Version="22.1.3" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.8.17" />        
   </ItemGroup>
 
   <ItemGroup>

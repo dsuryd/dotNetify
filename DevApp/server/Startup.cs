@@ -26,6 +26,7 @@ namespace DotNetify.DevApp
          services.AddDotNetify();
 
          services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+         services.AddSingleton<IMovieService, MovieService>();
       }
 
       public void Configure(IApplicationBuilder app)

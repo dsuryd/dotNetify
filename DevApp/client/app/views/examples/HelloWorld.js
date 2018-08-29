@@ -1,10 +1,11 @@
-import React from "react";
-import dotnetify from "dotnetify";
-import styled from "styled-components";
+import React from 'react';
+import dotnetify from 'dotnetify';
+import styled from 'styled-components';
 import TextBox from './components/TextBox';
-import RenderExample from "../../components/RenderExample";
+import RenderExample from '../../components/RenderExample';
 
 const Container = styled.div`
+  padding: 0 1rem;
   > section {
     display: flex;
     max-width: 1268px;
@@ -19,10 +20,10 @@ const Container = styled.div`
 class HelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { FirstName: "", LastName: "" };
+    this.state = { FirstName: '', LastName: '' };
 
     // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect("HelloWorldVM", this);
+    this.vm = dotnetify.react.connect('HelloWorldVM', this);
 
     // Set up function to dispatch state to the back-end.
     this.dispatchState = state => this.vm.$dispatch(state);
