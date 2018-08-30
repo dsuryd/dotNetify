@@ -45,9 +45,9 @@ class HelloWorld extends React.Component {
             onUpdate={value => this.dispatchState({ LastName: value })}
           />
         </section>
-        <footer>
+        <div>
           Full name is <b>{this.state.FullName}</b>
-        </footer>
+        </div>
       </Container>
     );
   }

@@ -8,6 +8,32 @@ const Container = styled.div`
   padding: 0 1rem;
   table {
     font-size: unset;
+    tr:hover {
+      background: #eee;
+      cursor: pointer;
+    }
+    td,
+    th {
+      padding: 0.5rem 0;
+      padding-right: 2rem;
+      border-bottom: 1px solid #ddd;
+    }
+  }
+  .pagination {
+    user-select: none;
+    div {
+      margin-top: 1rem;
+      padding: .5rem 1rem;
+      border: 1px solid #ccc;
+      &.current {
+        color: #aaa;
+        background: #eee;
+      }
+    }
+    div:hover:not(.current) {
+      background: #eee;
+      cursor: pointer;
+    }
   }
 `;
 
@@ -54,27 +80,40 @@ class MovieTable extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-    this.state = this.context.connect('MovieTableVM', this) || { Headers: [], Data: [] };
+    this.state = this.context.connect('MovieTableVM', this) || { Headers: [], Data: [], Pagination: [] };
   }
   componentWillUnmount() {
     this.vm.$destroy();
   }
   render() {
     return (
-      <table>
-        <tbody>
-          <tr>{this.state.Headers.map((text, idx) => <th key={idx}>{text}</th>)}</tr>
-          {this.state.Data.map((data, idx) => (
-            <tr>
-              <td key={idx}>{data.Rank}</td>
-              <td key={idx}>{data.Movie}</td>
-              <td key={idx}>{data.Year}</td>
-              <td key={idx}>{data.Cast}</td>
-              <td key={idx}>{data.Director}</td>
-            </tr>
+      <section>
+        <table>
+          <tbody>
+            <tr>{this.state.Headers.map((text, idx) => <th key={idx}>{text}</th>)}</tr>
+            {this.state.Data.map((data, idx) => (
+              <tr key={idx}>
+                <td>{data.Rank}</td>
+                <td>{data.Movie}</td>
+                <td>{data.Year}</td>
+                <td>{data.Cast}</td>
+                <td>{data.Director}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="pagination">
+          {this.state.Pagination.map(num => (
+            <div
+              key={num}
+              className={this.state.SelectedPage === num ? 'current' : ''}
+              onClick={_ => this.dispatchState({ SelectedPage: num })}
+            >
+              {num}
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </section>
     );
   }
 }
