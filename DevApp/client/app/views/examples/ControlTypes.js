@@ -15,13 +15,16 @@ const Container = styled.div`
       padding-bottom: 1.5rem;
     }
     td:first-child {
-      width: 20%;
-      min-width: 20rem;
+      font-weight: 500;
       display: flex;
       flex-direction: column;
+      > label {
+        font-weight: normal;
+        font-size: small;
+      }
     }
     td:nth-child(2) {
-      width: 50%;
+      width: 70%;
       padding-right: 1.5rem;
       li {
         cursor: pointer;
@@ -29,29 +32,23 @@ const Container = styled.div`
       li:hover {
         background: #efefef;
       }
-      input[type="checkbox"] ~ * {
-        margin-left: 0.25rem;
+      input ~ * {
+        margin-left: 5px;
+        margin-right: 0rem;
       }
       label {
         cursor: pointer;
         user-select: none;
-        &:first-child {
-          margin-right: 2rem;
-        }
-        &.label-warning {
-          background: #f0ad4e;
-          padding: 0.5rem 1rem;
-          border-radius: 0.25rem;
-        }
-        &.label-success {
-          background: #5cb85c;
-          padding: 0.5rem 1rem;
-          border-radius: 0.25rem;
-        }
+        margin-right: 1.5rem;
       }
     }
-    td:last-child {
-      width: 30%;
+    button.label-success {
+      margin-left: 3rem;
+      background: #5cb85c;
+    }
+    button.label-warning {
+      margin-left: 3rem;
+      background: #f0ad4e;
     }
   }
 `;
@@ -92,7 +89,7 @@ class ControlTypes extends React.Component {
           <tbody>
             <tr>
               <td>
-                <b>Text box:</b>
+                Text box:
                 <label>(updates on losing focus)</label>
               </td>
               <td>
@@ -104,13 +101,13 @@ class ControlTypes extends React.Component {
                   onChange={e => this.setState({ TextBoxValue: e.target.value })}
                   onBlur={_ => this.dispatchState({ TextBoxValue: this.state.TextBoxValue })}
                 />
+                <b>{this.state.TextBoxResult}</b>
               </td>
-              <td>{this.state.TextBoxResult}</td>
             </tr>
 
             <tr>
               <td>
-                <b>Search box:</b>
+                Search box:
                 <label>(updates on keystroke)</label>
               </td>
               <td>
@@ -131,13 +128,10 @@ class ControlTypes extends React.Component {
                   </ul>
                 )}
               </td>
-              <td />
             </tr>
 
             <tr>
-              <td>
-                <b>Check box:</b>
-              </td>
+              <td>Check box:</td>
               <td>
                 <label>
                   <input
@@ -155,8 +149,6 @@ class ControlTypes extends React.Component {
                   />
                   <span>Enable me</span>
                 </label>
-              </td>
-              <td>
                 {this.state.ShowMeCheckBox && (
                   <button className="btn btn-secondary" disabled={!this.state.EnableMeCheckBox}>
                     {this.state.CheckBoxResult}
@@ -167,7 +159,7 @@ class ControlTypes extends React.Component {
 
             <tr>
               <td>
-                <b>Simple drop-down list:</b>
+                Simple drop-down list:
                 <label>(string data type)</label>
               </td>
               <td>
@@ -185,13 +177,13 @@ class ControlTypes extends React.Component {
                     </option>
                   ))}
                 </select>
+                <b>{this.state.SimpleDropDownResult}</b>
               </td>
-              <td>{this.state.SimpleDropDownResult}</td>
             </tr>
 
             <tr>
               <td>
-                <b>Drop-down list:</b>
+                Drop-down list:
                 <label>(object data type)</label>
               </td>
               <td>
@@ -209,53 +201,47 @@ class ControlTypes extends React.Component {
                     </option>
                   ))}
                 </select>
+                <b>{this.state.DropDownResult}</b>
               </td>
-              <td>{this.state.DropDownResult}</td>
             </tr>
 
             <tr>
+              <td>Radio button:</td>
               <td>
-                <b>Radio button:</b>
-              </td>
-              <td>
-                <label className={this.state.RadioButtonStyle}>
+                <label>
                   <input
                     type="radio"
                     value="green"
                     checked={this.state.RadioButtonValue == 'green'}
                     onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
                   />
-                  &nbsp;Green
+                  <span>Green</span>
                 </label>
-                <label className={this.state.RadioButtonStyle}>
+                <label>
                   <input
                     type="radio"
                     value="yellow"
                     checked={this.state.RadioButtonValue == 'yellow'}
                     onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
                   />
-                  &nbsp;Yellow
+                  <span>Yellow</span>
                 </label>
+                <button className={'btn ' + this.state.RadioButtonStyle}>Result</button>
               </td>
-              <td />
             </tr>
 
             <tr>
-              <td>
-                <b>Button:</b>
-              </td>
+              <td>Button: </td>
               <td>
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="btn btn-secondary"
                   onClick={_ => this.dispatchState({ ButtonClicked: true })}
                 >
-                  Click me
+                  Click Me
                 </button>
-              </td>
-              <td>
                 {this.state.ClickCount > 0 && (
-                  <span>
+                  <span style={{ marginLeft: '2rem' }}>
                     You clicked me <b>{this.state.ClickCount}</b>
                     &nbsp;times!
                   </span>

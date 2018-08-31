@@ -6,11 +6,34 @@ import RenderExample from '../../components/RenderExample';
 
 const Container = styled.div`
   padding: 0 1rem;
+  display: flex;
+  > * {
+    &:first-child {
+      margin-right: 1rem;
+    }
+    &:last-child {
+      width: 20%;
+      min-width: 10rem;
+    }
+  }
+  .card {
+    p {
+      font-size: unset;
+    }
+    .card-header > *:first-child {
+      font-size: large;
+    }
+  }
   table {
     font-size: unset;
-    tr:hover {
-      background: #eee;
-      cursor: pointer;
+    tr {
+      &:hover {
+        background: #eee;
+        cursor: pointer;
+      }
+      &.selected {
+        background: #ddd;
+      }
     }
     td,
     th {
@@ -56,21 +79,14 @@ class CompositeView extends React.Component {
     return (
       <Container>
         <Scope vm="CompositeViewVM">
-          <FilterableMovieTableVM />
+          <Scope vm="FilterableMovieTableVM">
+            <MovieTable />
+          </Scope>
+          <aside>
+            <MovieDetails />
+          </aside>
         </Scope>
       </Container>
-    );
-  }
-}
-
-class FilterableMovieTableVM extends React.Component {
-  static contextTypes = { connect: PropTypes.func };
-
-  render() {
-    return (
-      <Scope vm="FilterableMovieTableVM">
-        <MovieTable />
-      </Scope>
     );
   }
 }
@@ -82,9 +98,11 @@ class MovieTable extends React.Component {
     super(props, context);
     this.state = this.context.connect('MovieTableVM', this) || { Headers: [], Data: [], Pagination: [] };
   }
+
   componentWillUnmount() {
     this.vm.$destroy();
   }
+
   render() {
     return (
       <section>
@@ -92,7 +110,11 @@ class MovieTable extends React.Component {
           <tbody>
             <tr>{this.state.Headers.map((text, idx) => <th key={idx}>{text}</th>)}</tr>
             {this.state.Data.map((data, idx) => (
-              <tr key={idx}>
+              <tr
+                key={idx}
+                className={this.state.SelectedKey === data.Rank && 'selected'}
+                onClick={_ => this.dispatchState({ SelectedKey: data.Rank })}
+              >
                 <td>{data.Rank}</td>
                 <td>{data.Movie}</td>
                 <td>{data.Year}</td>
@@ -106,7 +128,7 @@ class MovieTable extends React.Component {
           {this.state.Pagination.map(num => (
             <div
               key={num}
-              className={this.state.SelectedPage === num ? 'current' : ''}
+              className={this.state.SelectedPage === num && 'current'}
               onClick={_ => this.dispatchState({ SelectedPage: num })}
             >
               {num}
@@ -114,6 +136,43 @@ class MovieTable extends React.Component {
           ))}
         </div>
       </section>
+    );
+  }
+}
+
+class MovieDetails extends React.Component {
+  static contextTypes = { connect: PropTypes.func };
+
+  constructor(props, context) {
+    super(props, context);
+    this.state = this.context.connect('MovieDetailsVM', this) || { Movie: {} };
+  }
+
+  componentWillUnmount() {
+    this.vm.$destroy();
+  }
+
+  render() {
+    const movie = this.state.Movie || {};
+    const casts = movie.Cast ? movie.Cast.split(',') : [];
+
+    return (
+      <div class="card">
+        <header class="card-header">
+          <b>{movie.Movie}</b>
+          <div>{movie.Year}</div>
+        </header>
+        <section class="card-body">
+          <p>
+            <b>Director</b>
+            <div>{movie.Director}</div>
+          </p>
+          <p>
+            <b>Cast</b>
+            {casts.map((cast, idx) => <div key={idx}> {cast} </div>)}
+          </p>
+        </section>
+      </div>
     );
   }
 }

@@ -71,7 +71,7 @@ namespace DotNetify.DevApp
             Changed(() => CheckBoxResult);
          }
       }
-      public string CheckBoxResult => $"I am " + (EnableMeCheckBox ? "ENABLED" : "DISABLED"); 
+      public string CheckBoxResult => EnableMeCheckBox ? "Enabled" : "Disabled"; 
 
       // Simple Drop-down
 

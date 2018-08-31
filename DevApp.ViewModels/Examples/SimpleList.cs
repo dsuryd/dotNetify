@@ -33,7 +33,7 @@ namespace DotNetify.DevApp
         }
 
         public IEnumerable<EmployeeInfo> Employees => _repository
-           .GetAll(10)
+           .GetAll(7)
            .Select(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName });
 
         // If you use CRUD methods on a list, you must set the item key prop name of that list

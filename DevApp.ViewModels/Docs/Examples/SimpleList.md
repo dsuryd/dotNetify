@@ -87,7 +87,12 @@ class SimpleList extends React.Component {
 
 ```jsx
 import React from "react";
+import styled from "styled-components";
 import TextBox from "./TextBox";
+
+const EditableText = styled.div`
+   /* styles */
+`;
 
 class InlineEdit extends React.Component {
   state = {
@@ -108,9 +113,7 @@ class InlineEdit extends React.Component {
   };
 
   render() {
-    const textStyle = { display: "inline-block" };
-
-    if (this.state.edit)
+     if (this.state.edit)
       return (
         <div>
           <TextBox
@@ -126,9 +129,9 @@ class InlineEdit extends React.Component {
       );
 
     return (
-      <div style={textStyle} onClick={this.handleClick}>
+      <EditableText onClick={this.handleClick}>
         {this.state.value}
-      </div>
+      </EditableText>
     );
   }
 }

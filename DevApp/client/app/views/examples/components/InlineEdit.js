@@ -1,5 +1,16 @@
-import React from "react";
-import TextBox from "./TextBox";
+import React from 'react';
+import styled from 'styled-components';
+import TextBox from './TextBox';
+
+const EditableText = styled.div`
+  display: inline-block;
+  &:hover {
+    &:after {
+      font-family: "Material Icons";
+      content: "edit";
+    }
+  }
+`;
 
 class InlineEdit extends React.Component {
   state = {
@@ -16,11 +27,12 @@ class InlineEdit extends React.Component {
     this.setState({ edit: false });
     if (this.state.value.length > 0 && this.state.value != this.props.text) {
       this.props.onChange(this.state.value);
-    } else this.setState({ value: this.props.text });
+    }
+    else this.setState({ value: this.props.text });
   };
 
   render() {
-    const textStyle = { display: "inline-block" };
+    const textStyle = { display: 'inline-block' };
 
     if (this.state.edit)
       return (
@@ -37,11 +49,7 @@ class InlineEdit extends React.Component {
         </div>
       );
 
-    return (
-      <div style={textStyle} onClick={this.handleClick}>
-        {this.state.value}
-      </div>
-    );
+    return <EditableText onClick={this.handleClick}>{this.state.value}</EditableText>;
   }
 }
 
