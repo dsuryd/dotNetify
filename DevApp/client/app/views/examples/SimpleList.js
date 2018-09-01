@@ -38,6 +38,9 @@ const Container = styled.div`
     tr:hover {
       background: #efefef;
     }
+    i.material-icons {
+      font-size: 1.2rem;
+    }
   }
 `;
 

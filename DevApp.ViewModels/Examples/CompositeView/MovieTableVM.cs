@@ -20,7 +20,7 @@ namespace DotNetify.DevApp
       private int _recordsPerPage = 10;
       private Func<IEnumerable<MovieRecord>> _dataSourceFunc;
 
-      public IEnumerable<string> Headers => new string[] { "Rank", "Movie", "Year", "Cast", "Director" };
+      public IEnumerable<string> Headers => new string[] { "Rank", "Movie", "Year", "Director" };
 
       public Func<IEnumerable<MovieRecord>> DataSource
       {

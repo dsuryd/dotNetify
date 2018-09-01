@@ -77,7 +77,10 @@ class ControlTypes extends React.Component {
                 {this.state.SearchResults.length > 0 && (
                   <ul className="list-group">
                     {this.state.SearchResults.map((text, idx) => (
-                      <li className="list-group-item" key={idx} onClick={_ => this.dispatchState({ SearchBox: text })}>
+                      <li 
+                        className="list-group-item" key={idx} 
+                        onClick={_ => this.dispatchState({ SearchBox: text })}
+                      >
                         {text}
                       </li>
                     ))}

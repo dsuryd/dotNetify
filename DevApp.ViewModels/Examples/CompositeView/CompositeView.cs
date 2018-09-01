@@ -10,8 +10,8 @@ namespace DotNetify.DevApp
       {
          var markdown = new Markdown("DotNetify.DevApp.Docs.Examples.CompositeView.md");
 
-         AddProperty("ViewSource", markdown.GetSection(null, "AFITop100VM.cs"));
-         AddProperty("ViewModelSource", markdown.GetSection("AFITop100VM.cs"));
+         AddProperty("ViewSource", markdown.GetSection(null, "CompositeViewVM.cs"));
+         AddProperty("ViewModelSource", markdown.GetSection("CompositeViewVM.cs"));
       }
    }
 

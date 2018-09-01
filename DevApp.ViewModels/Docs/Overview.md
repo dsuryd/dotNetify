@@ -73,6 +73,7 @@ public class HelloWorld : BaseVM
    public override void Dispose() => _timer.Dispose();
 } 
 ```
+[inset]
 We added two new back-end APIs, __Changed__ that accepts the name of the property we want to update, and __PushUpdates__ to do the actual push of all changed properties to the front-end.
 
 #### Server Update
@@ -118,6 +119,7 @@ public class HelloWorld : BaseVM
    };
 }
 ```
+[inset]
 The React component now stores the return value of the __connect__ API, which is the proxy for the back-end class instance that's connecting to the component. Through this proxy, we have access to the __$dispatch__ API that we use to send the state to the back-end instance. The state value will be set to the property name matching the state name.
 
 On the back-end, we set up the Submit property to be of an Action delegate type since we don't expect it to send any value to the front-end. Invoking the __$dispatch__ Submit on the front-end will cause that action to be invoked, with the dispatched state value being the argument. After the action modifies the Greetings property, it marks it as changed so that the new text will get sent to the front-end.

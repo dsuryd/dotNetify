@@ -50,6 +50,9 @@ const Container = styled.div`
       margin-left: 3rem;
       background: #f0ad4e;
     }
+    button {
+      min-width: 6rem;
+    }
   }
 `;
 

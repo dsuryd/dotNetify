@@ -18,7 +18,7 @@ namespace DotNetify.DevApp
 
          public string ToQuery()
          {
-            if (Operation == "has")
+            if (Operation == "contains")
                return Property == "Any" ? $"( Movie + Cast + Director ).toLower().contains(\"{Text.ToLower()}\")"
                   : $"{Property}.toLower().contains(\"{Text.ToLower()}\")";
             else
