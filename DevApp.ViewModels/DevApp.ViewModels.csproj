@@ -13,6 +13,9 @@
     <EmbeddedResource Include="Docs\Examples\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Examples\SimpleList.md" />
     <EmbeddedResource Include="Docs\Examples\CompositeView.md" />
+    <EmbeddedResource Include="Docs\Examples\LiveChart.md" />
+    <EmbeddedResource Include="Docs\Examples\BookStore.md" />
+    <EmbeddedResource Include="Docs\Examples\SecurePage.md" />
   </ItemGroup>
 
   <ItemGroup>

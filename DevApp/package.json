@@ -21,6 +21,7 @@
     "@material-ui/core": "^1.5.1",
     "dotnetify-elements": "^0.1.0",
     "react": "~16.3.2",
+    "react-chartjs-2": "^2.7.4",
     "react-dom": "~16.3.2",
     "styled-components": "~3.3.3"
   },

@@ -49,7 +49,12 @@ const RenderExample = props => (
                 </Panel>
               </TabItem>
               <TabItem label="View Model">
-                <Markdown id="ViewModelSource" css="max-width: 80rem" />
+                <Panel horizontal css={panelCss}>
+                  <Markdown id="ViewModelSource" flex="72%" css="width: 100%" />
+                  <Sidebar flex>
+                    <MarkdownTOC id="ViewModelSource" />
+                  </Sidebar>
+                </Panel>
               </TabItem>
             </Tab>
           </TabItem>

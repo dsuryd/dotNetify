@@ -17,8 +17,11 @@ const SeeItLive = _ => <b>See It Live!</b>;
 class RealTimePush extends React.Component {
   constructor(props) {
     super(props);
-    dotnetify.react.connect('RealTimePush', this);
+    this.vm = dotnetify.react.connect('RealTimePush', this);
     this.state = { Greetings: '', ServerTime: '' };
+  }
+  componentWillUnmount() {
+    this.vm.$destroy();
   }
   render() {
     return (
@@ -35,6 +38,9 @@ class ServerUpdate extends React.Component {
     super(props);
     this.vm = dotnetify.react.connect('ServerUpdate', this);
     this.state = { Greetings: '', firstName: '', lastName: '' };
+  }
+  componentWillUnmount() {
+    this.vm.$destroy();
   }
   render() {
     const handleFirstName = e => this.setState({ firstName: e.target.value });
