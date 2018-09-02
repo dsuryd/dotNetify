@@ -1,33 +1,8 @@
 import React from 'react';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
+import { LiveChartCss } from './components/css';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import RenderExample from '../../components/RenderExample';
-
-const Container = styled.div`
-  padding: 0 1rem;
-  width: 100%;
-  max-width: 1268px;
-  > div:first-child {
-    display: inline-block;
-    width: 70%;
-  }
-  > div:last-child {
-    display: inline-block;
-    width: 30%;
-    > *:last-child {
-      margin-top: 2rem;
-    }
-  }
-  @media (max-width: 1170px) {
-    > div:first-child,
-    > div:last-child {
-      display: block;
-      width: 100%;
-      margin-bottom: 2rem;
-    }
-  }
-`;
 
 class LiveChart extends React.Component {
   constructor(props) {
@@ -44,7 +19,7 @@ class LiveChart extends React.Component {
 
   render() {
     return (
-      <Container>
+      <LiveChartCss>
         <div>
           <LineChart data={this.state.Waveform} />
         </div>
@@ -52,7 +27,7 @@ class LiveChart extends React.Component {
           <PieChart data={this.state.Pie} />
           <BarChart data={this.state.Bar} />
         </div>
-      </Container>
+      </LiveChartCss>
     );
   }
 }

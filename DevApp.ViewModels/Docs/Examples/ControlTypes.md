@@ -3,11 +3,7 @@
 ```jsx
 import React from "react";
 import dotnetify from "dotnetify";
-import styled from "styled-components";
-
-const Container = styled.table`
-  /*...styles...*/
-`;
+import { ControlTypesCss } from "./components/css";
 
 class ControlTypes extends React.Component {
   constructor(props) {
@@ -40,7 +36,7 @@ class ControlTypes extends React.Component {
 
   render() {
     return (
-      <Container>
+      <ControlTypesCss>
         <table>
           <tbody>
             <tr>
@@ -209,7 +205,7 @@ class ControlTypes extends React.Component {
             </tr>
           </tbody>
         </table>
-      </Container>
+      </ControlTypesCss>
     );
   }
 }

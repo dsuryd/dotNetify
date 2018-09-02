@@ -3,12 +3,8 @@
 ```jsx
 import React from "react";
 import dotnetify from "dotnetify";
-import styled from "styled-components";
 import TextBox from './components/TextBox';
-
-const Container = styled.div`
-  /*...styles...*/
-`;
+import { HelloWorldCss } from './components/css';
 
 class HelloWorld extends React.Component {
   constructor(props) {
@@ -28,7 +24,7 @@ class HelloWorld extends React.Component {
 
   render() {
     return (
-      <Container>
+      <HelloWorldCss>
         <section>
           <TextBox
             label="First Name:"
@@ -48,7 +44,7 @@ class HelloWorld extends React.Component {
         <div>
           Full name is <b>{this.state.FullName}</b>
         </div>
-      </Container>
+      </HelloWorldCss>
     );
   }
 }

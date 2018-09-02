@@ -1,48 +1,9 @@
 import React from 'react';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
 import TextBox from './components/TextBox';
 import InlineEdit from './components/InlineEdit';
+import { SimpleListCss } from './components/css';
 import RenderExample from '../../components/RenderExample';
-
-const Container = styled.div`
-  padding: 0 1rem;
-  > header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    > * {
-      margin-right: 1rem;
-    }
-  }
-  > table {
-    font-size: unset;
-    width: 100%;
-    max-width: 1268px;
-    td,
-    th {
-      padding: 0.5rem 0;
-      padding-right: 2rem;
-      border-bottom: 1px solid #ddd;
-      width: 50%;
-    }
-    td:last-child,
-    th:last-child {
-      width: 5rem;
-      > div {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-      }
-    }
-    tr:hover {
-      background: #efefef;
-    }
-    i.material-icons {
-      font-size: 1.2rem;
-    }
-  }
-`;
 
 class SimpleList extends React.Component {
   constructor(props) {
@@ -67,7 +28,7 @@ class SimpleList extends React.Component {
 
   render() {
     return (
-      <Container>
+      <SimpleListCss>
         <header>
           <span>Add:</span>
           <TextBox
@@ -111,7 +72,7 @@ class SimpleList extends React.Component {
             ))}
           </tbody>
         </table>
-      </Container>
+      </SimpleListCss>
     );
   }
 }

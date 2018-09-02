@@ -1,24 +1,8 @@
 import React from 'react';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
 import TextBox from './components/TextBox';
+import { HelloWorldCss } from './components/css';
 import RenderExample from '../../components/RenderExample';
-
-const Container = styled.div`
-  padding: 0 1rem;
-  > section {
-    display: flex;
-    max-width: 1268px;
-    margin-bottom: 1rem;
-    > * {
-      flex: 1;
-      margin-right: 1rem;
-    }
-    label {
-      font-weight: 500;
-    }
-  }
-`;
 
 class HelloWorld extends React.Component {
   constructor(props) {
@@ -38,7 +22,7 @@ class HelloWorld extends React.Component {
 
   render() {
     return (
-      <Container>
+      <HelloWorldCss>
         <section>
           <TextBox
             label="First Name:"
@@ -58,7 +42,7 @@ class HelloWorld extends React.Component {
         <div>
           Full name is <strong>{this.state.FullName}</strong>
         </div>
-      </Container>
+      </HelloWorldCss>
     );
   }
 }

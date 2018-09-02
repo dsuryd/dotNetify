@@ -1,39 +1,9 @@
 import React from 'react';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
 import 'whatwg-fetch';
 import TextBox from './components/TextBox';
+import { SecurePageCss } from './components/css';
 import RenderExample from '../../components/RenderExample';
-
-const Container = styled.div`
-  padding: 0 1rem;
-  max-width: 1268px;
-  display: flex;
-  > * {
-    flex: 1;
-    margin-right: 1rem;
-  }
-  label {
-    font-weight: 500;
-    margin-top: 1rem;
-  }
-  .card-body > div:last-child {
-    margin-bottom: 2rem;
-  }
-  .card-body > strong {
-    display: block;
-    margin-bottom: 1rem;
-  }
-  .card-footer {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .logout {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-`;
 
 class SecurePage extends React.Component {
   constructor(props) {
@@ -69,7 +39,7 @@ class SecurePage extends React.Component {
 
   render() {
     return (
-      <Container>
+      <SecurePageCss>
         <LoginForm
           onSubmit={info => this.signIn(info.username, info.password)}
           onSignOut={() => this.signOut()}
@@ -81,7 +51,7 @@ class SecurePage extends React.Component {
         ) : (
           <NotAuthenticatedView />
         )}
-      </Container>
+      </SecurePageCss>
     );
   }
 }

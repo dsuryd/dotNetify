@@ -4,17 +4,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
 import TextBox from './components/TextBox';
-
-const Container = styled.div`
-  /* styles */
-`;
+import { CompositeViewCss } from './components/css';
 
 const Scope = dotnetify.react.Scope;
 
 const CompositeView = () => (
-  <Container>
+  <CompositeViewCss>
     <Scope vm="CompositeViewVM">
       <Scope vm="FilterableMovieTableVM">
         <MovieTable />
@@ -26,7 +22,7 @@ const CompositeView = () => (
         </Scope>
       </aside>
     </Scope>
-  </Container>
+  </CompositeViewCss>
 );
 ```
 

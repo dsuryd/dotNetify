@@ -54,10 +54,6 @@ namespace DotNetify.DevApp
                   OpenIdConnectConstants.Destinations.AccessToken,
                   OpenIdConnectConstants.Destinations.IdentityToken);
 
-               identity.AddClaim(ClaimTypes.Uri, "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png",
-                  OpenIdConnectConstants.Destinations.AccessToken,
-                  OpenIdConnectConstants.Destinations.IdentityToken);
-
                if (context.Request.Username == "admin")
                {
                   identity.AddClaim(ClaimTypes.Role, "admin",
@@ -69,6 +65,8 @@ namespace DotNetify.DevApp
                   new ClaimsPrincipal(identity),
                   new AuthenticationProperties(),
                   context.Scheme.Name);
+
+               ticket.SetAccessTokenLifetime(System.TimeSpan.FromSeconds(30));
 
                ticket.SetScopes(
                         OpenIdConnectConstants.Scopes.Profile,

@@ -1,123 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
 import TextBox from './components/TextBox';
+import { CompositeViewCss } from './components/css';
 import RenderExample from '../../components/RenderExample';
-
-const Container = styled.div`
-  padding: 0 1rem;
-  max-width: 1268px;
-  display: flex;
-  flex-wrap: wrap;
-  > * {
-    &:first-child {
-      width: 70%;
-      margin-right: 1rem;
-    }
-    &:last-child {
-      width: calc(30% - 1rem);
-      min-width: 10rem;
-    }
-  }
-  @media (max-width: 860px) {
-    > * {
-      width: 100%;
-      &:first-child {
-        width: 100%;
-        margin-bottom: 2rem;
-      }
-      &:last-child {
-        width: 100%;
-      }
-    }
-  }
-  .card {
-    width: 100%;
-    p {
-      font-size: unset;
-    }
-    .card-header > *:first-child {
-      font-size: large;
-    }
-  }
-  table {
-    font-size: unset;
-    width: 100%;
-    tr {
-      &:hover {
-        background: #eee;
-        cursor: pointer;
-      }
-      &.selected {
-        background: #ddd;
-      }
-    }
-    td,
-    th {
-      width: 25%;
-      padding: .5rem;
-      padding-right: 2rem;
-      border-bottom: 1px solid #ddd;
-      &:nth-child(1),
-      &:nth-child(3) {
-        width: 10%;
-      }
-    }
-  }
-  .pagination {
-    user-select: none;
-    div {
-      margin-top: 1rem;
-      padding: .5rem 1rem;
-      border: 1px solid #ccc;
-      &.current {
-        color: #aaa;
-        background: #eee;
-      }
-    }
-    div:hover:not(.current) {
-      background: #eee;
-      cursor: pointer;
-    }
-  }
-  .filter {
-    margin-top: 1rem;
-    .card-header {
-      font-weight: bold;
-    }
-    .card-body {
-      > * {
-        margin-bottom: 1rem;
-      }
-    }
-    .card-footer {
-      display: flex;
-      justify-content: flex-end;
-    }
-    .chip {
-      margin-right: .25rem;
-      margin-bottom: .25rem;
-      display: inline-flex;
-      font-size: x-small;
-      background: #eee;
-      border-radius: .25rem;
-      align-items: center;
-      padding: .2rem .4rem;
-      i.material-icons {
-        font-size: small;
-        font-weight: bold;
-        cursor: pointer;
-        margin-left: .5rem;
-      }
-    }
-  }
-`;
 
 const Scope = dotnetify.react.Scope;
 
 const CompositeView = () => (
-  <Container>
+  <CompositeViewCss>
     <Scope vm="CompositeViewVM">
       <Scope vm="FilterableMovieTableVM">
         <MovieTable />
@@ -129,7 +20,7 @@ const CompositeView = () => (
         </Scope>
       </aside>
     </Scope>
-  </Container>
+  </CompositeViewCss>
 );
 
 class MovieTable extends React.Component {

@@ -3,13 +3,9 @@
 ```jsx
 import React from 'react';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
+import { SecurePageCss } from './components/css';
 import TextBox from './components/TextBox';
 import 'whatwg-fetch';
-
-const Container = styled.div`
-   /* styles */
-`;
 
 class SecurePage extends React.Component {
   constructor(props) {
@@ -45,7 +41,7 @@ class SecurePage extends React.Component {
 
   render() {
     return (
-      <Container>
+      <SecurePageCss>
         <LoginForm
           onSubmit={info => this.signIn(info.username, info.password)}
           onSignOut={() => this.signOut()}
@@ -57,7 +53,7 @@ class SecurePage extends React.Component {
         ) : (
           <NotAuthenticatedView />
         )}
-      </Container>
+      </SecurePageCss>
     );
   }
 }

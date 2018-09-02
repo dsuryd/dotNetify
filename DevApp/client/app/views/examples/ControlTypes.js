@@ -1,60 +1,7 @@
 import React from 'react';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
+import { ControlTypesCss } from './components/css';
 import RenderExample from '../../components/RenderExample';
-
-const Container = styled.div`
-  max-width: 1268px;
-  padding: 0 1rem;
-  table {
-    font-size: unset;
-    width: 100%;
-  }
-  tr {
-    td {
-      padding-bottom: 1.5rem;
-    }
-    td:first-child {
-      font-weight: 500;
-      display: flex;
-      flex-direction: column;
-      > label {
-        font-weight: normal;
-        font-size: small;
-      }
-    }
-    td:nth-child(2) {
-      width: 70%;
-      padding-right: 1.5rem;
-      li {
-        cursor: pointer;
-      }
-      li:hover {
-        background: #efefef;
-      }
-      input ~ * {
-        margin-left: 5px;
-        margin-right: 0rem;
-      }
-      label {
-        cursor: pointer;
-        user-select: none;
-        margin-right: 1.5rem;
-      }
-    }
-    button.label-success {
-      margin-left: 3rem;
-      background: #5cb85c;
-    }
-    button.label-warning {
-      margin-left: 3rem;
-      background: #f0ad4e;
-    }
-    button {
-      min-width: 6rem;
-    }
-  }
-`;
 
 class ControlTypes extends React.Component {
   constructor(props) {
@@ -87,7 +34,7 @@ class ControlTypes extends React.Component {
 
   render() {
     return (
-      <Container>
+      <ControlTypesCss>
         <table>
           <tbody>
             <tr>
@@ -253,7 +200,7 @@ class ControlTypes extends React.Component {
             </tr>
           </tbody>
         </table>
-      </Container>
+      </ControlTypesCss>
     );
   }
 }

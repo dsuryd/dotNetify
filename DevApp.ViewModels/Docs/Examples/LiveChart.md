@@ -3,12 +3,8 @@
 ```jsx
 import React from 'react';
 import dotnetify from 'dotnetify';
-import styled from 'styled-components';
+import { LiveChartCss } from './components/css';
 import { Line, Bar, Doughnut } from 'react-chartjs-2'; 
-
-const Container = styled.div`
-  /* styles */
-`;
 
 class LiveChart extends React.Component {
   constructor(props) {
@@ -25,7 +21,7 @@ class LiveChart extends React.Component {
 
   render() {
     return (
-      <Container>
+      <LiveChartCss>
         <div>
           <LineChart data={this.state.Waveform} />
         </div>
@@ -33,7 +29,7 @@ class LiveChart extends React.Component {
           <PieChart data={this.state.Pie} />
           <BarChart data={this.state.Bar} />
         </div>
-      </Container>
+      </LiveChartCss>
     );
   }
 }
