@@ -31,7 +31,7 @@ class TextBox extends React.Component {
       <div>
         <label>{this.props.label}</label>
         <input
-          type="text"
+          type={this.props.type || 'text'}
           className="form-control"
           value={this.props.value}
           placeholder={this.props.placeholder}
@@ -40,6 +40,7 @@ class TextBox extends React.Component {
           onKeyDown={this.handleKeydown}
           ref={this.textInput}
         />
+        {this.props.errorText && <strong>{this.props.errorText}</strong>}
       </div>
     );
   }

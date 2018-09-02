@@ -14,6 +14,9 @@ const Container = styled.div`
       flex: 1;
       margin-right: 1rem;
     }
+    label {
+      font-weight: 500;
+    }
   }
 `;
 
@@ -53,7 +56,7 @@ class HelloWorld extends React.Component {
           />
         </section>
         <div>
-          Full name is <b>{this.state.FullName}</b>
+          Full name is <strong>{this.state.FullName}</strong>
         </div>
       </Container>
     );

@@ -38,8 +38,7 @@ namespace DotNetify.DevApp
          {
             config.RegisterAssembly("DotNetify.DevApp.ViewModels");
 
-            // Middleware to do authenticate token in incoming request headers.
-            config.UseJwtBearerAuthentication(new TokenValidationParameters
+            var tokenValidationParameters = new TokenValidationParameters
             {
                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthServer.SecretKey)),
                ValidateIssuerSigningKey = true,
@@ -47,12 +46,22 @@ namespace DotNetify.DevApp
                ValidateIssuer = false,
                ValidateLifetime = true,
                ClockSkew = TimeSpan.FromSeconds(0)
-            });
+            };
+
+            // Middleware to do authenticate token in incoming request headers.
+            config.UseJwtBearerAuthentication(tokenValidationParameters);
 
             // Filter to check whether user has permission to access view models with [Authorize] attribute.
             config.UseFilter<AuthorizeFilter>();
 
+            // Middleware to log incoming/outgoing message; default to Sytem.Diagnostic.Trace.
             config.UseDeveloperLogging();
+
+            // Demonstration middleware that extracts auth token from incoming request headers.
+            config.UseMiddleware<ExtractAccessTokenMiddleware>(tokenValidationParameters);
+
+            // Demonstration filter that passes access token from the middleware to the ViewModels.SecurePageVM class instance.
+            config.UseFilter<SetAccessTokenFilter>();
          });
 
          app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions

@@ -58,6 +58,13 @@ namespace DotNetify.DevApp
                   OpenIdConnectConstants.Destinations.AccessToken,
                   OpenIdConnectConstants.Destinations.IdentityToken);
 
+               if (context.Request.Username == "admin")
+               {
+                  identity.AddClaim(ClaimTypes.Role, "admin",
+                     OpenIdConnectConstants.Destinations.AccessToken,
+                     OpenIdConnectConstants.Destinations.IdentityToken);
+               }
+
                var ticket = new AuthenticationTicket(
                   new ClaimsPrincipal(identity),
                   new AuthenticationProperties(),
