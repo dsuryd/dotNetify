@@ -148,7 +148,7 @@ class SecurePageView extends React.Component {
           <h4>{this.state.SecureCaption}</h4>
         </div>
         <div className="card-body">
-          <strong>{this.state.SecureData}</strong>
+          <b>{this.state.SecureData}</b>
           <AdminSecurePageView accessToken={this.props.accessToken} onExpiredAccess={handleExpiredAccess} />
         </div>
       </div>

@@ -2,6 +2,10 @@ import styled from 'styled-components';
 
 export const HelloWorldCss = styled.div`
   padding: 0 1rem;
+  b {
+    color: #ce4844;
+    font-weight: 500;
+  }
   section {
     display: flex;
     max-width: 1268px;
@@ -19,6 +23,10 @@ export const HelloWorldCss = styled.div`
 export const ControlTypesCss = styled.div`
   max-width: 1268px;
   padding: 0 1rem;
+  b {
+    color: #ce4844;
+    font-weight: 500;
+  }
   table {
     font-size: unset;
     width: 100%;
@@ -89,6 +97,9 @@ export const SimpleListCss = styled.div`
       padding-right: 2rem;
       border-bottom: 1px solid #ddd;
       width: 50%;
+    }
+    th {
+      font-weight: 500;
     }
     td:last-child,
     th:last-child {
@@ -246,6 +257,10 @@ export const SecurePageCss = styled.div`
   padding: 0 1rem;
   max-width: 1268px;
   display: flex;
+  b {
+    color: #ce4844;
+    font-weight: 500;
+  }
   > * {
     flex: 1;
     margin-right: 1rem;
@@ -269,5 +284,42 @@ export const SecurePageCss = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+`;
+
+export const BookStoreCss = styled.div`
+  padding: 0 1rem;
+  max-width: 1268px;
+  > header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #efefef;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  section {
+    display: flex;
+    flex-wrap: wrap;
+    > div {
+      flex: 1 1 25%;
+      margin-bottom: 2.5rem;
+      img {
+        padding: 4px;
+        border-radius: 4px;
+        background: white;
+        border: 1px solid #ddd;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+`;
+
+export const BookCss = styled.div`
+  display: flex;
+  > *:last-child {
+    margin: 1rem;
+    button {
+      margin-top: 1rem;
+    }
   }
 `;

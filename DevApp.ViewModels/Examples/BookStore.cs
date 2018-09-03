@@ -31,7 +31,7 @@ namespace DotNetify.DevApp
          _webStoreService = webStoreService;
 
          // Register the route templates with RegisterRoutes method extension of the IRoutable.
-         this.RegisterRoutes("BookStore", new List<RouteTemplate>
+         this.RegisterRoutes("examples/BookStore", new List<RouteTemplate>
          {
             new RouteTemplate("BookDefault") { UrlPattern = "" },
             new RouteTemplate("Book") { UrlPattern = "book(/:title)" }

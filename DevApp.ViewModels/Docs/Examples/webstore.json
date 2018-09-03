@@ -1,147 +1,147 @@
 [
-   {
-      "Id": 1,
-      "Type":  "Book",
-      "Category": "Fiction",
-      "Recommended":  1,
-      "Title": "The Martian",
-      "Author": "Andy Weir",
-      "Rating": 4.5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 2,
-      "Type":  "Book",
-      "Category": "Fiction",
-      "Title": "Life Of Pi",
-      "Author": "Yann Martel",
-      "Rating": 4.5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 3,
-      "Type":  "Book",
-      "Category": "Fiction",
-      "Title": "Wayward Pines",
-      "Author": "Blake Crouch",
-      "Rating": 4,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 4,
-      "Type":  "Book",
-      "Category": "Parenting",
-      "Recommended":  1,
-      "Title": "The 5 Love Languages Of Children",
-      "Author": "Gary D Chapman and Ross Campbell",
-      "Rating": 4.5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 5,
-      "Type": "Music",
-      "Recommended":  1,
-      "Category": "Country",
-      "Title": "Storyteller",
-      "Author": "Carrie Underwood",
-      "Rating": 4.5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 7,
-      "Type": "Music",
-      "Category": "Classical",
-      "Title": "Cinema",
-      "Author": "Andrea Bocelli",
-      "Rating": 5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 8,
-      "Type": "Book",
-      "Category": "Computer",
-      "Recommended":  1,
-      "Title": "The C# Player's Guide",
-      "Author": "RB Whitaker",
-      "Rating": 5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 9,
-      "Type": "Book",
-      "Category": "Computer",
-      "Title": "Beginning ASP.NET for Visual Studio 2015",
-      "Author": "Wiliam Penberthy",
-      "Rating": 0,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 10,
-      "Type": "Book",
-      "Category": "Computer",
-      "Title": "Learning Web App Development",
-      "Author": "Semmy Purewal",
-      "Rating": 4.5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 11,
-      "Type": "Book",
-      "Category": "Fiction",
-      "Title": "Go Set A Watchman",
-      "Author": "Harper Lee",
-      "Rating": 5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 12,
-      "Type": "Music",
-      "Category": "Pop",
-      "Recommended": 1,
-      "Title": "25",
-      "Author": "Adele",
-      "Rating": 5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 13,
-      "Type": "Music",
-      "Category": "Pop",
-      "Title": "In The Lonely Hour",
-      "Author": "Sam Smith",
-      "Rating": 5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 13,
-      "Type": "Music",
-      "Category": "Pop",
-      "Title": "Stages",
-      "Author": "Josh Groban",
-      "Rating": 5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   },
-   {
-      "Id": 14,
-      "Type": "Music",
-      "Category": "Country",
-      "Title": "Traveller",
-      "Author": "Chris Stapleton",
-      "Rating": 5,
-      "ImageUrl": "/images/placeholder.png",
-      "ItemUrl": ""
-   }
+  {
+     "Id": 1,
+     "Type":  "Book",
+     "Category": "Fiction",
+     "Recommended":  1,
+     "Title": "The Martian",
+     "Author": "Andy Weir",
+     "Rating": 4.5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=0553418025&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/0553418025/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=0553418025&linkCode=as2&tag=dotnetify-20&linkId=QD5BRXM3P53GV4MM"
+  },
+  {
+     "Id": 2,
+     "Type":  "Book",
+     "Category": "Fiction",
+     "Title": "Life Of Pi",
+     "Author": "Yann Martel",
+     "Rating": 4.5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00B5L899C&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/B00B5L899C/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B00B5L899C&linkCode=as2&tag=dotnetify-20&linkId=UEFREG7DPXITGC3R"
+  },
+  {
+     "Id": 3,
+     "Type":  "Book",
+     "Category": "Fiction",
+     "Title": "Wayward Pines",
+     "Author": "Blake Crouch",
+     "Rating": 4,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B007FG9LIE&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/B007FG9LIE/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B007FG9LIE&linkCode=as2&tag=dotnetify-20&linkId=OU6JTZL5OHDV66LE"
+  },
+  {
+     "Id": 4,
+     "Type":  "Book",
+     "Category": "Parenting",
+     "Recommended":  1,
+     "Title": "The 5 Love Languages Of Children",
+     "Author": "Gary D Chapman and Ross Campbell",
+     "Rating": 4.5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=0802403476&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/0802403476/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=0802403476&linkCode=as2&tag=dotnetify-20&linkId=RB76TL6WJQIROELG"
+  },
+  {
+     "Id": 5,
+     "Type": "Music",
+     "Recommended":  1,
+     "Category": "Country",
+     "Title": "Storyteller",
+     "Author": "Carrie Underwood",
+     "Rating": 4.5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B0157A58X6&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/B0157A58X6/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B0157A58X6&linkCode=as2&tag=dotnetify-20&linkId=LC46XCBC5242FB4Y"
+  },
+  {
+     "Id": 7,
+     "Type": "Music",
+     "Category": "Classical",
+     "Title": "Cinema",
+     "Author": "Andrea Bocelli",
+     "Rating": 5,
+     "ImageUrl": "https://images-na.ssl-images-amazon.com/images/I/51Pxp6B8%2BdL._AC_US160_.jpg",
+     "ItemUrl": "https://www.amazon.com/Cinema-Andrea-Bocelli/dp/B00Y1WH10K"
+  },
+  {
+     "Id": 8,
+     "Type": "Book",
+     "Category": "Computer",
+     "Recommended": 1,
+     "Title": "The C# Player's Guide",
+     "Author": "RB Whitaker",
+     "Rating": 5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=0985580127&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/0985580127/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=0985580127&linkCode=as2&tag=dotnetify-20&linkId=PDLOAXI5P5ZITVXR"
+  },
+  {
+     "Id": 9,
+     "Type": "Book",
+     "Category": "Computer",
+     "Title": "Beginning ASP.NET for Visual Studio 2015",
+     "Author": "Wiliam Penberthy",
+     "Rating": 0,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=1119077427&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/1119077427/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1119077427&linkCode=as2&tag=dotnetify-20&linkId=RU2X557UA67BPNIR"
+  },
+  {
+     "Id": 10,
+     "Type": "Book",
+     "Category": "Computer",
+     "Title": "Learning Web App Development",
+     "Author": "Semmy Purewal",
+     "Rating": 4.5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=1449370195&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/1449370195/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1449370195&linkCode=as2&tag=dotnetify-20&linkId=H2JO4KZ66HAUS2L4"
+  },
+  {
+     "Id": 11,
+     "Type": "Book",
+     "Category": "Fiction",
+     "Title": "Go Set A Watchman",
+     "Author": "Harper Lee",
+     "Rating": 5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00T3DNKIE&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/B00T3DNKIE/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B00T3DNKIE&linkCode=as2&tag=dotnetify-20&linkId=EOQJ4T3PUG23UTBU"
+  },
+  {
+     "Id": 12,
+     "Type": "Music",
+     "Category": "Pop",
+     "Recommended": 1,
+     "Title": "25",
+     "Author": "Adele",
+     "Rating": 5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B0170K9TNG&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/B0170K9TNG/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B0170K9TNG&linkCode=as2&tag=dotnetify-20&linkId=HWYFUFDPEIHYN3LE"
+  },
+  {
+     "Id": 13,
+     "Type": "Music",
+     "Category": "Pop",
+     "Title": "In The Lonely Hour",
+     "Author": "Sam Smith",
+     "Rating": 5,
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B0161PXVBW&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20",
+     "ItemUrl": "http://www.amazon.com/gp/product/B0161PXVBW/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B0161PXVBW&linkCode=as2&tag=dotnetify-20&linkId=4P72GLIGKLN7LTK2"
+  },
+  {
+     "Id": 13,
+     "Type": "Music",
+     "Category": "Pop",
+     "Title": "Stages",
+     "Author": "Josh Groban",
+     "Rating": 5,
+     "ItemUrl": "http://www.amazon.com/gp/product/B00UB1SWQM/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B00UB1SWQM&linkCode=as2&tag=dotnetify-20&linkId=N73CNXML3NH2SI2J",
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00UB1SWQM&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20"
+  },
+  {
+     "Id": 14,
+     "Type": "Music",
+     "Category": "Country",
+     "Title": "Traveller",
+     "Author": "Chris Stapleton",
+     "Rating": 5,
+     "ItemUrl": "http://www.amazon.com/gp/product/B00UB1SWQM/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=B00UB1SWQM&linkCode=as2&tag=dotnetify-20&linkId=N73CNXML3NH2SI2J",
+     "ImageUrl": "http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00V94H9OQ&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=dotnetify-20"
+  }
 ]

@@ -74,6 +74,7 @@ namespace DotNetify.DevApp
                      new NavRoute("Hello World",   this.GetRoute(nameof(Route.HelloWorld))),
                      new NavRoute("Control Types", this.GetRoute(nameof(Route.ControlTypes))),
                      new NavRoute("Simple List",   this.GetRoute(nameof(Route.SimpleList))),
+                     new NavRoute("Live Chart",       this.GetRoute(nameof(Route.LiveChart)))
                   },
                   IsExpanded = true
                },   
@@ -83,11 +84,10 @@ namespace DotNetify.DevApp
                   Routes = new NavRoute[]
                   {
                      new NavRoute("Composite View",   this.GetRoute(nameof(Route.CompositeView))),
-                     new NavRoute("Live Chart",       this.GetRoute(nameof(Route.LiveChart))),
                      new NavRoute("Book Store",       this.GetRoute(nameof(Route.BookStore))),
                      new NavRoute("Secure Page",      this.GetRoute(nameof(Route.SecurePage))),
                   },
-                  IsExpanded = true
+                  IsExpanded = false
                },  
                new NavGroup
                {

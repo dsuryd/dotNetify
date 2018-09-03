@@ -40,7 +40,7 @@ class HelloWorld extends React.Component {
           />
         </section>
         <div>
-          Full name is <strong>{this.state.FullName}</strong>
+          Full name is <b>{this.state.FullName}</b>
         </div>
       </HelloWorldCss>
     );

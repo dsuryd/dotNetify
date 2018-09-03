@@ -5,7 +5,8 @@ html {
 
 strong {
   font-weight: 500;
-  color: #ce4844;
+  color: #6aa828;
+  border-radius: 5px;
 }
 
 p,

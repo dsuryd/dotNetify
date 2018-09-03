@@ -51,7 +51,7 @@ class ControlTypes extends React.Component {
                   onChange={e => this.setState({ TextBoxValue: e.target.value })}
                   onBlur={_ => this.dispatchState({ TextBoxValue: this.state.TextBoxValue })}
                 />
-                <strong>{this.state.TextBoxResult}</strong>
+                <b>{this.state.TextBoxResult}</b>
               </td>
             </tr>
 
@@ -127,7 +127,7 @@ class ControlTypes extends React.Component {
                     </option>
                   ))}
                 </select>
-                <strong>{this.state.SimpleDropDownResult}</strong>
+                <b>{this.state.SimpleDropDownResult}</b>
               </td>
             </tr>
 
@@ -151,7 +151,7 @@ class ControlTypes extends React.Component {
                     </option>
                   ))}
                 </select>
-                <strong>{this.state.DropDownResult}</strong>
+                <b>{this.state.DropDownResult}</b>
               </td>
             </tr>
 
@@ -192,7 +192,7 @@ class ControlTypes extends React.Component {
                 </button>
                 {this.state.ClickCount > 0 && (
                   <span style={{ marginLeft: '2rem' }}>
-                    You clicked me <strong>{this.state.ClickCount}</strong>
+                    You clicked me <b>{this.state.ClickCount}</b>
                     &nbsp;times!
                   </span>
                 )}

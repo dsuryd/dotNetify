@@ -40,7 +40,7 @@ class TextBox extends React.Component {
           onKeyDown={this.handleKeydown}
           ref={this.textInput}
         />
-        {this.props.errorText && <strong>{this.props.errorText}</strong>}
+        {this.props.errorText && <b>{this.props.errorText}</b>}
       </div>
     );
   }
