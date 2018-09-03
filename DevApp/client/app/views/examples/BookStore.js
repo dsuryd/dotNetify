@@ -1,5 +1,6 @@
 import React from 'react';
-import dotnetify, { RouteLink } from 'dotnetify/react';
+import dotnetify from 'dotnetify';
+import { RouteLink } from 'dotnetify/react';
 import { Modal, Theme } from 'dotnetify-elements';
 import { BookStoreCss, BookCss } from './components/css';
 import RenderExample from '../../components/RenderExample';

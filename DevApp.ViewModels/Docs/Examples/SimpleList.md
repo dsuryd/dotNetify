@@ -2,7 +2,7 @@
 
 ```jsx
 import React from "react";
-import dotnetify from "dotnetify/react";
+import dotnetify from "dotnetify";
 import styled from "styled-components";
 import InlineEdit from "./components/InlineEdit";
 

@@ -2,7 +2,7 @@
 
 ```jsx
 import React from "react";
-import dotnetify from "dotnetify/react";
+import dotnetify from "dotnetify";
 import TextBox from './components/TextBox';
 import { HelloWorldCss } from './components/css';
 
