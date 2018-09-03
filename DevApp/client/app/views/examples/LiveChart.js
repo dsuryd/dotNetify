@@ -1,5 +1,5 @@
 import React from 'react';
-import dotnetify from 'dotnetify';
+import dotnetify from 'dotnetify/react';
 import { LiveChartCss } from './components/css';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import RenderExample from '../../components/RenderExample';

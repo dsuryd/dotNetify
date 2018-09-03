@@ -1,9 +1,9 @@
-import dotnetify from './react/dotnetify-react';
-import './react/dotnetify-react.scope';
-import './react/dotnetify-react.router';
+import dotnetify, { Scope, RouteLink } from './react';
+
+export { Scope, RouteLink };
+export default dotnetify;
 
 if (window) {
   window.dotNetify = dotnetify;
   window.dotnetify = dotnetify;
 }
-module.exports = dotnetify;

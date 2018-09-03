@@ -2,7 +2,7 @@
 
 ```jsx
 import React from "react";
-import dotnetify from "dotnetify";
+import dotnetify from "dotnetify/react";
 import { ControlTypesCss } from "./components/css";
 
 class ControlTypes extends React.Component {

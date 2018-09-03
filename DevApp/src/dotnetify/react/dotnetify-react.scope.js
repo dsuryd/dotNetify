@@ -26,7 +26,7 @@ import dotnetify from './dotnetify-react';
 // injects properties and dispatch functions into the component.
 export default class Scope extends React.Component {
   static displayName = 'Scope';
-  static version = '1.1.0';
+  static version = '1.2.0';
 
   static propTypes = { vm: PropTypes.string };
   static contextTypes = { scoped: PropTypes.func };

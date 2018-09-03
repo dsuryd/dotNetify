@@ -1,5 +1,5 @@
 import React from 'react';
-import dotnetify from 'dotnetify';
+import dotnetify from 'dotnetify/react';
 import TextBox from './components/TextBox';
 import InlineEdit from './components/InlineEdit';
 import { SimpleListCss } from './components/css';

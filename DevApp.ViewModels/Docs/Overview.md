@@ -114,7 +114,7 @@ public class HelloWorld : BaseVM
    public string Greetings { get; set; } = "Hello World!";
    public Action<Person> Submit => person =>
    {
-      Greetings = $"Hello {person.FirstName}!";
+      Greetings = $"Hello {person.FirstName} {person.LastName}!";
       Changed(nameof(Greetings));
    };
 }

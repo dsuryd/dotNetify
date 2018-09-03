@@ -3,11 +3,9 @@
 ```jsx
 import React from 'react';
 import PropTypes from 'prop-types';
-import dotnetify from 'dotnetify';
+import { Scope } from 'dotnetify/react';
 import TextBox from './components/TextBox';
 import { CompositeViewCss } from './components/css';
-
-const Scope = dotnetify.react.Scope;
 
 const CompositeView = () => (
   <CompositeViewCss>

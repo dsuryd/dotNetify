@@ -1,10 +1,8 @@
 import React from 'react';
-import dotnetify from 'dotnetify';
+import dotnetify, { RouteLink } from 'dotnetify/react';
 import { Modal, Theme } from 'dotnetify-elements';
 import { BookStoreCss, BookCss } from './components/css';
 import RenderExample from '../../components/RenderExample';
-
-const RouteLink = dotnetify.react.router.RouteLink;
 
 class BookStore extends React.Component {
   constructor(props) {

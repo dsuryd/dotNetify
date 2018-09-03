@@ -2,7 +2,7 @@
 
 ```jsx
 import React from 'react';
-import dotnetify from 'dotnetify';
+import dotnetify from 'dotnetify/react';
 import { SecurePageCss } from './components/css';
 import TextBox from './components/TextBox';
 import 'whatwg-fetch';

@@ -1,5 +1,5 @@
 import React from 'react';
-import dotnetify from 'dotnetify';
+import dotnetify from 'dotnetify/react';
 import 'whatwg-fetch';
 import TextBox from './components/TextBox';
 import { SecurePageCss } from './components/css';

@@ -2,7 +2,7 @@
 
 ```jsx
 import React from 'react';
-import dotnetify from 'dotnetify';
+import dotnetify from 'dotnetify/react';
 import { Modal, Theme } from 'dotnetify-elements';
 import { BookStoreCss, BookCss } from './components/css';
 

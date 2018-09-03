@@ -1,5 +1,5 @@
 import React from 'react';
-import dotnetify from 'dotnetify';
+import dotnetify from 'dotnetify/react';
 import { ControlTypesCss } from './components/css';
 import RenderExample from '../../components/RenderExample';
 
