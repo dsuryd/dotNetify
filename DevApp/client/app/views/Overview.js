@@ -6,7 +6,7 @@ import Expander from '../components/Expander';
 const Overview = props => (
   <Article vm="Overview" id="Content">
     <Markdown id="Content">
-      <Expander label={<SeeItLive />} content={<RealTimePush />} />
+      <Expander label={<SeeItLive />} content={<RealTimePush />} connectOnExpand />
       <Expander label={<SeeItLive />} content={<ServerUpdate />} />
     </Markdown>
   </Article>

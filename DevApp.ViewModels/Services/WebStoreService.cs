@@ -12,6 +12,8 @@ namespace DotNetify.DevApp
       IEnumerable<WebStoreRecord> GetAllBooks();
 
       WebStoreRecord GetBookByTitle(string title);
+
+      WebStoreRecord GetBookById(int id);
    }
 
    public class WebStoreRecord
@@ -42,5 +44,7 @@ namespace DotNetify.DevApp
       public IEnumerable<WebStoreRecord> GetAllBooks() => GetAllRecords().Where(i => i.Type == "Book");
 
       public WebStoreRecord GetBookByTitle(string title) => GetAllBooks().FirstOrDefault(i => i.UrlSafeTitle == title);
+
+      public WebStoreRecord GetBookById(int id) => GetAllBooks().FirstOrDefault(i => i.Id == id);
    }
 }

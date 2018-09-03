@@ -13,6 +13,9 @@ Whether in a brand-new ASP.NET Core project that runs on Windows, Linux, and Mac
 In the most basic form, you can just use dotNetify to quickly set up a back-end data store to get the initial state of your React component. Simply add the __connect__ API inside the constructor (or getInitialState if using ES5), specify the name of the C# class that will provide the state, and pass the component itself.
 
 ```jsx
+import React from 'react';
+import dotnetify from 'dotnetify';
+
 class MyApp extends React.Component {
    constructor(props) {
       super(props);
@@ -90,7 +93,11 @@ class MyApp extends React.Component {
    render() {
       const handleFirstName = e => this.setState({firstName: e.target.value});
       const handleLastName = e => this.setState({lastName: e.target.value});
-      const handleSubmit = () => this.vm.$dispatch({Submit: {FirstName: this.state.firstName, LastName: this.state.lastName}});
+      const handleSubmit = () => {
+        this.vm.$dispatch({
+          Submit: { FirstName: this.state.firstName, LastName: this.state.lastName }
+        });
+      }
       return (
          <div>
             <div>{this.state.Greetings}</div>

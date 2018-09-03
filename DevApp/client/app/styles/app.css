@@ -6,7 +6,13 @@ html {
 strong {
   font-weight: 500;
   color: #6aa828;
-  border-radius: 5px;
+  background-color: rgba(255, 255, 255, .6);
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+.theme-dark strong {
+  background-color: rgba(255, 255, 255, .2);
 }
 
 p,

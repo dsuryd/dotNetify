@@ -10,6 +10,9 @@
     <EmbeddedResource Include="Docs\Examples\AFITop100.json" />
     <EmbeddedResource Include="Docs\Examples\webstore.json" />
     <EmbeddedResource Include="Docs\Overview.md" />
+    <EmbeddedResource Include="Docs\DataFlow.md" />
+    <EmbeddedResource Include="Docs\Reactive.md" />
+    <EmbeddedResource Include="Docs\GetStarted.md" />
     <EmbeddedResource Include="Docs\Examples\HelloWorld.md" />
     <EmbeddedResource Include="Docs\Examples\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Examples\SimpleList.md" />
@@ -17,6 +20,13 @@
     <EmbeddedResource Include="Docs\Examples\LiveChart.md" />
     <EmbeddedResource Include="Docs\Examples\BookStore.md" />
     <EmbeddedResource Include="Docs\Examples\SecurePage.md" />
+    <EmbeddedResource Include="Docs\APIs\Connection.md" />
+    <EmbeddedResource Include="Docs\APIs\CRUD.md" />
+    <EmbeddedResource Include="Docs\APIs\DI.md" />
+    <EmbeddedResource Include="Docs\APIs\Filter.md" />
+    <EmbeddedResource Include="Docs\APIs\Middleware.md" />
+    <EmbeddedResource Include="Docs\APIs\Routing.md" />
+    <EmbeddedResource Include="Docs\APIs\Security.md" />
   </ItemGroup>
 
   <ItemGroup>
