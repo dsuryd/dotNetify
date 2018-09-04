@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "prod": "webpack --mode production"
+    "prod": "webpack -p --progress",
+    "dist": "webpack --config ./webpack.dist.config.js"
   },
   "babel": {
     "presets": [
@@ -18,7 +19,7 @@
     ]
   },
   "dependencies": {
-    "@material-ui/core": "^1.5.1",
+    "@aspnet/signalr": "~1.0.3",
     "dotnetify-elements": "^0.1.0",
     "react": "~16.3.2",
     "react-chartjs-2": "^2.7.4",
