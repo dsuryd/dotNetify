@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "@aspnet/signalr": "~1.0.3",
-    "dotnetify-elements": "^0.1.0",
+    "dotnetify-elements": "~0.1.2",
+    "jquery": "~3.3.1",
+    "knockout": "~3.4.1",
     "react": "~16.3.2",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "~16.3.2",
@@ -39,6 +41,7 @@
     "babel-preset-react": "~6.24.1",
     "css-loader": "~0.28.11",
     "file-loader": "~1.1.11",
+    "html-loader": "~0.5.5",
     "mini-css-extract-plugin": "~0.4.0",
     "style-loader": "~0.21.0",
     "svg-url-loader": "^2.3.2",
