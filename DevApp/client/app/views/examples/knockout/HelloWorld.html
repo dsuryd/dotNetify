@@ -1,24 +1,17 @@
 <div id="HelloWorld" data-vm="HelloWorldVM">
   <div>
     <label>First name:</label>
-    <input type="text" data-bind="value: FirstName" />
+    <input type="text" data-bind="textInput: FirstName" />
   </div>
   <div>
     <label>Last name:</label>
     <input type="text" data-bind="value: LastName" />
   </div>
   <div>
-    Full name is <span data-bind="text: FullName" />
+    Full name is
+    <span data-bind="text: FullName" />
   </div>
 </div>
-<img
-  style="display: none;"
-  class="load-script-img"
-  src="http://placehold.it/1x1"
-  onload="(function() {
-    console.log(dotnetify);
-    dotnetify.init();
-  })()"
->
-
-
+<img style="display: none;" class="load-script-img" src="http://placehold.it/1x1" onload="(function() {
+    dotnetify.ko.init();
+  })()">
