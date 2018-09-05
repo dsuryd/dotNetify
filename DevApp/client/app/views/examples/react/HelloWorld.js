@@ -1,15 +1,18 @@
-import React from 'react';
-import dotnetify from 'dotnetify';
-import TextBox from './components/TextBox';
-import { HelloWorldCss } from './components/css';
+import React from "react";
+import dotnetify from "dotnetify";
+import TextBox from "../components/TextBox";
+import { HelloWorldCss } from "../components/css";
 
 class HelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { FirstName: '', LastName: '' };
+    this.state = { FirstName: "", LastName: "" };
 
     // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect('HelloWorldVM', this);
+    this.vm = dotnetify.react.connect(
+      "HelloWorldVM",
+      this
+    );
 
     // Set up function to dispatch state to the back-end.
     this.dispatchState = state => this.vm.$dispatch(state);
