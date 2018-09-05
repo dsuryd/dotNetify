@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import { Frame, Markdown, MarkdownTOC, Panel, Tab, TabItem, Theme, VMContext } from "dotnetify-elements";
+import React from 'react';
+import styled from 'styled-components';
+import { Frame, Markdown, MarkdownTOC, Panel, Tab, TabItem, Theme, VMContext } from 'dotnetify-elements';
 
 const frameCss = `
   margin-left: 3rem; 
@@ -34,7 +34,7 @@ const Sidebar = styled.div`
 
 const RenderExample = props => (
   <Theme>
-    <VMContext vm={props.vm}>
+    <VMContext vm={props.vm} options={props.vmOptions}>
       <Frame css={frameCss}>
         <Tab margin="1.5rem 0">
           <TabItem label="Output">{props.children}</TabItem>
