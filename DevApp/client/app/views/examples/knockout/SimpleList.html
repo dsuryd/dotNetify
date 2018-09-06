@@ -1,0 +1,36 @@
+<div data-vm="SimpleListVM">
+  <div>
+     <input type="text" placeholder="First name" data-bind="value: _firstName" />
+     <input type="text" placeholder="Last name" data-bind="value: _lastName" />
+     <button type="button" data-bind="vmCommand: add">Add</button>
+  </div>
+</div>
+<table>
+  <thead>
+     <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th></th>
+     </tr>
+  </thead>
+  <tbody data-bind="foreach: Employees, vmItemKey: Id">
+     <tr>
+        <td>
+           <div>
+              <span data-bind="text: FirstName, vmCommand: edit"></span>
+              <input style="display:none" type="text" data-bind="value: FirstName" />
+           </div>
+        </td>
+        <td>
+           <div>
+              <span data-bind="text: LastName, vmCommand: edit"></span>
+              <input style="display:none" type="text" data-bind="value: LastName" />
+           </div>
+
+        </td>
+        <td>
+           <span class="glyphicon-remove" data-bind="vmCommand: remove"></span>
+        </td>
+     </tr>
+  </tbody>
+</table>
