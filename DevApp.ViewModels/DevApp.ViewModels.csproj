@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Docs\Examples\AFITop100.json" />
+    <EmbeddedResource Include="Docs\Examples\Knockout\HelloWorld.md" />
+    <EmbeddedResource Include="Docs\Examples\Knockout\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Examples\webstore.json" />
     <EmbeddedResource Include="Docs\Overview.md" />
     <EmbeddedResource Include="Docs\DataFlow.md" />

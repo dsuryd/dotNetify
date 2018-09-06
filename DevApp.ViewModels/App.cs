@@ -65,7 +65,7 @@ namespace DotNetify.DevApp
                new NavRoute("Data Flow Pattern",      this.GetRoute(nameof(Route.DataFlow))),
                new NavRoute("Reactive Programming",   this.GetRoute(nameof(Route.Reactive))),
                new NavRoute("Get Started",            this.GetRoute(nameof(Route.GetStarted))),
-            
+
                new NavGroup
                {
                   Label = "Basic Examples",
@@ -77,7 +77,7 @@ namespace DotNetify.DevApp
                      new NavRoute("Live Chart",       this.GetRoute(nameof(Route.LiveChart)))
                   },
                   IsExpanded = true
-               },   
+               },
                new NavGroup
                {
                   Label = "Further Examples",
@@ -88,7 +88,7 @@ namespace DotNetify.DevApp
                      new NavRoute("Secure Page",      this.GetRoute(nameof(Route.SecurePage))),
                   },
                   IsExpanded = false
-               },  
+               },
                new NavGroup
                {
                   Label = "API Reference",
@@ -103,8 +103,8 @@ namespace DotNetify.DevApp
                      new NavRoute("Security",               this.GetRoute(nameof(Route.Security))),
                   },
                   IsExpanded = false
-               }        
-            })                        
+               }
+            })
          );
       }
    }

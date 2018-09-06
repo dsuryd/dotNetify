@@ -114,7 +114,7 @@ const dotnetify = {
     } else dotnetify._hub.done(doneHandler);
   },
 
-  checkServerSideException: function(iVMData, iExceptionHandler) {
+  checkServerSideException: function(iVMId, iVMData, iExceptionHandler) {
     const vmData = JSON.parse(iVMData);
     if (vmData && vmData.hasOwnProperty("ExceptionType") && vmData.hasOwnProperty("Message")) {
       const exception = { name: vmData.ExceptionType, message: vmData.Message };

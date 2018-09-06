@@ -56,6 +56,7 @@ dotnetify.ko = {
     // Use the selector to locate the view model widget and pass the data.
     var element = $(selector);
     if (element.length > 0) {
+      dotnetify.checkServerSideException(iVMId, iVMData);
       element.data("ko-dotnetify").UpdateVM(iVMData);
       return true;
     }

@@ -121,7 +121,7 @@ dotnetify.react = {
 
     if (self.viewModels.hasOwnProperty(iVMId)) {
       const vm = self.viewModels[iVMId];
-      dotnetify.checkServerSideException(iVMData, vm.$exceptionHandler);
+      dotnetify.checkServerSideException(iVMId, iVMData, vm.$exceptionHandler);
       vm.$update(iVMData);
       return true;
     }

@@ -1,31 +1,26 @@
-using System;
+using DotNetify.Elements;
 using System.Linq;
 using System.Reactive.Linq;
-using DotNetify;
-using DotNetify.Elements;
 
 namespace DotNetify.DevApp
 {
    public class HelloWorldExample : BaseVM
    {
-      private ReactiveProperty<string> _viewSource;
-
-      public string Framework
-      {
-         get => Get<string>();
-         set
-         {
-            Set(value);
-            _viewSource.Value = "TEST";
-         }
-      }
-
       public HelloWorldExample()
       {
          var markdown = new Markdown("DotNetify.DevApp.Docs.Examples.HelloWorld.md");
 
-         _viewSource = AddProperty("ViewSource", markdown.GetSection(null, "HelloWorldVM.cs"));
+         AddProperty("ViewSource", markdown.GetSection(null, "HelloWorldVM.cs"))
+            .SubscribeTo(AddProperty<string>("Framework").Select(GetViewSource));
+
          AddProperty("ViewModelSource", markdown.GetSection("HelloWorldVM.cs"));
+      }
+
+      private string GetViewSource(string framework)
+      {
+         return framework == "Knockout" ?
+            new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.HelloWorld.md") :
+            new Markdown("DotNetify.DevApp.Docs.Examples.HelloWorld.md").GetSection(null, "HelloWorldVM.cs");
       }
    }
 
