@@ -57,6 +57,9 @@ export default class SimpleListVM {
     if (person.trim() === "") return;
 
     vm.Add(person);
+
+    vm._firstName('');
+    vm._lastName('');
   }
 
   edit(item, iElement) {

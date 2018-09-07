@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const HelloWorldCss = styled.div`
   padding: 0 1rem;
@@ -252,12 +252,31 @@ export const LiveChartCss = styled.div`
       margin-top: 2rem;
     }
   }
+  section {
+    padding: 0 1rem;
+    width: 100%;
+    max-width: 1268px;
+    > div:first-child,
+    > div:last-child {
+      display: block;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+  }
   @media (max-width: 1170px) {
     > div:first-child,
     > div:last-child {
       display: block;
       width: 100%;
       margin-bottom: 2rem;
+    }
+    section {
+      > div:first-child,
+      > div:last-child {
+        display: block;
+        width: 100%;
+        margin-bottom: 2rem;
+      }
     }
   }
 `;
