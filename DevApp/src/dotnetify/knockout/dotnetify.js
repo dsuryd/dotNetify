@@ -186,7 +186,7 @@ $.widget('ko.dotnetify', {
 
 				// Call any plugin's $init function if provided to give a chance to do
 				// things before initial binding is applied.
-				$.each(dotnetify.plugins, function(pluginId, plugin) {
+				$.each(dotnetify.ko.plugins, function(pluginId, plugin) {
 					if (typeof plugin['$init'] === 'function') plugin.$init.apply(self.VM);
 				});
 
@@ -207,7 +207,7 @@ $.widget('ko.dotnetify', {
 				self._OnComponentReady(function() {
 					// Call any plugin's $ready function if provided to give a chance to do
 					// things when the view model is ready.
-					$.each(dotnetify.plugins, function(pluginId, plugin) {
+					$.each(dotnetify.ko.plugins, function(pluginId, plugin) {
 						if (typeof plugin['$ready'] === 'function') plugin.$ready.apply(self.VM);
 					});
 
@@ -396,7 +396,7 @@ $.widget('ko.dotnetify', {
 		}
 
 		// Add plugin functions.
-		$.each(dotnetify.plugins, function(pluginId, plugin) {
+		$.each(dotnetify.ko.plugins, function(pluginId, plugin) {
 			if (plugin.hasOwnProperty('$inject')) plugin.$inject(self.VM);
 		});
 	},

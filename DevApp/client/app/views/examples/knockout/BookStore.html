@@ -1,0 +1,13 @@
+<section data-vm="BookStoreVM" data-bind="foreach: Books">
+    <div>
+        <center>
+            <a data-bind="vmRoute: Route">
+                <img class="thumbnail" data-bind="attr: {src: Info.ImageUrl}" />
+            </a>
+            <div>
+                <b data-bind="text: Info.Title"></b>
+                <div>by <span data-bind="text: Info.Author"></span></div>
+            </div>
+        </center>
+    </div>
+</section>
