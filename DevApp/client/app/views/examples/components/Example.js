@@ -1,6 +1,6 @@
-import React from 'react';
-import RenderExample from 'app/components/RenderExample';
-import { currentFramework, frameworkSelectEvent } from '../../framework';
+import React from "react";
+import RenderExample from "app/components/RenderExample";
+import { currentFramework, frameworkSelectEvent } from "app/components/SelectFramework";
 
 export default class Example extends React.Component {
   constructor() {
@@ -12,7 +12,7 @@ export default class Example extends React.Component {
     this.unsubs();
   }
   render() {
-    const example = this.state.framework === 'Knockout' ? this.props.ko : this.props.react;
+    const example = this.state.framework === "Knockout" ? this.props.ko : this.props.react;
     return (
       <RenderExample
         vm={this.props.vm}

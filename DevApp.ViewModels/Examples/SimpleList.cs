@@ -17,7 +17,7 @@ namespace DotNetify.DevApp
             var markdown = new Markdown("DotNetify.DevApp.Docs.Examples.SimpleList.md");
 
             AddProperty("ViewSource", markdown.GetSection(null, "SimpleListVM.cs"))
-                .SubscribeTo(AddProperty<string>("Framework").Select(GetViewSource));
+                .SubscribeTo(AddInternalProperty<string>("Framework").Select(GetViewSource));
 
             AddProperty("ViewModelSource", markdown.GetSection("SimpleListVM.cs"));
         }
@@ -26,7 +26,7 @@ namespace DotNetify.DevApp
         {
             return framework == "Knockout" ?
                new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.SimpleList.md") :
-               new Markdown("DotNetify.DevApp.Docs.Examples.SimpleList.md").GetSection(null, "SimpleList.cs");
+               new Markdown("DotNetify.DevApp.Docs.Examples.SimpleList.md").GetSection(null, "SimpleListVM.cs");
         }
     }
 
