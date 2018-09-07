@@ -1,9 +1,9 @@
 import dotnetify from './dotnetify-react';
-import './dotnetify-react.scope';
 import './dotnetify-react.router';
+import './ssr';
+import Scope from './Scope';
+import RouteLink from './RouteLink';
+import RouteTarget from './RouteTarget';
 
-const Scope = dotnetify.react.Scope;
-const RouteLink = dotnetify.react.router.RouteLink;
-
-export { Scope, RouteLink };
+export { Scope, RouteLink, RouteTarget };
 export default dotnetify;
