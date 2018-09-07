@@ -1,6 +1,8 @@
-import RenderKnockout from '../components/RenderKnockout';
-import { LiveChartCss } from '../components/css';
-import LiveChartHtml from './LiveChart.html';
+import RenderKnockout from "../components/RenderKnockout";
+import { LiveChartCss } from "../components/css";
+import LiveChartHtml from "./LiveChart.html";
+
+window.LiveChartVM = require("./LiveChartVM.ts").default;
 
 export default _ => (
   <LiveChartCss>

@@ -1,16 +1,19 @@
-import React from 'react';
-import dotnetify from 'dotnetify';
-import TextBox from '../components/TextBox';
-import InlineEdit from '../components/InlineEdit';
-import { SimpleListCss } from '../components/css';
+import React from "react";
+import dotnetify from "dotnetify";
+import TextBox from "../components/TextBox";
+import InlineEdit from "../components/InlineEdit";
+import { SimpleListCss } from "../components/css";
 
 export default class SimpleList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { Employees: [], newName: '' };
+    this.state = { Employees: [], newName: "" };
 
     // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect('SimpleListVM', this);
+    this.vm = dotnetify.react.connect(
+      "SimpleListVM",
+      this
+    );
 
     // Set up function to dispatch state to the back-end.
     this.dispatch = state => this.vm.$dispatch(state);
@@ -36,7 +39,7 @@ export default class SimpleList extends React.Component {
             onChange={value => this.setState({ newName: value })}
             onUpdate={value => {
               this.dispatch({ Add: value });
-              this.setState({ newName: '' });
+              this.setState({ newName: "" });
             }}
           />
         </header>
@@ -56,7 +59,6 @@ export default class SimpleList extends React.Component {
                   />
                 </td>
                 <td>
-                  {' '}
                   <InlineEdit
                     text={employee.LastName}
                     onChange={value => this.dispatch({ Id: employee.Id, LastName: value })}

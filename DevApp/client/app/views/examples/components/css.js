@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const HelloWorldCss = styled.div`
   padding: 0 1rem;
@@ -79,15 +79,18 @@ export const ControlTypesCss = styled.div`
 
 export const SimpleListCss = styled.div`
   padding: 0 1rem;
-  > header {
+  header {
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
     > * {
       margin-right: 1rem;
     }
+    input[type="text"] {
+      max-width: 15rem;
+    }
   }
-  > table {
+  table {
     font-size: unset;
     width: 100%;
     max-width: 1268px;
@@ -115,6 +118,12 @@ export const SimpleListCss = styled.div`
     }
     i.material-icons {
       font-size: 1.2rem;
+    }
+    span.editable:hover {
+      &:after {
+        font-family: "Material Icons";
+        content: "edit";
+      }
     }
   }
 `;
@@ -170,7 +179,7 @@ export const CompositeViewCss = styled.div`
     td,
     th {
       width: 25%;
-      padding: .5rem;
+      padding: 0.5rem;
       padding-right: 2rem;
       border-bottom: 1px solid #ddd;
       &:nth-child(1),
@@ -183,7 +192,7 @@ export const CompositeViewCss = styled.div`
     user-select: none;
     div {
       margin-top: 1rem;
-      padding: .5rem 1rem;
+      padding: 0.5rem 1rem;
       border: 1px solid #ccc;
       &.current {
         color: #aaa;
@@ -210,19 +219,19 @@ export const CompositeViewCss = styled.div`
       justify-content: flex-end;
     }
     .chip {
-      margin-right: .25rem;
-      margin-bottom: .25rem;
+      margin-right: 0.25rem;
+      margin-bottom: 0.25rem;
       display: inline-flex;
       font-size: x-small;
       background: #eee;
-      border-radius: .25rem;
+      border-radius: 0.25rem;
       align-items: center;
-      padding: .2rem .4rem;
+      padding: 0.2rem 0.4rem;
       i.material-icons {
         font-size: small;
         font-weight: bold;
         cursor: pointer;
-        margin-left: .5rem;
+        margin-left: 0.5rem;
       }
     }
   }

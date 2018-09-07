@@ -3,12 +3,8 @@
 ```jsx
 import React from "react";
 import dotnetify from "dotnetify";
-import styled from "styled-components";
+import { SimpleListCss } from './components/css';
 import InlineEdit from "./components/InlineEdit";
-
-const Container = styled.div`
-  /*...styles...*/
-`;
 
 class SimpleList extends React.Component {
   constructor(props) {
@@ -33,7 +29,7 @@ class SimpleList extends React.Component {
 
   render() {
     return (
-      <Container>
+      <SimpleListCss>
         <header>
           <span>Add:</span>
           <TextBox
@@ -77,7 +73,7 @@ class SimpleList extends React.Component {
             ))}
           </tbody>
         </table>
-      </Container>
+      <SimpleListCss>
     );
   }
 }
@@ -91,7 +87,7 @@ import styled from "styled-components";
 import TextBox from "./TextBox";
 
 const EditableText = styled.div`
-   /* styles */
+  /* styles */
 `;
 
 class InlineEdit extends React.Component {
@@ -113,7 +109,7 @@ class InlineEdit extends React.Component {
   };
 
   render() {
-     if (this.state.edit)
+    if (this.state.edit)
       return (
         <div>
           <TextBox
@@ -128,11 +124,7 @@ class InlineEdit extends React.Component {
         </div>
       );
 
-    return (
-      <EditableText onClick={this.handleClick}>
-        {this.state.value}
-      </EditableText>
-    );
+    return <EditableText onClick={this.handleClick}>{this.state.value}</EditableText>;
   }
 }
 
