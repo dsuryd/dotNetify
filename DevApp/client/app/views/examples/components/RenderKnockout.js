@@ -6,6 +6,6 @@ export default class RenderKnockout extends React.Component {
     dotnetify.ko.init();
   }
   render() {
-    return <section dangerouslySetInnerHTML={{ __html: this.props.html }} />;
+    return <section className="knockout" dangerouslySetInnerHTML={{ __html: this.props.html }} />;
   }
 }

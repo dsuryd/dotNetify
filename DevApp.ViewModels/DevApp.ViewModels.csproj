@@ -23,6 +23,7 @@
     <EmbeddedResource Include="Docs\Examples\Knockout\HelloWorld.md" />
     <EmbeddedResource Include="Docs\Examples\Knockout\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Examples\Knockout\SimpleList.md" />    
+    <EmbeddedResource Include="Docs\Examples\Knockout\LiveChart.md" /> 
     <EmbeddedResource Include="Docs\APIs\Connection.md" />
     <EmbeddedResource Include="Docs\APIs\CRUD.md" />
     <EmbeddedResource Include="Docs\APIs\DI.md" />

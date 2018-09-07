@@ -1,3 +1,20 @@
+##### LiveChart.html
+
+```html
+<section data-vm="LiveChartVM">
+  <div>
+    <canvas data-bind="vmOn: { Waveform: updateLineChart }"></canvas>
+  </div>
+  <div>
+    <canvas data-bind="vmOn: { Pie: updatePieChart }"></canvas>
+    <canvas data-bind="vmOn: { Bar: updateBarChart }"></canvas>
+  </div>  
+</section>
+```
+
+##### LiveChartVM.ts
+
+```jsx
 declare var Chart: any;
 
 export default class LiveChartVM {
@@ -96,3 +113,5 @@ export default class LiveChartVM {
     this.pieChart.update();
   }
 }
+
+```

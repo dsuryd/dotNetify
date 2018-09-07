@@ -252,15 +252,21 @@ export const LiveChartCss = styled.div`
       margin-top: 2rem;
     }
   }
-  section {
-    padding: 0 1rem;
+  .knockout > * {
+    display: flex;
+    align-items: center;
     width: 100%;
     max-width: 1268px;
-    > div:first-child,
+    > div:first-child {
+      display: inline-block;
+      width: 70%;
+    }
     > div:last-child {
-      display: block;
-      width: 100%;
-      margin-bottom: 2rem;
+      display: inline-block;
+      width: 30%;
+      > *:last-child {
+        margin-top: 2rem;
+      }
     }
   }
   @media (max-width: 1170px) {
@@ -270,7 +276,8 @@ export const LiveChartCss = styled.div`
       width: 100%;
       margin-bottom: 2rem;
     }
-    section {
+    .knockout > * {
+      flex-direction: column;
       > div:first-child,
       > div:last-child {
         display: block;

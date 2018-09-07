@@ -12,8 +12,17 @@ namespace DotNetify.DevApp
       {
          var markdown = new Markdown("DotNetify.DevApp.Docs.Examples.LiveChart.md");
 
-         AddProperty("ViewSource", markdown.GetSection(null, "LiveChartVM.cs"));
+         AddProperty("ViewSource", markdown.GetSection(null, "LiveChartVM.cs"))
+          .SubscribeTo(AddProperty<string>("Framework").Select(GetViewSource));
+
          AddProperty("ViewModelSource", markdown.GetSection("LiveChartVM.cs"));
+      }
+
+      private string GetViewSource(string framework)
+      {
+         return framework == "Knockout" ?
+            new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.LiveChart.md") :
+            new Markdown("DotNetify.DevApp.Docs.Examples.LiveChart.md").GetSection(null, "LiveChartVM.cs");
       }
    }
 
