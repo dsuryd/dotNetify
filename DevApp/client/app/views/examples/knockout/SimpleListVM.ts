@@ -1,6 +1,7 @@
 declare var $: any;
 
 export default class SimpleListVM {
+  // Variables with _ prefix will be converted to ko observables.
   _firstName: string = '';
   _lastName: string = '';
 

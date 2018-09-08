@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using DotNetify.Routing;
 using DotNetify.Elements;
 
@@ -11,9 +12,18 @@ namespace DotNetify.DevApp
       {
          var markdown = new Markdown("DotNetify.DevApp.Docs.Examples.BookStore.md");
 
-         AddProperty("ViewSource", markdown.GetSection(null, "BookStoreVM.cs"));
+         AddProperty("ViewSource", markdown.GetSection(null, "BookStoreVM.cs"))
+           .SubscribeTo(AddInternalProperty<string>("Framework").Select(GetViewSource));
+
          AddProperty("ViewModelSource", markdown.GetSection("BookStoreVM.cs"));
       }
+
+      private string GetViewSource(string framework)
+      {
+          return framework == "Knockout" ?
+              new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.BookStore.md") :
+              new Markdown("DotNetify.DevApp.Docs.Examples.BookStore.md").GetSection(null, "BookStoreVM.cs");
+      }      
    }
 
    public class BookStoreVM : BaseVM, IRoutable
@@ -31,7 +41,7 @@ namespace DotNetify.DevApp
          _webStoreService = webStoreService;
 
          // Register the route templates with RegisterRoutes method extension of the IRoutable.
-         this.RegisterRoutes("examples/BookStore", new List<RouteTemplate>
+         this.RegisterRoutes("examples/bookstore", new List<RouteTemplate>
          {
             new RouteTemplate("BookDefault") { UrlPattern = "" },
             new RouteTemplate("Book") { UrlPattern = "book(/:title)" }

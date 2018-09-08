@@ -1,0 +1,21 @@
+<div id="BookDetails" data-vm="BookDetailsVM" class="modal fade">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body" style="display: flex">
+        <img class="thumbnail" data-bind="attr: {src: Book.ImageUrl}" />
+        <div style="margin-left: 1rem">
+          <h3 data-bind="text: Book.Title"></h3>
+          <h5 data-bind="text: Book.Author"></h5>
+          <button class="btn btn-primary">Buy</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button id="Back" type="button" class="btn btn-success" data-dismiss="modal">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $('#BookDetails').modal();
+  $('#BookDetails').on('hidden.bs.modal', function (e) { window.history.back(); });
+</script>
