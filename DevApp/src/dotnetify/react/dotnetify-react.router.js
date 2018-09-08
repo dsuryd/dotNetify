@@ -73,13 +73,12 @@ dotnetify.react.router = {
   },
 
   // Redirect to the a URL.
-  redirect: function(iUrl) {
+  redirect: function(iUrl, viewModels) {
     // Check first whether existing views can handle routing this URL.
     // Otherwise, do a hard browser redirect.
     dotnetify.react.router.urlPath = iUrl;
-    for (var vmId in dotnetify.react.viewModels) {
-      var vm = dotnetify.react.viewModels[vmId];
-      if (vm != null && vm.$router.routeUrl()) {
+    for (var vm in viewModels) {
+      if (vm.$router.routeUrl()) {
         if (dotnetify.debug) console.log('router> redirected');
         return;
       }
@@ -273,15 +272,16 @@ dotnetify.react.router.$inject = function(iVM) {
 
       // Routes to a path.
       routeTo: function(iPath, iTemplate, iDisableEvent, iCallbackFn) {
-        var vm = this;
-        var state = vm.State();
+        const vm = this;
+        const state = vm.State();
+        const viewModels = vm.$lib.getViewModels();
 
         if (dotnetify.debug) console.log("router> route '" + iPath + "' to template id=" + iTemplate.Id);
 
         // We can determine whether the view has already been loaded by matching the 'RoutingState.Origin' argument
         // on the existing view model inside that target selector with the path.
-        for (var vmId in dotnetify.react.viewModels) {
-          var vmOther = dotnetify.react.viewModels[vmId];
+        for (let i = 0; i < viewModels.length; i++) {
+          var vmOther = viewModels[i];
           var vmArg = vmOther.Props('vmArg');
           if (vmArg != null) {
             if (typeof vmArg['RoutingState.Origin'] === 'string' && utils.equal(vmArg['RoutingState.Origin'], iPath)) return;
@@ -301,7 +301,7 @@ dotnetify.react.router.$inject = function(iVM) {
         if (document.getElementById(iTemplate.Target) == null) {
           if (dotnetify.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
 
-          return dotnetify.react.router.redirect(vm.$router.toUrl(iPath));
+          return dotnetify.react.router.redirect(vm.$router.toUrl(iPath), viewModels);
         }
 
         // Load the view associated with the route asynchronously.

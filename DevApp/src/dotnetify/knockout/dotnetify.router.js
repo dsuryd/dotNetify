@@ -66,14 +66,13 @@ dotnetify.ko.router = {
   },
 
   // Redirect to the a URL.
-  redirect: function(iUrl) {
+  redirect: function(iUrl, viewModels) {
+    dotnetify.ko.router.urlPath = iUrl;
+
     // Check first whether existing views can handle routing this URL.
     // Otherwise, do a hard browser redirect.
-    dotnetify.ko.router.urlPath = iUrl;
-    var vmElements = $('[data-vm]');
-    for (let j = 0; j < vmElements.length; j++) {
-      var widget = dotnetify.ko.widget(vmElements[j]);
-      if (widget != null && widget.VM.$router.routeUrl()) return;
+    for (let j = 0; j < viewModels.length; j++) {
+      if (viewModels[j].$router.routeUrl()) return;
     }
     window.location.replace(iUrl);
   },

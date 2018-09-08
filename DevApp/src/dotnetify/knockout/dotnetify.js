@@ -93,17 +93,17 @@ dotnetify.ko = {
     dotnetify.startHub();
 
     // Use SignalR event to raise the offline event with true/false argument.
-    // dotnetifyHub.stateChanged(function(state) {
-    //   console.log("SignalR: " + state);
+    dotnetify.hub.stateChanged(function(state) {
+      if (dotnetify.debug) console.log('SignalR: ' + state);
 
-    //   var isOffline = state != "connected";
-    //   if (dotnetify.isOffline != isOffline) {
-    //     dotnetify.isOffline = isOffline;
-    //     $(document).trigger("offline", dotnetify.isOffline);
-    //   }
-    // });
+      var isOffline = state != 'connected';
+      if (dotnetify.isOffline != isOffline) {
+        dotnetify.isOffline = isOffline;
+        $(document).trigger('offline', dotnetify.isOffline);
+      }
+    });
 
-    //if (dotnetify.offline) applyWidget();
+    if (dotnetify.offline) applyWidget();
   },
 
   destroy: function(iParent) {
@@ -112,6 +112,18 @@ dotnetify.ko = {
       const widget = dotnetify.ko.widget(elem);
       if (widget) widget.destroy();
     });
+  },
+
+  // Get all view models.
+  getViewModels: function() {
+    const self = dotnetify.ko;
+    const elems = $('[data-vm]').toArray();
+    return elems
+      .map(elem => {
+        const widget = dotnetify.ko.widget(elem);
+        return widget ? widget.VM : null;
+      })
+      .filter(x => x);
   },
 
   widget: function(iElement) {
@@ -186,6 +198,7 @@ $.widget('ko.dotnetify', {
         // Set essential info to the view model.
         self.VM.$vmId = self.VMId;
         self.VM.$element = self.element;
+        self.VM.$dotnetify = dotnetify.ko;
 
         // Add an observable to carry the offline state.
         if (dotnetify.offline) self.VM.$vmOffline = ko.observable(self.IsOffline);
