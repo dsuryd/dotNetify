@@ -17,5 +17,8 @@
 </div>
 <script>
   $('#BookDetails').modal();
-  $('#BookDetails').on('hidden.bs.modal', function (e) { window.history.back(); });
+  $('#BookDetails').on('hidden.bs.modal', function (e) { 
+    dotnetify.ko.destroy('#BookDetails');    
+    window.history.back(); 
+  });
 </script>

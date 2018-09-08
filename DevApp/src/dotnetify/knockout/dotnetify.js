@@ -23,7 +23,7 @@ ko.mapping = require('./knockout.mapping-latest');
 let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.ko = {
-  version: '1.3.0',
+  version: '2.0.0',
 
   // Internal variables.
   _responseSubs: null,
@@ -104,6 +104,14 @@ dotnetify.ko = {
     // });
 
     //if (dotnetify.offline) applyWidget();
+  },
+
+  destroy: function(iParent) {
+    const elems = iParent ? $(iParent).find('[data-vm]').addBack(iParent) : $('[data-vm]');
+    elems.toArray().forEach(elem => {
+      const widget = dotnetify.ko.widget(elem);
+      if (widget) widget.destroy();
+    });
   },
 
   widget: function(iElement) {
