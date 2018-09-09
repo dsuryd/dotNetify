@@ -1,27 +1,25 @@
-import dotnetifyHub from "./dotnetify-hub";
+/* 
+Copyright 2017-2018 Dicky Suryadi
 
-export const createEventEmitter = _ => {
-  let subscribers = [];
-  return {
-    emit(...args) {
-      let handled = false;
-      subscribers.forEach(subscriber => {
-        handled = subscriber(...args) || handled;
-      });
-      return handled;
-    },
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-    subscribe(subscriber) {
-      !subscribers.includes(subscriber) && subscribers.push(subscriber);
-      return () => (subscribers = subscribers.filter(x => x !== subscriber));
-    }
-  };
-};
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+import dotnetifyHub from './dotnetify-hub';
+import { createEventEmitter } from '../libs/utils';
 
 const dotnetify = {
   // SignalR hub options.
   hub: dotnetifyHub,
-  hubOptions: { transport: ["webSockets", "longPolling"] },
+  hubOptions: { transport: [ 'webSockets', 'longPolling' ] },
   hubPath: null,
   hubServerUrl: null,
 
@@ -56,11 +54,7 @@ const dotnetify = {
 
   // Generic connect function for non-React app.
   connect: function(iVMId, iOptions) {
-    return dotnetify.react.connect(
-      iVMId,
-      null,
-      iOptions
-    );
+    return dotnetify.react.connect(iVMId, null, iOptions);
   },
 
   initHub() {
@@ -103,26 +97,25 @@ const dotnetify = {
     };
     const failHandler = function(ex) {
       dotnetify.connectionFailedEvent.emit();
-      dotnetify._triggerConnectionStateEvent("error", ex);
+      dotnetify._triggerConnectionStateEvent('error', ex);
     };
 
     if (dotnetify._hub === null) {
-      dotnetify._hub = dotnetifyHub
-        .start(dotnetify.hubOptions)
-        .done(doneHandler)
-        .fail(failHandler);
-    } else dotnetify._hub.done(doneHandler);
+      dotnetify._hub = dotnetifyHub.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
+    }
+    else dotnetify._hub.done(doneHandler);
   },
 
   checkServerSideException: function(iVMId, iVMData, iExceptionHandler) {
     const vmData = JSON.parse(iVMData);
-    if (vmData && vmData.hasOwnProperty("ExceptionType") && vmData.hasOwnProperty("Message")) {
+    if (vmData && vmData.hasOwnProperty('ExceptionType') && vmData.hasOwnProperty('Message')) {
       const exception = { name: vmData.ExceptionType, message: vmData.Message };
 
-      if (typeof iExceptionHandler === "function") {
+      if (typeof iExceptionHandler === 'function') {
         return iExceptionHandler(exception);
-      } else {
-        console.error("[" + iVMId + "] " + exception.name + ": " + exception.message);
+      }
+      else {
+        console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
         throw exception;
       }
     }
@@ -141,9 +134,9 @@ const dotnetify = {
   },
 
   _triggerConnectionStateEvent: function(iState, iException) {
-    if (dotnetify.debug) console.log("SignalR: " + (iException ? iException.message : iState));
+    if (dotnetify.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
 
-    if (typeof dotnetify.connectionStateHandler === "function") dotnetify.connectionStateHandler(iState, iException);
+    if (typeof dotnetify.connectionStateHandler === 'function') dotnetify.connectionStateHandler(iState, iException);
     else if (iException) console.error(iException);
   },
 
