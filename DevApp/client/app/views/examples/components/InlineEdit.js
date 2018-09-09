@@ -42,7 +42,6 @@ class InlineEdit extends React.Component {
             ref={input => input && input.focus()}
             value={this.state.value}
             onClick={this.handleClick}
-            onBlur={this.handleUpdate}
             onUpdate={this.handleUpdate}
             onChange={value => this.setState({ value: value })}
           />

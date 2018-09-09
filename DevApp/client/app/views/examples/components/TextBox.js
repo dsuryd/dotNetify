@@ -17,7 +17,9 @@ class TextBox extends React.Component {
   };
 
   handleBlur = event => {
-    if (this.state.changed && this.props.onUpdate) this.props.onUpdate(this.props.value);
+    if (this.state.changed && this.props.onUpdate) {
+      this.props.onUpdate(this.props.value);
+    }
     this.setState({ changed: false });
     this.props.onBlur && this.props.onBlur(event);
   };
