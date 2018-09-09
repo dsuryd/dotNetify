@@ -16,86 +16,22 @@ limitations under the License.
 import React from 'react';
 import ReactDOM from 'react-dom';
 import dotnetify from './dotnetify-react';
+import dotnetifyRouter from '../core/dotnetify-router';
 import $ from '../libs/jquery-shim';
-import Path from '../libs/path';
 import utils from '../libs/utils';
 
 const _React = React;
 const _ReactDOM = ReactDOM;
 
 // Add plugin functions.
-dotnetify.react.router = {
-  version: '2.0.0',
-
-  // URL path that will be parsed when performing routing.
-  urlPath: document.location.pathname,
-
-  // Initialize routing using PathJS.
-  init: function() {
-    if (typeof Path !== 'undefined') {
-      Path.history.listen(true);
-      Path.routes.rescue = function() {
-        //window.location.replace(document.location.pathname);
-      };
-    }
-    else throw new Error('Pathjs library is required for routing.');
-  },
-
-  // Map a route to an action.
-  mapTo: function(iPath, iFn) {
-    if (typeof Path !== 'undefined')
-      Path.map(iPath).to(function() {
-        iFn(this.params);
-      });
-  },
-
-  // Match a URL path to a route and run the action.
-  match: function(iUrlPath) {
-    if (typeof Path !== 'undefined') {
-      var matched = Path.match(iUrlPath, true);
-      if (matched != null) {
-        matched.run();
-        return true;
-      }
-    }
-    return false;
-  },
-
-  // Optional callback to override a URL before performing routing.
-  overrideUrl: function(iUrl, iTargetSelector) {
-    return iUrl;
-  },
-
-  // Push state to HTML history.
-  pushState: function(iState, iTitle, iPath) {
-    dotnetify.react.router.urlPath = '';
-    if (typeof Path !== 'undefined') Path.history.pushState(iState, iTitle, iPath);
-  },
-
-  // Redirect to the a URL.
-  redirect: function(iUrl, viewModels) {
-    // Check first whether existing views can handle routing this URL.
-    // Otherwise, do a hard browser redirect.
-    dotnetify.react.router.urlPath = iUrl;
-    for (var vm in viewModels) {
-      if (vm.$router.routeUrl()) {
-        if (dotnetify.debug) console.log('router> redirected');
-        return;
-      }
-    }
-    window.location.replace(iUrl);
-  },
-
-  // Called by dotNetify when a view model is ready.
-  $ready: function() {
-    this.$router.initRouting();
-  }
-};
+dotnetify.react.router = new dotnetifyRouter();
 
 // Inject a view model with functions.
 dotnetify.react.router.$inject = function(iVM) {
+  const routerBase = dotnetify.react.router;
+
   // Put functions inside $router namespace.
-  iVM['$router'] = (function(iScope) {
+  iVM.$router = (function(iScope) {
     return {
       routes: [],
 
@@ -130,9 +66,9 @@ dotnetify.react.router.$inject = function(iVM) {
         if (templates == null || templates.length == 0) return;
 
         // Initialize the router.
-        if (!dotnetify.react.router.$init) {
-          dotnetify.react.router.init();
-          dotnetify.react.router.$init = true;
+        if (!routerBase.$init) {
+          routerBase.init();
+          routerBase.$init = true;
         }
 
         // Build the absolute root path.
@@ -146,8 +82,8 @@ dotnetify.react.router.$inject = function(iVM) {
 
           if (dotnetify.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
 
-          dotnetify.react.router.mapTo(mapUrl, function(iParams) {
-            dotnetify.react.router.urlPath = '';
+          routerBase.mapTo(mapUrl, function(iParams) {
+            routerBase.urlPath = '';
 
             // Construct the path from the template pattern and the params passed by PathJS.
             var path = urlPattern;
@@ -160,7 +96,7 @@ dotnetify.react.router.$inject = function(iVM) {
 
         // Route initial URL.
         var activeUrl = vm.$router.toUrl(state.RoutingState.Active);
-        if (dotnetify.react.router.urlPath == '') dotnetify.react.router.urlPath = activeUrl;
+        if (routerBase.urlPath == '') routerBase.urlPath = activeUrl;
         if (!vm.$router.routeUrl())
           // If routing ends incomplete, raise routed event anyway.
           vm.$router.raiseRoutedEvent(true);
@@ -193,8 +129,8 @@ dotnetify.react.router.$inject = function(iVM) {
         }
 
         // Provide the opportunity to override the URL.
-        iViewUrl = dotnetify.react.router.overrideUrl(iViewUrl, iTargetSelector);
-        iJsModuleUrl = dotnetify.react.router.overrideUrl(iJsModuleUrl, iTargetSelector);
+        iViewUrl = routerBase.overrideUrl(iViewUrl, iTargetSelector);
+        iJsModuleUrl = routerBase.overrideUrl(iJsModuleUrl, iTargetSelector);
 
         if (utils.endsWith(iViewUrl, 'html')) vm.$router.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
         else vm.$router.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
@@ -264,7 +200,7 @@ dotnetify.react.router.$inject = function(iVM) {
 
       // Raise event indicating the routing process has ended.
       raiseRoutedEvent: function(force) {
-        if (dotnetify.react.router.urlPath == '' || force == true) {
+        if (routerBase.urlPath == '' || force == true) {
           if (dotnetify.debug) console.log('router> routed');
           utils.dispatchEvent('dotnetify.routed');
         }
@@ -301,7 +237,7 @@ dotnetify.react.router.$inject = function(iVM) {
         if (document.getElementById(iTemplate.Target) == null) {
           if (dotnetify.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
 
-          return dotnetify.react.router.redirect(vm.$router.toUrl(iPath), viewModels);
+          return routerBase.redirect(vm.$router.toUrl(iPath), viewModels);
         }
 
         // Load the view associated with the route asynchronously.
@@ -336,7 +272,7 @@ dotnetify.react.router.$inject = function(iVM) {
         if (root == null) return false;
 
         // Get the URL path to route.
-        var urlPath = dotnetify.react.router.urlPath;
+        var urlPath = routerBase.urlPath;
 
         if (dotnetify.debug) console.log('router> routing ' + urlPath);
 
@@ -347,7 +283,7 @@ dotnetify.react.router.$inject = function(iVM) {
           });
           if (match.length > 0) {
             vm.$router.routeTo('', match[0]);
-            dotnetify.react.router.urlPath = '';
+            routerBase.urlPath = '';
             vm.$router.raiseRoutedEvent();
             return true;
           }
@@ -376,7 +312,7 @@ dotnetify.react.router.$inject = function(iVM) {
                 : null;
             if (template != null) {
               // If the URL path is completely routed, clear it.
-              if (utils.equal(dotnetify.react.router.urlPath, vm.$router.toUrl(path))) dotnetify.react.router.urlPath = '';
+              if (utils.equal(routerBase.urlPath, vm.$router.toUrl(path))) routerBase.urlPath = '';
 
               // If route's not already active, route to it.
               if (!utils.equal(state.RoutingState.Active, path))
@@ -387,9 +323,9 @@ dotnetify.react.router.$inject = function(iVM) {
               return true;
             }
           }
-          else if (dotnetify.react.router.match(urlPath)) {
+          else if (routerBase.match(urlPath)) {
             // If no vmRoute binding matches, try to match with any template's URL pattern.
-            dotnetify.react.router.urlPath = '';
+            routerBase.urlPath = '';
             vm.$router.raiseRoutedEvent();
             return true;
           }
@@ -486,7 +422,7 @@ dotnetify.react.router.$inject = function(iVM) {
     if (path == null || path == '') throw new Error('The event passed to $handleRoute has no path name.');
 
     setTimeout(function() {
-      dotnetify.react.router.pushState({}, '', path);
+      routerBase.pushState({}, '', path);
     }, 0);
   }.bind(iVM);
 
@@ -496,7 +432,7 @@ dotnetify.react.router.$inject = function(iVM) {
     if (path == null || path == '') throw new Error('The route passed to $routeTo is invalid.');
 
     setTimeout(function() {
-      dotnetify.react.router.pushState({}, '', path);
+      routerBase.pushState({}, '', path);
     }, 0);
   }.bind(iVM);
 };

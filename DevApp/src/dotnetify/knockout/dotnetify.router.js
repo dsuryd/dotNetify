@@ -14,74 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-import Path from '../libs/path';
+import dotnetifyRouter from '../core/dotnetify-router';
 
-// Add plugin functions.
-dotnetify.ko.router = {
-  version: '2.0.0',
-
-  // URL path that will be parsed when performing routing.
-  urlPath: document.location.pathname,
-
-  // Initialize routing using PathJS.
-  init: function() {
-    if (typeof Path !== 'undefined') {
-      Path.history.listen(true);
-      Path.routes.rescue = function() {
-        window.location.replace(document.location.pathname);
-      };
-    }
-    else throw new Error('Pathjs library is required for routing.');
-  },
-
-  // Map a route to an action.
-  mapTo: function(iPath, iFn) {
-    if (typeof Path !== 'undefined')
-      Path.map(iPath).to(function() {
-        iFn(this.params);
-      });
-  },
-
-  // Match a URL path to a route and run the action.
-  match: function(iUrlPath) {
-    if (typeof Path !== 'undefined') {
-      var matched = Path.match(iUrlPath, true);
-      if (matched != null) {
-        matched.run();
-        return true;
-      }
-    }
-    return false;
-  },
-
-  // Optional callback to override a URL before performing routing.
-  overrideUrl: function(iUrl) {
-    return iUrl;
-  },
-
-  // Push state to HTML history.
-  pushState: function(iState, iTitle, iPath) {
-    dotnetify.ko.router.urlPath = '';
-    if (typeof Path !== 'undefined') Path.history.pushState(iState, iTitle, iPath);
-  },
-
-  // Redirect to the a URL.
-  redirect: function(iUrl, viewModels) {
-    dotnetify.ko.router.urlPath = iUrl;
-
-    // Check first whether existing views can handle routing this URL.
-    // Otherwise, do a hard browser redirect.
-    for (let j = 0; j < viewModels.length; j++) {
-      if (viewModels[j].$router.routeUrl()) return;
-    }
-    window.location.replace(iUrl);
-  },
-
-  // Called by dotNetify when a view model is ready.
-  $ready: function() {
-    this.$router.initRouting();
-  }
-};
+dotnetify.ko.router = new dotnetifyRouter();
 
 // Inject a view model with functions.
 dotnetify.ko.router.$inject = function(iVM) {
@@ -344,9 +279,6 @@ dotnetify.ko.router.$inject = function(iVM) {
   })(iVM);
 };
 
-// Register the plugin to dotNetify.
-dotnetify.ko.plugins['router'] = dotnetify.ko.router;
-
 // Custom knockout binding to do routing.
 ko.bindingHandlers.vmRoute = {
   update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -421,3 +353,6 @@ ko.bindingHandlers.vmRoute = {
     });
   }
 };
+
+// Register the plugin to dotNetify.
+dotnetify.ko.plugins['router'] = dotnetify.ko.router;
