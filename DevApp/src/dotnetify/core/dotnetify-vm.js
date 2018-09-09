@@ -44,18 +44,17 @@ export default class dotnetifyVM {
     this.State = state => (typeof state === 'undefined' ? getState() : setState(state));
     this.Props = prop => this.$component.props[prop];
 
-    if (this.Props('vmArg')) {
-      this.$vmArg = $.extend(this.$vmArg, this.Props.vmArg);
-    }
+    const vmArg = this.Props('vmArg');
+    if (vmArg) this.$vmArg = $.extend(this.$vmArg, vmArg);
 
     // Inject plugin functions into this view model.
-    this.$getPlugins().map(plugin => (plugin.hasOwnProperty('$inject') ? plugin.$inject(this) : null));
+    this.$getPlugins().map(plugin => (typeof plugin['$inject'] == 'function' ? plugin.$inject(this) : null));
   }
 
   // Disposes the view model, both here and on the server.
   $destroy() {
     // Call any plugin's $destroy function if provided.
-    this.$getPlugins().map(plugin => (typeof plugin['$destroy'] === 'function' ? plugin.$destroy.apply(this) : null));
+    this.$getPlugins().map(plugin => (typeof plugin['$destroy'] == 'function' ? plugin.$destroy.apply(this) : null));
 
     const controller = this.$dotnetify.controller;
     if (controller.isConnected()) {
@@ -212,7 +211,7 @@ export default class dotnetifyVM {
   $onLoad() {
     // Call any plugin's $ready function if provided to give a chance to do
     // things when the view model is ready.
-    this.$getPlugins().map(plugin => (typeof plugin['$ready'] === 'function' ? plugin.$ready.apply(this) : null));
+    this.$getPlugins().map(plugin => (typeof plugin['$ready'] == 'function' ? plugin.$ready.apply(this) : null));
     this.$loaded = true;
   }
 
