@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import $ from './jquery-shim';
+import $ from '../libs/jquery-shim';
 var signalRNetCore = require('@aspnet/signalr');
 
 if (typeof window == 'undefined') window = global;
@@ -177,9 +177,7 @@ dotnetifyHub.init = function(iHubPath, iServerUrl, signalR) {
       'use strict';
 
       if (typeof $.signalR !== 'function') {
-        throw new Error(
-          'SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.'
-        );
+        throw new Error('SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.');
       }
 
       var signalR = $.signalR;
@@ -247,24 +245,15 @@ dotnetifyHub.init = function(iHubPath, iServerUrl, signalR) {
         proxies['dotNetifyHub'].client = {};
         proxies['dotNetifyHub'].server = {
           dispose_VM: function(vmId) {
-            return proxies['dotNetifyHub'].invoke.apply(
-              proxies['dotNetifyHub'],
-              $.merge([ 'Dispose_VM' ], $.makeArray(arguments))
-            );
+            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge([ 'Dispose_VM' ], $.makeArray(arguments)));
           },
 
           request_VM: function(vmId, vmArg) {
-            return proxies['dotNetifyHub'].invoke.apply(
-              proxies['dotNetifyHub'],
-              $.merge([ 'Request_VM' ], $.makeArray(arguments))
-            );
+            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge([ 'Request_VM' ], $.makeArray(arguments)));
           },
 
           update_VM: function(vmId, vmData) {
-            return proxies['dotNetifyHub'].invoke.apply(
-              proxies['dotNetifyHub'],
-              $.merge([ 'Update_VM' ], $.makeArray(arguments))
-            );
+            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge([ 'Update_VM' ], $.makeArray(arguments)));
           }
         };
 

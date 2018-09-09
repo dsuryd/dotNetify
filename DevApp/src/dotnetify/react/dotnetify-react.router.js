@@ -15,10 +15,10 @@ limitations under the License.
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import $ from '../jquery-shim';
 import dotnetify from './dotnetify-react';
-import Path from '../path';
-import utils from '../utils';
+import $ from '../libs/jquery-shim';
+import Path from '../libs/path';
+import utils from '../libs/utils';
 
 const _React = React;
 const _ReactDOM = ReactDOM;
@@ -274,7 +274,7 @@ dotnetify.react.router.$inject = function(iVM) {
       routeTo: function(iPath, iTemplate, iDisableEvent, iCallbackFn) {
         const vm = this;
         const state = vm.State();
-        const viewModels = vm.$lib.getViewModels();
+        const viewModels = vm.$dotnetify.getViewModels();
 
         if (dotnetify.debug) console.log("router> route '" + iPath + "' to template id=" + iTemplate.Id);
 

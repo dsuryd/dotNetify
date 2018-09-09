@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import $ from '../jquery-shim';
+import $ from '../libs/jquery-shim';
 
 // Client-side view model that acts as a proxy of the server view model.
 export default class dotnetifyVM {
@@ -34,8 +34,7 @@ export default class dotnetifyVM {
     this.$requested = false;
     this.$loaded = false;
     this.$itemKey = {};
-    this.$lib = iDotNetify;
-    this.$core = iDotNetify.core;
+    this.$dotnetify = iDotNetify;
 
     let getState = iOptions && iOptions['getState'];
     let setState = iOptions && iOptions['setState'];
@@ -45,8 +44,8 @@ export default class dotnetifyVM {
     this.State = state => (typeof state === 'undefined' ? getState() : setState(state));
     this.Props = prop => this.$component.props[prop];
 
-    if (iComponent && iComponent.props && iComponent.props.hasOwnProperty('vmArg')) {
-      this.$vmArg = $.extend(this.$vmArg, iComponent.props.vmArg);
+    if (this.Props('vmArg')) {
+      this.$vmArg = $.extend(this.$vmArg, this.Props.vmArg);
     }
 
     // Inject plugin functions into this view model.
@@ -58,32 +57,34 @@ export default class dotnetifyVM {
     // Call any plugin's $destroy function if provided.
     this.$getPlugins().map(plugin => (typeof plugin['$destroy'] === 'function' ? plugin.$destroy.apply(this) : null));
 
-    if (this.$core.isConnected()) {
+    const controller = this.$dotnetify.controller;
+    if (controller.isConnected()) {
       try {
-        this.$core.disposeVM(this.$vmId);
+        controller.disposeVM(this.$vmId);
       } catch (ex) {
-        this.$core._triggerConnectionStateEvent('error', ex);
+        controller._triggerConnectionStateEvent('error', ex);
       }
     }
 
-    delete this.$lib.viewModels[this.$vmId];
+    delete this.$dotnetify.viewModels[this.$vmId];
   }
 
   // Dispatches a value to the server view model.
   // iValue - Vvalue to dispatch.
   $dispatch(iValue) {
-    if (this.$core.isConnected()) {
+    const controller = this.$dotnetify.controller;
+    if (controller.isConnected()) {
       try {
-        this.$core.updateVM(this.$vmId, iValue);
+        controller.updateVM(this.$vmId, iValue);
 
-        if (this.$core.debug) {
+        if (controller.debug) {
           console.log('[' + this.$vmId + '] sent> ');
           console.log(iValue);
 
-          if (this.$core.debugFn != null) this.$core.debugFn(this.$vmId, 'sent', iValue);
+          controller.debugFn && controller.debugFn(this.$vmId, 'sent', iValue);
         }
       } catch (ex) {
-        this.$core._triggerConnectionStateEvent('error', ex);
+        controller._triggerConnectionStateEvent('error', ex);
       }
     }
   }
@@ -116,7 +117,7 @@ export default class dotnetifyVM {
   }
 
   $getPlugins() {
-    return Object.keys(this.$lib.plugins).map(id => this.$lib.plugins[id]);
+    return Object.keys(this.$dotnetify.plugins).map(id => this.$dotnetify.plugins[id]);
   }
 
   // Preprocess view model update from the server before we set the state.
@@ -180,8 +181,9 @@ export default class dotnetifyVM {
 
   // Requests state from the server view model.
   $request() {
-    if (this.$core.isConnected()) {
-      this.$core.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
+    const controller = this.$dotnetify.controller;
+    if (controller.isConnected()) {
+      controller.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
       this.$requested = true;
     }
   }
@@ -189,11 +191,12 @@ export default class dotnetifyVM {
   // Updates state from the server view model to the view.
   // iVMData - Serialized state from the server.
   $update(iVMData) {
-    if (this.$core.debug) {
+    const controller = this.$dotnetify.controller;
+    if (controller.debug) {
       console.log('[' + this.$vmId + '] received> ');
       console.log(JSON.parse(iVMData));
 
-      if (this.$core.debugFn != null) dotnetify.debugFn(this.$vmId, 'received', JSON.parse(iVMData));
+      controller.debugFn && controller.debugFn(this.$vmId, 'received', JSON.parse(iVMData));
     }
     var vmData = JSON.parse(iVMData);
     this.$preProcess(vmData);

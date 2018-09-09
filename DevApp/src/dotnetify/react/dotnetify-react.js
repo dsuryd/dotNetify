@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import _dotnetify from '../dotnetify-base';
+import _dotnetify from '../core/dotnetify';
 import dotnetifyVM from '../core/dotnetify-vm';
 
 if (typeof window == 'undefined') window = global;
@@ -23,7 +23,7 @@ dotnetify.react = {
   version: '2.0.0',
   viewModels: {},
   plugins: {},
-  core: dotnetify,
+  controller: dotnetify,
 
   // Internal variables.
   _responseSubs: null,
