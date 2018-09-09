@@ -20,6 +20,13 @@ import $ from '../libs/jquery-shim';
 import utils from '../libs/utils';
 
 export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
+  get hasRoutingState() {
+    const state = this.vm.State();
+    return state && state.hasOwnProperty('RoutingState');
+  }
+  get RoutingState() {
+    return this.vm.State().RoutingState;
+  }
   get VMRoot() {
     return this.vm.Props('vmRoot');
   }
@@ -33,20 +40,19 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
 
   // Loads a view into a target element.
   loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
-    var vm = this.vm;
-    var state = vm.State();
-    var reactProps;
+    const vm = this.vm;
+    let reactProps;
 
     // If the view model supports routing, add the root path to the view, to be used
     // to build the absolute route path, and view model argument if provided.
-    if (state.hasOwnProperty('RoutingState')) {
-      if (state.RoutingState === null) {
+    if (this.hasRoutingState) {
+      if (this.RoutingState === null) {
         console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
         return;
       }
 
-      var root = this.VMRoot;
-      root = root != null ? '/' + utils.trim(state.RoutingState.Root) + '/' + utils.trim(root) : state.RoutingState.Root;
+      let root = this.VMRoot;
+      root = root != null ? '/' + utils.trim(this.RoutingState.Root) + '/' + utils.trim(root) : this.RoutingState.Root;
       reactProps = { vmRoot: root, vmArg: iVmArg };
     }
 
@@ -60,7 +66,7 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
 
   // Loads an HTML view.
   loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
-    var vm = this.vm;
+    const vm = this.vm;
 
     try {
       // Unmount any React component before replacing with a new DOM.
@@ -82,8 +88,8 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
 
   // Loads a React view.
   loadReactView(iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
-    var vm = this.vm;
-    var createViewFunc = function() {
+    const vm = this.vm;
+    const createViewFunc = () => {
       if (!window.hasOwnProperty(iReactClassName)) {
         console.error('[' + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
         return;

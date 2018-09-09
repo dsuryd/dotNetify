@@ -18,6 +18,9 @@ import utils from '../libs/utils';
 export default class dotnetifyVMRouter {
   routes = [];
 
+  get RoutingState() {
+    throw new Error('Not implemented');
+  }
   get VMRoot() {
     throw new Error('Not implemented');
   }
@@ -31,6 +34,12 @@ export default class dotnetifyVMRouter {
     this.debug = vm.$dotnetify.controller.debug;
   }
 
+  // Dispatch the active routing state to the server.
+  dispatchActiveRoutingState(iPath) {
+    this.vm.$dispatch({ 'RoutingState.Active': iPath });
+    this.vm.State({ 'RoutingState.Active': iPath });
+  }
+
   // Handles click event from anchor tags.
   handleRoute(iEvent) {
     iEvent.preventDefault();
@@ -42,38 +51,34 @@ export default class dotnetifyVMRouter {
 
   // Build the absolute root path from the "vmRoot" property on React component.
   initRoot() {
-    var vm = this.vm;
-    var state = vm.State();
-    if (!state.hasOwnProperty('RoutingState') || state.RoutingState === null || state.RoutingState.Root === null) return;
+    if (!this.hasRoutingState || this.RoutingState === null || this.RoutingState.Root === null) return;
 
-    if (this._absRoot != state.RoutingState.Root) {
+    if (this._absRoot != this.RoutingState.Root) {
       var absRoot = utils.trim(this.VMRoot);
       if (absRoot != '') absRoot = '/' + absRoot;
-      var root = utils.trim(state.RoutingState.Root);
+      var root = utils.trim(this.RoutingState.Root);
       this._absRoot = root != '' ? absRoot + '/' + root : absRoot;
-      state.RoutingState.Root = this._absRoot;
+      this.RoutingState.Root = this._absRoot;
     }
   }
 
   // Initialize routing templates if the view model implements IRoutable.
   initRouting() {
-    var vm = this.vm;
-    var routerBase = this.router;
-    var state = vm.State();
-    if (state == null || !state.hasOwnProperty('RoutingState')) return;
+    const vm = this.vm;
+    if (!this.hasRoutingState) return;
 
-    if (state.RoutingState === null) {
+    if (this.RoutingState === null) {
       console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
       return;
     }
 
-    var templates = state.RoutingState.Templates;
+    var templates = this.RoutingState.Templates;
     if (templates == null || templates.length == 0) return;
 
     // Initialize the router.
-    if (!routerBase.$init) {
-      routerBase.init();
-      routerBase.$init = true;
+    if (!this.router.$init) {
+      this.router.init();
+      this.router.$init = true;
     }
 
     // Build the absolute root path.
@@ -87,8 +92,8 @@ export default class dotnetifyVMRouter {
 
       if (dotnetify.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
 
-      routerBase.mapTo(mapUrl, iParams => {
-        routerBase.urlPath = '';
+      this.router.mapTo(mapUrl, iParams => {
+        this.router.urlPath = '';
 
         // Construct the path from the template pattern and the params passed by PathJS.
         var path = urlPattern;
@@ -100,7 +105,7 @@ export default class dotnetifyVMRouter {
     });
 
     // Route initial URL.
-    var activeUrl = this.toUrl(state.RoutingState.Active);
+    var activeUrl = this.toUrl(this.RoutingState.Active);
     if (this.router.urlPath == '') this.router.urlPath = activeUrl;
     if (!this.routeUrl())
       // If routing ends incomplete, raise routed event anyway.
@@ -109,8 +114,9 @@ export default class dotnetifyVMRouter {
 
   // Whether a route is active.
   isActive(iRoute) {
-    var state = this.vm.State();
-    if (iRoute != null && iRoute.hasOwnProperty('Path')) return utils.equal(iRoute.Path, state.RoutingState.Active);
+    if (iRoute != null && iRoute.hasOwnProperty('Path')) {
+      return utils.equal(iRoute.Path, this.RoutingState.Active);
+    }
     return false;
   }
 
@@ -137,9 +143,6 @@ export default class dotnetifyVMRouter {
 
   // Returns the URL for an anchor tag.
   route(iRoute, iTarget) {
-    var vm = this.vm;
-    var state = vm.State();
-
     // No route to process. Return silently.
     if (iRoute == null) return;
 
@@ -152,8 +155,8 @@ export default class dotnetifyVMRouter {
     // This is so that we don't send the same data twice if both are equal.
     var path = iRoute.Path;
     var template = null;
-    if (state.hasOwnProperty('RoutingState') && state.RoutingState.Templates != null) {
-      var match = state.RoutingState.Templates.filter(function(iTemplate) {
+    if (this.hasRoutingState && this.RoutingState.Templates != null) {
+      var match = this.RoutingState.Templates.filter(function(iTemplate) {
         return iTemplate.Id == iRoute.TemplateId;
       });
       if (match.length > 0) {
@@ -210,7 +213,6 @@ export default class dotnetifyVMRouter {
   // Routes to a path.
   routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn) {
     const vm = this.vm;
-    const state = vm.State();
     const viewModels = vm.$dotnetify.getViewModels();
 
     if (this.debug) console.log("router> route '" + iPath + "' to template id=" + iTemplate.Id);
@@ -245,9 +247,8 @@ export default class dotnetifyVMRouter {
     var view = iTemplate.ViewUrl ? iTemplate.ViewUrl : iTemplate.Id;
     this.loadView('#' + iTemplate.Target, view, iTemplate.JSModuleUrl, { 'RoutingState.Origin': iPath }, () => {
       // If load is successful, update the active route.
-      state.RoutingState.Active = iPath;
-      vm.$dispatch({ 'RoutingState.Active': iPath });
-      vm.State({ 'RoutingState.Active': iPath });
+      this.RoutingState.Active = iPath;
+      this.dispatchActiveRoutingState(iPath);
 
       // Support exit interception.
       if (iDisableEvent != true && vm.hasOwnProperty('onRouteExit')) vm.onRouteExit(iPath, iTemplate);
@@ -266,11 +267,9 @@ export default class dotnetifyVMRouter {
   // Routes the URL if the view model implements IRoutable.
   // Returns true if the view model handles the routing.
   routeUrl() {
-    var vm = this.vm;
-    var state = vm.State();
-    if (!state.hasOwnProperty('RoutingState')) return false;
+    if (!this.hasRoutingState) return false;
 
-    var root = state.RoutingState.Root;
+    var root = this.RoutingState.Root;
     if (root == null) return false;
 
     // Get the URL path to route.
@@ -280,7 +279,7 @@ export default class dotnetifyVMRouter {
 
     // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
     if (utils.equal(urlPath, root) || utils.equal(urlPath, root + '/') || urlPath === '/') {
-      var match = utils.grep(state.RoutingState.Templates, function(iTemplate) {
+      var match = utils.grep(this.RoutingState.Templates, function(iTemplate) {
         return iTemplate.UrlPattern === '';
       });
       if (match.length > 0) {
@@ -314,7 +313,7 @@ export default class dotnetifyVMRouter {
           if (utils.equal(this.router.urlPath, this.toUrl(path))) this.router.urlPath = '';
 
           // If route's not already active, route to it.
-          if (!utils.equal(state.RoutingState.Active, path)) {
+          if (!utils.equal(this.RoutingState.Active, path)) {
             this.routeTo(path, template, false, () => this.raiseRoutedEvent());
           }
           else this.raiseRoutedEvent();
@@ -333,10 +332,8 @@ export default class dotnetifyVMRouter {
 
   // Builds an absolute URL from a path.
   toUrl(iPath) {
-    const vm = this.vm;
-    var state = vm.State();
-    var path = utils.trim(iPath);
+    let path = utils.trim(iPath);
     if (path.charAt(0) != '(' && path != '') path = '/' + path;
-    return state.hasOwnProperty('RoutingState') ? state.RoutingState.Root + path : iPath;
+    return this.hasRoutingState ? this.RoutingState.Root + path : iPath;
   }
 }
