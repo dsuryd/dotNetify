@@ -40,7 +40,7 @@ class MovieTable extends React.Component {
 
   render() {
     return (
-      <section>
+      <div>
         <table>
           <tbody>
             <tr>{this.state.Headers.map((text, idx) => <th key={idx}>{text}</th>)}</tr>
@@ -69,7 +69,7 @@ class MovieTable extends React.Component {
             </div>
           ))}
         </div>
-      </section>
+      </div>
     );
   }
 }

@@ -9,6 +9,11 @@ namespace DotNetify.DevApp
     public string Content => new Markdown("DotNetify.DevApp.Docs.Overview.md");
   }
 
+    public class OverviewKO : BaseVM
+  {
+    public string Content => new Markdown("DotNetify.DevApp.Docs.Overview.Knockout.md");
+  }
+
   public class RealTimePush : BaseVM
   {
     private Timer _timer;

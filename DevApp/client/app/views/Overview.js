@@ -2,13 +2,35 @@ import React from 'react';
 import { Markdown, withTheme } from 'dotnetify-elements';
 import Article from '../components/Article';
 import Expander from '../components/Expander';
+import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
 
-const Overview = props => (
+class Overview extends React.Component {
+  constructor() {
+    super();
+    this.state = { framework: currentFramework };
+    this.unsubs = frameworkSelectEvent.subscribe(framework => this.setState({ framework: framework }));
+  }
+  componentWillUnmount() {
+    this.unsubs();
+  }
+  render() {
+    const { framework } = this.state;
+    return framework === 'Knockout' ? <OverviewKO /> : <OverviewReact />;
+  }
+}
+
+const OverviewReact = _ => (
   <Article vm="Overview" id="Content">
     <Markdown id="Content">
       <Expander label={<SeeItLive />} content={<RealTimePush />} connectOnExpand />
       <Expander label={<SeeItLive />} content={<ServerUpdate />} />
     </Markdown>
+  </Article>
+);
+
+const OverviewKO = _ => (
+  <Article vm="OverviewKO" id="Content">
+    <Markdown id="Content" />
   </Article>
 );
 
@@ -45,8 +67,7 @@ class ServerUpdate extends React.Component {
   render() {
     const handleFirstName = e => this.setState({ firstName: e.target.value });
     const handleLastName = e => this.setState({ lastName: e.target.value });
-    const handleSubmit = () =>
-      this.vm.$dispatch({ Submit: { FirstName: this.state.firstName, LastName: this.state.lastName } });
+    const handleSubmit = () => this.vm.$dispatch({ Submit: { FirstName: this.state.firstName, LastName: this.state.lastName } });
     return (
       <div>
         <div>{this.state.Greetings}</div>

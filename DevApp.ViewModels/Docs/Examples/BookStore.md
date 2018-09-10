@@ -23,10 +23,6 @@ class BookStore extends React.Component {
   render() {
     return (
       <BookStoreCss>
-        <header>
-          Each product here is represented by a unique URL that can be entered into the address bar to go directly to
-          that specific product page.
-        </header>
         <BookStoreFront vm={this.vm} books={this.state.Books} />
         <div id="BookPanel" />
       </BookStoreCss>

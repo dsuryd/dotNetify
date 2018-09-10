@@ -10,6 +10,7 @@
     <EmbeddedResource Include="Docs\Examples\AFITop100.json" />
     <EmbeddedResource Include="Docs\Examples\webstore.json" />
     <EmbeddedResource Include="Docs\Overview.md" />
+    <EmbeddedResource Include="Docs\Overview.Knockout.md" />
     <EmbeddedResource Include="Docs\DataFlow.md" />
     <EmbeddedResource Include="Docs\Reactive.md" />
     <EmbeddedResource Include="Docs\GetStarted.md" />
@@ -24,6 +25,7 @@
     <EmbeddedResource Include="Docs\Examples\Knockout\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Examples\Knockout\SimpleList.md" />    
     <EmbeddedResource Include="Docs\Examples\Knockout\LiveChart.md" /> 
+    <EmbeddedResource Include="Docs\Examples\Knockout\CompositeView.md" /> 
     <EmbeddedResource Include="Docs\Examples\Knockout\BookStore.md" /> 
     <EmbeddedResource Include="Docs\APIs\Connection.md" />
     <EmbeddedResource Include="Docs\APIs\CRUD.md" />

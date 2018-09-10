@@ -2,10 +2,6 @@
 
 ```html
 <section data-vm="BookStoreVM"> 
-    <header>
-    Each product here is represented by a unique URL that can be entered into the address bar to go directly to that
-        specific product page.
-    </header>
     <div data-bind="foreach: Books">
       <div>
         <center>
@@ -29,8 +25,8 @@
 export default class BookStoreVM {
   constructor(vm: any) {
     vm.onRouteEnter = (path: string, template: any) => {
-      template.Target('BookPanel');
-      if (path !== '') template.ViewUrl('/examples/Book.html');
+      template.Target = 'BookPanel';
+      if (path.search('book/') >= 0) template.ViewUrl = '/examples/Book.html';
     };
   }
 }

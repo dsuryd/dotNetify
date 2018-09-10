@@ -1,5 +1,5 @@
 ﻿using System;
-using DotNetify;
+using System.Reactive.Linq;
 using DotNetify.Elements;
 
 namespace DotNetify.DevApp
@@ -10,8 +10,17 @@ namespace DotNetify.DevApp
       {
          var markdown = new Markdown("DotNetify.DevApp.Docs.Examples.CompositeView.md");
 
-         AddProperty("ViewSource", markdown.GetSection(null, "CompositeViewVM.cs"));
+         AddProperty("ViewSource", markdown.GetSection(null, "CompositeViewVM.cs"))
+            .SubscribeTo(AddInternalProperty<string>("Framework").Select(GetViewSource));
+
          AddProperty("ViewModelSource", markdown.GetSection("CompositeViewVM.cs"));
+      }
+
+      private string GetViewSource(string framework)
+      {
+         return framework == "Knockout" ?
+            new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.CompositeView.md") :
+            new Markdown("DotNetify.DevApp.Docs.Examples.CompositeView.md").GetSection(null, "CompositeViewVM.cs");
       }
    }
 

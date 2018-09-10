@@ -133,26 +133,29 @@ export const CompositeViewCss = styled.div`
   max-width: 1268px;
   display: flex;
   flex-wrap: wrap;
-  > * {
-    &:first-child {
-      width: 70%;
-      margin-right: 1rem;
-    }
-    &:last-child {
-      width: calc(30% - 1rem);
-      min-width: 10rem;
-    }
+  .knockout > div {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .knockout section,
+  > div {
+    width: 70%;
+    margin-right: 1rem;
+  }
+  .knockout aside,
+  > aside {
+    width: calc(30% - 1rem);
+    min-width: 10rem;
   }
   @media (max-width: 860px) {
-    > * {
+    .knockout section,
+    > div {
       width: 100%;
-      &:first-child {
-        width: 100%;
-        margin-bottom: 2rem;
-      }
-      &:last-child {
-        width: 100%;
-      }
+      margin-bottom: 2rem;
+    }
+    .knockout aside,
+    > aside {
+      width: 100%;
     }
   }
   .card {
