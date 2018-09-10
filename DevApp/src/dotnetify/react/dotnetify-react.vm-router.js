@@ -38,6 +38,11 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
     super(iVM, iDotNetifyRouter);
   }
 
+  onRouteEnter(iPath, iTemplate) {
+    if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id;
+    return true;
+  }
+
   // Loads a view into a target element.
   loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
     const vm = this.vm;

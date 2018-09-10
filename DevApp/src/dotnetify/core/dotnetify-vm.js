@@ -42,7 +42,7 @@ export default class dotnetifyVM {
     setState = typeof setState === 'function' ? setState : state => iComponent.setState(state);
 
     this.State = state => (typeof state === 'undefined' ? getState() : setState(state));
-    this.Props = prop => this.$component.props[prop];
+    this.Props = prop => this.$component.props && this.$component.props[prop];
 
     const vmArg = this.Props('vmArg');
     if (vmArg) this.$vmArg = $.extend(this.$vmArg, vmArg);

@@ -24,6 +24,7 @@ let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.ko = {
   version: '2.0.0',
+  controller: dotnetify,
 
   // Internal variables.
   _responseSubs: null,

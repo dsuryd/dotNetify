@@ -53,13 +53,13 @@ export default class dotnetifyRouter {
   }
 
   // Optional callback to override a URL before performing routing.
-  overrideUrl(iUrl, iTargetSelector) {
+  overrideUrl(iUrl) {
     return iUrl;
   }
 
   // Push state to HTML history.
   pushState(iState, iTitle, iPath) {
-    dotnetify.react.router.urlPath = '';
+    this.urlPath = '';
     if (typeof Path !== 'undefined') Path.history.pushState(iState, iTitle, iPath);
   }
 
@@ -67,7 +67,7 @@ export default class dotnetifyRouter {
   redirect(iUrl, viewModels) {
     // Check first whether existing views can handle routing this URL.
     // Otherwise, do a hard browser redirect.
-    dotnetify.react.router.urlPath = iUrl;
+    this.urlPath = iUrl;
     for (let i = 0; i < viewModels.length; i++) {
       const vm = viewModels[i];
       if (vm.$router.routeUrl()) {

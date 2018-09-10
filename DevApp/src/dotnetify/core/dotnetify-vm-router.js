@@ -132,6 +132,11 @@ export default class dotnetifyVMRouter {
     this.routeTo(iPath, template, true);
   }
 
+  // Handles route enter event.
+  onRouteEnter(iPath, iTemplate) {
+    return true;
+  }
+
   // Raise event indicating the routing process has ended.
   raiseRoutedEvent(force) {
     const vm = this.vm;
@@ -228,7 +233,9 @@ export default class dotnetifyVMRouter {
     }
 
     // Support enter interception.
-    if (iDisableEvent != true && vm.hasOwnProperty('onRouteEnter')) if (vm.onRouteEnter(iPath, iTemplate) == false) return;
+    if (iDisableEvent != true && vm.hasOwnProperty('onRouteEnter')) {
+      if (this.onRouteEnter(iPath, iTemplate) == false || vm.onRouteEnter(iPath, iTemplate) == false) return;
+    }
 
     // Check if the route has valid target.
     if (iTemplate.Target === null) {
@@ -244,10 +251,8 @@ export default class dotnetifyVMRouter {
     }
 
     // Load the view associated with the route asynchronously.
-    var view = iTemplate.ViewUrl ? iTemplate.ViewUrl : iTemplate.Id;
-    this.loadView('#' + iTemplate.Target, view, iTemplate.JSModuleUrl, { 'RoutingState.Origin': iPath }, () => {
+    this.loadView('#' + iTemplate.Target, iTemplate.ViewUrl, iTemplate.JSModuleUrl, { 'RoutingState.Origin': iPath }, () => {
       // If load is successful, update the active route.
-      this.RoutingState.Active = iPath;
       this.dispatchActiveRoutingState(iPath);
 
       // Support exit interception.
