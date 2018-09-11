@@ -5,5 +5,4 @@ import Scope from './Scope';
 import RouteLink from './RouteLink';
 import RouteTarget from './RouteTarget';
 
-export { Scope, RouteLink, RouteTarget };
-export default dotnetify;
+module.exports = Object.assign(dotnetify, { Scope, RouteLink, RouteTarget });

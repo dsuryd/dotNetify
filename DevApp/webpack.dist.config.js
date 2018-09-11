@@ -1,6 +1,7 @@
 'use strict';
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const baseExport = {
   module: {
@@ -13,45 +14,51 @@ const baseExport = {
       { test: /\.(eot|ttf|woff(2)?)(\?v=\d+\.\d+\.\d+)?/, loader: 'url-loader' }
     ]
   },
-  plugins: [ new MiniCssExtractPlugin() ]
+  resolve: {
+    modules: [ 'src', 'node_modules' ],
+    extensions: [ '.js', '.jsx', '.tsx' ]
+  },
+  plugins: [ new MiniCssExtractPlugin(), new CopyWebpackPlugin([ { from: './src/dotnetify/libs/signalR-netfx.js', to: './' } ]) ]
 };
 
 module.exports = [
   {
-    mode: 'production',
-    entry: {
-      dotnetify: './src/dotnetify/index.js'
-    },
-    output: {
-      path: __dirname + '/dist',
-      filename: '[name].js',
-      library: 'dotNetify',
-      libraryTarget: 'umd'
-    },
-    resolve: {
-      modules: [ 'src', 'node_modules' ],
-      extensions: [ '.js', '.jsx', '.tsx' ]
-    },
-    externals: [ 'prop-types', 'react', 'react-dom' ],
-    module: baseExport.module,
-    plugins: baseExport.plugins
-  },
-  {
-    mode: 'production',
+    mode: 'development',
     entry: {
       dotnetify: './src/dotnetify/react/index.js'
     },
     output: {
-      path: __dirname + '/dist/react',
-      filename: 'index.js',
-      library: 'dotNetifyReact',
+      path: __dirname + '/dist/dist',
+      filename: 'dotnetify-react.js',
+      library: 'dotnetify',
       libraryTarget: 'umd'
     },
-    resolve: {
-      modules: [ 'src', 'node_modules' ],
-      extensions: [ '.js', '.jsx', '.tsx' ]
+    externals: {
+      react: 'React',
+      'react-dom': 'ReactDOM',
+      '@aspnet/signalr': 'signalR'
     },
-    externals: [ 'prop-types', 'react', 'react-dom' ],
+    resolve: baseExport.resolve,
+    module: baseExport.module,
+    plugins: baseExport.plugins
+  },
+  {
+    mode: 'development',
+    entry: {
+      dotnetify: './src/dotnetify/knockout/index.js'
+    },
+    output: {
+      path: __dirname + '/dist/dist',
+      filename: 'dotnetify-ko.js',
+      library: 'dotnetify',
+      libraryTarget: 'umd'
+    },
+    externals: {
+      knockout: 'knockout',
+      jquery: 'jquery',
+      '@aspnet/signalr': 'signalR'
+    },
+    resolve: baseExport.resolve,
     module: baseExport.module,
     plugins: baseExport.plugins
   }
