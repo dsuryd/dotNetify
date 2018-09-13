@@ -2,6 +2,7 @@ import Overview from './Overview';
 import DataFlow from './DataFlow';
 import Reactive from './Reactive';
 import GetStarted from './GetStarted';
+import FromScratchWebPack from './from-scratch/FromScratchWebPack';
 import HelloWorld from './examples/HelloWorld';
 import ControlTypes from './examples/ControlTypes';
 import SimpleList from './examples/SimpleList';
@@ -19,6 +20,7 @@ import Security from './apis/Security';
 
 export {
   Overview,
+  FromScratchWebPack,
   DataFlow,
   Reactive,
   GetStarted,

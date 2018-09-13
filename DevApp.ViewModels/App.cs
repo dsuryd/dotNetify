@@ -14,6 +14,7 @@ namespace DotNetify.DevApp
         {
             Home,
             Overview,
+            FromScratchWebPack,
             DataFlow,
             Reactive,
             GetStarted,
@@ -60,6 +61,8 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.Middleware))     { UrlPattern = "api/middleware" },
                 new RouteTemplate(nameof(Route.Routing))        { UrlPattern = "api/routing" },
                 new RouteTemplate(nameof(Route.Security))       { UrlPattern = "api/security" },
+
+                new RouteTemplate(nameof(Route.FromScratchWebPack)) { UrlPattern = "fromscratch-webpack" },
             });
 
             _navMenuItems = new NavMenuItem[]

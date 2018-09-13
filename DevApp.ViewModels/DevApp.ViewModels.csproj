@@ -14,6 +14,7 @@
     <EmbeddedResource Include="Docs\DataFlow.md" />
     <EmbeddedResource Include="Docs\Reactive.md" />
     <EmbeddedResource Include="Docs\GetStarted.md" />
+    <EmbeddedResource Include="Docs\FromScratchWebPack.md" />
     <EmbeddedResource Include="Docs\Examples\HelloWorld.md" />
     <EmbeddedResource Include="Docs\Examples\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Examples\SimpleList.md" />

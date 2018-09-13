@@ -23,7 +23,7 @@ const baseExport = {
 
 module.exports = [
   {
-    mode: 'development',
+    mode: 'production',
     entry: {
       dotnetify: './src/dotnetify/react/index.js'
     },
@@ -34,16 +34,31 @@ module.exports = [
       libraryTarget: 'umd'
     },
     externals: {
-      react: 'React',
-      'react-dom': 'ReactDOM',
-      '@aspnet/signalr': 'signalR'
+      react: {
+        commonjs: 'react',
+        commonjs2: 'react',
+        amd: 'react',
+        root: 'React'
+      },
+      'react-dom': {
+        commonjs: 'react-dom',
+        commonjs2: 'react-dom',
+        amd: 'react-dom',
+        root: 'ReactDOM'
+      },
+      '@aspnet/signalr': {
+        commonjs: '@aspnet/signalr',
+        commonjs2: '@aspnet/signalr',
+        amd: '@aspnet/signalr',
+        root: 'signalR'
+      }
     },
     resolve: baseExport.resolve,
     module: baseExport.module,
     plugins: baseExport.plugins
   },
   {
-    mode: 'development',
+    mode: 'production',
     entry: {
       dotnetify: './src/dotnetify/knockout/index.js'
     },
@@ -56,7 +71,12 @@ module.exports = [
     externals: {
       knockout: 'knockout',
       jquery: 'jquery',
-      '@aspnet/signalr': 'signalR'
+      '@aspnet/signalr': {
+        commonjs: '@aspnet/signalr',
+        commonjs2: '@aspnet/signalr',
+        amd: '@aspnet/signalr',
+        root: 'signalR'
+      }
     },
     resolve: baseExport.resolve,
     module: baseExport.module,

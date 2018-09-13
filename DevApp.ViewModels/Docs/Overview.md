@@ -4,9 +4,8 @@ DotNetify makes it super easy to connect your [React](http://reactjs.org)/[React
 
 Whether in a brand-new ASP.NET Core project that runs on Windows, Linux, and Mac, or in an existing ASP.NET MVC codebase, you can use it right away with only a tiny footprint and get your app running in minutes! Need proof? Pick one and try it out:
 
-- Real-time "Hello World" from scratch with .NET Core CLI
-- Real-time "Hello World" from scratch with Visual Studio 2017 + WebPack
-- Real-time "Hello World" from scratch with create-react-app + Node.js + .NET Core Server
+- [Real-time "Hello World" from scratch with Visual Studio + WebPack](/fromscratch-webpack)
+- [Real-time "Hello World" from scratch with .NET Core CLI + Script Tag](/fromscratch-script)
 
 #### Hello World
 
