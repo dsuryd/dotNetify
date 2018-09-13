@@ -161,9 +161,8 @@ import dotnetify from 'dotnetify';
 export default class HelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { Greetings: '', ServerTime: '' };
-
     dotnetify.react.connect('HelloWorld', this);
+    this.state = { Greetings: '', ServerTime: '' };
   }
 
   render() {
@@ -183,7 +182,7 @@ using System;
 using DotNetify;
 using System.Threading;
 
-namespace HelloWorld.WebPack
+namespace HelloWorld
 {
     public class HelloWorld : BaseVM
     {
