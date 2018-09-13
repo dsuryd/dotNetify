@@ -3,6 +3,7 @@ import DataFlow from './DataFlow';
 import Reactive from './Reactive';
 import GetStarted from './GetStarted';
 import FromScratchWebPack from './from-scratch/FromScratchWebPack';
+import FromScratchScriptTag from './from-scratch/FromScratchScriptTag';
 import HelloWorld from './examples/HelloWorld';
 import ControlTypes from './examples/ControlTypes';
 import SimpleList from './examples/SimpleList';
@@ -19,25 +20,26 @@ import Routing from './apis/Routing';
 import Security from './apis/Security';
 
 export {
-  Overview,
-  FromScratchWebPack,
-  DataFlow,
-  Reactive,
-  GetStarted,
-  HelloWorld,
-  ControlTypes,
-  SimpleList,
-  CompositeView,
-  LiveChart,
-  BookStore,
-  BookDefault,
-  Book,
-  SecurePage,
-  Connection,
-  CRUD,
-  DI,
-  Filter,
-  Middleware,
-  Routing,
-  Security
+	Overview,
+	FromScratchWebPack,
+	FromScratchScriptTag,
+	DataFlow,
+	Reactive,
+	GetStarted,
+	HelloWorld,
+	ControlTypes,
+	SimpleList,
+	CompositeView,
+	LiveChart,
+	BookStore,
+	BookDefault,
+	Book,
+	SecurePage,
+	Connection,
+	CRUD,
+	DI,
+	Filter,
+	Middleware,
+	Routing,
+	Security
 };

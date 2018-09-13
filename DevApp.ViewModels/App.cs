@@ -15,6 +15,7 @@ namespace DotNetify.DevApp
             Home,
             Overview,
             FromScratchWebPack,
+            FromScratchScriptTag,
             DataFlow,
             Reactive,
             GetStarted,
@@ -62,7 +63,8 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.Routing))        { UrlPattern = "api/routing" },
                 new RouteTemplate(nameof(Route.Security))       { UrlPattern = "api/security" },
 
-                new RouteTemplate(nameof(Route.FromScratchWebPack)) { UrlPattern = "fromscratch-webpack" },
+                new RouteTemplate(nameof(Route.FromScratchWebPack))     { UrlPattern = "fromscratch-webpack" },
+                new RouteTemplate(nameof(Route.FromScratchScriptTag))   { UrlPattern = "fromscratch-scripttag" },
             });
 
             _navMenuItems = new NavMenuItem[]
