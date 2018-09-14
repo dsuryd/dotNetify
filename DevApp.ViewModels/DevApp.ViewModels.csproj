@@ -23,6 +23,8 @@
     <EmbeddedResource Include="Docs\Examples\BookStore.md" />
     <EmbeddedResource Include="Docs\Examples\SecurePage.md" />
     <EmbeddedResource Include="Docs\Knockout\Overview.md" />    
+    <EmbeddedResource Include="Docs\Knockout\GetStarted.md" />    
+    <EmbeddedResource Include="Docs\Knockout\FromScratchWebPack.md" />
     <EmbeddedResource Include="Docs\Knockout\FromScratchScriptTag.md" />
     <EmbeddedResource Include="Docs\Knockout\Examples\HelloWorld.md" />
     <EmbeddedResource Include="Docs\Knockout\Examples\ControlTypes.md" />

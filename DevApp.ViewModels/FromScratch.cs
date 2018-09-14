@@ -14,6 +14,11 @@ namespace DotNetify.DevApp
     public string Content => new Markdown("DotNetify.DevApp.Docs.FromScratchScriptTag.md");
   }
 
+    public class FromScratchWebPackKO : BaseVM
+  {
+    public string Content => new Markdown("DotNetify.DevApp.Docs.Knockout.FromScratchWebPack.md");
+  }
+
   public class FromScratchScriptTagKO : BaseVM
   {
     public string Content => new Markdown("DotNetify.DevApp.Docs.Knockout.FromScratchScriptTag.md");

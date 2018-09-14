@@ -1,6 +1,7 @@
 import React from 'react';
 import { Markdown, withTheme } from 'dotnetify-elements';
 import Article from '../components/Article';
+import FromScratchLink from './from-scratch/FromScratchLink';
 import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
 
 class GetStarted extends React.Component {
@@ -20,13 +21,17 @@ class GetStarted extends React.Component {
 
 const GetStartedReact = props => (
 	<Article vm="GetStarted" id="Content">
-		<Markdown id="Content" />
+		<Markdown id="Content">
+			<FromScratchLink />
+		</Markdown>
 	</Article>
 );
 
 const GetStartedKO = props => (
 	<Article vm="GetStartedKO" id="Content">
-		<Markdown id="Content" />
+		<Markdown id="Content">
+			<FromScratchLink />
+		</Markdown>
 	</Article>
 );
 

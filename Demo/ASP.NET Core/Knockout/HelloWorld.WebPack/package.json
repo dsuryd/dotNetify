@@ -1,0 +1,20 @@
+{
+  "name": "helloworld",
+  "scripts": {
+    "build": "webpack"
+  },
+  "dependencies": {
+    "dotnetify": "file:dotnetify-3.0.3.tgz",
+    "jquery": "~3.3.1",
+    "knockout": "~3.4.2"
+  },
+  "devDependencies": {
+    "aspnet-webpack": "^3.0.0",
+    "awesome-typescript-loader": "~5.2.1",
+    "typescript": "~3.0.3",
+    "webpack": "^4.18.0",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-middleware": "^3.3.0",
+    "webpack-hot-middleware": "^2.23.1"
+  }
+}

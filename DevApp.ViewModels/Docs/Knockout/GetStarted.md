@@ -1,23 +1,6 @@
 ## Get Started
 
-#### SPA Template
-The easiest way to get started is to use the basic SPA template that contains some examples, and also include a functional login page with JWT authentication.
-
-Prerequisites:
-- Node.js
-- .NET Core SDK (v2.1 and up)
-
-Download the template from nuget from the command line, then create your project:
-```js
-dotnet new -i dotnetify.react.template
-
-dotnet new dotnetify -o MyApp
-cd MyApp
-npm i
-dotnet watch run
-```
-
-You can also perform the following step-by-step instructions to create a new project from scratch with either WebPack or script tag.
+The easiest way to get started is to perform the following step-by-step instructions given in the _Overview_ to create a new project from scratch with either WebPack or script tag.  
 [inset]
 
 #### NuGet Packages
@@ -77,22 +60,20 @@ namespace MyProject
   }
 }
 ```
-<br/>
 
 #### Client-Side Library
 
-If you use module bundler like WebPack, install __dotnetify__, `react`, and `react-dom` from NPM: 
+If you use module bundler like WebPack, install __dotnetify__ and `knockout` from NPM: 
 ```js
 npm i --save dotnetify
-npm i --save react
-npm i --save react-dom
-``` 
+npm i --save knockout
+```
 
-If using script tags, include _dotNetify_, _React_ and _signalR_ from their respective CDNs:
+If using script tags, include _dotNetify_, _jQuery_, _knockout_ and _signalR_ from their respective CDNs:
 ```html
-<script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
-<script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
+<script src="https://unpkg.com/dotnetify@3/dist/dotnetify-ko.min.js"></script>
 ```
 

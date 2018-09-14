@@ -3,6 +3,7 @@ import dotnetify from 'dotnetify';
 import { Markdown, withTheme } from 'dotnetify-elements';
 import Article from '../components/Article';
 import Expander from '../components/Expander';
+import FromScratchLink from './from-scratch/FromScratchLink';
 import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
 
 class Overview extends React.Component {
@@ -41,24 +42,6 @@ const OverviewKO = _ => (
 );
 
 const SeeItLive = _ => <b>See It Live!</b>;
-const redirect = path => window.dotnetify.react.router.pushState({}, null, path);
-
-const FromScratchLink = ({ framework }) => (
-	<ul style={{ fontSize: '1.1rem' }}>
-		<li>
-			<a href="javascript:void(0)" onClick={_ => redirect('/fromscratch-scripttag')}>
-				Real-time "Hello World" from scratch with .NET Core CLI + Script Tag
-			</a>
-		</li>
-		{framework !== 'Knockout' && (
-			<li>
-				<a href="javascript:void(0)" onClick={_ => redirect('/fromscratch-webpack')}>
-					Real-time "Hello World" from scratch with Visual Studio + WebPack
-				</a>
-			</li>
-		)}
-	</ul>
-);
 
 class RealTimePush extends React.Component {
 	constructor(props) {
