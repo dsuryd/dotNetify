@@ -4,8 +4,7 @@ DotNetify makes it super easy to connect your [React](http://reactjs.org)/[React
 
 Whether in a brand-new ASP.NET Core project that runs on Windows, Linux, and Mac, or in an existing ASP.NET MVC codebase, you can use it right away with only a tiny footprint and get your app running in minutes! Need proof? Pick one and try it out:
 
-- [Real-time "Hello World" from scratch with Visual Studio + WebPack](/fromscratch-webpack)
-- [Real-time "Hello World" from scratch with .NET Core CLI + Script Tag](/fromscratch-scripttag)
+[inset]
 
 #### Hello World
 
@@ -147,8 +146,9 @@ componentWillUnmount() {
 }
 ```
 
-#### API Summary
+#### API Essentials
 
+##### Client APIs
 To get started, you only need these essential APIs to add to your React component:
 
 - _vm_ = __dotnetify.react.connect__(_vmName, component, options_)<br/>
@@ -169,6 +169,7 @@ To get started, you only need these essential APIs to add to your React componen
 - _vm_.__$dispatch__(_state_)
 - _vm_.__$destroy__()
 
+##### Server APIs
 On the back-end, inherit from __BaseVM__ and use:
 - __Changed__(_propName_)
 - __PushUpdates__(): for real-time push.

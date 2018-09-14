@@ -24,4 +24,10 @@ const FromScratchScriptTagReact = (_) => (
 	</Article>
 );
 
+const FromScratchScriptTagKO = (_) => (
+	<Article vm="FromScratchScriptTagKO" id="Content">
+		<Markdown id="Content" />
+	</Article>
+);
+
 export default withTheme(FromScratchScriptTag);

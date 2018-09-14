@@ -21,7 +21,7 @@ namespace DotNetify.DevApp
         private string GetViewSource(string framework)
         {
             return framework == "Knockout" ?
-               new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.LiveChart.md") :
+               new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.LiveChart.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.LiveChart.md").GetSection(null, "LiveChartVM.cs");
         }
     }

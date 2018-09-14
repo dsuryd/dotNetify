@@ -19,7 +19,7 @@ namespace DotNetify.DevApp
         private string GetViewSource(string framework)
         {
             return framework == "Knockout" ?
-               new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.HelloWorld.md") :
+               new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.HelloWorld.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.HelloWorld.md").GetSection(null, "HelloWorldVM.cs");
         }
     }

@@ -22,7 +22,7 @@ namespace DotNetify.DevApp
         private string GetViewSource(string framework)
         {
             return framework == "Knockout" ?
-               new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.ControlTypes.md") :
+               new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.ControlTypes.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.ControlTypes.md").GetSection(null, "ControlTypesVM.cs");
         }
     }

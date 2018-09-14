@@ -21,7 +21,7 @@ namespace DotNetify.DevApp
       private string GetViewSource(string framework)
       {
           return framework == "Knockout" ?
-              new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.BookStore.md") :
+              new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.BookStore.md") :
               new Markdown("DotNetify.DevApp.Docs.Examples.BookStore.md").GetSection(null, "BookStoreVM.cs");
       }      
    }

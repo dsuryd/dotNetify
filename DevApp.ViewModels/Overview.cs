@@ -9,9 +9,9 @@ namespace DotNetify.DevApp
     public string Content => new Markdown("DotNetify.DevApp.Docs.Overview.md");
   }
 
-    public class OverviewKO : BaseVM
+  public class OverviewKO : BaseVM
   {
-    public string Content => new Markdown("DotNetify.DevApp.Docs.Overview.Knockout.md");
+    public string Content => new Markdown("DotNetify.DevApp.Docs.Knockout.Overview.md");
   }
 
   public class RealTimePush : BaseVM

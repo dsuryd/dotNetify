@@ -7,4 +7,9 @@ namespace DotNetify.DevApp
    {
       public string Content => new Markdown("DotNetify.DevApp.Docs.GetStarted.md");
    }
+
+  public class GetStartedKO : BaseVM
+  {
+    public string Content => new Markdown("DotNetify.DevApp.Docs.Knockout.GetStarted.md");
+  }   
 }

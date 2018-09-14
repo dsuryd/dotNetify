@@ -70,46 +70,25 @@ Add a new file _wwwroot/index.html_ with the following content:
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
   <body>
-    <div id="App"></div>
+    <div data-vm="HelloWorld">
+        <p data-bind="text: Greetings" />
+        <p data-bind="text: ServerTime" />
+    </div>
 
     <!-- Polyfills for IE 11 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill.min.js"></script>
 
-    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
-    <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
-
-    <script src="HelloWorld.js" type="text/babel"></script>
+    <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-ko.min.js"></script>
   </body>
 </html>
 ```
 <br/>
 
 ##### Add Hello World
-
-Add a new file _wwwroot/HelloWorld.js_ with the following content:
-```jsx
-class HelloWorld extends React.Component {
-	constructor(props) {
-		super(props);
-		dotnetify.react.connect('HelloWorld', this);
-		this.state = { Greetings: '', ServerTime: '' };
-	}
-
-	render() {
-		return (
-			<div>
-				<p>{this.state.Greetings}</p>
-				<p>Server time is: {this.state.ServerTime}</p>
-			</div>
-		);
-	}
-}
-
-ReactDOM.render(<HelloWorld />, document.getElementById('App'));
-```
 
 Add a new file _HelloWorld.cs_ with the following content:
 ```csharp

@@ -25,7 +25,7 @@ namespace DotNetify.DevApp
         private string GetViewSource(string framework)
         {
             return framework == "Knockout" ?
-               new Markdown("DotNetify.DevApp.Docs.Examples.Knockout.SimpleList.md") :
+               new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.SimpleList.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.SimpleList.md").GetSection(null, "SimpleListVM.cs");
         }
     }
