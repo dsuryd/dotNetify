@@ -1,7 +1,7 @@
 ## Get Started
 
-##### SPA Template
-The easiest way to get started to use the basic SPA template that contains some of the examples from this website, and also include a functional login page with JWT authentication.
+#### SPA Template
+The easiest way to get started to use the basic SPA template that contains some examples, and also include a functional login page with JWT authentication.
 
 Prerequisites:
 - Node.js
@@ -17,17 +17,16 @@ npm i
 dotnet watch run
 ```
 
-#### New ASP.NET Core
+You can also perform the step-by-step instructions given in the _Overview_ to create a new project from scratch with either WebPack or script tag.
 
-Refer to the step-by-step instructions given in the _Overview_ to create a new project from scratch with either WebPack or script tag.
+#### NuGet Packages
 
-##### NuGet
-
-There are two published NuGet packages:
-- __DotNetify.SignalR__: The essential library for your ASP.NET Core web project.
+There are three published NuGet packages:
+- __DotNetify.SignalR__: The essential library for your `ASP.NET Core` web project.  
+- __DotNetify.SignalR.Owin__: The essential library for your `ASP.NET Framework` web project.
 - __DotNetify.Core__: core .NET Standard library; only for C# class libraries where you plan to group your view models.
 
-#### Startup Configuration
+#### ASP.NET Core Startup
 
 The following are required in the _Startup.cs_:
 ```csharp
@@ -56,6 +55,28 @@ app.UseDotNetify(config => {
     config.SetFactoryMethod((type, args) => /* let your favorite IoC library creates the view model instance */);
 });
 ```
+
+#### ASP.NET Framework Startup
+
+ASP.NET Framework does not come with _Startup.cs_, so will need to create one. Add an OWIN Startup Class item, and name it _Startup_.  Then replace the content with the following:
+```csharp
+using Microsoft.Owin;
+using Owin;
+[assembly: OwinStartup(typeof(MyProject.Startup))]
+namespace MyProject
+{
+  public class Startup
+  {
+    public void Configuration(IAppBuilder app)
+    {
+      var vmAssembly = /* assembly where your view models are */;
+      app.MapSignalR();
+      app.UseDotNetify(config => config.RegisterAssembly(vmAssembly));
+    }
+  }
+}
+```
+<br/>
 
 #### Client-Side Library
 
