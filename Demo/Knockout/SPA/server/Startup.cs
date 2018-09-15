@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.DependencyInjection;
 using DotNetify;
 
-namespace AllExamples
+namespace SPA
 {
     public class Startup
     {
@@ -15,7 +15,9 @@ namespace AllExamples
         {
             services.AddMemoryCache();
             services.AddSignalR();
-            services.AddDotNetify();          
+            services.AddDotNetify();      
+
+            services.AddSingleton<IEmployeeRepository, EmployeeRepository>(); 
         }
 
         public void Configure(IApplicationBuilder app)

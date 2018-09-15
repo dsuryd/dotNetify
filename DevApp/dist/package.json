@@ -3,6 +3,7 @@
    "version": "3.0.3",
    "description": "Simple, lightweight, yet powerful way to build realtime .NET web apps.",
    "main": "index.js",
+   "types": "dist/typings/dotnetify.d.ts",
    "files": [
       "dist/*.js",
       "dist/*.ts",

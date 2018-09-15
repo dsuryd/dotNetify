@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="DotNetify.SignalR" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Bogus" Version="22.1.3" />
   </ItemGroup>
 
 </Project>

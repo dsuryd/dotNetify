@@ -1,5 +1,5 @@
 {
-  "name": "allexamples",
+  "name": "spa",
   "scripts": {
     "build": "webpack"
   },
@@ -7,17 +7,28 @@
     "presets": [
       "env",
       "react"
+    ],
+    "plugins": [
+      "babel-plugin-styled-components",
+      "babel-plugin-transform-object-rest-spread",
+      "babel-plugin-transform-class-properties"
     ]
   },
   "dependencies": {
+    "chart.js": "^2.7.2",
     "dotnetify": "file:dotnetify-3.0.3.tgz",
     "react": "~16.5.0",
-    "react-dom": "~16.5.0"
+    "react-chartjs-2": "^2.7.4",
+    "react-dom": "~16.5.0",
+    "styled-components": "^3.4.6"
   },
   "devDependencies": {
     "aspnet-webpack": "^3.0.0",
     "babel-core": "~6.26.3",
     "babel-loader": "~7.1.4",
+    "babel-plugin-styled-components": "^1.7.1",
+    "babel-plugin-transform-class-properties": "~6.24.1",
+    "babel-plugin-transform-object-rest-spread": "~6.26.0",
     "babel-preset-env": "~1.7.0",
     "babel-preset-react": "~6.24.1",
     "webpack": "^4.18.0",

@@ -1667,7 +1667,7 @@ var dotnetifyKoVMRouter = function (_dotnetifyVMRouter) {
       };
 
       // Provide the opportunity to override the URL.
-      iViewUrl = dotnetify.ko.router.overrideUrl(iViewUrl);
+      iViewUrl = this.router.overrideUrl(iViewUrl);
 
       vm.$loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn);
     }

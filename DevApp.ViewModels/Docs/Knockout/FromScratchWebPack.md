@@ -67,7 +67,7 @@ namespace HelloWorld
 ##### Configure NPM
 
 Add NPM configuration file _package.json_ with the following content:
-```json
+```js
 {
   "name": "helloworld",
   "scripts": {
@@ -116,6 +116,19 @@ module.exports = {
 };
 ```
 <br/>
+
+##### Configure Typescript
+
+Add _tsconfig.json_ with the following content:
+```js
+{
+  "compilerOptions": {
+    "module": "commonjs"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
+```
 
 ##### Add Index Page
 
