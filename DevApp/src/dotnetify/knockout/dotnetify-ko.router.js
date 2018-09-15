@@ -16,6 +16,7 @@ limitations under the License.
 import dotnetify from './dotnetify-ko';
 import dotnetifyRouter from '../core/dotnetify-router';
 import dotnetifyKoVMRouter from './dotnetify-ko.vm-router';
+import $ from 'jquery';
 import * as ko from 'knockout';
 
 // Add plugin functions.

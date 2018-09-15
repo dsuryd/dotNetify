@@ -11,7 +11,6 @@ namespace SPA
       {
          public string Id => Route.TemplateId;
          public Route Route { get; set; }
-         public string Path { get; set; }
          public string Caption { get; set; }
       }
 
@@ -19,8 +18,8 @@ namespace SPA
 
       public List<Link> Links => new List<Link>
       {
-         new Link { Route = this.GetRoute("SimpleList"), Path = "/SimpleList", Caption = "Simple List" },
-         new Link { Route = this.GetRoute("LiveChart"), Path = "/LiveChart", Caption = "Live Chart" }
+         new Link { Route = this.GetRoute("SimpleList"), Caption = "Simple List" },
+         new Link { Route = this.GetRoute("LiveChart"), Caption = "Live Chart" }
       };
 
       public App()
@@ -28,8 +27,8 @@ namespace SPA
          this.RegisterRoutes("", new List<RouteTemplate>
          {
             new RouteTemplate("Home") { UrlPattern = "", ViewUrl = "SimpleList.html" },
-            new RouteTemplate("SimpleList") { ViewUrl = "SimpleList.html" },
-            new RouteTemplate("LiveChart") { ViewUrl = "LiveChart.html" }
+            new RouteTemplate("SimpleList") { UrlPattern = "simplelist" },
+            new RouteTemplate("LiveChart") { UrlPattern = "livechart" }
          });
       }
    }

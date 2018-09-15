@@ -100,6 +100,10 @@ export default class dotnetifyKoVMRouter extends dotnetifyVMRouter {
   dispatchActiveRoutingState(iPath) {
     this.RoutingState.Active = iPath;
   }
+  onRouteEnter(iPath, iTemplate) {
+    if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id + '.html';
+    return true;
+  }
 
   // Loads a view into a target element.
   // Method parameters: TargetSelector, ViewUrl, iJsModuleUrl, iVmArg, iCallbackFn

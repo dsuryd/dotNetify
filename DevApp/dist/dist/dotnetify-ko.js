@@ -1624,6 +1624,12 @@ var dotnetifyKoVMRouter = function (_dotnetifyVMRouter) {
     value: function dispatchActiveRoutingState(iPath) {
       this.RoutingState.Active = iPath;
     }
+  }, {
+    key: 'onRouteEnter',
+    value: function onRouteEnter(iPath, iTemplate) {
+      if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id + '.html';
+      return true;
+    }
 
     // Loads a view into a target element.
     // Method parameters: TargetSelector, ViewUrl, iJsModuleUrl, iVmArg, iCallbackFn
@@ -2082,6 +2088,10 @@ var _dotnetifyKo3 = __webpack_require__(6);
 
 var _dotnetifyKo4 = _interopRequireDefault(_dotnetifyKo3);
 
+var _jquery = __webpack_require__(1);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
 var _knockout = __webpack_require__(0);
 
 var ko = _interopRequireWildcard(_knockout);
@@ -2091,6 +2101,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Add plugin functions.
+_dotnetifyKo2.default.ko.router = new _dotnetifyRouter2.default(_dotnetifyKo2.default.debug);
+
+// Inject a view model with functions.
 /* 
 Copyright 2017-2018 Dicky Suryadi
 
@@ -2106,9 +2119,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-_dotnetifyKo2.default.ko.router = new _dotnetifyRouter2.default(_dotnetifyKo2.default.debug);
-
-// Inject a view model with functions.
 _dotnetifyKo2.default.ko.router.$inject = function (iVM) {
   var router = new _dotnetifyKo4.default(iVM, _dotnetifyKo2.default.ko.router);
 
@@ -2132,7 +2142,7 @@ ko.bindingHandlers.vmRoute = {
     var path = route.Path();
     var template = null;
     if (vm.hasOwnProperty('RoutingState') && typeof vm.RoutingState.Templates === 'function' && vm.RoutingState.Templates() != null) {
-      var match = $.grep(vm.RoutingState.Templates(), function (iTemplate) {
+      var match = _jquery2.default.grep(vm.RoutingState.Templates(), function (iTemplate) {
         return iTemplate.Id() == route.TemplateId();
       });
       if (match.length > 0) {
@@ -2165,9 +2175,9 @@ ko.bindingHandlers.vmRoute = {
       }
       url += redirectRoot + '/' + path;
 
-      $(element).attr('href', url).attr('data-vm-route', path).click(function (iEvent) {
+      (0, _jquery2.default)(element).attr('href', url).attr('data-vm-route', path).click(function (iEvent) {
         iEvent.preventDefault();
-        _dotnetifyKo2.default.ko.router.pushState({}, '', $(this).attr('href'));
+        _dotnetifyKo2.default.ko.router.pushState({}, '', (0, _jquery2.default)(this).attr('href'));
       });
       return;
     }
@@ -2181,9 +2191,9 @@ ko.bindingHandlers.vmRoute = {
 
     // Set the absolute path to the HREF attribute, and prevent the default behavior of
     // the anchor click event and instead do push to HTML5 history state.
-    $(element).attr('href', vm.$router.toUrl(path)).attr('data-vm-route', path).click(function (iEvent) {
+    (0, _jquery2.default)(element).attr('href', vm.$router.toUrl(path)).attr('data-vm-route', path).click(function (iEvent) {
       iEvent.preventDefault();
-      _dotnetifyKo2.default.ko.router.pushState({}, '', $(this).attr('href'));
+      _dotnetifyKo2.default.ko.router.pushState({}, '', (0, _jquery2.default)(this).attr('href'));
     });
   }
 };
