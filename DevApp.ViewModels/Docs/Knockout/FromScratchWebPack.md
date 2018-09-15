@@ -79,6 +79,7 @@ Add NPM configuration file _package.json_ with the following content:
     "knockout": "~3.4.2"
   },
   "devDependencies": {
+    "@types/knockout": "~3.4.59",
     "aspnet-webpack": "~3.0.0",
     "awesome-typescript-loader": "~5.2.1",
     "typescript": "~3.0.3",
