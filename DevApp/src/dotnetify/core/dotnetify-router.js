@@ -21,6 +21,10 @@ export default class dotnetifyRouter {
   // URL path that will be parsed when performing routing.
   urlPath = document.location.pathname;
 
+  constructor(debug) {
+    this.debug = debug;
+  }
+
   // Initialize routing using PathJS.
   init() {
     if (typeof Path !== 'undefined') {
@@ -71,7 +75,7 @@ export default class dotnetifyRouter {
     for (let i = 0; i < viewModels.length; i++) {
       const vm = viewModels[i];
       if (vm.$router.routeUrl()) {
-        if (dotnetify.debug) console.log('router> redirected');
+        if (this.debug) console.log('router> redirected');
         return;
       }
     }

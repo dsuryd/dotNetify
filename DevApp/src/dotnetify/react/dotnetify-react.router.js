@@ -18,7 +18,7 @@ import dotnetifyRouter from '../core/dotnetify-router';
 import dotnetifyReactVMRouter from './dotnetify-react.vm-router';
 
 // Add plugin functions.
-dotnetify.react.router = new dotnetifyRouter();
+dotnetify.react.router = new dotnetifyRouter(dotnetify.debug);
 
 // Inject a view model with functions.
 dotnetify.react.router.$inject = function(iVM) {

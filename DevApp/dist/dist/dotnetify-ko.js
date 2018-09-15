@@ -1147,7 +1147,7 @@ var dotnetifyVMRouter = function () {
         urlPattern = urlPattern != '' ? urlPattern : '/';
         var mapUrl = _this2.toUrl(urlPattern);
 
-        if (dotnetify.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
+        if (_this2.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
 
         _this2.router.mapTo(mapUrl, function (iParams) {
           _this2.router.urlPath = '';
@@ -1325,7 +1325,7 @@ var dotnetifyVMRouter = function () {
 
       // If target DOM element isn't found, redirect URL to the path.
       if (document.getElementById(iTemplate.Target) == null) {
-        if (dotnetify.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
 
         return this.router.redirect(this.toUrl(iPath), viewModels);
       }
@@ -1370,7 +1370,7 @@ var dotnetifyVMRouter = function () {
       // Get the URL path to route.
       var urlPath = this.router.urlPath;
 
-      if (dotnetify.debug) console.log('router> routing ' + urlPath);
+      if (this.debug) console.log('router> routing ' + urlPath);
 
       // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
       if (_utils2.default.equal(urlPath, root) || _utils2.default.equal(urlPath, root + '/') || urlPath === '/') {
@@ -1963,21 +1963,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var dotnetifyRouter = function () {
-  function dotnetifyRouter() {
+  function dotnetifyRouter(debug) {
     _classCallCheck(this, dotnetifyRouter);
 
     this.version = '2.0.0';
     this.urlPath = document.location.pathname;
+
+    this.debug = debug;
   }
+
+  // Initialize routing using PathJS.
+
 
   // URL path that will be parsed when performing routing.
 
 
   _createClass(dotnetifyRouter, [{
     key: 'init',
-
-
-    // Initialize routing using PathJS.
     value: function init() {
       if (typeof _path2.default !== 'undefined') {
         _path2.default.history.listen(true);
@@ -2040,7 +2042,7 @@ var dotnetifyRouter = function () {
       for (var i = 0; i < viewModels.length; i++) {
         var vm = viewModels[i];
         if (vm.$router.routeUrl()) {
-          if (dotnetify.debug) console.log('router> redirected');
+          if (this.debug) console.log('router> redirected');
           return;
         }
       }
@@ -2104,86 +2106,86 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-_dotnetifyKo2.default.ko.router = new _dotnetifyRouter2.default();
+_dotnetifyKo2.default.ko.router = new _dotnetifyRouter2.default(_dotnetifyKo2.default.debug);
 
 // Inject a view model with functions.
 _dotnetifyKo2.default.ko.router.$inject = function (iVM) {
-	var router = new _dotnetifyKo4.default(iVM, _dotnetifyKo2.default.ko.router);
+  var router = new _dotnetifyKo4.default(iVM, _dotnetifyKo2.default.ko.router);
 
-	// Put functions inside $router namespace.
-	iVM.$router = router;
+  // Put functions inside $router namespace.
+  iVM.$router = router;
 };
 
 // Custom knockout binding to do routing.
 ko.bindingHandlers.vmRoute = {
-	update: function update(element, valueAccessor, allBindings, viewModel, bindingContext) {
-		var vm = bindingContext.$root;
-		var route = ko.unwrap(valueAccessor());
+  update: function update(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var vm = bindingContext.$root;
+    var route = ko.unwrap(valueAccessor());
 
-		if (!route.hasOwnProperty('Path') || !route.hasOwnProperty('TemplateId')) throw new Error('invalid vmRoute data at ' + element.outerHTML);
+    if (!route.hasOwnProperty('Path') || !route.hasOwnProperty('TemplateId')) throw new Error('invalid vmRoute data at ' + element.outerHTML);
 
-		// Build the absolute root path.
-		vm.$router.initRoot();
+    // Build the absolute root path.
+    vm.$router.initRoot();
 
-		// If the route path is not defined, use the URL pattern from the associated template.
-		// This is so that we don't send the same data twice if both are equal.
-		var path = route.Path();
-		var template = null;
-		if (vm.hasOwnProperty('RoutingState') && typeof vm.RoutingState.Templates === 'function' && vm.RoutingState.Templates() != null) {
-			var match = $.grep(vm.RoutingState.Templates(), function (iTemplate) {
-				return iTemplate.Id() == route.TemplateId();
-			});
-			if (match.length > 0) {
-				template = match[0];
-				if (path == null) {
-					path = template.UrlPattern();
-					route.Path(path);
-				}
-			} else if (route.RedirectRoot() == null) throw new Error("vmRoute cannot find route template '" + route.TemplateId() + "' at " + element.outerHTML);
-		}
+    // If the route path is not defined, use the URL pattern from the associated template.
+    // This is so that we don't send the same data twice if both are equal.
+    var path = route.Path();
+    var template = null;
+    if (vm.hasOwnProperty('RoutingState') && typeof vm.RoutingState.Templates === 'function' && vm.RoutingState.Templates() != null) {
+      var match = $.grep(vm.RoutingState.Templates(), function (iTemplate) {
+        return iTemplate.Id() == route.TemplateId();
+      });
+      if (match.length > 0) {
+        template = match[0];
+        if (path == null) {
+          path = template.UrlPattern();
+          route.Path(path);
+        }
+      } else if (route.RedirectRoot() == null) throw new Error("vmRoute cannot find route template '" + route.TemplateId() + "' at " + element.outerHTML);
+    }
 
-		// If the path has a redirect root, the path doesn't belong to the current root and needs to be
-		// redirected to a different one.  Set the absolute path to the HREF attribute, and prevent the
-		// default behavior of the anchor click event and instead do push to HTML5 history state, which
-		// would attempt to resolve the path first before resorting to hard browser redirect.
-		if (route.RedirectRoot() != null) {
-			// Combine the redirect root with the view model's root.
-			var redirectRoot = route.RedirectRoot();
-			if (redirectRoot.charAt(0) == '/') redirectRoot = redirectRoot.substr(0, redirectRoot.length - 1);
-			var redirectRootPath = route.RedirectRoot().split('/');
+    // If the path has a redirect root, the path doesn't belong to the current root and needs to be
+    // redirected to a different one.  Set the absolute path to the HREF attribute, and prevent the
+    // default behavior of the anchor click event and instead do push to HTML5 history state, which
+    // would attempt to resolve the path first before resorting to hard browser redirect.
+    if (route.RedirectRoot() != null) {
+      // Combine the redirect root with the view model's root.
+      var redirectRoot = route.RedirectRoot();
+      if (redirectRoot.charAt(0) == '/') redirectRoot = redirectRoot.substr(0, redirectRoot.length - 1);
+      var redirectRootPath = route.RedirectRoot().split('/');
 
-			var url = '';
-			var absRoot = vm.$element.attr('data-vm-root');
-			if (absRoot != null) {
-				var absRootPath = absRoot.split('/');
-				for (i = 0; i < absRootPath.length; i++) {
-					if (absRootPath[i] != '' && absRootPath[i] == redirectRootPath[0]) break;
-					url += absRootPath[i] + '/';
-				}
-			}
-			url += redirectRoot + '/' + path;
+      var url = '';
+      var absRoot = vm.$element.attr('data-vm-root');
+      if (absRoot != null) {
+        var absRootPath = absRoot.split('/');
+        for (i = 0; i < absRootPath.length; i++) {
+          if (absRootPath[i] != '' && absRootPath[i] == redirectRootPath[0]) break;
+          url += absRootPath[i] + '/';
+        }
+      }
+      url += redirectRoot + '/' + path;
 
-			$(element).attr('href', url).attr('data-vm-route', path).click(function (iEvent) {
-				iEvent.preventDefault();
-				_dotnetifyKo2.default.ko.router.pushState({}, '', $(this).attr('href'));
-			});
-			return;
-		}
+      $(element).attr('href', url).attr('data-vm-route', path).click(function (iEvent) {
+        iEvent.preventDefault();
+        _dotnetifyKo2.default.ko.router.pushState({}, '', $(this).attr('href'));
+      });
+      return;
+    }
 
-		// For quick lookup, save the mapping between the path to the route inside the view model.
-		if (template == null) throw new Error('vmRoute cannot find any route template at ' + element.outerHTML);
+    // For quick lookup, save the mapping between the path to the route inside the view model.
+    if (template == null) throw new Error('vmRoute cannot find any route template at ' + element.outerHTML);
 
-		route.$template = template;
-		vm.$router.pathToRoute = vm.$router.pathToRoute || {};
-		vm.$router.pathToRoute[path] = route;
+    route.$template = template;
+    vm.$router.pathToRoute = vm.$router.pathToRoute || {};
+    vm.$router.pathToRoute[path] = route;
 
-		// Set the absolute path to the HREF attribute, and prevent the default behavior of
-		// the anchor click event and instead do push to HTML5 history state.
-		$(element).attr('href', vm.$router.toUrl(path)).attr('data-vm-route', path).click(function (iEvent) {
-			iEvent.preventDefault();
-			_dotnetifyKo2.default.ko.router.pushState({}, '', $(this).attr('href'));
-		});
-	}
+    // Set the absolute path to the HREF attribute, and prevent the default behavior of
+    // the anchor click event and instead do push to HTML5 history state.
+    $(element).attr('href', vm.$router.toUrl(path)).attr('data-vm-route', path).click(function (iEvent) {
+      iEvent.preventDefault();
+      _dotnetifyKo2.default.ko.router.pushState({}, '', $(this).attr('href'));
+    });
+  }
 };
 
 // Register the plugin to dotNetify.

@@ -90,7 +90,7 @@ export default class dotnetifyVMRouter {
       urlPattern = urlPattern != '' ? urlPattern : '/';
       var mapUrl = this.toUrl(urlPattern);
 
-      if (dotnetify.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
+      if (this.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
 
       this.router.mapTo(mapUrl, iParams => {
         this.router.urlPath = '';
@@ -245,7 +245,7 @@ export default class dotnetifyVMRouter {
 
     // If target DOM element isn't found, redirect URL to the path.
     if (document.getElementById(iTemplate.Target) == null) {
-      if (dotnetify.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+      if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
 
       return this.router.redirect(this.toUrl(iPath), viewModels);
     }
@@ -280,7 +280,7 @@ export default class dotnetifyVMRouter {
     // Get the URL path to route.
     var urlPath = this.router.urlPath;
 
-    if (dotnetify.debug) console.log('router> routing ' + urlPath);
+    if (this.debug) console.log('router> routing ' + urlPath);
 
     // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
     if (utils.equal(urlPath, root) || utils.equal(urlPath, root + '/') || urlPath === '/') {

@@ -1157,7 +1157,7 @@ var dotnetifyVMRouter = function () {
         urlPattern = urlPattern != '' ? urlPattern : '/';
         var mapUrl = _this2.toUrl(urlPattern);
 
-        if (dotnetify.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
+        if (_this2.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
 
         _this2.router.mapTo(mapUrl, function (iParams) {
           _this2.router.urlPath = '';
@@ -1335,7 +1335,7 @@ var dotnetifyVMRouter = function () {
 
       // If target DOM element isn't found, redirect URL to the path.
       if (document.getElementById(iTemplate.Target) == null) {
-        if (dotnetify.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
 
         return this.router.redirect(this.toUrl(iPath), viewModels);
       }
@@ -1380,7 +1380,7 @@ var dotnetifyVMRouter = function () {
       // Get the URL path to route.
       var urlPath = this.router.urlPath;
 
-      if (dotnetify.debug) console.log('router> routing ' + urlPath);
+      if (this.debug) console.log('router> routing ' + urlPath);
 
       // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
       if (_utils2.default.equal(urlPath, root) || _utils2.default.equal(urlPath, root + '/') || urlPath === '/') {
@@ -1913,21 +1913,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var dotnetifyRouter = function () {
-  function dotnetifyRouter() {
+  function dotnetifyRouter(debug) {
     _classCallCheck(this, dotnetifyRouter);
 
     this.version = '2.0.0';
     this.urlPath = document.location.pathname;
+
+    this.debug = debug;
   }
+
+  // Initialize routing using PathJS.
+
 
   // URL path that will be parsed when performing routing.
 
 
   _createClass(dotnetifyRouter, [{
     key: 'init',
-
-
-    // Initialize routing using PathJS.
     value: function init() {
       if (typeof _path2.default !== 'undefined') {
         _path2.default.history.listen(true);
@@ -1990,7 +1992,7 @@ var dotnetifyRouter = function () {
       for (var i = 0; i < viewModels.length; i++) {
         var vm = viewModels[i];
         if (vm.$router.routeUrl()) {
-          if (dotnetify.debug) console.log('router> redirected');
+          if (this.debug) console.log('router> redirected');
           return;
         }
       }
@@ -2033,7 +2035,7 @@ var _dotnetifyReact4 = _interopRequireDefault(_dotnetifyReact3);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Add plugin functions.
-_dotnetifyReact2.default.react.router = new _dotnetifyRouter2.default();
+_dotnetifyReact2.default.react.router = new _dotnetifyRouter2.default(_dotnetifyReact2.default.debug);
 
 // Inject a view model with functions.
 /* 
