@@ -6,6 +6,8 @@ using DotNetify.Elements;
 
 namespace DotNetify.DevApp
 {
+  public class SetAccessTokenAttribute : Attribute { }
+
    public class SecurePageExample : BaseVM
    {
       public SecurePageExample()

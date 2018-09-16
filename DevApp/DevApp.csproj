@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>DotNetify.DevApp</RootNamespace>
     <AssemblyName>DotNetify.DevApp</AssemblyName>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
@@ -16,5 +17,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DevApp.ViewModels\DevApp.ViewModels.csproj" />
+    <ProjectReference Include="..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
   </ItemGroup>
 </Project>

@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace DotNetify.DevApp
 {
-   public class SetAccessTokenAttribute : Attribute { }
-
    /// <summary>
    /// Custom filter to set JWT access token to any view model that has AccessToken property.
    /// </summary>
