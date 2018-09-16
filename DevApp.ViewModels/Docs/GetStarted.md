@@ -63,6 +63,8 @@ ASP.NET Framework does not come with _Startup.cs_, so will need to create one. A
 ```csharp
 using Microsoft.Owin;
 using Owin;
+using DotNetify;
+
 [assembly: OwinStartup(typeof(MyProject.Startup))]
 namespace MyProject
 {
@@ -88,11 +90,17 @@ npm i --save react
 npm i --save react-dom
 ``` 
 
-If using script tags, include _dotNetify_, _React_ and _signalR_ from their respective CDNs:
+If using script tags, include _React_, _signalR_, and _dotNetify_ from their respective CDNs:
 ```html
 <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
+```
+
+The _signalR_ script above is only for ASP.NET Core. If you are using ASP.NET Framework server, replace with:
+```html
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signalr@2/jquery.signalR.min.js"></script>
 ```
 

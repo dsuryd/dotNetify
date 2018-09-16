@@ -3342,10 +3342,11 @@ var signalRNetCore = __webpack_require__(12); /*
                                                  limitations under the License.
                                                   */
 
+var $ = _jqueryShim2.default;
 
 if (typeof window == 'undefined') window = global;
 
-var dotnetifyHub = _jqueryShim2.default.extend(dotnetifyHub, {
+var dotnetifyHub = $.extend(dotnetifyHub, {
   version: '1.2.0',
   type: null,
   _init: false
@@ -3367,7 +3368,7 @@ dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
       }
     });
 
-    dotnetifyHub = _jqueryShim2.default.extend(dotnetifyHub, {
+    dotnetifyHub = $.extend(dotnetifyHub, {
       hubPath: iHubPath || '/dotnetify',
       url: iServerUrl,
       reconnectDelay: [2, 5, 10],
@@ -3485,6 +3486,8 @@ dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
     // SignalR .NET FX.
     dotnetifyHub.type = 'netfx';
 
+    if (window.jQuery) $ = window.jQuery;
+
     // SignalR hub auto-generated from /signalr/hubs.
     /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
     /// <reference path="jquery.signalR.js" />
@@ -3577,36 +3580,36 @@ dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
 
       signalR.hub = $.hubConnection(dotnetifyHub.hubPath, { useDefaultPath: false });
       $.extend(signalR, signalR.hub.createHubProxies());
-    })(_jqueryShim2.default, window);
+    })($, window);
 
     Object.defineProperty(dotnetifyHub, 'state', {
       get: function get() {
-        return _jqueryShim2.default.connection.hub.state;
+        return $.connection.hub.state;
       },
       set: function set(val) {
-        _jqueryShim2.default.connection.hub.state = val;
+        $.connection.hub.state = val;
       }
     });
 
     Object.defineProperty(dotnetifyHub, 'client', {
       get: function get() {
-        return _jqueryShim2.default.connection.dotNetifyHub.client;
+        return $.connection.dotNetifyHub.client;
       }
     });
 
     Object.defineProperty(dotnetifyHub, 'server', {
       get: function get() {
-        return _jqueryShim2.default.connection.dotNetifyHub.server;
+        return $.connection.dotNetifyHub.server;
       }
     });
 
     Object.defineProperty(dotnetifyHub, 'isConnected', {
       get: function get() {
-        return _jqueryShim2.default.connection.hub.state == _jqueryShim2.default.signalR.connectionState.connected;
+        return $.connection.hub.state == $.signalR.connectionState.connected;
       }
     });
 
-    dotnetifyHub = _jqueryShim2.default.extend(dotnetifyHub, {
+    dotnetifyHub = $.extend(dotnetifyHub, {
       hubPath: iHubPath || '/signalr',
       url: iServerUrl,
       reconnectDelay: [2, 5, 10],
@@ -3616,10 +3619,10 @@ dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
       _stateChangedHandler: function _stateChangedHandler(iNewState) {},
 
       start: function start(iHubOptions) {
-        if (dotnetifyHub.url) _jqueryShim2.default.connection.hub.url = dotnetifyHub.url;
+        if (dotnetifyHub.url) $.connection.hub.url = dotnetifyHub.url;
 
         var deferred;
-        if (iHubOptions) deferred = _jqueryShim2.default.connection.hub.start(iHubOptions);else deferred = _jqueryShim2.default.connection.hub.start();
+        if (iHubOptions) deferred = $.connection.hub.start(iHubOptions);else deferred = $.connection.hub.start();
         deferred.fail(function (error) {
           if (error.source && error.source.message === 'Error parsing negotiate response.') console.warn('This client may be attempting to connect to an incompatible SignalR .NET Core server.');
         });
@@ -3627,12 +3630,12 @@ dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
       },
 
       disconnected: function disconnected(iHandler) {
-        return _jqueryShim2.default.connection.hub.disconnected(iHandler);
+        return $.connection.hub.disconnected(iHandler);
       },
 
       stateChanged: function stateChanged(iHandler) {
         dotnetifyHub._stateChangedHandler = iHandler;
-        return _jqueryShim2.default.connection.hub.stateChanged(function (state) {
+        return $.connection.hub.stateChanged(function (state) {
           if (state == 1) dotnetifyHub._reconnectCount = 0;
 
           var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };

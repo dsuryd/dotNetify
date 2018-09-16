@@ -13,8 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import $ from '../libs/jquery-shim';
-var signalRNetCore = require('@aspnet/signalr');
+import jQueryShim from '../libs/jquery-shim';
+const signalRNetCore = require('@aspnet/signalr');
+let $ = jQueryShim;
 
 if (typeof window == 'undefined') window = global;
 
@@ -168,6 +169,8 @@ dotnetifyHub.init = function(iHubPath, iServerUrl, signalR) {
   else {
     // SignalR .NET FX.
     dotnetifyHub.type = 'netfx';
+
+    if (window.jQuery) $ = window.jQuery;
 
     // SignalR hub auto-generated from /signalr/hubs.
     /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />

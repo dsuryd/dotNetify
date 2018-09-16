@@ -46,6 +46,8 @@ ASP.NET Framework does not come with _Startup.cs_, so will need to create one. A
 ```csharp
 using Microsoft.Owin;
 using Owin;
+using DotNetify;
+
 [assembly: OwinStartup(typeof(MyProject.Startup))]
 namespace MyProject
 {
@@ -69,7 +71,7 @@ npm i --save dotnetify
 npm i --save knockout
 ```
 
-If using script tags, include _dotNetify_, _jQuery_, _knockout_ and _signalR_ from their respective CDNs:
+If using script tags, include _jQuery_, _knockout_, _signalR_, and _dotNetify_ from their respective CDNs:
 ```html
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
@@ -77,3 +79,7 @@ If using script tags, include _dotNetify_, _jQuery_, _knockout_ and _signalR_ fr
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-ko.min.js"></script>
 ```
 
+The _signalR_ script above is only for ASP.NET Core. If you are using ASP.NET Framework server, replace with:
+```html
+<script src="https://cdn.jsdelivr.net/npm/signalr@2/jquery.signalR.min.js"></script>
+```
