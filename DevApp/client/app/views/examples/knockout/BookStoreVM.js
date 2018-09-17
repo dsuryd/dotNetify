@@ -6,6 +6,8 @@ var BookStoreVM = (function () {
             template.Target = 'BookPanel';
             if (path.search('book/') >= 0)
                 template.ViewUrl = '/examples/Book.html';
+            else
+                return false;
         };
     }
     return BookStoreVM;
