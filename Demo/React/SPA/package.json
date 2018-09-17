@@ -1,5 +1,6 @@
 {
   "name": "spa",
+  "private": true,
   "scripts": {
     "build": "webpack"
   },
@@ -16,7 +17,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.2",
-    "dotnetify": "file:dotnetify-3.0.3.tgz",
+    "dotnetify": "^3.0.3",
     "react": "~16.5.0",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "~16.5.0",

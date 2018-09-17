@@ -1,10 +1,11 @@
 {
   "name": "helloworld",
+  "private": true,
   "scripts": {
     "build": "webpack"
   },
   "dependencies": {
-    "dotnetify": "file:dotnetify-3.0.3.tgz",
+    "dotnetify": "^3.0.3",
     "jquery": "~3.3.1",
     "knockout": "~3.4.2"
   },
