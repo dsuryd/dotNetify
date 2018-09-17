@@ -79,7 +79,6 @@ namespace MyProject
   }
 }
 ```
-<br/>
 
 #### Client-Side Library
 

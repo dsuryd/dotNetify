@@ -189,6 +189,6 @@ class Details extends React.Component {
 
 With the Scope component, you can now set the parent view model name through its vm property. When the nested components use this.context.connect to connect to the back-end, it will use the parent scope to resolve to the desired view model path, in this case _BookStore.MasterList_ and _BookStore.Details_.
 
-The Scope component can be nested and helps make both your React view and their view models highly reusable. For a more fleshed-out example, see the [Composite View Example]("/compositeview").
+The Scope component can be nested and helps make both your React view and their view models highly reusable. For a more fleshed-out example, see the [Composite View Example](/core/examples/compositeview).
 
 This pattern gives a potential to package the components and their view models in modules and in different assemblies, which will make it easier for multiple teams towards working autonomously. And to take it even further, given the right orchestration middleware it's possible to go full-stack microservice on very complex apps, where the app is composed of autonomous modules on their own databases and server processes.

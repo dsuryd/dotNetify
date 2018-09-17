@@ -145,6 +145,7 @@ componentWillUnmount() {
    this.vm.$destroy();
 }
 ```
+> In the situation where SignalR falls back to HTTP long-polling, the `componentWillUnmount` will not be called on browser reload. Orphan view models will eventually be cleared, but for best practice, use the window's `beforeUnload` event as a safeguard.  
 
 #### API Essentials
 
@@ -159,7 +160,7 @@ To get started, you only need these essential APIs to add to your React componen
    - __vmArg__: object, initialize view model properties. 
       For example:
       ```jsx
-      let initialState = {Person: {FirstName: 'John', LastName: 'Hancock'}};
+      let initialState = { Person: { FirstName: 'John', LastName: 'Hancock' } };
       dotnetify.react.connect("HelloWorld", this, {vmArg: initialState});
       ```
    - __headers__: object, pass request headers, e.g. for authentication purpose.
@@ -168,6 +169,8 @@ To get started, you only need these essential APIs to add to your React componen
 
 - _vm_.__$dispatch__(_state_)
 - _vm_.__$destroy__()
+
+To output debug logs to the browser's Console tab, add `dotnetify.debug = true`.
 
 ##### Server APIs
 On the back-end, inherit from __BaseVM__ and use:
