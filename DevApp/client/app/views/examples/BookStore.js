@@ -4,4 +4,4 @@ import BookStoreKo from './knockout/BookStore';
 import Example from './components/Example';
 
 export { BookDefault, Book };
-export default (_) => <Example vm="BookStoreExample" react={<BookStoreReact />} ko={<BookStoreKo />} />;
+export default props => <Example vm="BookStoreExample" react={<BookStoreReact {...props} />} ko={<BookStoreKo {...props} />} />;

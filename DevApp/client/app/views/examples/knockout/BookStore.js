@@ -4,8 +4,8 @@ import BookStoreHtml from './BookStore.html';
 
 window.BookStoreVM = require('./BookStoreVM.ts').default;
 
-export default _ => (
+export default props => (
   <BookStoreCss>
-    <RenderKnockout html={BookStoreHtml} />
+    <RenderKnockout html={BookStoreHtml} htmlAttrs={props} />
   </BookStoreCss>
 );

@@ -41,7 +41,7 @@ namespace DotNetify.DevApp
 
         public App()
         {
-            this.RegisterRoutes("", new List<RouteTemplate>
+            this.RegisterRoutes("core", new List<RouteTemplate>
             {
                 new RouteTemplate(nameof(Route.Home))           { UrlPattern = "", ViewUrl = nameof(Route.Overview) },
                 new RouteTemplate(nameof(Route.Overview))       { UrlPattern = "overview" },

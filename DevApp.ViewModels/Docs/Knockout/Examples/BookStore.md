@@ -27,6 +27,7 @@ export default class BookStoreVM {
     vm.onRouteEnter = (path: string, template: any) => {
       template.Target = 'BookPanel';
       if (path.search('book/') >= 0) template.ViewUrl = '/examples/Book.html';
+      else return false;
     };
   }
 }
