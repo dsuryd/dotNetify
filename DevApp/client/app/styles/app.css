@@ -81,3 +81,15 @@ div > h2 {
     font-size: .9rem;
   }
 }
+
+.theme-dark td {
+  color: #fff;
+}
+
+.theme-dark tr:hover td {
+  color: #333;
+}
+
+.theme-dark .card {
+  background-color: #333;
+}

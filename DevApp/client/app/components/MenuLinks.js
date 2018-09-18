@@ -7,8 +7,18 @@ const menuCss = `
     margin-left: 5.5rem;
   }   
   @media (max-width: 767px) {
-    margin-left: 2rem;
+    display: none;
   } 
+`;
+
+const navMenuCss = `
+display: none;
+@media (max-width: 767px) {
+  display: flex;
+  margin-top: .5rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid #e7e7e7;
+} 
 `;
 
 const textLinkCss = active => `
@@ -33,8 +43,8 @@ const ElementsLink = ({ active }) => (
   </a>
 );
 
-export const MenuLinks = ({ active }) => (
-  <Panel horizontal middle css={menuCss} gap="2rem">
+export const MenuLinks = ({ active, nav }) => (
+  <Panel horizontal middle css={nav ? navMenuCss : menuCss} gap="2rem">
     <CoreLink active={active === 'core'} />
     <ElementsLink active={active === 'elements'} />
   </Panel>

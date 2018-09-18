@@ -35,6 +35,7 @@ class App extends React.Component {
           </Header>
           <Nav>
             <Panel noGap>
+              <MenuLinks nav={true} active="core" />
               <GitHubLink />
               <SelectFramework id="Framework" onChange={value => this.setState({ framework: value })} />
               <NavMenu id="NavMenu" key={framework} />
