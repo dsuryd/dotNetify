@@ -26,7 +26,7 @@ class DataFlow extends React.Component {
 		this.unsubs();
 	}
 	componentDidUpdate() {
-		if (this.state.framework === 'Knockout') dotnetify.react.router.pushState({}, null, '/overview');
+		if (this.state.framework === 'Knockout') dotnetify.react.router.pushState({}, null, '/core/overview');
 	}
 	render() {
 		const { framework } = this.state;

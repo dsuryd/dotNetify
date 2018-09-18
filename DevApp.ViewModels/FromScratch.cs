@@ -23,4 +23,9 @@ namespace DotNetify.DevApp
   {
     public string Content => new Markdown("DotNetify.DevApp.Docs.Knockout.FromScratchScriptTag.md");
   }  
+
+  public class FromScratchCRA : BaseVM
+  {
+    public string Content => new Markdown("DotNetify.DevApp.Docs.FromScratchCRA.md");
+  }  
 }

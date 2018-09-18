@@ -4,6 +4,7 @@ import Reactive from './Reactive';
 import GetStarted from './GetStarted';
 import FromScratchWebPack from './from-scratch/FromScratchWebPack';
 import FromScratchScriptTag from './from-scratch/FromScratchScriptTag';
+import FromScratchCRA from './from-scratch/FromScratchCRA';
 import HelloWorld from './examples/HelloWorld';
 import ControlTypes from './examples/ControlTypes';
 import SimpleList from './examples/SimpleList';
@@ -23,6 +24,7 @@ export {
 	Overview,
 	FromScratchWebPack,
 	FromScratchScriptTag,
+	FromScratchCRA,
 	DataFlow,
 	Reactive,
 	GetStarted,
