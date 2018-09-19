@@ -39,19 +39,10 @@ namespace DotNetify
       /// </summary>
       protected internal static List<string> _registeredAssemblies = new List<string>();
 
-      #region Factory Method
-
       /// <summary>
       /// Delegate to override default mechanism used for creating view model instances.
       /// </summary>
       public static CreateInstanceDelegate CreateInstance { get; set; } = (type, args) => Activator.CreateInstance(type, args);
-
-      /// <summary>
-      /// Creates a view model instance of type T.
-      /// </summary>
-      public static T Create<T>(object[] args = null) where T : class => CreateInstance(typeof(T), args) as T;
-
-      #endregion Factory Method
 
       /// <summary>
       /// Gets known view model types.

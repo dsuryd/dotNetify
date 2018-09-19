@@ -137,51 +137,6 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Creates a view model instance.
-      /// </summary>
-      /// <param name="registeredTypes">Registered view model types.</param>
-      /// <param name="vmTypeName">View model type name.</param>
-      /// <param name="vmInstanceId">Optional view model instance identifier.</param>
-      /// <param name="vmNamespace">Optional view model type namespace.</param>
-      /// <returns></returns>
-      internal static BaseVM Create(IEnumerable<TypeHelper> registeredTypes, string vmTypeName, string vmInstanceId = null, string vmNamespace = null)
-      {
-         TypeHelper vmType = vmNamespace != null ?
-            registeredTypes.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}") :
-            registeredTypes.FirstOrDefault(i => i.Name == vmTypeName);
-
-         if (vmType == null)
-            return null;
-
-         try
-         {
-            if (vmInstanceId != null)
-            {
-               var instance = vmType.CreateInstance(new object[] { vmInstanceId }) as INotifyPropertyChanged;
-               if (instance != null)
-                  return instance is BaseVM ? instance as BaseVM : new BaseVM(instance);
-            }
-         }
-         catch (MissingMethodException)
-         {
-            Trace.Fail($"[dotNetify] ERROR: '{vmTypeName}' has no constructor accepting instance ID.");
-         }
-
-         try
-         {
-            var instance = vmType.CreateInstance(null) as INotifyPropertyChanged;
-            if (instance != null)
-               return instance is BaseVM ? instance as BaseVM : new BaseVM(instance);
-         }
-         catch (MissingMethodException)
-         {
-            Trace.Fail($"[dotNetify] ERROR: '{vmTypeName}' has no parameterless constructor.");
-         }
-
-         return null;
-      }
-
-      /// <summary>
       /// Accepts all changed properties so they won't marked as changed anymore.
       /// </summary>
       /// <returns>Accepted changed properties.</returns>

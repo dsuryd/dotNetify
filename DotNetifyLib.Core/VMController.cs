@@ -311,7 +311,7 @@ namespace DotNetify
 
          // Get the view model instance from the master view model, and if not, create it ourselves here.
          var vmInstance = masterVM?.GetSubVM(vmTypeName, vmInstanceId)
-            ?? BaseVM.Create(VMTypes, vmTypeName, vmInstanceId, vmNamespace)
+            ?? VMFactory.Create(VMTypes, vmTypeName, vmInstanceId, vmNamespace)
             ?? throw new Exception($"[dotNetify] ERROR: '{vmId}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.");
 
          // If there are view model arguments, set them into the instance.
