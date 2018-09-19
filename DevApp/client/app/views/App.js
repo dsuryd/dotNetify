@@ -9,6 +9,20 @@ import * as utils from '../utils';
 
 const themeToggleEvent = utils.createEventEmitter();
 
+const navCss = `
+  ::-webkit-scrollbar {
+    width: 7px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 20px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #eee;
+    border-radius: 20px;
+  }
+`;
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -33,7 +47,7 @@ class App extends React.Component {
               <TwitterLink />
             </Panel>
           </Header>
-          <Nav>
+          <Nav css={navCss}>
             <Panel noGap>
               <MenuLinks nav={true} active="core" />
               <GitHubLink />

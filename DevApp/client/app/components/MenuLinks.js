@@ -15,6 +15,7 @@ const navMenuCss = `
 display: none;
 @media (max-width: 767px) {
   display: flex;
+  margin-left: .5rem;
   margin-top: .5rem;
   padding-bottom: .5rem;
   border-bottom: 1px solid #e7e7e7;
