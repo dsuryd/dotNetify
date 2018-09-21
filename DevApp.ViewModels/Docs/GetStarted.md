@@ -89,6 +89,12 @@ npm i --save react
 npm i --save react-dom
 ``` 
 
+The library uses SignalR .NET Core client by default.  To switch to .NET Framework client, add:
+```jsx
+import signalR from 'dotnetify/dist/signalR-netfx';
+dotnetify.hubLib = signalR;
+```
+
 If using script tags, include _React_, _signalR_, and _dotNetify_ from their respective CDNs:
 ```html
 <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
@@ -97,7 +103,7 @@ If using script tags, include _React_, _signalR_, and _dotNetify_ from their res
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
 ```
 
-The _signalR_ script above is only for ASP.NET Core. If you are using ASP.NET Framework server, replace with:
+To use SignalR .NET Framework client, use:
 ```html
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/signalr@2/jquery.signalR.min.js"></script>

@@ -5,7 +5,7 @@ DotNetify is an abstraction over SignalR, which in turn is an abstraction over s
 While dotNetify's client-side library can be used for either one, it needs to be configured to match the server it connects with. The .NET Core library is assumed by default. To switch to the .NET Framework library, import the one included in the dotNetify's distribution package (a customized one that doesn't require the full jQuery) and set it to the __dotnetify.hubLib__ at the application's entry point:
 
 ```jsx
-import signalR from 'dotnetify/dist/signalr-netfx';
+import signalR from 'dotnetify/dist/signalR-netfx';
 dotnetify.hubLib = signalR;
 ```
 
