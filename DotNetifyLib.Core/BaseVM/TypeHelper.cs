@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,14 @@ limitations under the License.
 
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace DotNetify
 {
    /// <summary>
    /// Provides Type abstraction for both static and runtime view model type.
    /// </summary>
-   internal class TypeHelper
+   public class TypeHelper
    {
       private bool _isRuntimeType;
       private Func<object[], object> _factoryDelegate;
@@ -38,17 +39,25 @@ namespace DotNetify
       public string Name { get; }
 
       /// <summary>
+      /// Whether it's a multicast type.
+      /// </summary>
+      public bool IsMulticast => typeof(IMulticast).GetTypeInfo().IsAssignableFrom(Type);
+
+      /// <summary>
       /// Full type name.
       /// </summary>
       public string FullName { get; }
 
       public static implicit operator Type(TypeHelper typeHelper) => typeHelper.Type;
+
       public static implicit operator TypeHelper(Type type) => new TypeHelper(type);
 
       public static bool operator ==(TypeHelper lhs, TypeHelper rhs) => IsEqual(lhs, rhs);
+
       public static bool operator !=(TypeHelper lhs, TypeHelper rhs) => !IsEqual(lhs, rhs);
 
       public override bool Equals(object obj) => obj is TypeHelper ? IsEqual(this, obj as TypeHelper) : base.Equals(obj);
+
       public override int GetHashCode() => base.GetHashCode();
 
       /// <summary>

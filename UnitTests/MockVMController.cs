@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using DotNetify;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using DotNetify;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using static UnitTests.MockDotNetifyHub;
 
 namespace UnitTests
 {
@@ -24,7 +25,9 @@ namespace UnitTests
       }
 
       public T GetVM<T>() where T : INotifyPropertyChanged => JsonConvert.DeserializeObject<T>(_vmData);
-      public T GetVMProperty<T>(string propName) => (T) VMData[propName]?.ToObject(typeof(T));
+
+      public T GetVMProperty<T>(string propName) => (T)VMData[propName]?.ToObject(typeof(T));
+
       public void Reset()
       {
          _vmId = string.Empty;
@@ -54,7 +57,7 @@ namespace UnitTests
          {
             _response.Handler(connectionId, vmId, vmData);
             OnResponse?.Invoke(this, vmData);
-         });
+         }, new VMFactory(new MemoryCache()));
       }
 
       public Response RequestVM()

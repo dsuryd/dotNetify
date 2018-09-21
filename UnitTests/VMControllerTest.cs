@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DotNetify;
+using static UnitTests.MockDotNetifyHub;
 
 namespace UnitTest
 {
@@ -51,6 +52,7 @@ namespace UnitTest
       private string _connectionId;
       private string _vmId;
       private string _vmData;
+      private IVMFactory _vmFactory;
 
       static VMControllerTest()
       {
@@ -64,10 +66,16 @@ namespace UnitTest
          _vmData = vmData;
       }
 
+      [TestInitialize]
+      public void Initialize()
+      {
+         _vmFactory = new VMFactory(new MemoryCache());
+      }
+
       [TestMethod]
       public void VMController_OnRequestVM()
       {
-         var vmController = new VMController(TestResponse);
+         var vmController = new VMController(TestResponse, _vmFactory);
          vmController.OnRequestVM("conn1", typeof(UnitTestVM).Name);
 
          Assert.AreEqual("conn1", _connectionId);
@@ -85,7 +93,7 @@ namespace UnitTest
       [TestMethod]
       public void VMController_OnUpdateVM()
       {
-         var vmController = new VMController(TestResponse);
+         var vmController = new VMController(TestResponse, _vmFactory);
          vmController.OnRequestVM("conn1", typeof(UnitTestVM).Name);
 
          vmController.OnUpdateVM("conn1", typeof(UnitTestVM).Name, new Dictionary<string, object>() { { "LastName", "Doe" }, { "Age", 42 } });

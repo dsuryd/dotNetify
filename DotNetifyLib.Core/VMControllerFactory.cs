@@ -29,6 +29,11 @@ namespace DotNetify
       private readonly IMemoryCache _controllersCache;
 
       /// <summary>
+      /// For creating view model instances.
+      /// </summary>
+      private readonly IVMFactory _vmFactory;
+
+      /// <summary>
       /// For creating dependency injection service scope.
       /// </summary>
       private readonly IVMServiceScopeFactory _serviceScopeFactory;
@@ -47,11 +52,13 @@ namespace DotNetify
       /// Constructor.
       /// </summary>
       /// <param name="memoryCache">Memory cache for storing the view model controllers.</param>
+      /// <param name="vmFactory">Factory for view models.</param>
       /// <param name="serviceScopeFactory">Factory for dependency injection service scope.</param>
-      public VMControllerFactory(IMemoryCache memoryCache, IVMServiceScopeFactory serviceScopeFactory)
+      public VMControllerFactory(IMemoryCache memoryCache, IVMFactory vmFactory, IVMServiceScopeFactory serviceScopeFactory)
       {
          _controllersCache = memoryCache ?? throw new ArgumentNullException("No service of type IMemoryCache has been registered.");
          _serviceScopeFactory = serviceScopeFactory;
+         _vmFactory = vmFactory;
       }
 
       /// <summary>
@@ -66,7 +73,7 @@ namespace DotNetify
 
          if (!cache.TryGetValue(key, out Lazy<VMController> cachedValue))
          {
-            cachedValue = new Lazy<VMController>(() => new VMController(ResponseDelegate, _serviceScopeFactory.CreateScope()));
+            cachedValue = new Lazy<VMController>(() => new VMController(ResponseDelegate, _vmFactory, _serviceScopeFactory.CreateScope()));
             cache.Set(key, cachedValue, GetCacheEntryOptions());
          }
          return cachedValue?.Value;

@@ -58,6 +58,11 @@ namespace DotNetify
       #region Fields
 
       /// <summary>
+      /// View model factory.
+      /// </summary>
+      private readonly IVMFactory _vmFactory;
+
+      /// <summary>
       /// Dependency injection service scope.
       /// </summary>
       private readonly IVMServiceScope _serviceScope;
@@ -115,7 +120,7 @@ namespace DotNetify
       public IServiceProvider ServiceProvider => _serviceScope?.ServiceProvider;
 
       // Default constructor.
-      public VMController()
+      internal VMController()
       {
          RequestVMFilter = (string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => vmAction(vmArg);
          UpdateVMFilter = (string vmId, BaseVM vm, object vmData, Action<object> vmAction) => vmAction(vmData);
@@ -127,9 +132,10 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmResponse">Function invoked by the view model to provide response back to the client.</param>
       /// <param name="serviceScope">Dependency injection service scope.</param>
-      public VMController(VMResponseDelegate vmResponse, IVMServiceScope serviceScope = null) : this()
+      public VMController(VMResponseDelegate vmResponse, IVMFactory vmFactory, IVMServiceScope serviceScope = null) : this()
       {
          _vmResponse = vmResponse ?? throw new ArgumentNullException(nameof(vmResponse));
+         _vmFactory = vmFactory;
          _serviceScope = serviceScope;
       }
 
@@ -311,7 +317,7 @@ namespace DotNetify
 
          // Get the view model instance from the master view model, and if not, create it ourselves here.
          var vmInstance = masterVM?.GetSubVM(vmTypeName, vmInstanceId)
-            ?? VMFactory.Create(VMTypes, vmTypeName, vmInstanceId, vmNamespace)
+            ?? _vmFactory.GetInstance(vmTypeName, vmInstanceId, vmNamespace)
             ?? throw new Exception($"[dotNetify] ERROR: '{vmId}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.");
 
          // If there are view model arguments, set them into the instance.

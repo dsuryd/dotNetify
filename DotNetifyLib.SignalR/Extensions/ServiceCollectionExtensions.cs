@@ -31,6 +31,9 @@ namespace DotNetify
          // Add view model controller factory, to be injected to dotNetify's signalR hub.
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
 
+         // Add view model factory.
+         services.AddSingleton<IVMFactory, VMFactory>();
+
          // Add the dependency injection service scope factory for view model controllers.
          services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
 

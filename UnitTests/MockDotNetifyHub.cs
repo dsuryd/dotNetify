@@ -18,15 +18,15 @@ namespace UnitTests
       private List<Tuple<Type, Func<IMiddlewarePipeline>>> _middlewareFactories = new List<Tuple<Type, Func<IMiddlewarePipeline>>>();
       private Dictionary<Type, Func<IVMFilter>> _vmFilterFactories = new Dictionary<Type, Func<IVMFilter>>();
       private Func<Type, object[], object> _factoryMethod = (type, args) => VMController.CreateInstance(type, args);
-      private string _mockConnectionId = Guid.NewGuid().ToString();
+      private IVMFactory _vmFactory = new VMFactory(new MemoryCache());
 
-      public string ConnectionId => _mockConnectionId;
+      public string ConnectionId { get; } = Guid.NewGuid().ToString();
 
       public event EventHandler<Tuple<string, string>> Response;
 
       public static IMemoryCache CreateMemoryCache() => new MemoryCache();
 
-      private class MemoryCache : IMemoryCache
+      internal class MemoryCache : IMemoryCache
       {
          private Dictionary<string, object> _cache = new Dictionary<string, object>();
 
@@ -143,7 +143,7 @@ namespace UnitTests
       public MockDotNetifyHub Create()
       {
          _hub = new DotNetifyHub(
-            new VMControllerFactory(_memoryCache, _serviceScopeFactory) { ResponseDelegate = ResponseVM },
+            new VMControllerFactory(_memoryCache, _vmFactory, _serviceScopeFactory) { ResponseDelegate = ResponseVM },
             new HubServiceProvider(),
             new HubPrincipalAccessor(),
             new HubPipeline(_middlewareFactories, _vmFilterFactories),
