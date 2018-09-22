@@ -43,7 +43,7 @@ namespace UnitTests
          }
       }
 
-      private class ServiceScopeFactory : IVMServiceScopeFactory
+      internal class ServiceScopeFactory : IVMServiceScopeFactory
       {
          public IVMServiceScope CreateScope() => null;
       }

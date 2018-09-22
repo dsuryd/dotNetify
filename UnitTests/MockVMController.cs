@@ -40,8 +40,18 @@ namespace UnitTests
       private readonly Response _response = new Response();
       private readonly string _vmId;
       private readonly VMController _vmController;
+      private readonly IVMFactory _vmFactory = new VMFactory(new MemoryCache());
 
       public event EventHandler<string> OnResponse;
+
+      public MockVMController(IVMFactory vmFactory) : this()
+      {
+         _vmController = new VMController((connectionId, vmId, vmData) =>
+         {
+            _response.Handler(connectionId, vmId, vmData);
+            OnResponse?.Invoke(this, vmData);
+         }, vmFactory);
+      }
 
       public MockVMController(TViewModel vmInstance = default(TViewModel))
       {
@@ -57,7 +67,7 @@ namespace UnitTests
          {
             _response.Handler(connectionId, vmId, vmData);
             OnResponse?.Invoke(this, vmData);
-         }, new VMFactory(new MemoryCache()));
+         }, _vmFactory);
       }
 
       public Response RequestVM()
@@ -85,5 +95,7 @@ namespace UnitTests
       {
          _vmController.OnDisposeVM("conn1", vmId ?? _vmId);
       }
+
+      public static IVMFactory GetVMFactory() => new VMFactory(new MemoryCache());
    }
 }

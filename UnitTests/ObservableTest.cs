@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotNetify;
 
-namespace UnitTest
+namespace UnitTests
 {
    [TestClass]
    public class ObservableTest

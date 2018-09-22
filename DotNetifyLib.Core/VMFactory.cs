@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -35,7 +36,12 @@ namespace DotNetify
       /// <summary>
       /// For caching multicast view models.
       /// </summary>
-      private IMemoryCache _memoryCache;
+      private readonly IMemoryCache _memoryCache;
+
+      /// <summary>
+      /// Used for synchronizing key-based access to the memory cache.
+      /// </summary>
+      private readonly ConcurrentDictionary<string, object> _keyBasedLock = new ConcurrentDictionary<string, object>();
 
       /// <summary>
       /// Constructor.
@@ -95,7 +101,32 @@ namespace DotNetify
       /// <returns>View model instance.</returns>
       private BaseVM GetMulticastInstance(TypeHelper vmType, string vmInstanceId)
       {
-         return Create(vmType, vmInstanceId);
+         string key = vmType.FullName;
+         MulticastVM vm = null;
+
+         lock (_keyBasedLock.GetOrAdd(key, _ => new object()))
+         {
+            if (!_memoryCache.TryGetValue(key, out HashSet<MulticastVM> vmCollections))
+            {
+               vm = Create(vmType, vmInstanceId) as MulticastVM;
+               vm.Disposed += (sender, e) => RemoveMulticastInstance(vm, key);
+               vmCollections = new HashSet<MulticastVM> { vm };
+               _memoryCache.Set(key, vmCollections);
+            }
+            else
+            {
+               vm = vmCollections.FirstOrDefault(x => x.IsMember);
+               if (vm != null)
+                  vm.AddRef();
+               else
+               {
+                  vm = Create(vmType, vmInstanceId) as MulticastVM;
+                  vm.Disposed += (sender, e) => RemoveMulticastInstance(vm, key);
+                  vmCollections.Add(vm);
+               }
+            }
+         }
+         return vm;
       }
 
       /// <summary>
@@ -109,6 +140,20 @@ namespace DotNetify
          return vmNamespace != null ?
             VMTypes.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}") :
             VMTypes.FirstOrDefault(i => i.Name == vmTypeName);
+      }
+
+      /// <summary>
+      /// Removes multicast view model instance from the cache.
+      /// </summary>
+      /// <param name="vm">Multicast view model.</param>
+      /// <param name="key">Key to the cache collection, which is the view model's type name.</param>
+      private void RemoveMulticastInstance(MulticastVM vm, string key)
+      {
+         lock (_keyBasedLock.GetOrAdd(key, _ => new object()))
+         {
+            if (_memoryCache.TryGetValue(key, out HashSet<MulticastVM> vmCollections))
+               vmCollections.Remove(vm);
+         }
       }
    }
 }

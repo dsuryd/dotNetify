@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotNetify;
 using System.Collections.Generic;
 
-namespace UnitTest
+namespace UnitTests
 {
    [TestClass]
    public class VMControllerFactoryTest

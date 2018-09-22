@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 using DotNetify;
 using static UnitTests.MockDotNetifyHub;
 
-namespace UnitTest
+namespace UnitTests
 {
    public class UnitTestVM : BaseVM
    {

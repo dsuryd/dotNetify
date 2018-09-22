@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotNetify;
 using DotNetify.Routing;
 
-namespace UnitTest.DotNetifyLibTest
+namespace UnitTests
 {
    [TestClass]
    public class RoutableExtensionTest
