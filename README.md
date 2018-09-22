@@ -51,7 +51,7 @@ ASP.NET Framework:
 *PM> Install-Package DotNetify.Core*  
 *PM> Install-Package DotNetify.SignalR.Owin*  
 
-Read the website on how to configure your project ([React](http://dotnetify.net/react/Installation) | [Knockout](http://dotnetify.net/index/Installing)).
+Read the website on how to configure your project.
 
 ## License
 Licensed under the Apache License, Version 2.0.
