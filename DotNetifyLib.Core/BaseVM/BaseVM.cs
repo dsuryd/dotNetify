@@ -140,7 +140,7 @@ namespace DotNetify
       /// Accepts all changed properties so they won't marked as changed anymore.
       /// </summary>
       /// <returns>Accepted changed properties.</returns>
-      internal IDictionary<string, object> AcceptChangedProperties()
+      internal virtual IDictionary<string, object> AcceptChangedProperties()
       {
          IDictionary<string, object> result = null;
          lock (_propertyDictionaries)
@@ -287,7 +287,7 @@ namespace DotNetify
       /// <summary>
       /// Push property changed updates to the client.
       /// </summary>
-      public void PushUpdates()
+      public virtual void PushUpdates()
       {
          if (ChangedProperties.Any())
             RequestPushUpdates?.Invoke(this, null);
@@ -296,11 +296,12 @@ namespace DotNetify
       /// <summary>
       /// Serializes the instance into JSON-formatted string.
       /// </summary>
+      /// <param name="data">Optional data to be serialized.</param>
       /// <returns>Serialized string.</returns>
-      internal string Serialize()
+      internal string Serialize(object data = null)
       {
          var serializer = _vmInstance as ISerializer ?? this;
-         return serializer.Serialize(_vmInstance, IgnoredProperties);
+         return serializer.Serialize(data ?? _vmInstance, IgnoredProperties);
       }
 
       /// <summary>
@@ -324,29 +325,7 @@ namespace DotNetify
       {
          var deserializer = _vmInstance as IDeserializer ?? this;
          bool success = deserializer.Deserialize(_vmInstance, vmPath, newValue);
-         if (success)
-         {
-            // Don't include the property we just updated in the ChangedProperties of the view model
-            // unless the value is changed internally, so that we don't send the same value back to the client
-            // during PushUpdates call by this VMController.
-            var changedProperties = ChangedProperties;
-            if (changedProperties.ContainsKey(vmPath))
-            {
-               var changedPropertyValue = changedProperties[vmPath] is IReactiveProperty ?
-                  (changedProperties[vmPath] as IReactiveProperty).Value : changedProperties[vmPath];
-
-               var changedValue = changedPropertyValue?.ToString() ?? string.Empty;
-               bool hasChanged = changedValue != newValue;
-
-               // If property is an array type, use Json serializer to compare the values.
-               if (hasChanged && changedPropertyValue?.GetType().IsArray == true)
-                  hasChanged = JsonConvert.SerializeObject(changedPropertyValue) != JsonConvert.SerializeObject(JsonConvert.DeserializeObject(newValue));
-
-               if (!hasChanged)
-                  changedProperties.TryRemove(vmPath, out object value);
-            }
-         }
-         else
+         if (!success)
             // If we cannot resolve the property path, forward the info to the instance to give it a chance to resolve it.
             OnUnresolvedUpdate(vmPath, newValue);
 
@@ -369,6 +348,32 @@ namespace DotNetify
       /// <param name="newValue">New value.</param>
       /// <returns>True if the property value was deserialized.</returns>
       public virtual bool Deserialize(object instance, string propertyPath, string newValue) => _deserializer.Deserialize(instance, propertyPath, newValue);
+
+      /// <summary>
+      /// Checks whether a changed property value is equal to a value.
+      /// </summary>
+      /// <param name="propPath">Property path of the changed property.</param>
+      /// <param name="value">Value to compare with.</param>
+      /// <returns>True if the changed property value is equal to the given value.</returns>
+      internal bool IsEqualToChangedPropertyValue(string propPath, object value)
+      {
+         string valueToCompare = Serialize(value);
+         if (_changedProperties.ContainsKey(propPath))
+         {
+            var changedPropertyValue = _changedProperties[propPath] is IReactiveProperty ?
+               (_changedProperties[propPath] as IReactiveProperty).Value : _changedProperties[propPath];
+
+            var changedValue = changedPropertyValue?.ToString() ?? string.Empty;
+            bool isEqual = changedValue == valueToCompare;
+
+            // If property is an array type, use Json serializer to compare the values.
+            if (!isEqual && changedPropertyValue?.GetType().IsArray == true)
+               isEqual = JsonConvert.SerializeObject(changedPropertyValue) != valueToCompare;
+
+            return isEqual;
+         }
+         return false;
+      }
 
       /// <summary>
       /// Handles property changed event.

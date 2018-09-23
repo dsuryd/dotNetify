@@ -227,17 +227,25 @@ namespace DotNetify
             lock (vmInstance)
             {
                foreach (var kvp in filteredData as Dictionary<string, object>)
-               {
                   UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
-
-                  // If the view model was recreated, include the changes that trigger this update to overwrite their initial values.
-                  if (isRecreated && !vmInstance.ChangedProperties.ContainsKey(kvp.Key))
-                     vmInstance.ChangedProperties.TryAdd(kvp.Key, kvp.Value);
-               }
             }
 
             // If the updates cause some properties of this and other view models to change, push those new values back to the client.
-            PushUpdates();
+            // For multicast view models, use their PushUpdates method to push to any other connected clients.
+            if (vmInstance is MulticastVM)
+               vmInstance.PushUpdates();
+            else
+            {
+               // Unless the view model was recreated, exclude the changes that trigger this update if their values don't change.
+               if (!isRecreated)
+               {
+                  foreach (var kvp in data)
+                     if (vmInstance.IsEqualToChangedPropertyValue(kvp.Key, kvp.Value))
+                        vmInstance.ChangedProperties.TryRemove(kvp.Key, out object dummy);
+               }
+
+               PushUpdates();
+            }
          });
       }
 

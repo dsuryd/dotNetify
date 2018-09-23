@@ -15,13 +15,15 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace DotNetify
 {
    // Implements multicast view models.  A multicast view model can be connected to multiple views,
    // basically serving as a single data source for those views.
-   public class MulticastVM : BaseVM, IMulticast
+   public abstract class MulticastVM : BaseVM, IMulticast
    {
       /// <summary>
       /// Reference count of VMController instances.
@@ -29,9 +31,14 @@ namespace DotNetify
       private int _reference = 1;
 
       /// <summary>
+      /// Keeps changed properties to be multicasted to connected clients.
+      /// </summary>
+      private IDictionary<string, object> _changedProperties;
+
+      /// <summary>
       /// Determine whether the view model can be shared with the calling VMController.
       /// </summary>
-      public virtual bool IsMember => throw new NotImplementedException();
+      public abstract bool IsMember { get; }
 
       /// <summary>
       /// Increment reference count.
@@ -42,12 +49,31 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overrides the Dispose method to dispose only when the reference count is zero.
+      /// Overrides the base method to dispose only when the reference count is zero.
       /// </summary>
       public override void Dispose()
       {
          if (Interlocked.Decrement(ref _reference) == 0)
             base.Dispose();
+      }
+
+      /// <summary>
+      /// Overrides the base method to cache the changed properties before it gets cleared.
+      /// </summary>
+      public override void PushUpdates()
+      {
+         _changedProperties = new Dictionary<string, object>(ChangedProperties);
+         base.PushUpdates();
+         base.AcceptChangedProperties();
+      }
+
+      /// <summary>
+      /// Overrides the base method to return the cached changed properties.
+      /// </summary>
+      /// <returns>Changed properties.</returns>
+      internal override IDictionary<string, object> AcceptChangedProperties()
+      {
+         return _changedProperties;
       }
    }
 }

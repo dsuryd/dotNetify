@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+
 using Rx = System.Reactive.Linq;
 
 namespace UnitTests
@@ -78,6 +79,9 @@ namespace UnitTests
 
          Assert.AreEqual("John World", response1["FullName"]);
          Assert.AreEqual("John Doe", response2["FullName"]);
+
+         Assert.IsFalse(response1.ContainsKey("FirstName"));
+         Assert.IsFalse(response2.ContainsKey("LastName"));
       }
 
       [TestMethod]

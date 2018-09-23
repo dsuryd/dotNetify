@@ -41,6 +41,9 @@ namespace DotNetify
       {
          try
          {
+            if (viewModel is string || !viewModel.GetType().GetTypeInfo().IsClass)
+               return Convert.ToString(viewModel);
+
             var serializer = new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) };
             var vmJObject = JObject.FromObject(viewModel, serializer);
 
