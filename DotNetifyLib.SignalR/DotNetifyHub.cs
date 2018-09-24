@@ -55,8 +55,7 @@ namespace DotNetify
       {
          get
          {
-            if (_principalAccessor is HubPrincipalAccessor)
-               (_principalAccessor as HubPrincipalAccessor).Principal = Principal;
+            SetHubPrincipalAccessor();
 
             var vmController = _vmControllerFactory.GetInstance(Context.ConnectionId);
             vmController.RequestVMFilter = RunRequestingVMFilters;
@@ -268,5 +267,18 @@ namespace DotNetify
       /// <param name="ex">Exception to serialize.</param>
       /// <returns>Serialized exception.</returns>
       private string SerializeException(Exception ex) => JsonConvert.SerializeObject(new { ExceptionType = ex.GetType().Name, Message = ex.Message });
+
+      /// <summary>
+      /// Sets the hub principal and connection context to the ambient accessor object.
+      /// </summary>
+      private void SetHubPrincipalAccessor()
+      {
+         if (_principalAccessor is HubPrincipalAccessor)
+         {
+            var hubPrincipalAccessor = _principalAccessor as HubPrincipalAccessor;
+            hubPrincipalAccessor.Principal = Principal;
+            hubPrincipalAccessor.CallerContext = Context;
+         }
+      }
    }
 }

@@ -14,23 +14,72 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-using System.Security.Principal;
 using DotNetify.Security;
+using Microsoft.AspNetCore.Http.Connections.Features;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Security.Principal;
 using System.Threading;
 
 namespace DotNetify
 {
    /// <summary>
-   /// Implements ambient data store for the current principal of the hub.
+   /// Implements ambient data store for the current principal and connection context of the SignalR hub.
    /// </summary>
-   internal class HubPrincipalAccessor : IPrincipalAccessor
+   internal class HubPrincipalAccessor : IPrincipalAccessor, IHubCallerContextAccessor, IConnectionContext
    {
-      private readonly static AsyncLocal<IPrincipal> _asyncLocal = new AsyncLocal<IPrincipal>();
+      private readonly static AsyncLocal<IPrincipal> _asyncLocalPrincipal = new AsyncLocal<IPrincipal>();
+      private readonly static AsyncLocal<HubCallerContext> _asyncLocalCallerContext = new AsyncLocal<HubCallerContext>();
 
+      /// <summary>
+      /// Current principal.
+      /// </summary>
       public IPrincipal Principal
       {
-         get { return _asyncLocal.Value; }
-         set { _asyncLocal.Value = value; }
+         get { return _asyncLocalPrincipal.Value; }
+         set { _asyncLocalPrincipal.Value = value; }
+      }
+
+      /// <summary>
+      /// SignalR hub caller context.
+      /// </summary>
+      public HubCallerContext CallerContext
+      {
+         get { return _asyncLocalCallerContext.Value; }
+         set { _asyncLocalCallerContext.Value = value; }
+      }
+
+      /// <summary>
+      /// HTTP request headers.
+      /// </summary>
+      public dynamic HttpRequestHeaders
+      {
+         get
+         {
+            var httpContext = CallerContext?.Features.Get<IHttpContextFeature>();
+            return httpContext != null ? JObject.Parse(JsonConvert.SerializeObject(httpContext.HttpContext.Request.Headers)) : null;
+         }
+      }
+
+      /// <summary>
+      /// HTTP connection info.
+      /// </summary>
+      public dynamic HttpConnection
+      {
+         get
+         {
+            var httpConnection = CallerContext?.Features.Get<IHttpConnectionFeature>();
+            return httpConnection != null ? new JObject
+            {
+               ["LocalIpAddress"] = httpConnection.LocalIpAddress.ToString(),
+               ["LocalPort"] = httpConnection.LocalPort,
+               ["RemoteIpAddress"] = httpConnection.RemoteIpAddress.ToString(),
+               ["RemotePort"] = httpConnection.RemotePort,
+               ["ConnectionId"] = httpConnection.ConnectionId
+            } : null;
+         }
       }
    }
 }

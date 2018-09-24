@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2017 Dicky Suryadi
+Copyright 2017-2018 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,8 +37,10 @@ namespace DotNetify
          // Add the dependency injection service scope factory for view model controllers.
          services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
 
-         // Add service to get the hub principal.
+         // Add service to get the hub principal and the associated connection context.
          services.AddSingleton<IPrincipalAccessor, HubPrincipalAccessor>();
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IHubCallerContextAccessor);
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IConnectionContext);
 
          // Add service to get the service provider for the view models.
          services.AddSingleton<IHubServiceProvider, HubServiceProvider>();
