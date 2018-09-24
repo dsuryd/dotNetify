@@ -12,6 +12,7 @@ import CompositeView from './examples/CompositeView';
 import LiveChart from './examples/LiveChart';
 import BookStore, { BookDefault, Book } from './examples/BookStore';
 import SecurePage from './examples/SecurePage';
+import ChatRoom from './examples/ChatRoom';
 import Connection from './apis/Connection';
 import CRUD from './apis/CRUD';
 import DI from './apis/DI';
@@ -21,27 +22,28 @@ import Routing from './apis/Routing';
 import Security from './apis/Security';
 
 export {
-	Overview,
-	FromScratchWebPack,
-	FromScratchScriptTag,
-	FromScratchCRA,
-	DataFlow,
-	Reactive,
-	GetStarted,
-	HelloWorld,
-	ControlTypes,
-	SimpleList,
-	CompositeView,
-	LiveChart,
-	BookStore,
-	BookDefault,
-	Book,
-	SecurePage,
-	Connection,
-	CRUD,
-	DI,
-	Filter,
-	Middleware,
-	Routing,
-	Security
+  Overview,
+  FromScratchWebPack,
+  FromScratchScriptTag,
+  FromScratchCRA,
+  DataFlow,
+  Reactive,
+  GetStarted,
+  HelloWorld,
+  ControlTypes,
+  SimpleList,
+  CompositeView,
+  LiveChart,
+  BookStore,
+  BookDefault,
+  Book,
+  SecurePage,
+  ChatRoom,
+  Connection,
+  CRUD,
+  DI,
+  Filter,
+  Middleware,
+  Routing,
+  Security
 };
