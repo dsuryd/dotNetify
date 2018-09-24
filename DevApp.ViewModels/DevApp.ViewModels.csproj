@@ -23,6 +23,7 @@
     <EmbeddedResource Include="Docs\Examples\LiveChart.md" />
     <EmbeddedResource Include="Docs\Examples\BookStore.md" />
     <EmbeddedResource Include="Docs\Examples\SecurePage.md" />
+    <EmbeddedResource Include="Docs\Examples\ChatRoom.md" />
     <EmbeddedResource Include="Docs\Knockout\Overview.md" />    
     <EmbeddedResource Include="Docs\Knockout\GetStarted.md" />    
     <EmbeddedResource Include="Docs\Knockout\APIs\Routing.md" />    

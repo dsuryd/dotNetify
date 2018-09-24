@@ -8,41 +8,42 @@ using DotNetify.Security;
 
 namespace DotNetify.DevApp
 {
-    public class App : BaseVM, IRoutable
-    {
-        private enum Route
-        {
-            Home,
-            Overview,
-            FromScratchWebPack,
-            FromScratchScriptTag,
-            FromScratchCRA,
-            DataFlow,
-            Reactive,
-            GetStarted,
-            HelloWorld,
-            ControlTypes,
-            SimpleList,
-            CompositeView,
-            LiveChart,
-            BookStore,
-            SecurePage,
-            Connection,
-            CRUD,
-            DI,
-            Filter,
-            Middleware,
-            Routing,
-            Security
-        }
-        
-        private NavMenuItem[] _navMenuItems;
+   public class App : BaseVM, IRoutable
+   {
+      private enum Route
+      {
+         Home,
+         Overview,
+         FromScratchWebPack,
+         FromScratchScriptTag,
+         FromScratchCRA,
+         DataFlow,
+         Reactive,
+         GetStarted,
+         HelloWorld,
+         ControlTypes,
+         SimpleList,
+         CompositeView,
+         LiveChart,
+         BookStore,
+         SecurePage,
+         ChatRoom,
+         Connection,
+         CRUD,
+         DI,
+         Filter,
+         Middleware,
+         Routing,
+         Security
+      }
 
-        public RoutingState RoutingState { get; set; }
+      private NavMenuItem[] _navMenuItems;
 
-        public App()
-        {
-            this.RegisterRoutes("core", new List<RouteTemplate>
+      public RoutingState RoutingState { get; set; }
+
+      public App()
+      {
+         this.RegisterRoutes("core", new List<RouteTemplate>
             {
                 new RouteTemplate(nameof(Route.Home))           { UrlPattern = "", ViewUrl = nameof(Route.Overview) },
                 new RouteTemplate(nameof(Route.Overview))       { UrlPattern = "overview" },
@@ -56,6 +57,7 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.LiveChart))      { UrlPattern = "examples/livechart" },
                 new RouteTemplate(nameof(Route.BookStore))      { UrlPattern = "examples/bookstore" },
                 new RouteTemplate(nameof(Route.SecurePage))     { UrlPattern = "examples/securepage" },
+                new RouteTemplate(nameof(Route.ChatRoom))       { UrlPattern = "examples/chatroom" },
                 new RouteTemplate(nameof(Route.Connection))     { UrlPattern = "api/connection" },
                 new RouteTemplate(nameof(Route.CRUD))           { UrlPattern = "api/crud" },
                 new RouteTemplate(nameof(Route.DI))             { UrlPattern = "api/di" },
@@ -69,8 +71,8 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.FromScratchCRA))         { UrlPattern = "fromscratch-cra" },
             });
 
-            _navMenuItems = new NavMenuItem[]
-            {
+         _navMenuItems = new NavMenuItem[]
+         {
                 new NavRoute("Overview",               this.GetRoute(nameof(Route.Overview))),
                 new NavRoute("Data Flow Pattern",      this.GetRoute(nameof(Route.DataFlow))),
                 new NavRoute("Reactive Programming",   this.GetRoute(nameof(Route.Reactive))),
@@ -96,6 +98,7 @@ namespace DotNetify.DevApp
                         new NavRoute("Composite View",   this.GetRoute(nameof(Route.CompositeView))),
                         new NavRoute("Book Store",       this.GetRoute(nameof(Route.BookStore))),
                         new NavRoute("Secure Page",      this.GetRoute(nameof(Route.SecurePage))),
+                        new NavRoute("Chat Room",        this.GetRoute(nameof(Route.ChatRoom))),
                     },
                     IsExpanded = false
                 },
@@ -114,30 +117,30 @@ namespace DotNetify.DevApp
                     },
                     IsExpanded = false
                 }
-            };
-            
-            AddProperty("NavMenu", new NavMenu(_navMenuItems))
-                .SubscribeTo(AddProperty<string>("Framework").Select(framework => GetNavMenu(framework)));
-        }
+         };
 
-        private NavMenu GetNavMenu(string framework) 
-        {
-            var navMenuItems = new List<NavMenuItem>(_navMenuItems);
-            if (framework == "Knockout") 
+         AddProperty("NavMenu", new NavMenu(_navMenuItems))
+             .SubscribeTo(AddProperty<string>("Framework").Select(framework => GetNavMenu(framework)));
+      }
+
+      private NavMenu GetNavMenu(string framework)
+      {
+         var navMenuItems = new List<NavMenuItem>(_navMenuItems);
+         if (framework == "Knockout")
+         {
+            navMenuItems[5] = new NavGroup
             {
-                navMenuItems[5] = new NavGroup
+               Label = "Further Examples",
+               Routes = new NavRoute[]
                 {
-                    Label = "Further Examples",
-                    Routes = new NavRoute[]
-                    {
                         new NavRoute("Composite View",   this.GetRoute(nameof(Route.CompositeView))),
                         new NavRoute("Book Store",       this.GetRoute(nameof(Route.BookStore)))
-                    },
-                    IsExpanded = false
-                };
-                navMenuItems.RemoveAt(1);  // Remove "Data Flow Pattern".
-            }
-            return new NavMenu(navMenuItems.ToArray());
-        }
-    }
+                },
+               IsExpanded = false
+            };
+            navMenuItems.RemoveAt(1);  // Remove "Data Flow Pattern".
+         }
+         return new NavMenu(navMenuItems.ToArray());
+      }
+   }
 }
