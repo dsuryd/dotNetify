@@ -25,7 +25,8 @@ class MovieTable extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-    this.state = this.context.connect('MovieTableVM', this) || { Headers: [], Data: [], Pagination: [] };
+    this.state = { Headers: [], Data: [], Pagination: [] };
+    this.context.connect('MovieTableVM', this);
   }
 
   componentWillUnmount() {
@@ -73,7 +74,8 @@ class MovieDetails extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-    this.state = this.context.connect('MovieDetailsVM', this) || { Movie: {} };
+    this.state = { Movie: {} };
+    this.context.connect('MovieDetailsVM', this);
   }
 
   componentWillUnmount() {
@@ -106,10 +108,7 @@ class MovieFilter extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-    // Combine state from back-end with local state.
-    // This can be more concise using Object.assign if not for IE 11 support.
-    var state = this.context.connect('MovieFilterVM', this) || {};
-    var localState = {
+    this.state = {
       filters: [],
       filterId: 0,
       filter: 'Any',
@@ -117,8 +116,7 @@ class MovieFilter extends React.Component {
       operations: [ 'contains' ],
       text: ''
     };
-    for (var prop in localState) state[prop] = localState[prop];
-    this.state = state;
+    this.context.connect('MovieFilterVM', this);
   }
 
   componentWillUnmount() {
