@@ -1,26 +1,54 @@
 import React from 'react';
 import dotnetify from 'dotnetify';
 import TextBox from '../components/TextBox';
-//import { ChatRoomCss } from "../components/css";
+import { ChatRoomCss } from '../components/css';
 
 class ChatRoom extends React.Component {
-  constructor(props) {
-    super(props);
+	constructor(props) {
+		super(props);
+		this.state = { Messages: [], message: '' };
 
-    // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect('ChatLobbyVM', this);
+		this.vm = dotnetify.react.connect('ChatLobbyVM', this);
+		this.dispatchState = state => this.vm.$dispatch(state);
+	}
 
-    // Set up function to dispatch state to the back-end.
-    this.dispatchState = state => this.vm.$dispatch(state);
-  }
+	componentWillUnmount() {
+		this.vm.$destroy();
+	}
 
-  componentWillUnmount() {
-    this.vm.$destroy();
-  }
+	sendMessage(text) {
+		this.dispatchState({
+			Send: {
+				Text: text,
+				Date: new Date()
+			}
+		});
+	}
 
-  render() {
-    return <div />;
-  }
+	render() {
+		return (
+			<ChatRoomCss>
+				<section>
+					{this.state.Messages.map(msg => (
+						<div>
+							<div>{msg.Date}</div>
+							<div>{msg.UserName}</div>
+							<div>{msg.Browser}</div>
+							<div>{msg.Text}</div>
+						</div>
+					))}
+				</section>
+				<footer>
+					<TextBox
+						placeholder="Type message"
+						value={this.state.message}
+						onChange={value => this.setState({ message: value })}
+						onUpdate={value => this.sendMessage(value)}
+					/>
+				</footer>
+			</ChatRoomCss>
+		);
+	}
 }
 
 export default ChatRoom;

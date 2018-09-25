@@ -49,7 +49,8 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Bogus" Version="22.1.3" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.2.4" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.8.17" />        
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.8.17" />
+    <PackageReference Include="UAParser" Version="3.0.0" />        
   </ItemGroup>
 
   <ItemGroup>
