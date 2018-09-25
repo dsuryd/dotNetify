@@ -1,54 +1,83 @@
 import React from 'react';
-import dotnetify from 'dotnetify';
+import PropTypes from 'prop-types';
+import dotnetify, { Scope } from 'dotnetify';
 import TextBox from '../components/TextBox';
 import { ChatRoomCss } from '../components/css';
 
-class ChatRoom extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = { Messages: [], message: '' };
+class ChatLobby extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { Users: [], Messages: [], message: '' };
 
-		this.vm = dotnetify.react.connect('ChatLobbyVM', this);
-		this.dispatchState = state => this.vm.$dispatch(state);
-	}
+    this.vm = dotnetify.react.connect('ChatLobbyVM', this);
+  }
 
-	componentWillUnmount() {
-		this.vm.$destroy();
-	}
+  componentDidMount() {
+    this.vm.$dispatch({ AddUser: null });
+  }
 
-	sendMessage(text) {
-		this.dispatchState({
-			Send: {
-				Text: text,
-				Date: new Date()
-			}
-		});
-	}
+  componentWillUnmount() {
+    this.vm.$dispatch({ RemoveUser: null });
+    this.vm.$destroy();
+  }
 
-	render() {
-		return (
-			<ChatRoomCss>
-				<section>
-					{this.state.Messages.map(msg => (
-						<div>
-							<div>{msg.Date}</div>
-							<div>{msg.UserName}</div>
-							<div>{msg.Browser}</div>
-							<div>{msg.Text}</div>
-						</div>
-					))}
-				</section>
-				<footer>
-					<TextBox
-						placeholder="Type message"
-						value={this.state.message}
-						onChange={value => this.setState({ message: value })}
-						onUpdate={value => this.sendMessage(value)}
-					/>
-				</footer>
-			</ChatRoomCss>
-		);
-	}
+  render() {
+    return (
+      <ChatRoomCss>
+        <nav>{this.state.Users.map(user => <div key={user.Id}>{user.Name}</div>)}</nav>
+        <Scope vm="ChatLobbyVM">
+          <ChatRoom />
+        </Scope>
+      </ChatRoomCss>
+    );
+  }
 }
 
-export default ChatRoom;
+class ChatRoom extends React.Component {
+  static contextTypes = { connect: PropTypes.func };
+
+  constructor(props, context) {
+    super(props, context);
+    this.state = { Users: [], Messages: [], message: '' };
+
+    this.context.connect('ChatRoomVM', this);
+  }
+
+  componentWillUnmount() {
+    this.vm.$destroy();
+  }
+
+  sendMessage(text) {
+    this.dispatchState({
+      Send: {
+        Text: text,
+        Date: new Date()
+      }
+    });
+  }
+
+  render() {
+    return (
+      <section>
+        <div>
+          {this.state.Messages.map(msg => (
+            <div>
+              <div>{msg.Date}</div>
+              <div>{msg.UserName}</div>
+              <div>{msg.Browser}</div>
+              <div>{msg.Text}</div>
+            </div>
+          ))}
+        </div>
+        <TextBox
+          placeholder="Type message"
+          value={this.state.message}
+          onChange={value => this.setState({ message: value })}
+          onUpdate={value => this.sendMessage(value)}
+        />
+      </section>
+    );
+  }
+}
+
+export default ChatLobby;

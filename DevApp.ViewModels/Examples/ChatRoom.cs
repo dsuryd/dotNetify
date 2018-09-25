@@ -36,7 +36,7 @@ namespace DotNetify.DevApp
 
    public class ChatUser
    {
-      private static int _nameGenerator = 1;
+      private int _nameGenerator = 1;
 
       public string Id { get; set; }
       public string Name { get; set; }
@@ -106,7 +106,7 @@ namespace DotNetify.DevApp
          lock (_chatRooms)
          {
             if (!_chatRooms.ContainsKey(room))
-               _chatRooms.Add(vmInstanceId, new ChatRoomVM(_connectionContext, Users.Where(x => x.Room == room).ToList()));
+               _chatRooms.Add(room, new ChatRoomVM(_connectionContext, Users.Where(x => x.Room == room).ToList()));
 
             return _chatRooms[room];
          }

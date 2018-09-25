@@ -38,6 +38,7 @@ namespace DotNetify
       /// <summary>
       /// Determine whether the view model can be shared with the calling VMController.
       /// </summary>
+      [Ignore]
       public abstract bool IsMember { get; }
 
       /// <summary>
