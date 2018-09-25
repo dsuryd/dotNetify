@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System.Net;
+
 namespace DotNetify
 {
    /// <summary>
@@ -22,13 +24,53 @@ namespace DotNetify
    public interface IConnectionContext
    {
       /// <summary>
-      /// HTTP request headers.
-      /// </summary>
-      dynamic HttpRequestHeaders { get; }
-
-      /// <summary>
       /// HTTP connection info.
       /// </summary>
-      dynamic HttpConnection { get; }
+      HttpConnection HttpConnection { get; }
+
+      /// <summary>
+      /// HTTP request headers.
+      /// </summary>
+      HttpRequestHeaders HttpRequestHeaders { get; }
+   }
+
+   /// <summary>
+   /// Provides HTTP request headers from the initial connection.
+   /// </summary>
+   public class HttpRequestHeaders
+   {
+      public dynamic AllHeaders { get; }
+
+      /// <summary>
+      /// Browser's user agent.
+      /// </summary>
+      public string UserAgent { get; }
+
+      public HttpRequestHeaders(dynamic allHeaders, string userAgent)
+      {
+         AllHeaders = allHeaders;
+         UserAgent = userAgent;
+      }
+   }
+
+   /// <summary>
+   /// Provides the same information as IHttpConnectionFeature.
+   /// </summary>
+   public class HttpConnection
+   {
+      public string ConnectionId { get; }
+      public IPAddress LocalIpAddress { get; }
+      public IPAddress RemoteIpAddress { get; }
+      public int LocalPort { get; }
+      public int RemotePort { get; }
+
+      public HttpConnection(string connectionId, IPAddress localIpAddress, int localPort, IPAddress remoteIpAddress, int remotePort)
+      {
+         ConnectionId = connectionId;
+         LocalIpAddress = localIpAddress;
+         RemoteIpAddress = remoteIpAddress;
+         LocalPort = localPort;
+         RemotePort = remotePort;
+      }
    }
 }

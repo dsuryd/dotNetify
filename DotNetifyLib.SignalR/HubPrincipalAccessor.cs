@@ -54,31 +54,33 @@ namespace DotNetify
       /// <summary>
       /// HTTP request headers.
       /// </summary>
-      public dynamic HttpRequestHeaders
+      public HttpRequestHeaders HttpRequestHeaders
       {
          get
          {
             var httpContext = CallerContext?.Features.Get<IHttpContextFeature>();
-            return httpContext != null ? JObject.Parse(JsonConvert.SerializeObject(httpContext.HttpContext.Request.Headers)) : null;
+            return httpContext != null ? new HttpRequestHeaders(
+               allHeaders: JObject.Parse(JsonConvert.SerializeObject(httpContext.HttpContext?.Request?.Headers)),
+               userAgent: httpContext.HttpContext?.Request?.Headers["User-Agent"]
+               ) : null;
          }
       }
 
       /// <summary>
       /// HTTP connection info.
       /// </summary>
-      public dynamic HttpConnection
+      public HttpConnection HttpConnection
       {
          get
          {
-            var httpConnection = CallerContext?.Features.Get<IHttpConnectionFeature>();
-            return httpConnection != null ? new JObject
-            {
-               ["LocalIpAddress"] = httpConnection.LocalIpAddress.ToString(),
-               ["LocalPort"] = httpConnection.LocalPort,
-               ["RemoteIpAddress"] = httpConnection.RemoteIpAddress.ToString(),
-               ["RemotePort"] = httpConnection.RemotePort,
-               ["ConnectionId"] = httpConnection.ConnectionId
-            } : null;
+            var feature = CallerContext?.Features.Get<IHttpConnectionFeature>();
+            return feature != null ? new HttpConnection(
+               connectionId: feature.ConnectionId,
+               localIpAddress: feature.LocalIpAddress,
+               remoteIpAddress: feature.RemoteIpAddress,
+               localPort: feature.LocalPort,
+               remotePort: feature.RemotePort
+               ) : null;
          }
       }
    }
