@@ -41,11 +41,15 @@ namespace UnitTests
       private readonly string _vmId;
       private readonly VMController _vmController;
       private readonly IVMFactory _vmFactory = new VMFactory(new MemoryCache());
+      private string _connectionId;
+      private static int IdCount = 1;
 
       public event EventHandler<string> OnResponse;
 
       public MockVMController(IVMFactory vmFactory) : this()
       {
+         _connectionId = $"conn{IdCount++}";
+
          _vmController = new VMController((connectionId, vmId, vmData) =>
          {
             _response.Handler(connectionId, vmId, vmData);
@@ -73,27 +77,27 @@ namespace UnitTests
       public Response RequestVM()
       {
          _response.Reset();
-         _vmController.OnRequestVM("conn1", _vmId);
+         _vmController.OnRequestVM(_connectionId, _vmId);
          return _response;
       }
 
       public Response RequestVM(string vmId, object vmArg = null)
       {
          _response.Reset();
-         _vmController.OnRequestVM("conn1", vmId, vmArg);
+         _vmController.OnRequestVM(_connectionId, vmId, vmArg);
          return _response;
       }
 
       public JObject UpdateVM(Dictionary<string, object> update, string vmId = null)
       {
          _response.Reset();
-         _vmController.OnUpdateVM("conn1", vmId ?? _vmId, update);
+         _vmController.OnUpdateVM(_connectionId, vmId ?? _vmId, update);
          return _response.VMData;
       }
 
       public void DisposeVM(string vmId = null)
       {
-         _vmController.OnDisposeVM("conn1", vmId ?? _vmId);
+         _vmController.OnDisposeVM(_connectionId, vmId ?? _vmId);
       }
 
       public static IVMFactory GetVMFactory() => new VMFactory(new MemoryCache());

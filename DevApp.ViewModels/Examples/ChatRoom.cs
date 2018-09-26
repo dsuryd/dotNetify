@@ -46,7 +46,7 @@ namespace DotNetify.DevApp
 
       public ChatUser(IConnectionContext connectionContext)
       {
-         Id = connectionContext.HttpConnection.ConnectionId;
+         Id = ToUserId(connectionContext);
          Name = $"user{Interlocked.Increment(ref _nameGenerator)}";
          IpAddress = connectionContext.HttpConnection.RemoteIpAddress.ToString();
 
@@ -54,74 +54,21 @@ namespace DotNetify.DevApp
          if (browserInfo != null)
             Browser = $"{browserInfo.UserAgent.Family}/{browserInfo.OS.Family} {browserInfo.OS.Major}";
       }
+
+      public static string ToUserId(IConnectionContext connectionContext) => connectionContext.HttpConnection.ConnectionId;
    }
 
-   public class ChatLobbyVM : MulticastVM
+   public class ChatRoomVM : MulticastVM
    {
       private readonly IConnectionContext _connectionContext;
-
-      private Dictionary<string, ChatRoomVM> _chatRooms = new Dictionary<string, ChatRoomVM>();
 
       public override bool IsMember => true;
-
-      public List<ChatUser> Users { get; } = new List<ChatUser>();
-
-      public string Users_itemKey => nameof(ChatUser.Id);
-
-      public Action<object> AddUser => _ =>
-      {
-         var user = new ChatUser(_connectionContext);
-         Users.Add(user);
-         this.AddList(nameof(Users), user);
-         if (_chatRooms.ContainsKey(user.Room))
-            _chatRooms[user.Room].AddUser(user);
-      };
-
-      public Action RemoveUser => () =>
-      {
-         var user = Users.FirstOrDefault(x => x.Id == _connectionContext.HttpConnection.ConnectionId);
-         Users.Remove(user);
-         this.RemoveList(nameof(Users), user);
-         if (_chatRooms.ContainsKey(user.Room))
-            _chatRooms[user.Room].RemoveUser(user);
-      };
-
-      public Action<string> ChangeRoom => room =>
-      {
-         var user = Users.FirstOrDefault(x => x.Id == _connectionContext.HttpConnection.ConnectionId);
-         user.Room = room;
-         this.UpdateList(nameof(Users), user);
-      };
-
-      public ChatLobbyVM(IConnectionContext connectionContext)
-      {
-         _connectionContext = connectionContext;
-      }
-
-      public override BaseVM GetSubVM(string vmTypeName, string vmInstanceId)
-      {
-         if (vmTypeName != nameof(ChatRoomVM)) return null;
-
-         var room = vmInstanceId ?? "Lobby";
-         lock (_chatRooms)
-         {
-            if (!_chatRooms.ContainsKey(room))
-               _chatRooms.Add(room, new ChatRoomVM(_connectionContext, Users.Where(x => x.Room == room).ToList()));
-
-            return _chatRooms[room];
-         }
-      }
-   }
-
-   public class ChatRoomVM : BaseVM
-   {
-      private readonly IConnectionContext _connectionContext;
 
       public List<ChatMessage> Messages { get; } = new List<ChatMessage>();
 
       public string Messages_itemKey => nameof(ChatMessage.Id);
 
-      public List<ChatUser> Users { get; private set; }
+      public List<ChatUser> Users { get; } = new List<ChatUser>();
 
       public string Users_itemKey => nameof(ChatUser.Id);
 
@@ -136,27 +83,23 @@ namespace DotNetify.DevApp
          }
       };
 
-      public Action<ChatUser> AddUser => user =>
+      public Action<object> AddUser => _ =>
       {
-         if (Users.Any(x => x.Id == user.Id)) return;
+         var user = new ChatUser(_connectionContext);
          Users.Add(user);
          this.AddList(nameof(Users), user);
       };
 
-      public Action<ChatUser> RemoveUser => user =>
+      public Action RemoveUser => () =>
       {
-         var roomUser = Users.FirstOrDefault(x => x.Id == user.Id);
-         if (roomUser != null)
-         {
-            Users.Remove(roomUser);
-            this.RemoveList(nameof(Users), roomUser);
-         }
+         var user = Users.FirstOrDefault(x => x.Id == ChatUser.ToUserId(_connectionContext));
+         Users.Remove(user);
+         this.RemoveList(nameof(Users), user);
       };
 
-      public ChatRoomVM(IConnectionContext connectionContext, List<ChatUser> users)
+      public ChatRoomVM(IConnectionContext connectionContext)
       {
          _connectionContext = connectionContext;
-         Users = users;
       }
    }
 }

@@ -296,24 +296,22 @@ namespace DotNetify
       /// <summary>
       /// Serializes the instance into JSON-formatted string.
       /// </summary>
-      /// <param name="data">Optional data to be serialized.</param>
-      /// <returns>Serialized string.</returns>
-      internal string Serialize(object data = null)
+      /// <returns>Serialized instance string.</returns>
+      internal string Serialize()
       {
          var serializer = _vmInstance as ISerializer ?? this;
-         return serializer.Serialize(data ?? _vmInstance, IgnoredProperties);
+         return serializer.Serialize(_vmInstance, IgnoredProperties);
       }
 
       /// <summary>
-      /// Serializes only changed properties into JSON-formatted string.
+      /// Serializes data into JSON-formatted string.
       /// </summary>
-      /// <returns>Serialized string.</returns>
-      internal string SerializeChangedProperties()
+      /// <param name="data">Data to be serialized.</param>
+      /// <returns>Serialized data string.</returns>
+      internal string Serialize(object data)
       {
-         IDictionary<string, object> changedProperties = AcceptChangedProperties();
-
          var serializer = _vmInstance as ISerializer ?? this;
-         return changedProperties != null ? serializer.Serialize(changedProperties, null) : string.Empty;
+         return data != null ? serializer.Serialize(data, IgnoredProperties) : null;
       }
 
       /// <summary>

@@ -73,14 +73,26 @@ namespace DotNetify
       protected internal class VMInfo
       {
          /// <summary>
-         /// Instance of a view model.
+         /// Identifies the view model.
          /// </summary>
-         public BaseVM Instance { get; set; }
+         public string Id { get; }
+
+         /// <summary>
+         /// Instance of the view model.
+         /// </summary>
+         public BaseVM Instance { get; }
 
          /// <summary>
          /// Identifies the SignalR connection to the browser client associated with the view model.
          /// </summary>
          public string ConnectionId { get; set; }
+
+         public VMInfo(string id, BaseVM instance, string connectionId)
+         {
+            Id = id;
+            Instance = instance;
+            ConnectionId = connectionId;
+         }
       }
 
       /// <summary>
@@ -147,6 +159,8 @@ namespace DotNetify
          foreach (var kvp in _activeVMs)
          {
             kvp.Value.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
+            if (kvp.Value.Instance is IMulticast)
+               (kvp.Value.Instance as IMulticast).RequestMulticastPushUpdates -= VMInstance_RequestMulticastPushUpdates;
             kvp.Value.Instance.Dispose();
          }
 
@@ -189,14 +203,17 @@ namespace DotNetify
             // Add the view model instance to the controller.
             if (!_activeVMs.ContainsKey(vmId))
             {
-               _activeVMs.TryAdd(vmId, new VMInfo { Instance = vmInstance, ConnectionId = connectionId });
+               _activeVMs.TryAdd(vmId, new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId));
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
+               if (vmInstance is IMulticast)
+                  (vmInstance as IMulticast).RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
             }
             else
                _activeVMs[vmId].ConnectionId = connectionId;
 
             // If this request causes other view models to change, push those new values back to the client.
-            PushUpdates();
+            foreach (var vmInfo in _activeVMs.Values)
+               PushUpdates(vmInfo);
          });
       }
 
@@ -231,21 +248,34 @@ namespace DotNetify
             }
 
             // If the updates cause some properties of this and other view models to change, push those new values back to the client.
-            // For multicast view models, use their PushUpdates method to push to any other connected clients.
-            if (vmInstance is MulticastVM)
-               vmInstance.PushUpdates();
-            else
+            lock (vmInstance)
             {
+               var vmInfo = _activeVMs.Values.FirstOrDefault(vm => vm.Instance == vmInstance);
+               var changedProperties = new Dictionary<string, object>(vmInstance.ChangedProperties);
+
                // Unless the view model was recreated, exclude the changes that trigger this update if their values don't change.
                if (!isRecreated)
                {
                   foreach (var kvp in data)
                      if (vmInstance.IsEqualToChangedPropertyValue(kvp.Key, kvp.Value))
-                        vmInstance.ChangedProperties.TryRemove(kvp.Key, out object dummy);
+                        changedProperties.Remove(kvp.Key);
                }
 
-               PushUpdates();
+               if (changedProperties.Count > 0)
+               {
+                  var vmData = vmInstance.Serialize(changedProperties);
+                  PushUpdates(vmInfo, vmData);
+               }
+
+               if (vmInstance is IMulticast)
+                  (vmInstance as IMulticast).PushUpdates(vmInfo.ConnectionId);
+               else
+                  vmInstance.AcceptChangedProperties();
             }
+
+            // Push updates on other view model instances in case they too change.
+            foreach (var vmInfo in _activeVMs.Values.Where(vm => vm.Instance != vmInstance))
+               PushUpdates(vmInfo);
          });
       }
 
@@ -305,7 +335,7 @@ namespace DotNetify
                if (!_activeVMs.ContainsKey(masterVMId))
                {
                   masterVM = CreateVM(masterVMId, null, vmNamespace);
-                  _activeVMs.TryAdd(masterVMId, new VMInfo { Instance = masterVM });
+                  _activeVMs.TryAdd(masterVMId, new VMInfo(id: masterVMId, instance: masterVM, connectionId: null));
                }
                else
                   masterVM = _activeVMs[masterVMId].Instance;
@@ -351,25 +381,39 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Push property changed updates on all view models back to the client.
+      /// Push property changed updates on a view model back to the client.
       /// </summary>
-      protected virtual void PushUpdates()
+      /// <param name="vmInfo">View model.</param>
+      protected virtual void PushUpdates(VMInfo vmInfo)
       {
-         foreach (var kvp in _activeVMs)
+         var vmInstance = vmInfo.Instance;
+         if (vmInstance is IMulticast)
+            vmInstance.PushUpdates();
+         else
          {
-            var vmInstance = kvp.Value.Instance;
             lock (vmInstance)
             {
-               var vmData = vmInstance.SerializeChangedProperties();
-               if (!string.IsNullOrEmpty(vmData))
-               {
-                  ResponseVMFilter.Invoke(kvp.Key, vmInstance, vmData, filteredData =>
-                  {
-                     _vmResponse(kvp.Value.ConnectionId, kvp.Key, (string)filteredData);
-                  });
-               }
+               var changedProperties = vmInstance.AcceptChangedProperties();
+               if (changedProperties != null && changedProperties.Count > 0)
+                  PushUpdates(vmInfo, vmInstance.Serialize(changedProperties));
             }
          }
+      }
+
+      /// <summary>
+      /// Push property changed updates on a view model back to the client.
+      /// </summary>
+      /// <param name="vmInfo">View model.</param>
+      /// <param name="vmData">Serialized data to be pushed. If null, it's coming from the view model.</param>
+      protected virtual void PushUpdates(VMInfo vmInfo, string vmData)
+      {
+         if (string.IsNullOrEmpty(vmData))
+            return;
+
+         ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, vmData, filteredData =>
+         {
+            _vmResponse(vmInfo.ConnectionId, vmInfo.Id, (string)filteredData);
+         });
       }
 
       /// <summary>
@@ -395,7 +439,36 @@ namespace DotNetify
       /// </summary>
       private void VmInstance_RequestPushUpdates(object sender, EventArgs e)
       {
-         PushUpdates();
+         foreach (var vmInfo in _activeVMs.Values)
+            PushUpdates(vmInfo);
+      }
+
+      /// <summary>
+      /// Handles multicast push updates request from a multicast view model.
+      /// </summary>
+      private void VMInstance_RequestMulticastPushUpdates(object sender, MulticastPushUpdatesEventArgs e)
+      {
+         var vmInstance = sender as MulticastVM;
+         var vmInfo = _activeVMs.FirstOrDefault(kvp => kvp.Value.Instance == vmInstance).Value;
+
+         if (e.CanPush)
+         {
+            lock (vmInstance)
+            {
+               var changedProperties = vmInstance.AcceptChangedProperties();
+               if (changedProperties != null && changedProperties.Count > 0 && vmInfo != null)
+               {
+                  var vmData = vmInstance.Serialize(changedProperties);
+                  ResponseVMFilter.Invoke(vmInfo.Id, vmInstance, vmData, filteredData =>
+                  {
+                     foreach (var connectionId in e.ConnectionIds)
+                        _vmResponse(connectionId, vmInfo.Id, (string)filteredData);
+                  });
+               }
+            }
+         }
+         else if (e.ExcludedConnectionId != vmInfo.ConnectionId)
+            e.ConnectionIds.Add(vmInfo.ConnectionId);
       }
    }
 }

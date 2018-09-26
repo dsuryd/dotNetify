@@ -15,7 +15,6 @@ limitations under the License.
  */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -31,20 +30,21 @@ namespace DotNetify
       private int _reference = 1;
 
       /// <summary>
-      /// Keeps changed properties to be multicasted to connected clients.
-      /// </summary>
-      private IDictionary<string, object> _changedProperties;
-
-      /// <summary>
       /// Determine whether the view model can be shared with the calling VMController.
       /// </summary>
       [Ignore]
       public abstract bool IsMember { get; }
 
       /// <summary>
+      /// Occurs when the view model wants to push updates to all associated clients.
+      /// This event is handled by the VMController.
+      /// </summary>
+      public event EventHandler<MulticastPushUpdatesEventArgs> RequestMulticastPushUpdates;
+
+      /// <summary>
       /// Increment reference count.
       /// </summary>
-      public void AddRef()
+      internal void AddRef()
       {
          Interlocked.Increment(ref _reference);
       }
@@ -59,22 +59,30 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overrides the base method to cache the changed properties before it gets cleared.
+      /// Overrides the base method to call the specialized multicast push updates method.
       /// </summary>
       public override void PushUpdates()
       {
-         _changedProperties = new Dictionary<string, object>(ChangedProperties);
-         base.PushUpdates();
-         base.AcceptChangedProperties();
+         PushUpdates(null);
       }
 
       /// <summary>
-      /// Overrides the base method to return the cached changed properties.
+      /// Pushes changed properties to all associated clients, excluding the given connection.
       /// </summary>
-      /// <returns>Changed properties.</returns>
-      internal override IDictionary<string, object> AcceptChangedProperties()
+      /// <param name="excludedConnectionId">Connection to exclude.</param>
+      public void PushUpdates(string excludedConnectionId)
       {
-         return _changedProperties;
+         var delegates = RequestMulticastPushUpdates.GetInvocationList().ToList();
+         if (delegates != null && delegates.Count > 0)
+         {
+            // First invocation cycle is to get the participating connection Ids from the VMControllers.
+            var eventArgs = new MulticastPushUpdatesEventArgs { ExcludedConnectionId = excludedConnectionId };
+            RequestMulticastPushUpdates?.Invoke(this, eventArgs);
+
+            // Invoke the first event handler to do the real data push.
+            eventArgs.CanPush = true;
+            delegates.First().DynamicInvoke(this, eventArgs);
+         }
       }
    }
 }
