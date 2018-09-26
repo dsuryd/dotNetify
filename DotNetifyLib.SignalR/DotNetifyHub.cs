@@ -100,6 +100,9 @@ namespace DotNetify
       /// <returns></returns>
       public override Task OnDisconnectedAsync(Exception exception)
       {
+         // Access VMController to set the ambient context.
+         var controller = VMController;
+
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(Context.ConnectionId);
 
@@ -198,8 +201,16 @@ namespace DotNetify
       /// <param name="vmData">View model data in serialized JSON.</param>
       internal void Response_VM(string connectionId, string vmId, string vmData)
       {
-         if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
-            _globalHubContext.Clients.Client(connectionId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
+         if (connectionId.StartsWith("group$"))
+         {
+            string groupId = connectionId.Split(new char[] { '$' }, 2)[1];
+            _globalHubContext.Clients.Group(groupId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
+         }
+         else
+         {
+            if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
+               _globalHubContext.Clients.Client(connectionId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
+         }
       }
 
       #endregion Server Responses
