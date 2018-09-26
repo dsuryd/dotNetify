@@ -97,14 +97,17 @@ namespace UnitTests
       {
          MulticastTestVM.MemberTest = () => true;
 
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory);
-
          dynamic responseData1 = null;
          dynamic responseData2 = null;
-         vmController1.OnResponse += (sender, data) => responseData1 = JObject.Parse(data);
-         vmController2.OnResponse += (sender, data) => responseData2 = JObject.Parse(data);
+         Action<string, string> responseDelegate = (connId, data) =>
+         {
+            if (connId == "conn1") responseData1 = JObject.Parse(data);
+            else if (connId == "conn2") responseData2 = JObject.Parse(data);
+         };
+
+         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
+         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory, "conn1", responseDelegate);
+         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory, "conn2", responseDelegate);
 
          vmController1.RequestVM();
          vmController2.RequestVM();
@@ -113,12 +116,12 @@ namespace UnitTests
          vm.PushMessage("Goodbye");
 
          Assert.AreEqual("Goodbye", responseData1.Message.Value);
-         // Assert.AreEqual("Goodbye", responseData2.Message.Value);
+         Assert.AreEqual("Goodbye", responseData2.Message.Value);
 
          vm.PushMessage("World");
 
          Assert.AreEqual("World", responseData1.Message.Value);
-         //Assert.AreEqual("World", responseData2.Message.Value);
+         Assert.AreEqual("World", responseData2.Message.Value);
       }
 
       [TestMethod]
@@ -126,14 +129,17 @@ namespace UnitTests
       {
          MulticastTestVM.MemberTest = () => true;
 
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory);
-
          dynamic responseData1 = null;
          dynamic responseData2 = null;
-         vmController1.OnResponse += (sender, data) => responseData1 = JObject.Parse(data);
-         vmController2.OnResponse += (sender, data) => responseData2 = JObject.Parse(data);
+         Action<string, string> responseDelegate = (connId, data) =>
+         {
+            if (connId == "conn1") responseData1 = JObject.Parse(data);
+            else if (connId == "conn2") responseData2 = JObject.Parse(data);
+         };
+
+         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
+         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory, "conn1", responseDelegate);
+         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory, "conn2", responseDelegate);
 
          vmController1.RequestVM();
          vmController2.RequestVM();
@@ -141,12 +147,12 @@ namespace UnitTests
          var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Goodbye" } };
          vmController1.UpdateVM(update);
 
-         //Assert.AreEqual("Goodbye", responseData2.Message.Value);
+         Assert.AreEqual("Goodbye", responseData2.Message.Value);
 
          update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Adios" } };
          vmController2.UpdateVM(update);
 
-         //Assert.AreEqual("Adios", responseData1.Message.Value);
+         Assert.AreEqual("Adios", responseData1.Message.Value);
       }
    }
 }

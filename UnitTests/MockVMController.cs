@@ -46,14 +46,17 @@ namespace UnitTests
 
       public event EventHandler<string> OnResponse;
 
-      public MockVMController(IVMFactory vmFactory) : this()
+      public MockVMController(IVMFactory vmFactory, string hubConnectionId = null, Action<string, string> responseDelegate = null) : this()
       {
-         _connectionId = $"conn{IdCount++}";
+         _connectionId = hubConnectionId ?? $"conn{IdCount++}";
 
          _vmController = new VMController((connectionId, vmId, vmData) =>
          {
             _response.Handler(connectionId, vmId, vmData);
-            OnResponse?.Invoke(this, vmData);
+            if (responseDelegate != null)
+               responseDelegate(connectionId, vmData);
+            else
+               OnResponse?.Invoke(this, vmData);
          }, vmFactory);
       }
 
