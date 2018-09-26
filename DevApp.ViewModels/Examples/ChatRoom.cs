@@ -36,7 +36,7 @@ namespace DotNetify.DevApp
 
    public class ChatUser
    {
-      private int _nameGenerator = 1;
+      private static int _nameGenerator = 1;
 
       public string Id { get; set; }
       public string Name { get; set; }
@@ -93,13 +93,24 @@ namespace DotNetify.DevApp
       public Action RemoveUser => () =>
       {
          var user = Users.FirstOrDefault(x => x.Id == ChatUser.ToUserId(_connectionContext));
-         Users.Remove(user);
-         this.RemoveList(nameof(Users), user);
+         if (user != null)
+         {
+            Users.Remove(user);
+            this.RemoveList(nameof(Users), user);
+         }
       };
 
       public ChatRoomVM(IConnectionContext connectionContext)
       {
          _connectionContext = connectionContext;
+      }
+
+      public override void Dispose()
+      {
+         RemoveUser();
+         PushUpdates();
+
+         base.Dispose();
       }
    }
 }

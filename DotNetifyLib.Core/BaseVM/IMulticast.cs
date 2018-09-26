@@ -42,10 +42,24 @@ namespace DotNetify
       void PushUpdates(string excludedConnectionId);
    }
 
+   /// <summary>
+   /// Event arguments used by a multicast view model to request push updates.
+   /// </summary>
    public class MulticastPushUpdatesEventArgs : EventArgs
    {
+      /// <summary>
+      /// Identifies the connections to push the data to.
+      /// </summary>
       public IList<string> ConnectionIds { get; } = new List<string>();
+
+      /// <summary>
+      /// Connection to exclude.
+      /// </summary>
       public string ExcludedConnectionId { get; set; }
-      public bool CanPush { get; set; }
+
+      /// <summary>
+      /// Whether to push the data.
+      /// </summary>
+      public bool PushData { get; set; }
    }
 }

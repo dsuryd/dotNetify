@@ -448,15 +448,17 @@ namespace DotNetify
       /// </summary>
       private void VMInstance_RequestMulticastPushUpdates(object sender, MulticastPushUpdatesEventArgs e)
       {
-         var vmInstance = sender as MulticastVM;
-         var vmInfo = _activeVMs.FirstOrDefault(kvp => kvp.Value.Instance == vmInstance).Value;
+         var vmInfo = _activeVMs.FirstOrDefault(kvp => kvp.Value.Instance == sender).Value;
+         if (vmInfo == null)
+            return;
 
-         if (e.CanPush)
+         if (e.PushData)
          {
+            var vmInstance = vmInfo.Instance;
             lock (vmInstance)
             {
                var changedProperties = vmInstance.AcceptChangedProperties();
-               if (changedProperties != null && changedProperties.Count > 0 && vmInfo != null)
+               if (changedProperties != null && changedProperties.Count > 0)
                {
                   var vmData = vmInstance.Serialize(changedProperties);
                   ResponseVMFilter.Invoke(vmInfo.Id, vmInstance, vmData, filteredData =>
@@ -465,6 +467,7 @@ namespace DotNetify
                         _vmResponse(connectionId, vmInfo.Id, (string)filteredData);
                   });
                }
+               e.PushData = false;
             }
          }
          else if (e.ExcludedConnectionId != vmInfo.ConnectionId)

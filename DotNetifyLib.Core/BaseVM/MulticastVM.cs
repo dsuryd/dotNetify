@@ -72,16 +72,22 @@ namespace DotNetify
       /// <param name="excludedConnectionId">Connection to exclude.</param>
       public void PushUpdates(string excludedConnectionId)
       {
-         var delegates = RequestMulticastPushUpdates.GetInvocationList().ToList();
+         var delegates = RequestMulticastPushUpdates?.GetInvocationList().ToList();
          if (delegates != null && delegates.Count > 0)
          {
             // First invocation cycle is to get the participating connection Ids from the VMControllers.
             var eventArgs = new MulticastPushUpdatesEventArgs { ExcludedConnectionId = excludedConnectionId };
             RequestMulticastPushUpdates?.Invoke(this, eventArgs);
 
-            // Invoke the first event handler to do the real data push.
-            eventArgs.CanPush = true;
-            delegates.First().DynamicInvoke(this, eventArgs);
+            // Invoke the first available event handler to do the actual data push.
+            // If successful, the handler will set the PushData back to false.
+            eventArgs.PushData = true;
+            foreach (var d in delegates)
+            {
+               d.DynamicInvoke(this, eventArgs);
+               if (!eventArgs.PushData)
+                  break;
+            }
          }
       }
    }
