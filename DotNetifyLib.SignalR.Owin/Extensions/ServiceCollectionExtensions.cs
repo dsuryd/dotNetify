@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,16 +29,19 @@ namespace DotNetify
 
          // Use built-in DI to inject the dotNetify's view model controller factory to the dotNetify's SignalR hub.
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
+         services.AddSingleton<IVMFactory, VMFactory>();
 
          // Add service to get the hub principal.
          try
          {
             services.AddScoped<IPrincipalAccessor, HubPrincipalAccessor>();
+            services.AddScoped<IConnectionContext, HubPrincipalAccessor>();
             services.AddScoped<IHubPipeline, HubPipeline>();
          }
-         catch(NotImplementedException)
+         catch (NotImplementedException)
          {
             services.AddTransient<IPrincipalAccessor, HubPrincipalAccessor>();
+            services.AddTransient<IConnectionContext, HubPrincipalAccessor>();
             services.AddTransient<IHubPipeline, HubPipeline>();
          }
 

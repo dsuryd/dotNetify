@@ -52,8 +52,7 @@ namespace DotNetify
       {
          get
          {
-            if (_principalAccessor is HubPrincipalAccessor)
-               (_principalAccessor as HubPrincipalAccessor).Principal = Principal;
+            SetHubPrincipalAccessor();
 
             var vmController = _vmControllerFactory.GetInstance(Context.ConnectionId);
             vmController.RequestVMFilter = RunRequestingVMFilters;
@@ -97,6 +96,9 @@ namespace DotNetify
       /// <returns></returns>
       public override Task OnDisconnected(bool stopCalled)
       {
+         // Access VMController to set the ambient context.
+         var controller = VMController;
+
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(Context.ConnectionId);
 
@@ -192,8 +194,43 @@ namespace DotNetify
       /// <param name="vmData">View model data in serialized JSON.</param>
       internal void Response_VM(string connectionId, string vmId, string vmData)
       {
-         if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
-            Clients.Client(connectionId).Response_VM(vmId, vmData);
+         if (connectionId.StartsWith(VMController.MULTICAST))
+            HandleMulticastMessage(connectionId, vmId, vmData);
+         else
+         {
+            if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
+               Clients.Client(connectionId).Response_VM(vmId, vmData);
+         }
+      }
+
+      /// <summary>
+      /// Handles messages dealing with group multicasting.
+      /// </summary>
+      /// <param name="messageType">Message type.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="serializedMessage">Serialized message.</param>
+      internal void HandleMulticastMessage(string messageType, string vmId, string serializedMessage)
+      {
+         if (messageType.EndsWith(nameof(VMController.GroupSend)))
+         {
+            var message = JsonConvert.DeserializeObject<VMController.GroupSend>(serializedMessage);
+            if (string.IsNullOrEmpty(message.ExcludedConnectionId))
+               Clients.Group(message.GroupName).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
+            else
+            {
+               var excludedIds = new List<string> { message.ExcludedConnectionId };
+               Clients.Group(message.GroupName, excludedIds.ToArray()).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
+            }
+
+            // Touch the factory to push the timeout.
+            foreach (var connectionId in message.ConnectionIds)
+               _vmControllerFactory.GetInstance(connectionId);
+         }
+         else if (messageType.EndsWith(nameof(VMController.GroupRemove)))
+         {
+            var message = JsonConvert.DeserializeObject<VMController.GroupRemove>(serializedMessage);
+            Groups.Remove(message.ConnectionId, message.GroupName);
+         }
       }
 
       #endregion Server Responses
@@ -261,5 +298,18 @@ namespace DotNetify
       /// <param name="ex">Exception to serialize.</param>
       /// <returns>Serialized exception.</returns>
       private string SerializeException(Exception ex) => JsonConvert.SerializeObject(new { ExceptionType = ex.GetType().Name, Message = ex.Message });
+
+      /// <summary>
+      /// Sets the hub principal and connection context to the ambient accessor object.
+      /// </summary>
+      private void SetHubPrincipalAccessor()
+      {
+         if (_principalAccessor is HubPrincipalAccessor)
+         {
+            var hubPrincipalAccessor = _principalAccessor as HubPrincipalAccessor;
+            hubPrincipalAccessor.Principal = Principal;
+            hubPrincipalAccessor.CallerContext = Context;
+         }
+      }
    }
 }
