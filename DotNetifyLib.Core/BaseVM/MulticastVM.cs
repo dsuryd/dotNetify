@@ -22,12 +22,17 @@ namespace DotNetify
 {
    // Implements multicast view models.  A multicast view model can be connected to multiple views,
    // basically serving as a single data source for those views.
-   public abstract class MulticastVM : BaseVM, IMulticast
+   public class MulticastVM : BaseVM, IMulticast
    {
       /// <summary>
       /// Reference count of VMController instances.
       /// </summary>
       private int _reference = 1;
+
+      /// <summary>
+      /// Group name generated when this instance was created.
+      /// </summary>
+      private string _ownerGroupName;
 
       /// <summary>
       /// Optional multicast group name.
@@ -39,7 +44,7 @@ namespace DotNetify
       /// Determine whether the view model can be shared with the calling VMController.
       /// </summary>
       [Ignore]
-      public abstract bool IsMember { get; }
+      public virtual bool IsMember => _ownerGroupName == GroupName;
 
       /// <summary>
       /// Occurs when the view model wants to push updates to all associated clients.
@@ -53,6 +58,14 @@ namespace DotNetify
       internal void AddRef()
       {
          Interlocked.Increment(ref _reference);
+      }
+
+      /// <summary>
+      /// Default constructor.
+      /// </summary>
+      public MulticastVM() : base()
+      {
+         _ownerGroupName = GroupName;
       }
 
       /// <summary>

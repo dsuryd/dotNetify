@@ -31,7 +31,7 @@ namespace DotNetify
       event EventHandler<MulticastPushUpdatesEventArgs> RequestMulticastPushUpdates;
 
       /// <summary>
-      /// Optional multicast group name.
+      /// Multicast group name.
       /// </summary>
       string GroupName { get; }
 

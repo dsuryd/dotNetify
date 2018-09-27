@@ -63,8 +63,6 @@ namespace DotNetify.DevApp
    {
       private readonly IConnectionContext _connectionContext;
 
-      public override bool IsMember => true;
-
       public List<ChatMessage> Messages { get; } = new List<ChatMessage>();
 
       public string Messages_itemKey => nameof(ChatMessage.Id);
