@@ -30,13 +30,14 @@ namespace DotNetify.DevApp
    {
       public int Id { get; set; }
       public string UserId { get; set; }
+      public string UserName { get; set; }
       public DateTimeOffset Date { get; set; }
       public string Text { get; set; }
    }
 
    public class ChatUser
    {
-      private static int _nameGenerator = 1;
+      private static int _nameGenerator = 0;
 
       public string Id { get; set; }
       public string Name { get; set; }
@@ -74,10 +75,13 @@ namespace DotNetify.DevApp
 
       public Action<ChatMessage> Send => chat =>
       {
+         string userId = ChatUser.ToUserId(_connectionContext);
+
          lock (Messages)
          {
             chat.Id = Messages.Count + 1;
-            chat.UserId = _connectionContext.HttpConnection.ConnectionId;
+            chat.UserId = userId;
+            chat.UserName = UpdateUserName(userId, chat.UserName);
             Messages.Add(chat);
             this.AddList(nameof(Messages), chat);
          }
@@ -111,6 +115,21 @@ namespace DotNetify.DevApp
          PushUpdates();
 
          base.Dispose();
+      }
+
+      private string UpdateUserName(string userId, string userName)
+      {
+         var user = Users.FirstOrDefault(x => x.Id == userId);
+         if (user != null)
+         {
+            if (!string.IsNullOrEmpty(userName))
+            {
+               user.Name = userName;
+               this.UpdateList(nameof(Users), user);
+            }
+            return user.Name;
+         }
+         return userId;
       }
    }
 }

@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using DotNetify.Security;
+using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
@@ -128,7 +129,12 @@ namespace DotNetify
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
-               VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
+               string groupName = VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
+
+               // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
+               if (!string.IsNullOrEmpty(groupName))
+                  _globalHubContext.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+
                return Task.CompletedTask;
             });
          }
@@ -195,21 +201,49 @@ namespace DotNetify
 
       /// <summary>
       /// This method is called internally to send response back to browser clients.
+      /// This is also overloaded to handle SignalR groups for multicast view models.
       /// </summary>
       /// <param name="connectionId">Identifies the browser client making prior request.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data in serialized JSON.</param>
       internal void Response_VM(string connectionId, string vmId, string vmData)
       {
-         if (connectionId.StartsWith("group$"))
-         {
-            string groupId = connectionId.Split(new char[] { '$' }, 2)[1];
-            _globalHubContext.Clients.Group(groupId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
-         }
+         if (connectionId.StartsWith(VMController.MULTICAST))
+            HandleMulticastMessage(connectionId, vmId, vmData);
          else
          {
             if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
                _globalHubContext.Clients.Client(connectionId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
+         }
+      }
+
+      /// <summary>
+      /// Handles messages dealing with group multicasting.
+      /// </summary>
+      /// <param name="messageType">Message type.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="serializedMessage">Serialized message.</param>
+      internal void HandleMulticastMessage(string messageType, string vmId, string serializedMessage)
+      {
+         if (messageType.EndsWith(nameof(VMController.GroupSend)))
+         {
+            var message = JsonConvert.DeserializeObject<VMController.GroupSend>(serializedMessage);
+            if (string.IsNullOrEmpty(message.ExcludedConnectionId))
+               _globalHubContext.Clients.Group(message.GroupName).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
+            else
+            {
+               var excludedIds = new List<string> { message.ExcludedConnectionId };
+               _globalHubContext.Clients.GroupExcept(message.GroupName, excludedIds).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
+            }
+
+            // Touch the factory to push the timeout.
+            foreach (var connectionId in message.ConnectionIds)
+               _vmControllerFactory.GetInstance(connectionId);
+         }
+         else if (messageType.EndsWith(nameof(VMController.GroupRemove)))
+         {
+            var message = JsonConvert.DeserializeObject<VMController.GroupRemove>(serializedMessage);
+            _globalHubContext.Groups.RemoveFromGroupAsync(message.ConnectionId, message.GroupName);
          }
       }
 
@@ -267,7 +301,7 @@ namespace DotNetify
          catch (Exception ex)
          {
             var finalEx = _hubPipeline.RunExceptionMiddleware(_callerContext, ex);
-            if (finalEx is OperationCanceledException == false)
+            if (finalEx is OperationCanceledException == false && _callerContext != null)
                Response_VM(_callerContext.ConnectionId, vmId, SerializeException(finalEx));
          }
       }

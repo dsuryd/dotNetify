@@ -1,5 +1,6 @@
 ﻿using DotNetify;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ namespace UnitTests
 
          public override bool IsMember => MemberTest();
 
+         public override string GroupName => GroupNameTest();
+
          public void PushMessage(string message)
          {
             Message = message;
@@ -26,6 +29,8 @@ namespace UnitTests
          }
 
          internal static Func<bool> MemberTest { get; set; } = () => true;
+
+         internal static Func<string> GroupNameTest { get; set; } = () => null;
       }
 
       [TestMethod]
@@ -153,6 +158,61 @@ namespace UnitTests
          vmController2.UpdateVM(update);
 
          Assert.AreEqual("Adios", responseData1.Message.Value);
+      }
+
+      [TestMethod]
+      public void MulticastVM_Group()
+      {
+         MulticastTestVM.MemberTest = () => true;
+         MulticastTestVM.GroupNameTest = () => "group1";
+
+         dynamic responseData1 = null;
+         dynamic responseData2 = null;
+         string removeGroup1 = null;
+         string removeGroup2 = null;
+         Action<string, string> responseDelegate = (connId, data) =>
+         {
+            if (connId.EndsWith(nameof(VMController.GroupSend)))
+            {
+               var message = JsonConvert.DeserializeObject<VMController.GroupSend>(data);
+               responseData1 = JObject.Parse(message.Data);
+               responseData2 = JObject.Parse(message.Data);
+            }
+            else if (connId.EndsWith(nameof(VMController.GroupRemove)))
+            {
+               var message = JsonConvert.DeserializeObject<VMController.GroupRemove>(data);
+               if (message.ConnectionId == "conn1")
+                  removeGroup1 = message.GroupName;
+               else if (message.ConnectionId == "conn2")
+                  removeGroup2 = message.GroupName;
+            }
+         };
+
+         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
+         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory, "conn1", responseDelegate);
+         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory, "conn2", responseDelegate);
+
+         vmController1.RequestVM(out string groupName1);
+         vmController2.RequestVM(out string groupName2);
+
+         Assert.AreEqual("group1", groupName1);
+         Assert.AreEqual("group1", groupName2);
+
+         var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Goodbye" } };
+         vmController1.UpdateVM(update);
+
+         Assert.AreEqual("Goodbye", responseData2.Message.Value);
+
+         update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Adios" } };
+         vmController2.UpdateVM(update);
+
+         Assert.AreEqual("Adios", responseData1.Message.Value);
+
+         vmController1.DisposeVM();
+         vmController2.DisposeVM();
+
+         Assert.AreEqual("group1", removeGroup1);
+         Assert.AreEqual("group1", removeGroup2);
       }
    }
 }

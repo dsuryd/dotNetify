@@ -25,21 +25,26 @@ namespace DotNetify
    public interface IMulticast
    {
       /// <summary>
-      /// Determine whether the view model can be shared with the calling VMController.
-      /// </summary>
-      bool IsMember { get; }
-
-      /// <summary>
       /// Occurs when the view model wants to push updates to all associated clients.
       /// This event is handled by the VMController.
       /// </summary>
       event EventHandler<MulticastPushUpdatesEventArgs> RequestMulticastPushUpdates;
 
       /// <summary>
-      /// Pushes updates to all connected views.
+      /// Optional multicast group name.
+      /// </summary>
+      string GroupName { get; }
+
+      /// <summary>
+      /// Determine whether the view model can be shared with the calling VMController.
+      /// </summary>
+      bool IsMember { get; }
+
+      /// <summary>
+      /// Pushes updates to all connected views with an exception.
       /// </summary>
       /// <param name="excludedConnectionId">Connection to exclude.</param>
-      void PushUpdates(string excludedConnectionId);
+      void PushUpdatesExcept(string excludedConnectionId);
    }
 
    /// <summary>
@@ -56,6 +61,11 @@ namespace DotNetify
       /// Connection to exclude.
       /// </summary>
       public string ExcludedConnectionId { get; set; }
+
+      /// <summary>
+      /// Multicast group name.
+      /// </summary>
+      public string GroupName { get; set; }
 
       /// <summary>
       /// Whether to push the data.

@@ -30,6 +30,12 @@ namespace DotNetify
       private int _reference = 1;
 
       /// <summary>
+      /// Optional multicast group name.
+      /// </summary>
+      [Ignore]
+      public virtual string GroupName { get; }
+
+      /// <summary>
       /// Determine whether the view model can be shared with the calling VMController.
       /// </summary>
       [Ignore]
@@ -63,25 +69,27 @@ namespace DotNetify
       /// </summary>
       public override void PushUpdates()
       {
-         PushUpdates(null);
+         PushUpdatesExcept(null);
       }
 
       /// <summary>
       /// Pushes changed properties to all associated clients, excluding the given connection.
       /// </summary>
       /// <param name="excludedConnectionId">Connection to exclude.</param>
-      public void PushUpdates(string excludedConnectionId)
+      public void PushUpdatesExcept(string excludedConnectionId)
       {
          var delegates = RequestMulticastPushUpdates?.GetInvocationList().ToList();
          if (delegates != null && delegates.Count > 0)
          {
-            // First invocation cycle is to get the participating connection Ids from the VMControllers.
             var eventArgs = new MulticastPushUpdatesEventArgs { ExcludedConnectionId = excludedConnectionId };
+
+            // First invocation cycle is to get the participating connection Ids from the VMControllers.
             RequestMulticastPushUpdates?.Invoke(this, eventArgs);
 
             // Invoke the first available event handler to do the actual data push.
             // If successful, the handler will set the PushData back to false.
             eventArgs.PushData = true;
+            eventArgs.GroupName = GroupName;
             foreach (var d in delegates)
             {
                d.DynamicInvoke(this, eventArgs);

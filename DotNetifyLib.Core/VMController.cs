@@ -18,6 +18,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DotNetify
@@ -27,6 +28,22 @@ namespace DotNetify
    /// </summary>
    public partial class VMController : IDisposable
    {
+      public static readonly string MULTICAST = "multicast$";
+
+      public class GroupSend
+      {
+         public string GroupName { get; set; }
+         public IList<string> ConnectionIds { get; set; }
+         public string ExcludedConnectionId { get; set; }
+         public string Data { get; set; }
+      }
+
+      public class GroupRemove
+      {
+         public string GroupName { get; set; }
+         public string ConnectionId { get; set; }
+      }
+
       #region Delegates
 
       /// <summary>
@@ -157,12 +174,7 @@ namespace DotNetify
       public virtual void Dispose()
       {
          foreach (var kvp in _activeVMs)
-         {
-            kvp.Value.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
-            if (kvp.Value.Instance is IMulticast)
-               (kvp.Value.Instance as IMulticast).RequestMulticastPushUpdates -= VMInstance_RequestMulticastPushUpdates;
-            kvp.Value.Instance.Dispose();
-         }
+            DisposeViewModel(kvp.Value);
 
          _serviceScope?.Dispose();
       }
@@ -185,7 +197,8 @@ namespace DotNetify
       /// <param name="connectionId">Identifies the client connection.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional view model's initialization argument.</param>
-      public virtual void OnRequestVM(string connectionId, string vmId, object vmArg = null)
+      /// <returns>Group name, if the request is for a multicast view model associated with one.</returns>
+      public virtual string OnRequestVM(string connectionId, string vmId, object vmArg = null)
       {
          // Create a new view model instance whose class name is matching the given VMId.
          BaseVM vmInstance = !_activeVMs.ContainsKey(vmId) ? CreateVM(vmId, vmArg) : _activeVMs[vmId].Instance;
@@ -205,6 +218,7 @@ namespace DotNetify
             {
                _activeVMs.TryAdd(vmId, new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId));
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
+
                if (vmInstance is IMulticast)
                   (vmInstance as IMulticast).RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
             }
@@ -215,6 +229,8 @@ namespace DotNetify
             foreach (var vmInfo in _activeVMs.Values)
                PushUpdates(vmInfo);
          });
+
+         return vmInstance is IMulticast ? (vmInstance as IMulticast).GroupName : null;
       }
 
       /// <summary>
@@ -268,7 +284,7 @@ namespace DotNetify
                }
 
                if (vmInstance is IMulticast)
-                  (vmInstance as IMulticast).PushUpdates(vmInfo.ConnectionId);
+                  (vmInstance as IMulticast).PushUpdatesExcept(vmInfo.ConnectionId);
                else
                   vmInstance.AcceptChangedProperties();
             }
@@ -292,8 +308,7 @@ namespace DotNetify
             var vmIds = _activeVMs.Keys.Where(i => i == vmId || i.StartsWith(vmId + "."));
             foreach (var id in vmIds.OrderByDescending(i => i.Length))
             {
-               VMInfo vmInfo;
-               if (_activeVMs.TryRemove(id, out vmInfo))
+               if (_activeVMs.TryRemove(id, out VMInfo vmInfo))
                {
                   // If the view model is within a master view model's scope, notify the
                   // master view model that the view model is being disposed.
@@ -304,8 +319,7 @@ namespace DotNetify
                         _activeVMs[masterVMId].Instance.OnSubVMDisposing(vmInfo.Instance);
                   }
 
-                  vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
-                  vmInfo.Instance.Dispose();
+                  DisposeViewModel(vmInfo);
                }
             }
          }
@@ -370,6 +384,44 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Disposes a view model.
+      /// </summary>
+      /// <param name="vmInfo">View model info.</param>
+      protected void DisposeViewModel(VMInfo vmInfo)
+      {
+         vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
+
+         if (vmInfo.Instance is IMulticast)
+         {
+            var multicastVM = vmInfo.Instance as IMulticast;
+            multicastVM.RequestMulticastPushUpdates -= VMInstance_RequestMulticastPushUpdates;
+
+            // If the multicast view model has a group, call the hub to disassociate the connection Id with that group.
+            if (!string.IsNullOrEmpty(multicastVM.GroupName))
+               RemoveConnectionFromGroup(vmInfo.ConnectionId, vmInfo.Id, multicastVM.GroupName);
+         }
+         vmInfo.Instance.Dispose();
+      }
+
+      /// <summary>
+      /// Extracts the namespace string from a view model initialization argument.
+      /// </summary>
+      /// <param name="vmArg">View model's initialization argument.</param>
+      /// <returns>Namespace string or null.</returns>
+      private string ExtractNamespace(ref object vmArg)
+      {
+         const string NAMESPACE = "namespace";
+         string vmNamespace = null;
+         JToken namespaceToken;
+         if (vmArg is JObject && (vmArg as JObject).TryGetValue(NAMESPACE, StringComparison.OrdinalIgnoreCase, out namespaceToken))
+         {
+            vmNamespace = namespaceToken.ToString();
+            (vmArg as JObject).Remove(NAMESPACE);
+         }
+         return vmNamespace;
+      }
+
+      /// <summary>
       /// Updates a value of a view model.
       /// </summary>
       /// <param name="vmInstance">View model instance.</param>
@@ -417,21 +469,19 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Extracts the namespace string from a view model initialization argument.
+      /// Disassociates a connection from a group.
       /// </summary>
-      /// <param name="vmArg">View model's initialization argument.</param>
-      /// <returns>Namespace string or null.</returns>
-      private string ExtractNamespace(ref object vmArg)
+      /// <param name="connectionId">Identifies the connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="groupName">Group name.</param>
+      protected void RemoveConnectionFromGroup(string connectionId, string vmId, string groupName)
       {
-         const string NAMESPACE = "namespace";
-         string vmNamespace = null;
-         JToken namespaceToken;
-         if (vmArg is JObject && (vmArg as JObject).TryGetValue(NAMESPACE, StringComparison.OrdinalIgnoreCase, out namespaceToken))
+         var message = new GroupRemove
          {
-            vmNamespace = namespaceToken.ToString();
-            (vmArg as JObject).Remove(NAMESPACE);
-         }
-         return vmNamespace;
+            GroupName = groupName,
+            ConnectionId = connectionId
+         };
+         _vmResponse(MULTICAST + nameof(GroupRemove), vmId, JsonConvert.SerializeObject(message));
       }
 
       /// <summary>
@@ -463,8 +513,22 @@ namespace DotNetify
                   var vmData = vmInstance.Serialize(changedProperties);
                   ResponseVMFilter.Invoke(vmInfo.Id, vmInstance, vmData, filteredData =>
                   {
-                     foreach (var connectionId in e.ConnectionIds)
-                        _vmResponse(connectionId, vmInfo.Id, (string)filteredData);
+                     if (!string.IsNullOrEmpty(e.GroupName))
+                     {
+                        var message = new GroupSend
+                        {
+                           GroupName = e.GroupName,
+                           ConnectionIds = e.ConnectionIds,
+                           ExcludedConnectionId = e.ExcludedConnectionId,
+                           Data = (string)filteredData
+                        };
+                        _vmResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(message));
+                     }
+                     else
+                     {
+                        foreach (var connectionId in e.ConnectionIds)
+                           _vmResponse(connectionId, vmInfo.Id, (string)filteredData);
+                     }
                   });
                }
                e.PushData = false;

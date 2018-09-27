@@ -84,6 +84,13 @@ namespace UnitTests
          return _response;
       }
 
+      public Response RequestVM(out string groupName)
+      {
+         _response.Reset();
+         groupName = _vmController.OnRequestVM(_connectionId, _vmId);
+         return _response;
+      }
+
       public Response RequestVM(string vmId, object vmArg = null)
       {
          _response.Reset();
