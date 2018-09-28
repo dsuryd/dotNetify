@@ -37,18 +37,19 @@ namespace DotNetify.DevApp
 
    public class ChatUser
    {
-      private static int _nameGenerator = 0;
+      private static int _counter = 0;
 
       public string Id { get; set; }
+      public string CorrelationId { get; set; }
       public string Name { get; set; }
       public string IpAddress { get; set; }
       public string Browser { get; set; }
-      public string Room { get; set; } = "Lobby";
 
-      public ChatUser(IConnectionContext connectionContext)
+      public ChatUser(IConnectionContext connectionContext, string correlationId)
       {
          Id = ToUserId(connectionContext);
-         Name = $"user{Interlocked.Increment(ref _nameGenerator)}";
+         CorrelationId = correlationId;
+         Name = $"user{Interlocked.Increment(ref _counter)}";
          IpAddress = connectionContext.HttpConnection.RemoteIpAddress.ToString();
 
          var browserInfo = Parser.GetDefault().Parse(connectionContext.HttpRequestHeaders.UserAgent);
@@ -74,20 +75,26 @@ namespace DotNetify.DevApp
       public Action<ChatMessage> Send => chat =>
       {
          string userId = ChatUser.ToUserId(_connectionContext);
+         chat.Id = Messages.Count + 1;
+         chat.UserId = userId;
+         chat.UserName = UpdateUserName(userId, chat.UserName);
 
-         lock (Messages)
+         var privateMessageUser = Users.FirstOrDefault(x => chat.Text.StartsWith($"{x.Name}:"));
+         if (privateMessageUser != null)
+            base.Send(new List<string> { privateMessageUser.Id, userId }, "PrivateMessage", chat);
+         else
          {
-            chat.Id = Messages.Count + 1;
-            chat.UserId = userId;
-            chat.UserName = UpdateUserName(userId, chat.UserName);
-            Messages.Add(chat);
-            this.AddList(nameof(Messages), chat);
+            lock (Messages)
+            {
+               Messages.Add(chat);
+               this.AddList(nameof(Messages), chat);
+            }
          }
       };
 
-      public Action<object> AddUser => _ =>
+      public Action<string> AddUser => correlationId =>
       {
-         var user = new ChatUser(_connectionContext);
+         var user = new ChatUser(_connectionContext, correlationId);
          Users.Add(user);
          this.AddList(nameof(Users), user);
       };
@@ -111,7 +118,6 @@ namespace DotNetify.DevApp
       {
          RemoveUser();
          PushUpdates();
-
          base.Dispose();
       }
 
