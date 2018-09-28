@@ -83,6 +83,7 @@
     <Compile Include="HubPipeline.cs" />
     <Compile Include="HubPrincipalAccessor.cs" />
     <Compile Include="Adapter\Adapters.cs" />
+    <Compile Include="IHubCallerContextAccessor.cs" />
     <Compile Include="IMiddleware.cs" />
     <Compile Include="IVMFilter.cs" />
     <Compile Include="Security\AuthorizeFilter.cs" />

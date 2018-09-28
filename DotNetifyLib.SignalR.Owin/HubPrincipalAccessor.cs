@@ -26,7 +26,7 @@ using System.Threading;
 
 namespace DotNetify
 {
-   internal class HubPrincipalAccessor : IPrincipalAccessor, IConnectionContext
+   internal class HubPrincipalAccessor : IPrincipalAccessor, IHubCallerContextAccessor, IConnectionContext
    {
       private readonly static AsyncLocal<HubCallerContext> _asyncLocalCallerContext = new AsyncLocal<HubCallerContext>();
 

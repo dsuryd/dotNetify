@@ -36,12 +36,14 @@ namespace DotNetify
          {
             services.AddScoped<IPrincipalAccessor, HubPrincipalAccessor>();
             services.AddScoped<IConnectionContext, HubPrincipalAccessor>();
+            services.AddScoped<IHubCallerContextAccessor, HubPrincipalAccessor>();
             services.AddScoped<IHubPipeline, HubPipeline>();
          }
          catch (NotImplementedException)
          {
             services.AddTransient<IPrincipalAccessor, HubPrincipalAccessor>();
             services.AddTransient<IConnectionContext, HubPrincipalAccessor>();
+            services.AddTransient<IHubCallerContextAccessor, HubPrincipalAccessor>();
             services.AddTransient<IHubPipeline, HubPipeline>();
          }
 
