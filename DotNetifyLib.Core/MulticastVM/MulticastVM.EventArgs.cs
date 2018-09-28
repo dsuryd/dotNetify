@@ -20,40 +20,6 @@ using System.Collections.Generic;
 namespace DotNetify
 {
    /// <summary>
-   /// Indicates the view model that supports multicast to multiple views.
-   /// </summary>
-   public interface IMulticast
-   {
-      /// <summary>
-      /// Occurs when the view model wants to push updates to all associated clients.
-      /// This event is handled by the VMController.
-      /// </summary>
-      event EventHandler<MulticastPushUpdatesEventArgs> RequestMulticastPushUpdates;
-
-      /// <summary>
-      /// Occurs when the view model wants to send data to specific clients.
-      /// This event is handled by the VMController.
-      /// </summary>
-      event EventHandler<SendEventArgs> RequestSend;
-
-      /// <summary>
-      /// Multicast group name.
-      /// </summary>
-      string GroupName { get; }
-
-      /// <summary>
-      /// Determine whether the view model can be shared with the calling VMController.
-      /// </summary>
-      bool IsMember { get; }
-
-      /// <summary>
-      /// Pushes updates to all connected views with an exception.
-      /// </summary>
-      /// <param name="excludedConnectionId">Connection to exclude.</param>
-      void PushUpdatesExcept(string excludedConnectionId);
-   }
-
-   /// <summary>
    /// Event arguments used by a multicast view model to request push updates.
    /// </summary>
    public class MulticastPushUpdatesEventArgs : EventArgs

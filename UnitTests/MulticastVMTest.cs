@@ -18,8 +18,6 @@ namespace UnitTests
             set => Set(value);
          }
 
-         public override bool IsMember => MemberTest();
-
          public override string GroupName => GroupNameTest();
 
          public void PushMessage(string message)
@@ -28,16 +26,18 @@ namespace UnitTests
             PushUpdates();
          }
 
-         internal static Func<bool> MemberTest { get; set; } = () => true;
+         internal static Func<string> GroupNameTest { get; set; }
+      }
 
-         internal static Func<string> GroupNameTest { get; set; } = () => null;
+      [TestInitialize]
+      public void Initialize()
+      {
+         MulticastTestVM.GroupNameTest = () => null;
       }
 
       [TestMethod]
       public void MulticastVM_ViewModelShared()
       {
-         MulticastTestVM.MemberTest = () => true;
-
          var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
          var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
          var vmController2 = new MockVMController<MulticastTestVM>(vmFactory);
@@ -55,7 +55,8 @@ namespace UnitTests
       [TestMethod]
       public void MulticastVM_ViewModelNotShared()
       {
-         MulticastTestVM.MemberTest = () => false;
+         var random = new Random();
+         MulticastTestVM.GroupNameTest = () => random.Next().ToString();
 
          var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
          var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
@@ -74,8 +75,6 @@ namespace UnitTests
       [TestMethod]
       public void MulticastVM_ViewModelDisposed()
       {
-         MulticastTestVM.MemberTest = () => true;
-
          var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
          var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
          var vmController2 = new MockVMController<MulticastTestVM>(vmFactory);
@@ -100,8 +99,6 @@ namespace UnitTests
       [TestMethod]
       public void MulticastVM_PushUpdates()
       {
-         MulticastTestVM.MemberTest = () => true;
-
          dynamic responseData1 = null;
          dynamic responseData2 = null;
          Action<string, string> responseDelegate = (connId, data) =>
@@ -132,8 +129,6 @@ namespace UnitTests
       [TestMethod]
       public void MulticastVM_ChangedDataMulticasted()
       {
-         MulticastTestVM.MemberTest = () => true;
-
          dynamic responseData1 = null;
          dynamic responseData2 = null;
          Action<string, string> responseDelegate = (connId, data) =>
@@ -163,7 +158,6 @@ namespace UnitTests
       [TestMethod]
       public void MulticastVM_Group()
       {
-         MulticastTestVM.MemberTest = () => true;
          MulticastTestVM.GroupNameTest = () => "group1";
 
          dynamic responseData1 = null;

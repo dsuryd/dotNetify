@@ -41,7 +41,7 @@ namespace DotNetify
       /// <summary>
       /// Whether it's a multicast type.
       /// </summary>
-      public bool IsMulticast => typeof(IMulticast).GetTypeInfo().IsAssignableFrom(Type);
+      public bool IsMulticast => typeof(MulticastVM).GetTypeInfo().IsAssignableFrom(Type);
 
       /// <summary>
       /// Full type name.

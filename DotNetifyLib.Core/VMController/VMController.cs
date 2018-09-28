@@ -219,10 +219,10 @@ namespace DotNetify
                _activeVMs.TryAdd(vmId, new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId));
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
 
-               if (vmInstance is IMulticast)
+               if (vmInstance is MulticastVM)
                {
-                  (vmInstance as IMulticast).RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
-                  (vmInstance as IMulticast).RequestSend += VMInstance_RequestSend;
+                  (vmInstance as MulticastVM).RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
+                  (vmInstance as MulticastVM).RequestSend += VMInstance_RequestSend;
                }
             }
             else
@@ -233,7 +233,7 @@ namespace DotNetify
                PushUpdates(vmInfo);
          });
 
-         return vmInstance is IMulticast ? (vmInstance as IMulticast).GroupName : null;
+         return vmInstance is MulticastVM ? (vmInstance as MulticastVM).GroupName : null;
       }
 
       /// <summary>
@@ -286,8 +286,8 @@ namespace DotNetify
                   PushUpdates(vmInfo, vmData);
                }
 
-               if (vmInstance is IMulticast)
-                  (vmInstance as IMulticast).PushUpdatesExcept(vmInfo.ConnectionId);
+               if (vmInstance is MulticastVM)
+                  (vmInstance as MulticastVM).PushUpdatesExcept(vmInfo.ConnectionId);
                else
                   vmInstance.AcceptChangedProperties();
             }
@@ -394,9 +394,9 @@ namespace DotNetify
       {
          vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
 
-         if (vmInfo.Instance is IMulticast)
+         if (vmInfo.Instance is MulticastVM)
          {
-            var multicastVM = vmInfo.Instance as IMulticast;
+            var multicastVM = vmInfo.Instance as MulticastVM;
             multicastVM.RequestMulticastPushUpdates -= VMInstance_RequestMulticastPushUpdates;
             multicastVM.RequestSend -= VMInstance_RequestSend;
 
@@ -443,7 +443,7 @@ namespace DotNetify
       protected virtual void PushUpdates(VMInfo vmInfo)
       {
          var vmInstance = vmInfo.Instance;
-         if (vmInstance is IMulticast)
+         if (vmInstance is MulticastVM)
             vmInstance.PushUpdates();
          else
          {

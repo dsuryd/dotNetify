@@ -108,8 +108,7 @@ namespace DotNetify
          {
             if (!_memoryCache.TryGetValue(key, out HashSet<MulticastVM> vmCollections))
             {
-               vm = Create(vmType, vmInstanceId) as MulticastVM;
-               vm.Disposed += (sender, e) => RemoveMulticastInstance(vm, key);
+               vm = CreateMulticastInstance(vmType, vmInstanceId, key);
                vmCollections = new HashSet<MulticastVM> { vm };
                _memoryCache.Set(key, vmCollections);
             }
@@ -120,8 +119,7 @@ namespace DotNetify
                   vm.AddRef();
                else
                {
-                  vm = Create(vmType, vmInstanceId) as MulticastVM;
-                  vm.Disposed += (sender, e) => RemoveMulticastInstance(vm, key);
+                  vm = CreateMulticastInstance(vmType, vmInstanceId, key);
                   vmCollections.Add(vm);
                }
             }
@@ -140,6 +138,22 @@ namespace DotNetify
          return vmNamespace != null ?
             VMTypes.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}") :
             VMTypes.FirstOrDefault(i => i.Name == vmTypeName);
+      }
+
+      /// <summary>
+      /// Creates a multicast view model instance.
+      /// </summary>
+      /// <param name="vmType">View model type.</param>
+      /// <param name="vmInstanceId">Optional view model instance identifier.</param>
+      /// <param name="key">Key to the cache collection, which is the view model's type name.</param>
+      /// <returns>Multicast view model.</returns>
+      private MulticastVM CreateMulticastInstance(Type vmType, string vmInstanceId, string key)
+      {
+         var vm = Create(vmType, vmInstanceId) as MulticastVM;
+         vm.Disposed += (sender, e) => RemoveMulticastInstance(vm, key);
+
+         vm.Initialize();
+         return vm;
       }
 
       /// <summary>

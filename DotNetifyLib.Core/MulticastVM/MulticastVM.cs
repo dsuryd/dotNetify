@@ -23,7 +23,7 @@ namespace DotNetify
 {
    // Implements multicast view models.  A multicast view model can be connected to multiple views,
    // basically serving as a single data source for those views.
-   public class MulticastVM : BaseVM, IMulticast
+   public class MulticastVM : BaseVM
    {
       /// <summary>
       /// Reference count of VMController instances.
@@ -33,19 +33,7 @@ namespace DotNetify
       /// <summary>
       /// Group name generated when this instance was created.
       /// </summary>
-      private string _ownerGroupName;
-
-      /// <summary>
-      /// Multicast group name.
-      /// </summary>
-      [Ignore]
-      public virtual string GroupName { get; }
-
-      /// <summary>
-      /// Determine whether the view model can be shared with the calling VMController.
-      /// </summary>
-      [Ignore]
-      public virtual bool IsMember => _ownerGroupName == GroupName;
+      private string _groupName;
 
       /// <summary>
       /// Occurs when the view model wants to push updates to all associated clients.
@@ -60,19 +48,22 @@ namespace DotNetify
       public event EventHandler<SendEventArgs> RequestSend;
 
       /// <summary>
+      /// Multicast group name.
+      /// </summary>
+      [Ignore]
+      public virtual string GroupName { get; }
+
+      /// <summary>
+      /// Determine whether the view model can be shared with the calling VMController.
+      /// </summary>
+      internal virtual bool IsMember => _groupName == GroupName;
+
+      /// <summary>
       /// Increment reference count.
       /// </summary>
       internal void AddRef()
       {
          Interlocked.Increment(ref _reference);
-      }
-
-      /// <summary>
-      /// Default constructor.
-      /// </summary>
-      public MulticastVM() : base()
-      {
-         _ownerGroupName = GroupName;
       }
 
       /// <summary>
@@ -85,29 +76,12 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Sends data to specific connecting clients.
+      /// Initializes the group name asssociated with this view model. 
+      /// the 
       /// </summary>
-      /// <param name="connectionIds">Identifies the clients.</param>
-      /// <param name="propertyName">Property name to send.</param>
-      /// <param name="propertyValue">Property value to send.</param>
-      public void Send<T>(IList<string> connectionIds, string propertyName, T propertyValue = default(T))
+      internal void Initialize()
       {
-         var eventArgs = new SendEventArgs();
-         foreach (string connectionId in connectionIds)
-            eventArgs.ConnectionIds.Add(connectionId);
-         eventArgs.Properties = new Dictionary<string, object> { { propertyName, propertyValue } };
-
-         var delegates = RequestSend?.GetInvocationList().ToList();
-         if (delegates != null && delegates.Count > 0)
-         {
-            eventArgs.SendData = true;
-            foreach (var d in delegates)
-            {
-               d.DynamicInvoke(this, eventArgs);
-               if (!eventArgs.SendData)
-                  break;
-            }
-         }
+         _groupName = GroupName;
       }
 
       /// <summary>
@@ -144,5 +118,31 @@ namespace DotNetify
             }
          }
       }
+
+      /// <summary>
+      /// Sends data to specific connecting clients.
+      /// </summary>
+      /// <param name="connectionIds">Identifies the clients.</param>
+      /// <param name="propertyName">Property name to send.</param>
+      /// <param name="propertyValue">Property value to send.</param>
+      public void Send<T>(IList<string> connectionIds, string propertyName, T propertyValue = default(T))
+      {
+         var eventArgs = new SendEventArgs();
+         foreach (string connectionId in connectionIds)
+            eventArgs.ConnectionIds.Add(connectionId);
+         eventArgs.Properties = new Dictionary<string, object> { { propertyName, propertyValue } };
+
+         var delegates = RequestSend?.GetInvocationList().ToList();
+         if (delegates != null && delegates.Count > 0)
+         {
+            eventArgs.SendData = true;
+            foreach (var d in delegates)
+            {
+               d.DynamicInvoke(this, eventArgs);
+               if (!eventArgs.SendData)
+                  break;
+            }
+         }
+      }      
    }
 }

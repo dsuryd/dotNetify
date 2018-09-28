@@ -95,17 +95,23 @@ namespace DotNetify.DevApp
       public Action<string> AddUser => correlationId =>
       {
          var user = new ChatUser(_connectionContext, correlationId);
-         Users.Add(user);
-         this.AddList(nameof(Users), user);
+         lock (Users)
+         {
+            Users.Add(user);
+            this.AddList(nameof(Users), user);
+         }
       };
 
       public Action RemoveUser => () =>
       {
-         var user = Users.FirstOrDefault(x => x.Id == ChatUser.ToUserId(_connectionContext));
-         if (user != null)
+         lock (Users)
          {
-            Users.Remove(user);
-            this.RemoveList(nameof(Users), user);
+            var user = Users.FirstOrDefault(x => x.Id == ChatUser.ToUserId(_connectionContext));
+            if (user != null)
+            {
+               Users.Remove(user);
+               this.RemoveList(nameof(Users), user);
+            }
          }
       };
 
@@ -123,15 +129,18 @@ namespace DotNetify.DevApp
 
       private string UpdateUserName(string userId, string userName)
       {
-         var user = Users.FirstOrDefault(x => x.Id == userId);
-         if (user != null)
+         lock (Users)
          {
-            if (!string.IsNullOrEmpty(userName))
+            var user = Users.FirstOrDefault(x => x.Id == userId);
+            if (user != null)
             {
-               user.Name = userName;
-               this.UpdateList(nameof(Users), user);
+               if (!string.IsNullOrEmpty(userName))
+               {
+                  user.Name = userName;
+                  this.UpdateList(nameof(Users), user);
+               }
+               return user.Name;
             }
-            return user.Name;
          }
          return userId;
       }
