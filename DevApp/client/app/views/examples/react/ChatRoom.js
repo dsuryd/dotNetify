@@ -1,20 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import dotnetify, { Scope } from 'dotnetify';
+import dotnetify from 'dotnetify';
 import TextBox from '../components/TextBox';
 import { ChatRoomCss } from '../components/css';
 
 class ChatRoom extends React.Component {
-  static contextTypes = { connect: PropTypes.func };
-
-  constructor(props, context) {
-    super(props, context);
+  constructor(props) {
+    super(props);
     this.state = { Users: [], Messages: [], message: '' };
+    this.scrollToBottom = () => this.bottomElem.scrollIntoView({ behavior: 'smooth' });
 
     this.vm = dotnetify.react.connect('ChatRoomVM', this);
     this.dispatchState = state => this.vm.$dispatch(state);
-
-    this.scrollToBottom = () => this.bottomElem.scrollIntoView({ behavior: 'smooth' });
   }
 
   componentDidMount() {
@@ -59,6 +55,7 @@ class ChatRoom extends React.Component {
   render() {
     return (
       <ChatRoomCss>
+        <b style={{ color: '#e2544b' }}>*** This feature will be available in the next Nuget release ***</b>
         <div className="chatPanel">
           <nav>
             {this.state.Users.map(user => (

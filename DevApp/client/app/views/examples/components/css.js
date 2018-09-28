@@ -375,7 +375,7 @@ export const ChatRoomCss = styled.div`
     flex-direction: row;
   }
   .chatPanel {
-    height: calc(100vh - 20rem);
+    height: calc(100vh - 23rem);
     max-width: 1268px;
     display: flex;
     flex: 1;

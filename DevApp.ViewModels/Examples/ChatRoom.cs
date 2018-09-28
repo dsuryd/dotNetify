@@ -22,7 +22,7 @@ namespace DotNetify.DevApp
 
       private string GetViewSource(string framework)
       {
-         return new Markdown("DotNetify.DevApp.Docs.Examples.ChatRoom.md");
+         return new Markdown("DotNetify.DevApp.Docs.Examples.ChatRoom.md").GetSection(null, "ChatRoomVM.cs");
       }
    }
 
