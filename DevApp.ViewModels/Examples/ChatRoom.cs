@@ -72,7 +72,7 @@ namespace DotNetify.DevApp
 
       public string Users_itemKey => nameof(ChatUser.Id);
 
-      public Action<ChatMessage> Send => chat =>
+      public Action<ChatMessage> SendMessage => chat =>
       {
          string userId = ChatUser.ToUserId(_connectionContext);
          chat.Id = Messages.Count + 1;

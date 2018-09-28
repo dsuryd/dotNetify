@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnitTests
 {
@@ -103,8 +104,14 @@ namespace UnitTests
          dynamic responseData2 = null;
          Action<string, string> responseDelegate = (connId, data) =>
          {
-            if (connId == "conn1") responseData1 = JObject.Parse(data);
-            else if (connId == "conn2") responseData2 = JObject.Parse(data);
+            if (connId.EndsWith("GroupSend"))
+            {
+               var msg = JsonConvert.DeserializeObject<VMController.GroupSend>(data);
+               if (msg.ConnectionIds.Contains("conn1"))
+                  responseData1 = JObject.Parse(msg.Data);
+               if (msg.ConnectionIds.Contains("conn2"))
+                  responseData2 = JObject.Parse(msg.Data);
+            }
          };
 
          var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
@@ -133,8 +140,14 @@ namespace UnitTests
          dynamic responseData2 = null;
          Action<string, string> responseDelegate = (connId, data) =>
          {
-            if (connId == "conn1") responseData1 = JObject.Parse(data);
-            else if (connId == "conn2") responseData2 = JObject.Parse(data);
+            if (connId.EndsWith("GroupSend"))
+            {
+               var msg = JsonConvert.DeserializeObject<VMController.GroupSend>(data);
+               if (msg.ConnectionIds.Contains("conn1"))
+                  responseData1 = JObject.Parse(msg.Data);
+               if (msg.ConnectionIds.Contains("conn2"))
+                  responseData2 = JObject.Parse(msg.Data);
+            }
          };
 
          var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();

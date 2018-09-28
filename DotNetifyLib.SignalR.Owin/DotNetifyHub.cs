@@ -123,7 +123,12 @@ namespace DotNetify
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
-               VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
+               string groupName = VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
+
+               // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
+               if (!string.IsNullOrEmpty(groupName))
+                  Groups.Add(Context.ConnectionId, groupName);
+
                return Task.FromResult(0);
             });
          }
@@ -214,12 +219,25 @@ namespace DotNetify
          if (messageType.EndsWith(nameof(VMController.GroupSend)))
          {
             var message = JsonConvert.DeserializeObject<VMController.GroupSend>(serializedMessage);
-            if (string.IsNullOrEmpty(message.ExcludedConnectionId))
-               Clients.Group(message.GroupName).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
-            else
+
+            if (!string.IsNullOrEmpty(message.GroupName))
             {
-               var excludedIds = new List<string> { message.ExcludedConnectionId };
-               Clients.Group(message.GroupName, excludedIds.ToArray()).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
+               if (message.ExcludedConnectionIds?.Count == 0)
+                  Clients.Group(message.GroupName).Response_VM(vmId, message.Data);
+               else
+               {
+                  var excludedIds = new List<string>(message.ExcludedConnectionIds);
+                  Clients.Group(message.GroupName, excludedIds.ToArray()).Response_VM(vmId, message.Data);
+               }
+            }
+            else if (message.UserIds?.Count > 0)
+            {
+               Clients.Users(message.UserIds).Response_VM(vmId, message.Data);
+            }
+            else if (message.ConnectionIds?.Count > 0)
+            {
+               foreach (var connectionId in message.ConnectionIds)
+                  Clients.Client(connectionId).Response_VM(vmId, message.Data);
             }
 
             // Touch the factory to push the timeout.

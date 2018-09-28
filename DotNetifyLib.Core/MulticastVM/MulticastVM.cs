@@ -76,8 +76,8 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Initializes the group name asssociated with this view model. 
-      /// the 
+      /// Initializes the group name asssociated with this view model.
+      /// the
       /// </summary>
       internal void Initialize()
       {
@@ -96,7 +96,7 @@ namespace DotNetify
       /// Pushes changed properties to all associated clients, excluding the given connection.
       /// </summary>
       /// <param name="excludedConnectionId">Connection to exclude.</param>
-      public void PushUpdatesExcept(string excludedConnectionId)
+      internal void PushUpdatesExcept(string excludedConnectionId)
       {
          var delegates = RequestMulticastPushUpdates?.GetInvocationList().ToList();
          if (delegates != null && delegates.Count > 0)
@@ -125,24 +125,31 @@ namespace DotNetify
       /// <param name="connectionIds">Identifies the clients.</param>
       /// <param name="propertyName">Property name to send.</param>
       /// <param name="propertyValue">Property value to send.</param>
-      public void Send<T>(IList<string> connectionIds, string propertyName, T propertyValue = default(T))
+      protected void Send<T>(IList<string> connectionIds, string propertyName, T propertyValue = default(T))
       {
-         var eventArgs = new SendEventArgs();
+         var eventArgs = new SendEventArgs { Properties = new Dictionary<string, object> { { propertyName, propertyValue } } };
          foreach (string connectionId in connectionIds)
             eventArgs.ConnectionIds.Add(connectionId);
-         eventArgs.Properties = new Dictionary<string, object> { { propertyName, propertyValue } };
+         Send(eventArgs);
+      }
 
+      /// <summary>
+      /// Sends data to the clients.
+      /// </summary>
+      /// <param name="args">Contains information on who to send to.</param>
+      protected void Send(SendEventArgs args)
+      {
          var delegates = RequestSend?.GetInvocationList().ToList();
          if (delegates != null && delegates.Count > 0)
          {
-            eventArgs.SendData = true;
+            args.SendData = true;
             foreach (var d in delegates)
             {
-               d.DynamicInvoke(this, eventArgs);
-               if (!eventArgs.SendData)
+               d.DynamicInvoke(this, args);
+               if (!args.SendData)
                   break;
             }
          }
-      }      
+      }
    }
 }

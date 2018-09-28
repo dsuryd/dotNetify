@@ -33,8 +33,9 @@ namespace DotNetify
       public class GroupSend
       {
          public string GroupName { get; set; }
+         public IList<string> UserIds { get; set; }
          public IList<string> ConnectionIds { get; set; }
-         public string ExcludedConnectionId { get; set; }
+         public IList<string> ExcludedConnectionIds { get; set; }
          public string Data { get; set; }
       }
 
@@ -489,6 +490,19 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Sends a view model data to one or more clients.
+      /// </summary>
+      /// <param name="vmInfo">View model info.</param>
+      /// <param name="args">Arguments containing information on clients to send to.</param>
+      private void Send(VMInfo vmInfo, GroupSend args)
+      {
+         ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, args.Data, filteredData =>
+         {
+            _vmResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(args));
+         });
+      }
+
+      /// <summary>
       /// Handles send request from a multicast view model.
       /// </summary>
       private void VMInstance_RequestSend(object sender, SendEventArgs e)
@@ -498,13 +512,14 @@ namespace DotNetify
             return;
 
          var vmInstance = vmInfo.Instance;
-         var vmData = vmInstance.Serialize(e.Properties);
-         ResponseVMFilter.Invoke(vmInfo.Id, vmInstance, vmData, filteredData =>
+         Send(vmInfo, new GroupSend
          {
-            foreach (var connectionId in e.ConnectionIds)
-               _vmResponse(connectionId, vmInfo.Id, (string)filteredData);
+            GroupName = e.GroupName,
+            ConnectionIds = e.ConnectionIds,
+            ExcludedConnectionIds = e.ExcludedConnectionIds,
+            UserIds = e.UserIds,
+            Data = vmInstance.Serialize(e.Properties)
          });
-
          e.SendData = false;
       }
 
@@ -525,25 +540,12 @@ namespace DotNetify
                var changedProperties = vmInstance.AcceptChangedProperties();
                if (changedProperties != null && changedProperties.Count > 0)
                {
-                  var vmData = vmInstance.Serialize(changedProperties);
-                  ResponseVMFilter.Invoke(vmInfo.Id, vmInstance, vmData, filteredData =>
+                  Send(vmInfo, new GroupSend
                   {
-                     if (!string.IsNullOrEmpty(e.GroupName))
-                     {
-                        var message = new GroupSend
-                        {
-                           GroupName = e.GroupName,
-                           ConnectionIds = e.ConnectionIds,
-                           ExcludedConnectionId = e.ExcludedConnectionId,
-                           Data = (string)filteredData
-                        };
-                        _vmResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(message));
-                     }
-                     else
-                     {
-                        foreach (var connectionId in e.ConnectionIds)
-                           _vmResponse(connectionId, vmInfo.Id, (string)filteredData);
-                     }
+                     GroupName = e.GroupName,
+                     ConnectionIds = e.ConnectionIds,
+                     ExcludedConnectionIds = new List<string> { e.ExcludedConnectionId },
+                     Data = vmInstance.Serialize(changedProperties)
                   });
                }
                e.PushData = false;

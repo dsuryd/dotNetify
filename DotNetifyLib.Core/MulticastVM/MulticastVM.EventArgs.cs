@@ -56,6 +56,21 @@ namespace DotNetify
       public IList<string> ConnectionIds { get; } = new List<string>();
 
       /// <summary>
+      /// Identifies the connections to exclude.
+      /// </summary>
+      public IList<string> ExcludedConnectionIds { get; } = new List<string>();
+
+      /// <summary>
+      /// Group name to push the data to.
+      /// </summary>
+      public string GroupName { get; set; }
+
+      /// <summary>
+      /// Identifies the users to push the data to.
+      /// </summary>
+      public IList<string> UserIds { get; } = new List<string>();
+
+      /// <summary>
       /// Property values to push.
       /// </summary>
       public IDictionary<string, object> Properties { get; set; }

@@ -228,12 +228,28 @@ namespace DotNetify
          if (messageType.EndsWith(nameof(VMController.GroupSend)))
          {
             var message = JsonConvert.DeserializeObject<VMController.GroupSend>(serializedMessage);
-            if (string.IsNullOrEmpty(message.ExcludedConnectionId))
-               _globalHubContext.Clients.Group(message.GroupName).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
-            else
+            var method = nameof(Response_VM);
+            var payload = new object[] { vmId, message.Data };
+
+            if (!string.IsNullOrEmpty(message.GroupName))
             {
-               var excludedIds = new List<string> { message.ExcludedConnectionId };
-               _globalHubContext.Clients.GroupExcept(message.GroupName, excludedIds).SendAsync(nameof(Response_VM), new object[] { vmId, message.Data });
+               if (message.ExcludedConnectionIds?.Count == 0)
+                  _globalHubContext.Clients.Group(message.GroupName).SendAsync(method, payload);
+               else
+               {
+                  var excludedIds = new List<string>(message.ExcludedConnectionIds);
+                  _globalHubContext.Clients.GroupExcept(message.GroupName, excludedIds).SendAsync(method, payload);
+               }
+            }
+            else if (message.UserIds?.Count > 0)
+            {
+               var userIds = new List<string>(message.UserIds);
+               _globalHubContext.Clients.Users(userIds).SendAsync(method, payload);
+            }
+            else if (message.ConnectionIds?.Count > 0)
+            {
+               foreach (var connectionId in message.ConnectionIds)
+                  _globalHubContext.Clients.Client(connectionId).SendAsync(method, payload);
             }
 
             // Touch the factory to push the timeout.
