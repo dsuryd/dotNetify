@@ -31,6 +31,12 @@ namespace DotNetify
       event EventHandler<MulticastPushUpdatesEventArgs> RequestMulticastPushUpdates;
 
       /// <summary>
+      /// Occurs when the view model wants to send data to specific clients.
+      /// This event is handled by the VMController.
+      /// </summary>
+      event EventHandler<SendEventArgs> RequestSend;
+
+      /// <summary>
       /// Multicast group name.
       /// </summary>
       string GroupName { get; }
@@ -68,8 +74,29 @@ namespace DotNetify
       public string GroupName { get; set; }
 
       /// <summary>
-      /// Whether to push the data.
+      /// Whether to push the data. After it's pushed, this will reset to signal success.
       /// </summary>
       public bool PushData { get; set; }
+   }
+
+   /// <summary>
+   /// Event aguments used by a multicast view model to request sending data to specific clients.
+   /// </summary>
+   public class SendEventArgs : EventArgs
+   {
+      /// <summary>
+      /// Identifies the connections to push the data to.
+      /// </summary>
+      public IList<string> ConnectionIds { get; } = new List<string>();
+
+      /// <summary>
+      /// Property values to push.
+      /// </summary>
+      public IDictionary<string, object> Properties { get; set; }
+
+      /// <summary>
+      /// Whether to send the data. After it's sent, this will reset to signal success.
+      /// </summary>
+      public bool SendData { get; set; }
    }
 }

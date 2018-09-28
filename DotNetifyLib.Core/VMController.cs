@@ -220,7 +220,10 @@ namespace DotNetify
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
 
                if (vmInstance is IMulticast)
+               {
                   (vmInstance as IMulticast).RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
+                  (vmInstance as IMulticast).RequestSend += VMInstance_RequestSend;
+               }
             }
             else
                _activeVMs[vmId].ConnectionId = connectionId;
@@ -395,6 +398,7 @@ namespace DotNetify
          {
             var multicastVM = vmInfo.Instance as IMulticast;
             multicastVM.RequestMulticastPushUpdates -= VMInstance_RequestMulticastPushUpdates;
+            multicastVM.RequestSend -= VMInstance_RequestSend;
 
             // If the multicast view model has a group, call the hub to disassociate the connection Id with that group.
             if (!string.IsNullOrEmpty(multicastVM.GroupName))
@@ -485,12 +489,23 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Handles push updates request from a view model.
+      /// Handles send request from a multicast view model.
       /// </summary>
-      private void VmInstance_RequestPushUpdates(object sender, EventArgs e)
+      private void VMInstance_RequestSend(object sender, SendEventArgs e)
       {
-         foreach (var vmInfo in _activeVMs.Values)
-            PushUpdates(vmInfo);
+         var vmInfo = _activeVMs.FirstOrDefault(kvp => kvp.Value.Instance == sender).Value;
+         if (vmInfo == null)
+            return;
+
+         var vmInstance = vmInfo.Instance;
+         var vmData = vmInstance.Serialize(e.Properties);
+         ResponseVMFilter.Invoke(vmInfo.Id, vmInstance, vmData, filteredData =>
+         {
+            foreach (var connectionId in e.ConnectionIds)
+               _vmResponse(connectionId, vmInfo.Id, (string)filteredData);
+         });
+
+         e.SendData = false;
       }
 
       /// <summary>
@@ -536,6 +551,15 @@ namespace DotNetify
          }
          else if (e.ExcludedConnectionId != vmInfo.ConnectionId)
             e.ConnectionIds.Add(vmInfo.ConnectionId);
+      }
+
+      /// <summary>
+      /// Handles push updates request from a view model.
+      /// </summary>
+      private void VmInstance_RequestPushUpdates(object sender, EventArgs e)
+      {
+         foreach (var vmInfo in _activeVMs.Values)
+            PushUpdates(vmInfo);
       }
    }
 }

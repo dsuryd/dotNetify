@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -35,7 +36,7 @@ namespace DotNetify
       private string _ownerGroupName;
 
       /// <summary>
-      /// Optional multicast group name.
+      /// Multicast group name.
       /// </summary>
       [Ignore]
       public virtual string GroupName { get; }
@@ -51,6 +52,12 @@ namespace DotNetify
       /// This event is handled by the VMController.
       /// </summary>
       public event EventHandler<MulticastPushUpdatesEventArgs> RequestMulticastPushUpdates;
+
+      /// <summary>
+      /// Occurs when the view model wants to push data to specific clients.
+      /// This event is handled by the VMController.
+      /// </summary>
+      public event EventHandler<SendEventArgs> RequestSend;
 
       /// <summary>
       /// Increment reference count.
@@ -75,6 +82,32 @@ namespace DotNetify
       {
          if (Interlocked.Decrement(ref _reference) == 0)
             base.Dispose();
+      }
+
+      /// <summary>
+      /// Sends data to specific connecting clients.
+      /// </summary>
+      /// <param name="connectionIds">Identifies the clients.</param>
+      /// <param name="propertyName">Property name to send.</param>
+      /// <param name="propertyValue">Property value to send.</param>
+      public void Send<T>(IList<string> connectionIds, string propertyName, T propertyValue = default(T))
+      {
+         var eventArgs = new SendEventArgs();
+         foreach (string connectionId in connectionIds)
+            eventArgs.ConnectionIds.Add(connectionId);
+         eventArgs.Properties = new Dictionary<string, object> { { propertyName, propertyValue } };
+
+         var delegates = RequestSend?.GetInvocationList().ToList();
+         if (delegates != null && delegates.Count > 0)
+         {
+            eventArgs.SendData = true;
+            foreach (var d in delegates)
+            {
+               d.DynamicInvoke(this, eventArgs);
+               if (!eventArgs.SendData)
+                  break;
+            }
+         }
       }
 
       /// <summary>

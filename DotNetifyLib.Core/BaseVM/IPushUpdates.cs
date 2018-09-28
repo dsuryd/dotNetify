@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2015 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ namespace DotNetify
    {
       /// <summary>
       /// Occurs when the view model wants to push updates to the client.
-      /// This event is handled by the VMController. 
+      /// This event is handled by the VMController.
       /// </summary>
       event EventHandler RequestPushUpdates;
    }
