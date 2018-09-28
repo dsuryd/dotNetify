@@ -43,7 +43,7 @@ class ChatRoom extends React.Component {
   sendMessage(text) {
     var match = /name is ([A-z]+)/i.exec(text);
     this.dispatchState({
-      Send: {
+      SendMessage: {
         Text: text,
         Date: new Date(),
         UserName: match ? match[1] : ''

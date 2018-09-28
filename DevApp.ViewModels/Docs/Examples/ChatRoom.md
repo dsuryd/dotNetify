@@ -46,7 +46,7 @@ class ChatRoom extends React.Component {
   sendMessage(text) {
     var match = /name is ([A-z]+)/i.exec(text);
     this.dispatchState({
-      Send: {
+      SendMessage: {
         Text: text,
         Date: new Date(),
         UserName: match ? match[1] : ''
@@ -151,7 +151,7 @@ public class ChatRoomVM : MulticastVM
 
     public string Users_itemKey => nameof(ChatUser.Id);
 
-    public Action<ChatMessage> Send => chat =>
+    public Action<ChatMessage> SendMessage => chat =>
     {
         string userId = ChatUser.ToUserId(_connectionContext);
         chat.Id = Messages.Count + 1;
@@ -160,14 +160,14 @@ public class ChatRoomVM : MulticastVM
 
         var privateMessageUser = Users.FirstOrDefault(x => chat.Text.StartsWith($"{x.Name}:"));
         if (privateMessageUser != null)
-        base.Send(new List<string> { privateMessageUser.Id, userId }, "PrivateMessage", chat);
+            base.Send(new List<string> { privateMessageUser.Id, userId }, "PrivateMessage", chat);
         else
         {
-        lock (Messages)
-        {
-            Messages.Add(chat);
-            this.AddList(nameof(Messages), chat);
-        }
+           lock (Messages)
+           {
+               Messages.Add(chat);
+               this.AddList(nameof(Messages), chat);
+           }
         }
     };
 
@@ -176,8 +176,8 @@ public class ChatRoomVM : MulticastVM
         var user = new ChatUser(_connectionContext, correlationId);
         lock (Users)
         {
-        Users.Add(user);
-        this.AddList(nameof(Users), user);
+           Users.Add(user);
+           this.AddList(nameof(Users), user);
         }
     };
 
@@ -185,12 +185,12 @@ public class ChatRoomVM : MulticastVM
     {
         lock (Users)
         {
-        var user = Users.FirstOrDefault(x => x.Id == ChatUser.ToUserId(_connectionContext));
-        if (user != null)
-        {
-            Users.Remove(user);
-            this.RemoveList(nameof(Users), user);
-        }
+           var user = Users.FirstOrDefault(x => x.Id == ChatUser.ToUserId(_connectionContext));
+           if (user != null)
+           {
+               Users.Remove(user);
+               this.RemoveList(nameof(Users), user);
+           }
         }
     };
 
@@ -210,16 +210,16 @@ public class ChatRoomVM : MulticastVM
     {
         lock (Users)
         {
-        var user = Users.FirstOrDefault(x => x.Id == userId);
-        if (user != null)
-        {
-            if (!string.IsNullOrEmpty(userName))
-            {
-                user.Name = userName;
-                this.UpdateList(nameof(Users), user);
-            }
-            return user.Name;
-        }
+           var user = Users.FirstOrDefault(x => x.Id == userId);
+           if (user != null)
+           {
+               if (!string.IsNullOrEmpty(userName))
+               {
+                   user.Name = userName;
+                   this.UpdateList(nameof(Users), user);
+               }
+               return user.Name;
+           }
         }
         return userId;
     }
