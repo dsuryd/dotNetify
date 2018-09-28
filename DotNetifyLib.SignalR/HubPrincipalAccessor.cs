@@ -75,7 +75,7 @@ namespace DotNetify
          {
             var feature = CallerContext?.Features.Get<IHttpConnectionFeature>();
             return feature != null ? new HttpConnection(
-               connectionId: feature.ConnectionId,
+               connectionId: CallerContext.ConnectionId,
                localIpAddress: feature.LocalIpAddress,
                remoteIpAddress: feature.RemoteIpAddress,
                localPort: feature.LocalPort,
