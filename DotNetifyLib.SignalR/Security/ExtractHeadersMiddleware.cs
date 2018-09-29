@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,15 +49,17 @@ namespace DotNetify.Security
       /// <param name="context">DotNetify hub context.</param>
       /// <param name="next">Next middleware delegate.</param>
       public Task Invoke(DotNetifyHubContext context, NextDelegate next)
-      {       
+      {
          // Set initial headers from previously cached headers.
-         context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
+         if (context.CallerContext != null)
+            context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
 
          var tuple = ExtractHeaders(context.Data);
          if (tuple.Item1 != null)
          {
             context.Headers = tuple.Item1;
-            _headersCache.Set(_headersKey(context.CallerContext.ConnectionId), context.Headers);
+            if (context.CallerContext != null)
+               _headersCache.Set(_headersKey(context.CallerContext.ConnectionId), context.Headers);
          }
          context.Data = tuple.Item2;
 
