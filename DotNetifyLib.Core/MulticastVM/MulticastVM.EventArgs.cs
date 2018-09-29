@@ -73,6 +73,6 @@ namespace DotNetify
       /// <summary>
       /// Whether to send the data. After it's sent, this will reset to signal success.
       /// </summary>
-      public bool SendData { get; set; }
+      internal bool SendData { get; set; }
    }
 }
