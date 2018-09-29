@@ -18,6 +18,7 @@ import CRUD from './apis/CRUD';
 import DI from './apis/DI';
 import Filter from './apis/Filter';
 import Middleware from './apis/Middleware';
+import Multicast from './apis/Multicast';
 import Routing from './apis/Routing';
 import Security from './apis/Security';
 
@@ -44,6 +45,7 @@ export {
   DI,
   Filter,
   Middleware,
+  Multicast,
   Routing,
   Security
 };

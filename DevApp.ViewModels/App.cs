@@ -33,6 +33,7 @@ namespace DotNetify.DevApp
          DI,
          Filter,
          Middleware,
+         Multicast,
          Routing,
          Security
       }
@@ -63,6 +64,7 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.DI))             { UrlPattern = "api/di" },
                 new RouteTemplate(nameof(Route.Filter))         { UrlPattern = "api/filter" },
                 new RouteTemplate(nameof(Route.Middleware))     { UrlPattern = "api/middleware" },
+                new RouteTemplate(nameof(Route.Multicast))      { UrlPattern = "api/multicast" },
                 new RouteTemplate(nameof(Route.Routing))        { UrlPattern = "api/routing" },
                 new RouteTemplate(nameof(Route.Security))       { UrlPattern = "api/security" },
 
@@ -112,6 +114,7 @@ namespace DotNetify.DevApp
                         new NavRoute("Dependency Injection",   this.GetRoute(nameof(Route.DI))),
                         new NavRoute("Filter",                 this.GetRoute(nameof(Route.Filter))),
                         new NavRoute("Middleware",             this.GetRoute(nameof(Route.Middleware))),
+                        new NavRoute("Multicast",              this.GetRoute(nameof(Route.Multicast))),
                         new NavRoute("Routing",                this.GetRoute(nameof(Route.Routing))),
                         new NavRoute("Security",               this.GetRoute(nameof(Route.Security))),
                     },
