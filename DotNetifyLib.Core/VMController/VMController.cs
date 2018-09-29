@@ -30,6 +30,9 @@ namespace DotNetify
    {
       public static readonly string MULTICAST = "multicast$";
 
+      /// <summary>
+      /// Specifies parameters for sending data to a group of connections.
+      /// </summary>
       public class GroupSend
       {
          public string GroupName { get; set; }
@@ -39,6 +42,9 @@ namespace DotNetify
          public string Data { get; set; }
       }
 
+      /// <summary>
+      /// Specifies paramaters for removing a connection from a group.
+      /// </summary>
       public class GroupRemove
       {
          public string GroupName { get; set; }
@@ -104,6 +110,11 @@ namespace DotNetify
          /// Identifies the SignalR connection to the browser client associated with the view model.
          /// </summary>
          public string ConnectionId { get; set; }
+
+         /// <summary>
+         /// Identifies the group the view model belongs to.
+         /// </summary>
+         public string GroupName { get; set; }
 
          public VMInfo(string id, BaseVM instance, string connectionId)
          {
@@ -217,14 +228,16 @@ namespace DotNetify
             // Add the view model instance to the controller.
             if (!_activeVMs.ContainsKey(vmId))
             {
-               _activeVMs.TryAdd(vmId, new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId));
+               var vmInfo = new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId);
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
-
                if (vmInstance is MulticastVM)
                {
-                  (vmInstance as MulticastVM).RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
-                  (vmInstance as MulticastVM).RequestSend += VMInstance_RequestSend;
+                  var multicastVM = vmInstance as MulticastVM;
+                  vmInfo.GroupName = multicastVM.GroupName;
+                  multicastVM.RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
+                  multicastVM.RequestSend += VMInstance_RequestSend;
                }
+               _activeVMs.TryAdd(vmId, vmInfo);
             }
             else
                _activeVMs[vmId].ConnectionId = connectionId;
@@ -234,7 +247,7 @@ namespace DotNetify
                PushUpdates(vmInfo);
          });
 
-         return vmInstance is MulticastVM ? (vmInstance as MulticastVM).GroupName : null;
+         return _activeVMs[vmId].GroupName;
       }
 
       /// <summary>
@@ -402,8 +415,8 @@ namespace DotNetify
             multicastVM.RequestSend -= VMInstance_RequestSend;
 
             // If the multicast view model has a group, call the hub to disassociate the connection Id with that group.
-            if (!string.IsNullOrEmpty(multicastVM.GroupName))
-               RemoveConnectionFromGroup(vmInfo.ConnectionId, vmInfo.Id, multicastVM.GroupName);
+            if (!string.IsNullOrEmpty(vmInfo.GroupName))
+               RemoveConnectionFromGroup(vmInfo.ConnectionId, vmInfo.Id, vmInfo.GroupName);
          }
          vmInfo.Instance.Dispose();
       }
@@ -542,7 +555,7 @@ namespace DotNetify
                {
                   Send(vmInfo, new GroupSend
                   {
-                     GroupName = e.GroupName,
+                     GroupName = vmInfo.GroupName,
                      ConnectionIds = e.ConnectionIds,
                      ExcludedConnectionIds = new List<string> { e.ExcludedConnectionId },
                      Data = vmInstance.Serialize(changedProperties)

@@ -35,11 +35,6 @@ namespace DotNetify
       public string ExcludedConnectionId { get; set; }
 
       /// <summary>
-      /// Multicast group name.
-      /// </summary>
-      public string GroupName { get; set; }
-
-      /// <summary>
       /// Whether to push the data. After it's pushed, this will reset to signal success.
       /// </summary>
       public bool PushData { get; set; }

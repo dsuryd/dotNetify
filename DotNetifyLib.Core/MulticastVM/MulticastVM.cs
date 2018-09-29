@@ -109,7 +109,6 @@ namespace DotNetify
             // Invoke the first available event handler to do the actual data push.
             // If successful, the handler will set the PushData back to false.
             eventArgs.PushData = true;
-            eventArgs.GroupName = GroupName;
             foreach (var d in delegates)
             {
                d.DynamicInvoke(this, eventArgs);
