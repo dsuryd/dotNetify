@@ -127,7 +127,7 @@
       <title
          id="title184">Circle.21</title>
       <desc
-         id="desc186">React</desc>
+         id="desc186">Component</desc>
       <v:userDefs>
         <v:ud
            v:nameU="visVersion"
@@ -167,7 +167,7 @@
          id="path191"
          style="fill:url(#linearGradient7003);stroke:#404040;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round" />
       <text
-         x="8.7799997"
+         x="10.7799997"
          y="769.79999"
          class="st4"
          v:langID="1033"
@@ -175,7 +175,7 @@
          style="font-size:15.99995995px;font-family:Calibri;fill:#000000"><v:paragraph
    v:horizAlign="1" />
 <v:tabList />
-React</text>
+Root</text>
     </g>
     <g
        id="shape22-107"
