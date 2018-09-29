@@ -145,7 +145,7 @@ componentWillUnmount() {
    this.vm.$destroy();
 }
 ```
-> In the situation where SignalR falls back to HTTP long-polling, the `componentWillUnmount` will not be called on browser reload. Orphan view models will eventually be cleared, but for best practice, use the window's `beforeUnload` event as a safeguard.  
+> When the browser is closing or reloading, SignalR will normally send a disconnection event to the server, which signals dotNetify to dispose the view models associated with the connection.  However, this event won't occur when the SignalR transport falls back to HTTP long polling.  Orphan view models will eventually be cleared, but for best practice, use the window's `beforeUnload` event as fallback to invoke `this.vm.$destroy()`.  
 
 #### API Essentials
 

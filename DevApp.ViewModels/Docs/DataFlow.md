@@ -6,7 +6,7 @@ This is the simplest pattern that we've used so far, in which the root component
 
 [inset]
 
-But you can make the view model do more. It can host any data-driven logic, such as selecting an item in the master list triggers new data being loaded into the details view. As demonstrated in the Grid View Example, with a single action-reaction cycle, the view model can process the selection changed event, load the data, and push the new state to your React view.
+But you can make the view model do more. It can host any data-driven logic, such as selecting an item in the master list triggers new data being loaded into the details view. As demonstrated in the [Composite View Example](/core/examples/compositeview), with a single action-reaction cycle, the view model can process the selection changed event, load the data, and push the new state to your App view.
 
 #### Siloed View Model
 
@@ -17,7 +17,7 @@ When the component tree is deeper, you may choose to connect some components to 
 This pattern is well-suited for building an SPA, where each page is a stand-alone component. And it also works well with container components.
 
 #### Scoped View Model
-For a more complex app with many deeply-layered components that are emitting various events that trigger data updates on various other components, it's easy for your React components to get bogged down with handling all the business logic. This pattern helps you to pull those logic out of your views and put them in the view models.
+For a more complex app with many deeply-layered components that are emitting various events that trigger data updates on various other components, it's easy for your UI components to get bogged down with handling all the business logic. This pattern helps you to pull those logic out of your views and put them in the view models.
 
 In this pattern, the view models are no longer isolated, but can be arranged hierarchically, in which a parent has access to its children and sets the context for them. Given this way, we can imagine the app as being composed of independent modules that are capable of interacting with one another through orchestration by a higher-order module, where each module is composed of front-end components and back-end view models that are working as a unit.
 
@@ -138,9 +138,9 @@ public class Details : BaseVM
 
 [inset]
 
-Notice that in the React view, the components are connecting to their own view models to get their state, and nothing is passed between components. It's their view models that are doing that on the back-end, and pushing the state change to the front-end.
+Notice that in the UI view, the components are connecting to their own view models to get their state, and nothing is passed between components. It's their view models that are doing that on the back-end, and pushing the state change to the front-end.
 
-The connect name of the components are qualified with the parent view model name. This allows the parent view model to intercept the lifecycle of its children. In the case above, the BookStore parent receives a call right after a child view model instance is created, which allows it to subscribe to the Selected event of the MasterList, so that it can in turn update the Details.
+The connect name of the components are qualified with the parent view model name. This allows the parent view model to intercept the lifecycle of its children. In the case above, the BookStore parent receives a call right after a child view model instance is created, which allows it to subscribe to the _Selected_ event of the _MasterList_, so that it can in turn update the Details.
 
 In general, the parent view model serves as a light orchestrator of the view models under its scope. This is the same uni-directional data flow as in the front-end, and it keeps the child view models stay decoupled from one another. The parent too can be decoupled from the children, by using interfaces instead of concrete types.
 
