@@ -81,7 +81,7 @@ namespace DotNetify
                return null;
 
             return new HttpConnection(
-               connectionId: env["owin.RequestId"].ToString(),
+               connectionId: null,
                localIpAddress: IPAddress.Parse(env["server.LocalIpAddress"].ToString()),
                remoteIpAddress: IPAddress.Parse(env["server.RemoteIpAddress"].ToString()),
                localPort: int.Parse(env["server.LocalPort"].ToString()),
