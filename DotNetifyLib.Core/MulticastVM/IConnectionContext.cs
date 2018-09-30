@@ -24,6 +24,11 @@ namespace DotNetify
    public interface IConnectionContext
    {
       /// <summary>
+      /// Identifies the connection.
+      /// </summary>
+      string ConnectionId { get; }
+
+      /// <summary>
       /// HTTP connection info.
       /// </summary>
       HttpConnection HttpConnection { get; }

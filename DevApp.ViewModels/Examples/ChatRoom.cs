@@ -47,7 +47,7 @@ namespace DotNetify.DevApp
 
       public ChatUser(IConnectionContext connectionContext, string correlationId)
       {
-         Id = ToUserId(connectionContext);
+         Id = connectionContext.ConnectionId;
          CorrelationId = correlationId;
          Name = $"user{Interlocked.Increment(ref _counter)}";
          IpAddress = connectionContext.HttpConnection.RemoteIpAddress.ToString();
@@ -56,8 +56,6 @@ namespace DotNetify.DevApp
          if (browserInfo != null)
             Browser = $"{browserInfo.UserAgent.Family}/{browserInfo.OS.Family} {browserInfo.OS.Major}";
       }
-
-      public static string ToUserId(IConnectionContext connectionContext) => connectionContext.HttpConnection.ConnectionId;
    }
 
    public class ChatRoomVM : MulticastVM
@@ -74,7 +72,7 @@ namespace DotNetify.DevApp
 
       public Action<ChatMessage> SendMessage => chat =>
       {
-         string userId = ChatUser.ToUserId(_connectionContext);
+         string userId = _connectionContext.ConnectionId;
          chat.Id = Messages.Count + 1;
          chat.UserId = userId;
          chat.UserName = UpdateUserName(userId, chat.UserName);
@@ -106,7 +104,7 @@ namespace DotNetify.DevApp
       {
          lock (Users)
          {
-            var user = Users.FirstOrDefault(x => x.Id == ChatUser.ToUserId(_connectionContext));
+            var user = Users.FirstOrDefault(x => x.Id == _connectionContext.ConnectionId);
             if (user != null)
             {
                Users.Remove(user);

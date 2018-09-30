@@ -42,6 +42,11 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Identifies the SignalR connection.
+      /// </summary>
+      public string ConnectionId => CallerContext?.ConnectionId;
+
+      /// <summary>
       /// HTTP request headers.
       /// </summary>
       public HttpRequestHeaders HttpRequestHeaders
@@ -76,7 +81,7 @@ namespace DotNetify
                return null;
 
             return new HttpConnection(
-               connectionId: CallerContext.ConnectionId,
+               connectionId: env["owin.RequestId"].ToString(),
                localIpAddress: IPAddress.Parse(env["server.LocalIpAddress"].ToString()),
                remoteIpAddress: IPAddress.Parse(env["server.RemoteIpAddress"].ToString()),
                localPort: int.Parse(env["server.LocalPort"].ToString()),

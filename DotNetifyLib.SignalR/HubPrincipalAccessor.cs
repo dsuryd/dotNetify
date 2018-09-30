@@ -52,6 +52,11 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Identifies the SignalR connection.
+      /// </summary>
+      public string ConnectionId => CallerContext?.ConnectionId;
+
+      /// <summary>
       /// HTTP request headers.
       /// </summary>
       public HttpRequestHeaders HttpRequestHeaders
@@ -75,7 +80,7 @@ namespace DotNetify
          {
             var feature = CallerContext?.Features.Get<IHttpConnectionFeature>();
             return feature != null ? new HttpConnection(
-               connectionId: CallerContext.ConnectionId,
+               connectionId: feature.ConnectionId,
                localIpAddress: feature.LocalIpAddress,
                remoteIpAddress: feature.RemoteIpAddress,
                localPort: feature.LocalPort,
