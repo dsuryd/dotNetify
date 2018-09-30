@@ -1,8 +1,10 @@
 using DotNetify;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace UnitTests
 {
@@ -22,7 +24,10 @@ namespace UnitTests
                .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
                .SubscribedBy(
                   AddProperty<int>("NameLength"), x => x.Select(name => name.Length)
-               );
+               )
+               .SubscribedByAsync(
+                  AddProperty<int>("NameLengthAsync").SubscribedBy(_ => PushUpdates(), out IDisposable subs),
+                  async x => await GetNameLengthAsync(x));
 
             AddInternalProperty<string>("Internal1");
             AddInternalProperty("Internal2", 0);
@@ -36,6 +41,12 @@ namespace UnitTests
          }
 
          private string FullNameDelegate(string firstName, string lastName) => $"{firstName} {lastName}";
+
+         private async Task<int> GetNameLengthAsync(string name)
+         {
+            await Task.Delay(100);
+            return name.Length;
+         }
       }
 
       [TestMethod]
@@ -66,6 +77,39 @@ namespace UnitTests
 
          Assert.AreEqual(10, response1["NameLength"]);
          Assert.AreEqual(8, response2["NameLength"]);
+      }
+
+      [TestMethod]
+      public void HelloWorldReactiveVM_UpdateAsync()
+      {
+         var vmController = new MockVMController<HelloWorldReactiveVM>();
+         vmController.RequestVM();
+
+         dynamic data1 = null;
+         dynamic data2 = null;
+         vmController.OnResponse += (sender, e) =>
+         {
+            dynamic data = JObject.Parse(e);
+            if (data.NameLengthAsync != null)
+            {
+               if (data1 == null)
+                  data1 = data;
+               else data2 = data;
+            }
+         };
+
+         var update = new Dictionary<string, object>() { { "FirstName", "John" } };
+         var response1 = vmController.UpdateVM(update);
+
+         update = new Dictionary<string, object>() { { "LastName", "Doe" } };
+         var response2 = vmController.UpdateVM(update);
+
+         Assert.AreEqual("John World", response1["FullName"]);
+         Assert.AreEqual("John Doe", response2["FullName"]);
+
+         System.Threading.Thread.Sleep(500);
+         Assert.AreEqual(10, data1.NameLengthAsync.Value);
+         Assert.AreEqual(8, data2.NameLengthAsync.Value);
       }
 
       [TestMethod]
