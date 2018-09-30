@@ -19,6 +19,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace DotNetify
 {
@@ -168,6 +169,46 @@ namespace DotNetify
       {
          subscriber.SubscribeTo(property.Select(value => mapper(value)));
          return property;
+      }
+
+      /// <summary>
+      /// Initiates subscription by an action delegate to a reactive property.
+      /// </summary>
+      /// <param name="property">Property to subscribe to.</param>
+      /// <param name="action">Action delegate.</param>
+      /// <returns>Property.</returns>
+      public static ReactiveProperty<TSource> SubscribedBy<TSource>(this ReactiveProperty<TSource> property, Action<TSource> action, out IDisposable subscription)
+      {
+         subscription = property.Subscribe(action);
+         return property;
+      }
+
+      /// <summary>
+      /// Initiates subscription to a reactive property.
+      /// </summary>
+      /// <param name="property">Property to subscribe to.</param>
+      /// <param name="subscriber">Subscriber.</param>
+      /// <param name="mapper">Function to map the property's data type to the subscriber's.</param>
+      /// <returns>Property.</returns>
+      public static ReactiveProperty<TSource> SubscribedByAsync<TSource, TTarget>(this ReactiveProperty<TSource> property,
+         ReactiveProperty<TTarget> subscriber, Func<TSource, Task<TTarget>> mapper)
+      {
+         subscriber.SubscribeTo(property.Select(value => Observable.FromAsync(() => mapper(value))).Concat());
+         return property;
+      }
+
+      /// <summary>
+      /// Subscribes to a reactive property.
+      /// </summary>
+      /// <param name="subscriber">Subscriber.</param>
+      /// <param name="property">Property to subscribe to.</param>
+      /// <param name="mapper">Function to map the property's data type to the subscriber's.</param>
+      /// <returns>Property.</returns>
+      public static ReactiveProperty<TTarget> SubscribeToAsync<TTarget, TSource>(this ReactiveProperty<TTarget> subscriber,
+         ReactiveProperty<TSource> property, Func<TSource, Task<TTarget>> mapper)
+      {
+         subscriber.SubscribeTo(property.Select(value => Observable.FromAsync(() => mapper(value))).Concat());
+         return subscriber;
       }
 
       #endregion Reactive

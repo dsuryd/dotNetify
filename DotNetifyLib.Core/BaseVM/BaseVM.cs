@@ -294,6 +294,21 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Push property changed updates to the client.  It accepts a boolean to force the request be sent to the VMController
+      /// even when there is no changed properties in this view model.  The intent is to allow a way for this view model to
+      /// push changes in other view models that share the same VMController.
+      /// This method also returns a boolean just so it can support fluent chaining.
+      /// </summary>
+      /// <param name="force">Always send push update request.</param>
+      /// <returns>True, just so it returns a value.</returns>
+      public virtual bool PushUpdates(bool force)
+      {
+         if (ChangedProperties.Any() || force)
+            RequestPushUpdates?.Invoke(this, null);
+         return true;
+      }
+
+      /// <summary>
       /// Serializes the instance into JSON-formatted string.
       /// </summary>
       /// <returns>Serialized instance string.</returns>
