@@ -52,8 +52,10 @@ For more information on reactive programming, I recommend to start here: [Intro 
 
 - this.__AddProperty<T>__(_propName, propValue_): add a reactive property.
 - this.__AddInternalProperty<T>__(_propName, propValue_): add a server-only reactive property; the value won't be sent to the client.
-- _ReactiveProperty_.__SubscribeTo__(_observable_): subscribe the reactive property to an observable.
-- _ReactiveProperty_.__SubscribedBy__(_reactiveProp, mapper_): subscribe the reactive property in the argument to self.
+- _ReactiveProperty_.__SubscribeTo__(_observable_)<br/>_ReactiveProperty_.__SubscribeToAsync__: subscribe the reactive property to an observable.
+- _ReactiveProperty_.__SubscribedBy__(_reactiveProp, mapper_)<br/>_ReactiveProperty_.__SubscribedByAsync__: subscribe the reactive property in the argument to self.
+
+> Caution: values produced by the async methods require explicit call to __PushUpdates__ to be sent to the client.
 
 #### Dynamic Registration
 
