@@ -55,7 +55,6 @@ class ChatRoom extends React.Component {
   render() {
     return (
       <ChatRoomCss>
-        <b style={{ color: '#e2544b' }}>*** This feature will be available in the next Nuget release ***</b>
         <div className="chatPanel">
           <nav>
             {this.state.Users.map(user => (
