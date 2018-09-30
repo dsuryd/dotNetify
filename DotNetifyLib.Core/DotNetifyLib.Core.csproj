@@ -18,7 +18,7 @@
     <Copyright>Copyright 2015-2018</Copyright>
     <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageTags>netcore reactive realtime signalr mobile web websocket</PackageTags>
-    <PackageIconUrl>http://dotnetify.net/content/images/dotnetify_128.png</PackageIconUrl>
+    <PackageIconUrl>http://dotnetify.net/content/images/dotnetify.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
