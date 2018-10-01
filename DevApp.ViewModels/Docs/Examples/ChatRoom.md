@@ -126,33 +126,29 @@ public class ChatUser
 
   public ChatUser(IConnectionContext connectionContext, string correlationId)
   {
-      Id = ToUserId(connectionContext);
+      Id = connectionContext.ConnectionId;
       CorrelationId = correlationId;
       Name = $"user{Interlocked.Increment(ref _counter)}";
       IpAddress = connectionContext.HttpConnection.RemoteIpAddress.ToString();
 
-      var browserInfo = UAParser.Parser.GetDefault().Parse(connectionContext.HttpRequestHeaders.UserAgent);
+      var browserInfo = Parser.GetDefault().Parse(connectionContext.HttpRequestHeaders.UserAgent);
       if (browserInfo != null)
         Browser = $"{browserInfo.UserAgent.Family}/{browserInfo.OS.Family} {browserInfo.OS.Major}";
   }
-
-  public static string ToUserId(IConnectionContext connectionContext) => connectionContext.HttpConnection.ConnectionId;
 }
 
 public class ChatRoomVM : MulticastVM
 {
-   private readonly IConnectionContext _connectionContext;
+  private readonly IConnectionContext _connectionContext;
 
-   public List<ChatMessage> Messages { get; } = new List<ChatMessage>();
+  public List<ChatMessage> Messages { get; } = new List<ChatMessage>();
+  public string Messages_itemKey => nameof(ChatMessage.Id);
 
-   public string Messages_itemKey => nameof(ChatMessage.Id);
+  public List<ChatUser> Users { get; } = new List<ChatUser>();
+  public string Users_itemKey => nameof(ChatUser.Id);
 
-   public List<ChatUser> Users { get; } = new List<ChatUser>();
-
-   public string Users_itemKey => nameof(ChatUser.Id);
-
-   public Action<ChatMessage> SendMessage => chat =>
-   {
+  public Action<ChatMessage> SendMessage => chat =>
+  {
       string userId = _connectionContext.ConnectionId;
       chat.Id = Messages.Count + 1;
       chat.UserId = userId;
@@ -160,68 +156,68 @@ public class ChatRoomVM : MulticastVM
 
       var privateMessageUser = Users.FirstOrDefault(x => chat.Text.StartsWith($"{x.Name}:"));
       if (privateMessageUser != null)
-         base.Send(new List<string> { privateMessageUser.Id, userId }, "PrivateMessage", chat);
+        base.Send(new List<string> { privateMessageUser.Id, userId }, "PrivateMessage", chat);
       else
       {
-         lock (Messages)
-         {
+        lock (Messages)
+        {
             Messages.Add(chat);
             this.AddList(nameof(Messages), chat);
-         }
+        }
       }
-   };
+  };
 
-   public Action<string> AddUser => correlationId =>
-   {
+  public Action<string> AddUser => correlationId =>
+  {
       var user = new ChatUser(_connectionContext, correlationId);
       lock (Users)
       {
-         Users.Add(user);
-         this.AddList(nameof(Users), user);
+        Users.Add(user);
+        this.AddList(nameof(Users), user);
       }
-   };
+  };
 
-   public Action RemoveUser => () =>
-   {
+  public Action RemoveUser => () =>
+  {
       lock (Users)
       {
-         var user = Users.FirstOrDefault(x => x.Id == _connectionContext.ConnectionId);
-         if (user != null)
-         {
+        var user = Users.FirstOrDefault(x => x.Id == _connectionContext.ConnectionId);
+        if (user != null)
+        {
             Users.Remove(user);
             this.RemoveList(nameof(Users), user);
-         }
+        }
       }
-   };
+  };
 
-   public ChatRoomVM(IConnectionContext connectionContext)
-   {
+  public ChatRoomVM(IConnectionContext connectionContext)
+  {
       _connectionContext = connectionContext;
-   }
+  }
 
-   public override void Dispose()
-   {
+  public override void Dispose()
+  {
       RemoveUser();
       PushUpdates();
       base.Dispose();
-   }
+  }
 
-   private string UpdateUserName(string userId, string userName)
-   {
+  private string UpdateUserName(string userId, string userName)
+  {
       lock (Users)
       {
-         var user = Users.FirstOrDefault(x => x.Id == userId);
-         if (user != null)
-         {
+        var user = Users.FirstOrDefault(x => x.Id == userId);
+        if (user != null)
+        {
             if (!string.IsNullOrEmpty(userName))
             {
-               user.Name = userName;
-               this.UpdateList(nameof(Users), user);
+              user.Name = userName;
+              this.UpdateList(nameof(Users), user);
             }
             return user.Name;
-         }
+        }
       }
       return userId;
-   }
+  }
 }
 ```
