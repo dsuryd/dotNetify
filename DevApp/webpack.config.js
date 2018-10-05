@@ -1,5 +1,6 @@
 'use strict';
 
+const { VueLoaderPlugin } = require('vue-loader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
@@ -17,12 +18,14 @@ module.exports = {
   devtool: 'source-map',
   resolve: {
     modules: [ 'src', 'client', 'node_modules' ],
-    extensions: [ '.js', '.jsx', '.tsx' ]
+    extensions: [ '.js', '.jsx', '.tsx', '.vue' ],
+    alias: { vue$: 'vue/dist/vue.esm.js' }
   },
   module: {
     rules: [
       { test: /\.jsx?$/, use: 'babel-loader', exclude: /node_modules/ },
       { test: /\.tsx?$/, use: 'awesome-typescript-loader?silent=true' },
+      { test: /\.vue$/, use: 'vue-loader' },
       { test: /\.html$/, loader: 'html-loader' },
       { test: /\.css$/, use: [ MiniCssExtractPlugin.loader, 'css-loader?minimize' ] },
       { test: /\.svg$/, use: 'svg-url-loader?noquotes=true' },
@@ -37,5 +40,5 @@ module.exports = {
     react: 'React',
     'react-dom': 'ReactDOM'
   },
-  plugins: [ new MiniCssExtractPlugin() ]
+  plugins: [ new VueLoaderPlugin(), new MiniCssExtractPlugin() ]
 };

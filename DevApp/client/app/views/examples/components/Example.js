@@ -13,11 +13,12 @@ export default class Example extends React.Component {
     this.unsubs();
   }
   render() {
-    const example = this.state.framework === 'Knockout' ? this.props.ko : this.props.react;
+    const { framework } = this.state;
+    const example = framework === 'Knockout' ? this.props.ko : framework === 'Vue' ? this.props.vue : this.props.react;
     if (!example) dotnetify.react.router.pushState({}, null, '/core/overview');
 
     return (
-      <RenderExample vm={this.props.vm} vmOptions={{ vmArg: { Framework: this.state.framework } }} key={this.state.framework}>
+      <RenderExample vm={this.props.vm} vmOptions={{ vmArg: { Framework: framework } }} key={framework}>
         {example}
       </RenderExample>
     );
