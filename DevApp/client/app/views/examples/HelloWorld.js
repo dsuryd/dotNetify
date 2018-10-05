@@ -1,6 +1,6 @@
 import React from 'react';
 import HelloWorldReact from './react/HelloWorld';
-import HelloWorldKo from './knockout/HelloWorld';
+import HelloWorldKo from './knockout/adapters/HelloWorld';
 import HelloWorldVue from './vue/adapters/HelloWorld';
 import Example from './components/Example';
 

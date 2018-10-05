@@ -1,6 +1,6 @@
 import React from 'react';
 import BookStoreReact, { BookDefault, Book } from './react/BookStore';
-import BookStoreKo from './knockout/BookStore';
+import BookStoreKo from './knockout/adapters/BookStore';
 import Example from './components/Example';
 
 export { BookDefault, Book };
