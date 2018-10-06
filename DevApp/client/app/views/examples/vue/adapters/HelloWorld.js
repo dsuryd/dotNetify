@@ -1,9 +1,9 @@
 import RenderVue from './RenderVue';
 import { HelloWorldCss } from '../../components/css';
-import HelloWorldVue from '../HelloWorld.vue';
+import HelloWorld from '../HelloWorld.vue';
 
 export default _ => (
 	<HelloWorldCss>
-		<RenderVue src={HelloWorldVue} />
+		<RenderVue src={HelloWorld} />
 	</HelloWorldCss>
 );

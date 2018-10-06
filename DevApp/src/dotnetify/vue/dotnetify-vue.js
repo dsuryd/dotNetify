@@ -80,11 +80,11 @@ dotnetify.vue = {
 
 			self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self);
 
-			if (Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, self.viewModels[iVMId], iVue);
+			if (iOptions && Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, self.viewModels[iVMId], iVue);
 		} else
 			console.error(
 				`Component is attempting to connect to an already active '${iVMId}'. ` +
-					` If it's from a dismounted component, you must add vm.$destroy to componentWillUnmount().`
+					` If it's from a dismounted component, you must call vm.$destroy in destroyed().`
 			);
 
 		self.init();
@@ -98,12 +98,11 @@ dotnetify.vue = {
 	},
 
 	_addWatchers(iWatchlist, iVM, iVue) {
-		iVM.$watched = [];
 		const callback = prop =>
 			function(newValue) {
-				if (iVM.$watched.includes(prop)) iVM.$dispatch({ [prop]: newValue });
-				else iVM.$watched.push(prop);
+				iVM.$serverUpdate === true && iVM.$dispatch({ [prop]: newValue });
 			}.bind(iVM);
+
 		iWatchlist.forEach(prop => iVue.$watch(prop, callback(prop)));
 	},
 
@@ -113,7 +112,11 @@ dotnetify.vue = {
 		if (self.viewModels.hasOwnProperty(iVMId)) {
 			const vm = self.viewModels[iVMId];
 			dotnetify.checkServerSideException(iVMId, iVMData, vm.$exceptionHandler);
+
+			// Disable server update while updating Vue so the change event won't cause rebound.
+			vm.$serverUpdate = false;
 			vm.$update(iVMData);
+			setTimeout(() => (vm.$serverUpdate = true));
 			return true;
 		}
 		return false;

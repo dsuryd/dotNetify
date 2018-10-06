@@ -7,12 +7,15 @@ export default class RenderVue extends React.Component {
 	}
 
 	componentDidMount() {
-		new Vue({
+		this.vue = new Vue({
 			el: '.vue',
 			components: {
 				'vue-example': this.props.src
 			}
 		});
+	}
+	componentWillUnmount() {
+		this.vue.$destroy();
 	}
 
 	render() {

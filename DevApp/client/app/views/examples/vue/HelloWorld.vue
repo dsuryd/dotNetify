@@ -1,5 +1,5 @@
 <template>
-  <div id="HelloWorld">
+  <div>
     <section>
       <div>
         <label>First name:</label>
@@ -27,8 +27,15 @@ export default {
   created: function () {
     this.vm = dotnetify.vue.connect("HelloWorldVM", this, { watch: ['FirstName', 'LastName'] });
   },
+  destroyed: function () {
+    this.vm.$destroy();
+  },
   data() {
-    return { FirstName: '', LastName: '', FullName: '' }
+    return {
+      FirstName: '',
+      LastName: '',
+      FullName: ''
+    }
   }
 }
 </script>
