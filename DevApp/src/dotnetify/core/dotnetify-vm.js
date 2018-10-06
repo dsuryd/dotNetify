@@ -155,7 +155,7 @@ export default class dotnetifyVM {
           var key = this.$itemKey[listName];
           if (key != null)
             vm.$removeList(listName, function(i) {
-              return i[key] == iVMUpdate[prop][key];
+              return i[key] == iVMUpdate[prop];
             });
           else console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
         }
