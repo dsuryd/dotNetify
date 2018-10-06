@@ -18,7 +18,7 @@ export default class RenderKnockout extends React.Component {
   }
 
   render() {
-    return <section ref={this.koRef} className="knockout" dangerouslySetInnerHTML={{ __html: this.props.html }} />;
+    return <section ref={this.koRef} className="example-root knockout" dangerouslySetInnerHTML={{ __html: this.props.html }} />;
   }
 
   setRoutingArgs() {

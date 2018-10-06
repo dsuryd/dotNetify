@@ -54,8 +54,11 @@ export const ControlTypesCss = styled.div`
         background: #efefef;
       }
       input ~ * {
-        margin-left: 5px;
+        margin-left: 0rem;
         margin-right: 0rem;
+        > li {
+          padding-left: .75rem;
+        }
       }
       label {
         cursor: pointer;
@@ -133,27 +136,31 @@ export const CompositeViewCss = styled.div`
   max-width: 1268px;
   display: flex;
   flex-wrap: wrap;
-  .knockout > div {
-    display: flex;
-    flex-wrap: wrap;
+  .example-root {
+    width: 100%;
+    max-width: 1268px;
+    > div {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
-  .knockout section,
+  .example-root section,
   > div {
     width: 70%;
     margin-right: 1rem;
   }
-  .knockout aside,
+  .example-root aside,
   > aside {
     width: calc(30% - 1rem);
     min-width: 10rem;
   }
   @media (max-width: 860px) {
-    .knockout section,
+    .example-root section,
     > div {
       width: 100%;
       margin-bottom: 2rem;
     }
-    .knockout aside,
+    .example-root aside,
     > aside {
       width: 100%;
     }
@@ -255,7 +262,7 @@ export const LiveChartCss = styled.div`
       margin-top: 2rem;
     }
   }
-  .knockout > * {
+  .example-root > * {
     display: flex;
     align-items: center;
     width: 100%;
@@ -279,7 +286,7 @@ export const LiveChartCss = styled.div`
       width: 100%;
       margin-bottom: 2rem;
     }
-    .knockout > * {
+    .example-root > * {
       flex-direction: column;
       > div:first-child,
       > div:last-child {
@@ -329,7 +336,7 @@ export const BookStoreCss = styled.div`
   padding: 0 1rem;
   max-width: 1268px;
   > header,
-  .knockout > section > header {
+  .example-root > section > header {
     padding: 1rem;
     margin-bottom: 1rem;
     background: #efefef;
@@ -337,7 +344,7 @@ export const BookStoreCss = styled.div`
     border: 1px solid #ddd;
   }
   > section,
-  .knockout > section > div {
+  .example-root > section > div {
     display: flex;
     flex-wrap: wrap;
     > div {
