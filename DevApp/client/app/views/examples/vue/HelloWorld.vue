@@ -30,7 +30,7 @@ export default {
   destroyed: function () {
     this.vm.$destroy();
   },
-  data() {
+  data: function () {
     return {
       FirstName: '',
       LastName: '',

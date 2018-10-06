@@ -112,45 +112,45 @@
 import dotnetify from 'dotnetify/vue';
 
 export default {
-    name: 'ControlTypes',
-    created: function () {
-        this.vm = dotnetify.vue.connect("ControlTypesVM", this, {
-            watch: [
-                'TextBoxValue', 'SearchBox', 'ShowMeCheckBox', 'EnableMeCheckBox',
-                'SimpleDropDownValue', 'DropDownValue', 'RadioButtonValue'
-            ]
-        });
-    },
-    destroyed: function () {
-        this.vm.$destroy();
-    },
-    data() {
-        return {
-            TextBoxValue: '',
-            TextBoxPlaceHolder: '',
-            TextBoxResult: '',
-            SearchBox: '',
-            SearchBoxPlaceHolder: '',
-            SearchResults: [],
-            ShowMeCheckBox: true,
-            EnableMeCheckBox: true,
-            CheckBoxResult: '',
-            SimpleDropDownValue: '',
-            SimpleDropDownResult: '',
-            SimpleDropDownOptions: [],
-            DropDownCaption: '',
-            DropDownValue: '',
-            DropDownResult: '',
-            DropDownOptions: [],
-            RadioButtonValue: '',
-            RadioButtonStyle: '',
-            ClickCount: 0
-        }
-    },
-    methods: {
-        onButtonClick: function () {
-            this.vm.$dispatch({ ButtonClicked: true });
-        }
+  name: 'ControlTypes',
+  created: function () {
+    this.vm = dotnetify.vue.connect("ControlTypesVM", this, {
+      watch: [
+        'TextBoxValue', 'SearchBox', 'ShowMeCheckBox', 'EnableMeCheckBox',
+        'SimpleDropDownValue', 'DropDownValue', 'RadioButtonValue'
+      ]
+    });
+  },
+  destroyed: function () {
+    this.vm.$destroy();
+  },
+  data: function () {
+    return {
+      TextBoxValue: '',
+      TextBoxPlaceHolder: '',
+      TextBoxResult: '',
+      SearchBox: '',
+      SearchBoxPlaceHolder: '',
+      SearchResults: [],
+      ShowMeCheckBox: true,
+      EnableMeCheckBox: true,
+      CheckBoxResult: '',
+      SimpleDropDownValue: '',
+      SimpleDropDownResult: '',
+      SimpleDropDownOptions: [],
+      DropDownCaption: '',
+      DropDownValue: '',
+      DropDownResult: '',
+      DropDownOptions: [],
+      RadioButtonValue: '',
+      RadioButtonStyle: '',
+      ClickCount: 0
     }
+  },
+  methods: {
+    onButtonClick: function () {
+      this.vm.$dispatch({ ButtonClicked: true });
+    }
+  }
 }
 </script>

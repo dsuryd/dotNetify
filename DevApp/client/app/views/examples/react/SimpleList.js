@@ -56,7 +56,10 @@ export default class SimpleList extends React.Component {
                   />
                 </td>
                 <td>
-                  <InlineEdit text={employee.LastName} onChange={value => this.dispatch({ Id: employee.Id, LastName: value })} />
+                  <InlineEdit
+                    text={employee.LastName}
+                    onChange={value => this.dispatch({ Update: { Id: employee.Id, LastName: value } })}
+                  />
                 </td>
                 <td>
                   <div onClick={_ => this.dispatch({ Remove: employee.Id })}>

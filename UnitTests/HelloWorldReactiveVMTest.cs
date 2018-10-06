@@ -107,7 +107,7 @@ namespace UnitTests
          Assert.AreEqual("John World", response1["FullName"]);
          Assert.AreEqual("John Doe", response2["FullName"]);
 
-         System.Threading.Thread.Sleep(1000);
+         System.Threading.Thread.Sleep(2000);
          Assert.AreEqual(10, data1.NameLengthAsync.Value);
          Assert.AreEqual(8, data2.NameLengthAsync.Value);
       }
