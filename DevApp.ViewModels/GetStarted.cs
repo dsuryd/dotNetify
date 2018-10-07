@@ -15,4 +15,12 @@ namespace DotNetify.DevApp
       new Markdown("DotNetify.DevApp.Docs.GetStarted.md").GetSection("NuGet Packages", "Client-Side Library") +
       new Markdown("DotNetify.DevApp.Docs.Knockout.GetStarted.md").GetSection("Client-Side Library");
   }   
+
+  public class GetStartedVue : BaseVM
+  {
+    public string Content => 
+      new Markdown("DotNetify.DevApp.Docs.Vue.GetStarted.md").GetSection(null, "Client-Side Library") +
+      new Markdown("DotNetify.DevApp.Docs.GetStarted.md").GetSection("NuGet Packages", "Client-Side Library") +
+      new Markdown("DotNetify.DevApp.Docs.Vue.GetStarted.md").GetSection("Client-Side Library");
+  }     
 }

@@ -1,3 +1,6 @@
+##### ControlTypes.vue
+
+```html
 <template>
   <table>
     <tbody>
@@ -154,3 +157,4 @@ export default {
   }
 }
 </script>
+```

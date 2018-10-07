@@ -1,3 +1,6 @@
+##### HelloWorld.vue
+
+```html
 <template>
   <div>
     <section>
@@ -11,8 +14,7 @@
       </div>
     </section>
     <div>
-      Full name is
-      <b>{{FullName}}</b>
+      Full name is <b>{{FullName}}</b>
     </div>
   </div>
 </template>
@@ -37,3 +39,4 @@ export default {
   }
 }
 </script>
+```

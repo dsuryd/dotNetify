@@ -20,6 +20,8 @@ namespace DotNetify.DevApp
         {
             return framework == "Knockout" ?
                new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.HelloWorld.md") :
+               framework == "Vue" ?
+               new Markdown("DotNetify.DevApp.Docs.Vue.Examples.HelloWorld.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.HelloWorld.md").GetSection(null, "HelloWorldVM.cs");
         }
     }

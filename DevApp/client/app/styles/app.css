@@ -30,7 +30,8 @@ div > h2 {
   font-size: .9rem;
 }
 
-.markdown pre .language-jsx {
+.markdown pre .language-jsx,
+.markdown pre .language-html {
   font-size: 1rem;
 }
 

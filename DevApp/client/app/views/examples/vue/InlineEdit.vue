@@ -1,13 +1,14 @@
 <template>
   <div>
-    <span v-if="!edit" class="editable" v-on:click="toggleEdit">{{value}}</span>
+    <span v-if="!edit" class="editable" @click="toggleEdit">{{value}}</span>
     <input
       v-else
       type="text"
       class="form-control"
       ref="inputElem"
       v-model.lazy="input"
-      v-on:blur="onBlur"
+      @blur="update"
+      @keydown.enter="update"
     >
   </div>
 </template>
@@ -27,11 +28,10 @@ export default {
       this.edit = !this.edit;
       if (this.edit)
         setTimeout(_ => this.$refs.inputElem.focus());
-
     },
-    onBlur: function (e) {
+    update: function () {
       this.toggleEdit();
-
+      this.$emit('update', this.input);
     }
   }
 }

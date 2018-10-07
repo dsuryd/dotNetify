@@ -26,6 +26,8 @@ namespace DotNetify.DevApp
         {
             return framework == "Knockout" ?
                new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.SimpleList.md") :
+               framework == "Vue" ?
+               new Markdown("DotNetify.DevApp.Docs.Vue.Examples.SimpleList.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.SimpleList.md").GetSection(null, "SimpleListVM.cs");
         }
     }

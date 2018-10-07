@@ -23,6 +23,8 @@ namespace DotNetify.DevApp
         {
             return framework == "Knockout" ?
                new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.ControlTypes.md") :
+               framework == "Vue" ?
+               new Markdown("DotNetify.DevApp.Docs.Vue.Examples.ControlTypes.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.ControlTypes.md").GetSection(null, "ControlTypesVM.cs");
         }
     }
