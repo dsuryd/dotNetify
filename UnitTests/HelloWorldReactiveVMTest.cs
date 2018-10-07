@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UnitTests
@@ -85,6 +86,8 @@ namespace UnitTests
          var vmController = new MockVMController<HelloWorldReactiveVM>();
          vmController.RequestVM();
 
+         var autoResetEvent = new AutoResetEvent(false);
+
          dynamic data1 = null;
          dynamic data2 = null;
          vmController.OnResponse += (sender, e) =>
@@ -94,7 +97,11 @@ namespace UnitTests
             {
                if (data1 == null)
                   data1 = data;
-               else data2 = data;
+               else
+               {
+                  data2 = data;
+                  autoResetEvent.Set();
+               }
             }
          };
 
@@ -107,7 +114,7 @@ namespace UnitTests
          Assert.AreEqual("John World", response1["FullName"]);
          Assert.AreEqual("John Doe", response2["FullName"]);
 
-         System.Threading.Thread.Sleep(2000);
+         autoResetEvent.WaitOne();
          Assert.AreEqual(10, data1.NameLengthAsync.Value);
          Assert.AreEqual(8, data2.NameLengthAsync.Value);
       }
