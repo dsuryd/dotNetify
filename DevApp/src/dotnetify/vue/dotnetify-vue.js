@@ -71,7 +71,7 @@ dotnetify.vue = {
           return props;
         },
         get state() {
-          return iVue.data;
+          return iVue.$data;
         },
         setState(state) {
           Object.keys(state).forEach(key => (iVue[key] = state[key]));
