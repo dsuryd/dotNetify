@@ -68,25 +68,27 @@ dotnetify.react = {
     }
 
     var self = dotnetify.react;
-    if (!self.viewModels.hasOwnProperty(iVMId)) {
-      const component = {
-        get props() {
-          return iReact.props;
-        },
-        get state() {
-          return iReact.state;
-        },
-        setState(state) {
-          iReact.setState(state);
-        }
-      };
-      self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, dotnetify.react);
-    }
-    else
+    if (self.viewModels.hasOwnProperty(iVMId)) {
       console.error(
         `Component is attempting to connect to an already active '${iVMId}'. ` +
           ` If it's from a dismounted component, you must add vm.$destroy to componentWillUnmount().`
       );
+      self.viewModels[iVMId].$destroy();
+      return setTimeout(() => self.connect(iVMId, iReact, iOptions));
+    }
+
+    const component = {
+      get props() {
+        return iReact.props;
+      },
+      get state() {
+        return iReact.state;
+      },
+      setState(state) {
+        iReact.setState(state);
+      }
+    };
+    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, dotnetify.react);
 
     self.init();
     return self.viewModels[iVMId];

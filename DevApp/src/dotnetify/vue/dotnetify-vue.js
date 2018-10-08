@@ -63,30 +63,31 @@ dotnetify.vue = {
     if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
 
     const self = dotnetify.vue;
-    if (!self.viewModels.hasOwnProperty(iVMId)) {
-      const component = {
-        get props() {
-          let props = {};
-          iVue.props && Object.keys(iVue.props).forEach(key => (props[key] = iVue.props[key]));
-          return props;
-        },
-        get state() {
-          return iVue.$data;
-        },
-        setState(state) {
-          Object.keys(state).forEach(key => (iVue[key] = state[key]));
-        }
-      };
-
-      self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self);
-
-      if (iOptions && Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, self.viewModels[iVMId], iVue);
-    }
-    else
+    if (self.viewModels.hasOwnProperty(iVMId)) {
       console.error(
         `Component is attempting to connect to an already active '${iVMId}'. ` +
           ` If it's from a dismounted component, you must call vm.$destroy in destroyed().`
       );
+      self.viewModels[iVMId].$destroy();
+      return setTimeout(() => self.connect(iVMId, iVue, iOptions));
+    }
+
+    const component = {
+      get props() {
+        let props = {};
+        iVue.props && Object.keys(iVue.props).forEach(key => (props[key] = iVue.props[key]));
+        return props;
+      },
+      get state() {
+        return iVue.$data;
+      },
+      setState(state) {
+        Object.keys(state).forEach(key => (iVue[key] = state[key]));
+      }
+    };
+
+    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self);
+    if (iOptions && Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, self.viewModels[iVMId], iVue);
 
     self.init();
     return self.viewModels[iVMId];
