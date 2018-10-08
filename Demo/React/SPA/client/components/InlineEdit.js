@@ -18,6 +18,10 @@ class InlineEdit extends React.Component {
     value: this.props.text
   };
 
+  handleBlur = _ => {
+    this.setState({ edit: false });
+  };
+
   handleClick = event => {
     event.stopPropagation();
     if (!this.state.edit) this.setState({ edit: true });
@@ -41,6 +45,7 @@ class InlineEdit extends React.Component {
             id="EditField"
             ref={input => input && input.focus()}
             value={this.state.value}
+            onBlur={this.handleBlur}
             onClick={this.handleClick}
             onUpdate={this.handleUpdate}
             onChange={value => this.setState({ value: value })}
