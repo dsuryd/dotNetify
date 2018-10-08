@@ -1,4 +1,6 @@
 import dotnetify from './dotnetify-vue';
+import Scope from './Scope';
 import './directives';
 
-module.exports = dotnetify;
+dotnetify.vue.Scope = Scope;
+module.exports = Object.assign(dotnetify, { Scope });

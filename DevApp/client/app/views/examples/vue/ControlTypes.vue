@@ -32,8 +32,8 @@
             <li
               class="list-group-item"
               v-for="(result, i) in SearchResults"
-              @click="SearchBox = result"
               :key="i"
+              @click="SearchBox = result"
             >{{result}}</li>
           </ul>
         </td>

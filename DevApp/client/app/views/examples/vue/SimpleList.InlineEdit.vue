@@ -16,7 +16,9 @@
 <script>
 export default {
   name: 'InlineEdit',
-  props: ['value'],
+  props: {
+    value: String
+  },
   data: function () {
     return {
       edit: false,
