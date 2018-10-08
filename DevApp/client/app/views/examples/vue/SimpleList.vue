@@ -40,7 +40,7 @@
 
 <script>
 import dotnetify from 'dotnetify/vue';
-import InlineEdit from './InlineEdit.vue';
+import InlineEdit from './SimpleList.InlineEdit.vue';
 
 export default {
   name: 'SimpleList',
