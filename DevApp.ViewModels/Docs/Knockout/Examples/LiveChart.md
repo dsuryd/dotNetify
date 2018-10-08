@@ -38,7 +38,6 @@ export default class LiveChartVM {
         ]
       }
     };
-    const chartOptions = { responsive: true };
     return new Chart(iElement.getContext('2d'), chartData, chartOptions);
   }
 
@@ -65,9 +64,9 @@ export default class LiveChartVM {
             borderWidth: 1
           }
         ]
-      }
+      },
+      options: { responsive: true, legend: { display: false } }
     };
-    const chartOptions = { responsive: true, legend: { display: false } };
     return new Chart(iElement.getContext('2d'), chartData, chartOptions);
   }
 

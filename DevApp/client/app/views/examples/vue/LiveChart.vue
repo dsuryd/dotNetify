@@ -1,6 +1,3 @@
-##### LiveChart.vue
-
-```html
 <template>
   <section>
     <div>
@@ -125,4 +122,4 @@ export default {
   }
 }
 </script>
-```
+

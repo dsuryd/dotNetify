@@ -22,6 +22,8 @@ namespace DotNetify.DevApp
         {
             return framework == "Knockout" ?
                new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.LiveChart.md") :
+               framework == "Vue" ?
+               new Markdown("DotNetify.DevApp.Docs.Vue.Examples.LiveChart.md") :
                new Markdown("DotNetify.DevApp.Docs.Examples.LiveChart.md").GetSection(null, "LiveChartVM.cs");
         }
     }

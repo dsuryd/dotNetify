@@ -49,7 +49,6 @@ export default {
   },
   created: function () {
     this.vm = dotnetify.vue.connect("SimpleListVM", this);
-    this.dispatch = state => this.vm.$dispatch(state);
   },
   destroyed: function () {
     this.vm.$destroy();
@@ -65,17 +64,17 @@ export default {
     add: function () {
       let fullName = `${this.firstName} ${this.lastName}`;
       if (fullName.trim() !== '') {
-        this.dispatch({ Add: fullName });
+        this.vm.$dispatch({ Add: fullName });
         this.firstName = '';
         this.lastName = '';
       }
     },
     onUpdate(employee, prop, value) {
       employee[prop] = value;
-      this.dispatch({ Update: { Id: employee.Id, [prop]: value } });
+      this.vm.$dispatch({ Update: { Id: employee.Id, [prop]: value } });
     },
     onRemove(id) {
-      this.dispatch({ Remove: id });
+      this.vm.$dispatch({ Remove: id });
     }
   }
 }

@@ -48,10 +48,10 @@ export default class LiveChartVM {
             borderWidth: 1
           }
         ]
-      }
+      },
+      options: { responsive: true, legend: { display: false } }
     };
-    const chartOptions = { responsive: true, legend: { display: false } };
-    return new Chart(iElement.getContext('2d'), chartData, chartOptions);
+    return new Chart(iElement.getContext('2d'), chartData);
   }
 
   createPieChart(iElement) {
@@ -68,10 +68,10 @@ export default class LiveChartVM {
             borderWidth: 1
           }
         ]
-      }
+      },
+      options: { responsive: true }
     };
-    const chartOptions = { responsive: true };
-    return new Chart(iElement.getContext('2d'), chartData, chartOptions);
+    return new Chart(iElement.getContext('2d'), chartData);
   }
 
   updateLineChart(vm, element) {
