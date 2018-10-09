@@ -32,12 +32,11 @@
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
-
 export default {
   name: 'MovieTable',
+  inject: ['connect'],
   created: function () {
-    this.vm = dotnetify.vue.connect("CompositeViewVM.FilterableMovieTableVM.MovieTableVM", this, { watch: ['SelectedKey', 'SelectedPage'] });
+    this.vm = this.connect("MovieTableVM", this, { watch: ['SelectedKey', 'SelectedPage'] });
   },
   destroyed: function () {
     this.vm.$destroy();

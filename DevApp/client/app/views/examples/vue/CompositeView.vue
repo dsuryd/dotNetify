@@ -1,15 +1,13 @@
 <template>
-  <!-- <Scope vm="CompositeViewVM"> -->
-  <div>
-    <section>
+  <Scope vm="CompositeViewVM">
+    <Scope tag="section" vm="FilterableMovieTableVM">
       <MovieTable/>
-    </section>
+    </Scope>
     <aside>
       <MovieDetails/>
       <MovieFilter/>
     </aside>
-  </div>
-  <!-- </Scope> -->
+  </Scope>
 </template>
 
 <script>
@@ -25,16 +23,6 @@ export default {
     'MovieTable': MovieTable,
     'MovieDetails': MovieDetails,
     'MovieFilter': MovieFilter
-  },
-  created: function () {
-    this.vm = dotnetify.vue.connect("CompositeViewVM", this);
-  },
-  destroyed: function () {
-    this.vm.$destroy();
-  },
-  data: function () {
-    return {
-    }
   }
 }
 </script>

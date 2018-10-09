@@ -18,13 +18,28 @@ import dotnetify from './dotnetify-vue';
 
 export default {
   name: 'Scope',
-  template: '<slot></slot>',
   props: {
-    vm: String
+    vm: String,
+    tag: String
   },
-  provide: {
-    context: {
-      connect: function() {}
+  inject: { scoped: { name: 'scoped', default: null } },
+  provide: function() {
+    const _this = this;
+    return {
+      scoped: vmId => _this.getScope(vmId),
+      connect: (vmId, component, options) => {
+        vmId = _this.getScope(vmId);
+        return dotnetify.vue.connect(vmId, component, options);
+      }
+    };
+  },
+  render: function(createElement) {
+    return createElement(this.tag || 'div', null, this.$slots.default);
+  },
+  methods: {
+    getScope: function(vmId) {
+      let scope = this.scoped ? this.scoped(this.vm) : this.vm;
+      return scope ? scope + '.' + vmId : vmId;
     }
   }
 };

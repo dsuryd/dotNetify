@@ -16,12 +16,11 @@
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
-
 export default {
   name: 'MovieDetails',
+  inject: ['connect'],
   created: function () {
-    this.vm = dotnetify.vue.connect("CompositeViewVM.MovieDetailsVM", this);
+    this.vm = this.connect("MovieDetailsVM", this);
   },
   destroyed: function () {
     this.vm.$destroy();
