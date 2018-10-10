@@ -22,6 +22,8 @@ namespace DotNetify.DevApp
       {
           return framework == "Knockout" ?
               new Markdown("DotNetify.DevApp.Docs.Knockout.Examples.BookStore.md") :
+              framework == "Vue" ? 
+              new Markdown("DotNetify.DevApp.Docs.Vue.Examples.BookStore.md") :
               new Markdown("DotNetify.DevApp.Docs.Examples.BookStore.md").GetSection(null, "BookStoreVM.cs");
       }      
    }

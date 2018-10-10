@@ -1,4 +1,5 @@
 import dotnetify from './dotnetify-vue';
+import './dotnetify-vue.router';
 import Scope from './Scope';
 import './directives';
 
