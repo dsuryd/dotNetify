@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("react"), require("react-dom"), require("@aspnet/signalr"));
+		module.exports = factory(require("vue"), require("@aspnet/signalr"));
 	else if(typeof define === 'function' && define.amd)
-		define(["react", "react-dom", "@aspnet/signalr"], factory);
+		define(["vue", "@aspnet/signalr"], factory);
 	else if(typeof exports === 'object')
-		exports["dotnetify"] = factory(require("react"), require("react-dom"), require("@aspnet/signalr"));
+		exports["dotnetify"] = factory(require("vue"), require("@aspnet/signalr"));
 	else
-		root["dotnetify"] = factory(root["React"], root["ReactDOM"], root["signalR"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__1__, __WEBPACK_EXTERNAL_MODULE__13__, __WEBPACK_EXTERNAL_MODULE__19__) {
+		root["dotnetify"] = factory(root["Vue"], root["signalR"]);
+})(window, function(__WEBPACK_EXTERNAL_MODULE__3__, __WEBPACK_EXTERNAL_MODULE__13__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,160 +91,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _dotnetify2 = __webpack_require__(26);
-
-var _dotnetify3 = _interopRequireDefault(_dotnetify2);
-
-var _dotnetifyVm = __webpack_require__(18);
-
-var _dotnetifyVm2 = _interopRequireDefault(_dotnetifyVm);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* 
-Copyright 2017-2018 Dicky Suryadi
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- */
-if (typeof window == 'undefined') window = global;
-var dotnetify = window.dotnetify || _dotnetify3.default;
-
-dotnetify.react = {
-  version: '2.0.0',
-  viewModels: {},
-  plugins: {},
-  controller: dotnetify,
-
-  // Internal variables.
-  _responseSubs: null,
-  _reconnectedSubs: null,
-  _connectedSubs: null,
-  _connectionFailedSubs: null,
-
-  // Initializes connection to SignalR server hub.
-  init: function init() {
-    var self = dotnetify.react;
-
-    if (!self._responseSubs) {
-      self._responseSubs = dotnetify.responseEvent.subscribe(function (iVMId, iVMData) {
-        return self._responseVM(iVMId, iVMData);
-      });
-    }
-
-    if (!self._connectedSubs) {
-      self._connectedSubs = dotnetify.connectedEvent.subscribe(function () {
-        return Object.keys(self.viewModels).forEach(function (vmId) {
-          return !self.viewModels[vmId].$requested && self.viewModels[vmId].$request();
-        });
-      });
-    }
-
-    var start = function start() {
-      if (!dotnetify.isHubStarted) Object.keys(self.viewModels).forEach(function (vmId) {
-        return self.viewModels[vmId].$requested = false;
-      });
-      dotnetify.startHub();
-    };
-
-    if (!self._reconnectedSubs) {
-      self._reconnectedSubs = dotnetify.reconnectedEvent.subscribe(start);
-    }
-
-    dotnetify.initHub();
-    start();
-  },
-
-  // Connects to a server view model.
-  connect: function connect(iVMId, iReact, iOptions) {
-    if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
-
-    if (dotnetify.ssr && dotnetify.react.ssrConnect) {
-      var vmArg = iOptions && iOptions['vmArg'];
-      return dotnetify.react.ssrConnect(iVMId, iReact, vmArg);
-    }
-
-    var self = dotnetify.react;
-    if (self.viewModels.hasOwnProperty(iVMId)) {
-      console.error('Component is attempting to connect to an already active \'' + iVMId + '\'. ' + ' If it\'s from a dismounted component, you must add vm.$destroy to componentWillUnmount().');
-      self.viewModels[iVMId].$destroy();
-      return setTimeout(function () {
-        return self.connect(iVMId, iReact, iOptions);
-      });
-    }
-
-    var component = {
-      get props() {
-        return iReact.props;
-      },
-      get state() {
-        return iReact.state;
-      },
-      setState: function setState(state) {
-        iReact.setState(state);
-      }
-    };
-    self.viewModels[iVMId] = new _dotnetifyVm2.default(iVMId, component, iOptions, dotnetify.react);
-
-    self.init();
-    return self.viewModels[iVMId];
-  },
-
-  // Get all view models.
-  getViewModels: function getViewModels() {
-    var self = dotnetify.react;
-    return Object.keys(self.viewModels).map(function (vmId) {
-      return self.viewModels[vmId];
-    });
-  },
-
-  _responseVM: function _responseVM(iVMId, iVMData) {
-    var self = dotnetify.react;
-
-    if (self.viewModels.hasOwnProperty(iVMId)) {
-      var vm = self.viewModels[iVMId];
-      dotnetify.checkServerSideException(iVMId, iVMData, vm.$exceptionHandler);
-      vm.$update(iVMData);
-      return true;
-    }
-    return false;
-  }
-};
-
-exports.default = dotnetify;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__1__;
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -365,7 +216,7 @@ var createEventEmitter = exports.createEventEmitter = function createEventEmitte
 exports.default = new utils();
 
 /***/ }),
-/* 3 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -389,7 +240,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var jQueryDeferred = __webpack_require__(23);
+var jQueryDeferred = __webpack_require__(17);
 var jQueryShim = jQueryDeferred.extend(function (selector) {
 
    if (selector === window || selector.document) return {
@@ -520,7 +371,181 @@ var jQueryShim = jQueryDeferred.extend(function (selector) {
 if (typeof window !== "undefined") window.jQuery = window.jQuery || jQueryShim;
 
 if (( false ? undefined : _typeof(exports)) === "object" && ( false ? undefined : _typeof(module)) === "object") module.exports = jQueryShim;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(24)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(18)(module)))
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _dotnetify2 = __webpack_require__(20);
+
+var _dotnetify3 = _interopRequireDefault(_dotnetify2);
+
+var _dotnetifyVm = __webpack_require__(12);
+
+var _dotnetifyVm2 = _interopRequireDefault(_dotnetifyVm);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; } /* 
+                                                                                                                                                                                                                  Copyright 2018 Dicky Suryadi
+                                                                                                                                                                                                                  
+                                                                                                                                                                                                                  Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                  you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                  You may obtain a copy of the License at
+                                                                                                                                                                                                                  
+                                                                                                                                                                                                                      http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                  
+                                                                                                                                                                                                                  Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                  distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                  See the License for the specific language governing permissions and
+                                                                                                                                                                                                                  limitations under the License.
+                                                                                                                                                                                                                   */
+
+
+if (typeof window == 'undefined') window = global;
+var dotnetify = window.dotnetify || _dotnetify3.default;
+
+dotnetify.vue = {
+  version: '1.0.0',
+  viewModels: {},
+  plugins: {},
+  controller: dotnetify,
+
+  // Internal variables.
+  _responseSubs: null,
+  _reconnectedSubs: null,
+  _connectedSubs: null,
+  _connectionFailedSubs: null,
+
+  // Initializes connection to SignalR server hub.
+  init: function init() {
+    var self = dotnetify.vue;
+
+    if (!self._responseSubs) {
+      self._responseSubs = dotnetify.responseEvent.subscribe(function (iVMId, iVMData) {
+        return self._responseVM(iVMId, iVMData);
+      });
+    }
+
+    if (!self._connectedSubs) {
+      self._connectedSubs = dotnetify.connectedEvent.subscribe(function () {
+        return Object.keys(self.viewModels).forEach(function (vmId) {
+          return !self.viewModels[vmId].$requested && self.viewModels[vmId].$request();
+        });
+      });
+    }
+
+    var start = function start() {
+      if (!dotnetify.isHubStarted) Object.keys(self.viewModels).forEach(function (vmId) {
+        return self.viewModels[vmId].$requested = false;
+      });
+      dotnetify.startHub();
+    };
+
+    if (!self._reconnectedSubs) {
+      self._reconnectedSubs = dotnetify.reconnectedEvent.subscribe(start);
+    }
+
+    dotnetify.initHub();
+    start();
+  },
+
+  // Connects to a server view model.
+  connect: function connect(iVMId, iVue, iOptions) {
+    if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
+
+    var self = dotnetify.vue;
+    if (self.viewModels.hasOwnProperty(iVMId)) {
+      console.error('Component is attempting to connect to an already active \'' + iVMId + '\'. ' + ' If it\'s from a dismounted component, you must call vm.$destroy in destroyed().');
+      self.viewModels[iVMId].$destroy();
+      return setTimeout(function () {
+        return self.connect(iVMId, iVue, iOptions);
+      });
+    }
+
+    var component = {
+      get props() {
+        var props = {};
+        iVue.props && Object.keys(iVue.props).forEach(function (key) {
+          return props[key] = iVue.props[key];
+        });
+        return props;
+      },
+      get state() {
+        return iVue.$data;
+      },
+      setState: function setState(state) {
+        Object.keys(state).forEach(function (key) {
+          var value = state[key];
+          if (iVue.hasOwnProperty(key)) iVue[key] = value;else if (value) console.error('\'' + key + '\' was received, but the property isn\'t defined in the Vue instance.');
+        });
+      }
+    };
+
+    self.viewModels[iVMId] = new _dotnetifyVm2.default(iVMId, component, iOptions, self);
+    if (iOptions && Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, self.viewModels[iVMId], iVue);
+
+    self.init();
+    return self.viewModels[iVMId];
+  },
+
+  // Get all view models.
+  getViewModels: function getViewModels() {
+    var self = dotnetify.vue;
+    return Object.keys(self.viewModels).map(function (vmId) {
+      return self.viewModels[vmId];
+    });
+  },
+
+  _addWatchers: function _addWatchers(iWatchlist, iVM, iVue) {
+    var callback = function callback(prop) {
+      return function (newValue) {
+        iVM.$serverUpdate === true && iVM.$dispatch(_defineProperty({}, prop, newValue));
+      }.bind(iVM);
+    };
+
+    iWatchlist.forEach(function (prop) {
+      return iVue.$watch(prop, callback(prop));
+    });
+  },
+
+
+  _responseVM: function _responseVM(iVMId, iVMData) {
+    var self = dotnetify.vue;
+
+    if (self.viewModels.hasOwnProperty(iVMId)) {
+      var vm = self.viewModels[iVMId];
+      dotnetify.checkServerSideException(iVMId, iVMData, vm.$exceptionHandler);
+
+      // Disable server update while updating Vue so the change event won't cause rebound.
+      vm.$serverUpdate = false;
+      vm.$update(iVMData);
+      setTimeout(function () {
+        return vm.$serverUpdate = true;
+      });
+      return true;
+    }
+    return false;
+  }
+};
+
+exports.default = dotnetify;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__3__;
 
 /***/ }),
 /* 4 */
@@ -555,90 +580,60 @@ module.exports = g;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
+var _vue = __webpack_require__(3);
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _dotnetifyReact = __webpack_require__(0);
-
-var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
+var _vue2 = _interopRequireDefault(_vue);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+// Call a method when a property value changes.
+_vue2.default.directive('vmOn', {
+  bind: function bind(el, binding, vnode) {
+    // Parse the value, which should be in object literal { property: fnName }.
+    var match = /{(.*):(.*)}/.exec(binding.expression);
+    if (match != null) {
+      var propName = match[1].trim();
+      var methodName = match[2].trim();
+      var vue = vnode.context;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+      if (!vue.hasOwnProperty(propName)) throw new Error('v-vmOn property \'' + propName + '\' is not defined');
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+      if (!vue.hasOwnProperty(methodName) && typeof vue[methodName] == 'function') throw new Error('v-vmOn method \'' + propName + '\' is not defined or not a function');
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Copyright 2017-2018 Dicky Suryadi
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Licensed under the Apache License, Version 2.0 (the "License");
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               you may not use this file except in compliance with the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               You may obtain a copy of the License at
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   http://www.apache.org/licenses/LICENSE-2.0
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Unless required by applicable law or agreed to in writing, software
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               distributed under the License is distributed on an "AS IS" BASIS,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               See the License for the specific language governing permissions and
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               limitations under the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+      vue.$watch(propName, function () {
+        return vue[methodName](el);
+      });
+    }
+  }
+});
 
-// <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
-var RouteTarget = function (_React$Component) {
-	_inherits(RouteTarget, _React$Component);
+// Route link directive for anchor tags.
+/* 
+Copyright 2018 Dicky Suryadi
 
-	function RouteTarget() {
-		_classCallCheck(this, RouteTarget);
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-		return _possibleConstructorReturn(this, (RouteTarget.__proto__ || Object.getPrototypeOf(RouteTarget)).apply(this, arguments));
-	}
+    http://www.apache.org/licenses/LICENSE-2.0
 
-	_createClass(RouteTarget, [{
-		key: 'componentWillMount',
-		value: function componentWillMount() {
-			var elem = document.getElementById(this.props.id);
-			if (elem != null && window.ssr && !window.ssr[this.props.id]) {
-				window.ssr[this.props.id] = true;
-				this.initialHtml = { __html: elem.innerHTML };
-			} else this.initialHtml = { __html: '' };
-		}
-	}, {
-		key: 'getDOMNode',
-		value: function getDOMNode() {
-			return this.elem;
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _props = this.props,
-			    id = _props.id,
-			    props = _objectWithoutProperties(_props, ['id']);
-
-			return _react2.default.createElement('div', _extends({ id: id, ref: function ref(el) {
-					return _this.elem = el;
-				} }, this.props, { dangerouslySetInnerHTML: this.initialHtml }));
-		}
-	}]);
-
-	return RouteTarget;
-}(_react2.default.Component);
-
-exports.default = RouteTarget;
-
-
-_dotnetifyReact2.default.react.router.RouteTarget = RouteTarget;
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+_vue2.default.directive('vmRoute', {
+  bind: function bind(el, binding, vnode) {
+    var vue = vnode.context;
+    var route = binding.value;
+    el.href = route && vue.vm ? vue.vm.$route(route) : '';
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      vue.vm.$handleRoute(e);
+    });
+  }
+});
 
 /***/ }),
 /* 6 */
@@ -648,384 +643,61 @@ _dotnetifyReact2.default.react.router.RouteTarget = RouteTarget;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _dotnetifyVue = __webpack_require__(2);
 
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _dotnetifyReact = __webpack_require__(0);
-
-var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
+var _dotnetifyVue2 = _interopRequireDefault(_dotnetifyVue);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Copyright 2017-2018 Dicky Suryadi
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Licensed under the Apache License, Version 2.0 (the "License");
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               you may not use this file except in compliance with the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               You may obtain a copy of the License at
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   http://www.apache.org/licenses/LICENSE-2.0
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Unless required by applicable law or agreed to in writing, software
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               distributed under the License is distributed on an "AS IS" BASIS,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               See the License for the specific language governing permissions and
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               limitations under the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-// <RouteLink> is a helper component to set anchor tags for routes.
-var RouteLink = function (_React$Component) {
-	_inherits(RouteLink, _React$Component);
-
-	function RouteLink() {
-		_classCallCheck(this, RouteLink);
-
-		return _possibleConstructorReturn(this, (RouteLink.__proto__ || Object.getPrototypeOf(RouteLink)).apply(this, arguments));
-	}
-
-	_createClass(RouteLink, [{
-		key: 'render',
-		value: function render() {
-			var props = this.props;
-			if (props.vm == null) console.error("RouteLink requires 'vm' property.");
-
-			var handleClick = function handleClick(event) {
-				event.preventDefault();
-				if (props.route == null) {
-					console.error("RouteLink requires 'route' property.");
-					return;
-				}
-				if (typeof props.onClick === 'function') props.onClick(event);
-				return props.vm.$handleRoute(event);
-			};
-
-			return _react2.default.createElement('a', {
-				style: props.style,
-				className: props.className,
-				href: props.route != null ? props.vm.$route(props.route) : '',
-				children: props.children,
-				onClick: handleClick
-			});
-		}
-	}]);
-
-	return RouteLink;
-}(_react2.default.Component);
-
-exports.default = RouteLink;
-
-
-_dotnetifyReact2.default.react.router.RouteLink = RouteLink;
+exports.default = {
+  name: 'Scope',
+  props: {
+    vm: String,
+    tag: String
+  },
+  inject: { scoped: { name: 'scoped', default: null } },
+  provide: function provide() {
+    var _this = this;
+    return {
+      scoped: function scoped(vmId) {
+        return _this.getScope(vmId);
+      },
+      connect: function connect(vmId, component, options) {
+        vmId = _this.getScope(vmId);
+        return _dotnetifyVue2.default.vue.connect(vmId, component, options);
+      }
+    };
+  },
+  render: function render(createElement) {
+    return createElement(this.tag || 'div', null, this.$slots.default);
+  },
+  methods: {
+    getScope: function getScope(vmId) {
+      var scope = this.scoped ? this.scoped(this.vm) : this.vm;
+      return scope ? scope + '.' + vmId : vmId;
+    }
+  }
+}; /* 
+   Copyright 2018 Dicky Suryadi
+   
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+   
+       http://www.apache.org/licenses/LICENSE-2.0
+   
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+    */
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-
-
-var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
-
-module.exports = ReactPropTypesSecret;
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-
-
-var ReactPropTypesSecret = __webpack_require__(7);
-
-function emptyFunction() {}
-
-module.exports = function() {
-  function shim(props, propName, componentName, location, propFullName, secret) {
-    if (secret === ReactPropTypesSecret) {
-      // It is still safe when called from React.
-      return;
-    }
-    var err = new Error(
-      'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
-      'Use PropTypes.checkPropTypes() to call them. ' +
-      'Read more at http://fb.me/use-check-prop-types'
-    );
-    err.name = 'Invariant Violation';
-    throw err;
-  };
-  shim.isRequired = shim;
-  function getShim() {
-    return shim;
-  };
-  // Important!
-  // Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
-  var ReactPropTypes = {
-    array: shim,
-    bool: shim,
-    func: shim,
-    number: shim,
-    object: shim,
-    string: shim,
-    symbol: shim,
-
-    any: shim,
-    arrayOf: getShim,
-    element: shim,
-    instanceOf: getShim,
-    node: shim,
-    objectOf: getShim,
-    oneOf: getShim,
-    oneOfType: getShim,
-    shape: getShim,
-    exact: getShim
-  };
-
-  ReactPropTypes.checkPropTypes = emptyFunction;
-  ReactPropTypes.PropTypes = ReactPropTypes;
-
-  return ReactPropTypes;
-};
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-if (false) { var throwOnDirectAccess, isValidElement, REACT_ELEMENT_TYPE; } else {
-  // By explicitly using `prop-types` you are opting into new production behavior.
-  // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(8)();
-}
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(9);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _dotnetifyReact = __webpack_require__(0);
-
-var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Copyright 2017-2018 Dicky Suryadi
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Licensed under the Apache License, Version 2.0 (the "License");
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               you may not use this file except in compliance with the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               You may obtain a copy of the License at
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   http://www.apache.org/licenses/LICENSE-2.0
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Unless required by applicable law or agreed to in writing, software
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               distributed under the License is distributed on an "AS IS" BASIS,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               See the License for the specific language governing permissions and
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               limitations under the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-// The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
-// of the parent component, so that when the child component connects to its back-end view model, the child view model
-// instance is created within the scope of the parent view model.
-//
-// The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
-// injects properties and dispatch functions into the component.
-var Scope = function (_React$Component) {
-	_inherits(Scope, _React$Component);
-
-	function Scope() {
-		_classCallCheck(this, Scope);
-
-		return _possibleConstructorReturn(this, (Scope.__proto__ || Object.getPrototypeOf(Scope)).apply(this, arguments));
-	}
-
-	_createClass(Scope, [{
-		key: 'scoped',
-		value: function scoped(vmId) {
-			var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
-			return scope ? scope + '.' + vmId : vmId;
-		}
-	}, {
-		key: 'getChildContext',
-		value: function getChildContext() {
-			var _this = this;
-
-			return {
-				scoped: function scoped(vmId) {
-					return _this.scoped(vmId);
-				},
-				connect: function connect(vmId, component, options) {
-					component.vmId = _this.scoped(vmId);
-					component.vm = _dotnetifyReact2.default.react.connect(component.vmId, component, options);
-					component.dispatch = function (state) {
-						return component.vm.$dispatch(state);
-					};
-
-					component.dispatchState = function (state) {
-						component.vm.State(state);
-						component.vm.$dispatch(state);
-					};
-					return window.vmStates ? window.vmStates[component.vmId] : null;
-				}
-			};
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return this.props.children;
-		}
-	}]);
-
-	return Scope;
-}(_react2.default.Component);
-
-Scope.displayName = 'Scope';
-Scope.version = '1.2.0';
-Scope.propTypes = { vm: _propTypes2.default.string };
-Scope.contextTypes = { scoped: _propTypes2.default.func };
-Scope.childContextTypes = {
-	scoped: _propTypes2.default.func.isRequired,
-	connect: _propTypes2.default.func.isRequired
-};
-exports.default = Scope;
-
-
-_dotnetifyReact2.default.react.Scope = Scope;
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _dotnetifyReact = __webpack_require__(0);
-
-var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Used by server-side rendering in lieu of connect method.
-_dotnetifyReact2.default.react.ssrConnect = function (iVMId, iReact, iVMArg) {
-	if (window.ssr == null || !window.ssr.hasOwnProperty(iVMId)) console.error("Server-side rendering requires initial state in 'window.ssr." + iVMId + "'.");
-
-	var self = _dotnetifyReact2.default.react;
-	var vmState = window.ssr[iVMId];
-	var getState = function getState() {
-		return vmState;
-	};
-	var setState = function setState(state) {
-		vmState = $.extend(vmState, state);
-	};
-	var options = {
-		getState: getState,
-		setState: setState,
-		vmArg: iVMArg
-	};
-	var vm = self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, options);
-
-	// Need to be asynch to allow initial state to be processed.
-	setTimeout(function () {
-		vm.$update(JSON.stringify(window.ssr[iVMId]));
-	}, 100);
-	return vm;
-};
-
-// Used by client-side React component to get server-side rendered initial state.
-_dotnetifyReact2.default.react.router.ssrState = function (iVMId) {
-	if (window.ssr && window.ssr[iVMId] && !window.ssr[iVMId].fetched) {
-		window.ssr[iVMId].fetched = true;
-		return window.ssr[iVMId];
-	}
-};
-
-// Called from server to configure server-side rendering.
-// iPath - initial URL path.
-// iInitialStates - serialized object literal '{ "vmName": {initialState}, ...}'.
-// iOverrideRouteFn - function to override routing URLs before the router loads them.
-// iCallbackFn - callback after the path is fully routed.
-// iTimeout - timeout in milliseconds.
-_dotnetifyReact2.default.react.router.ssr = function (iPath, iInitialStates, iOverrideRouteFn, iCallbackFn, iTimeout) {
-	_dotnetifyReact2.default.ssr = true;
-	_dotnetifyReact2.default.react.router.urlPath = iPath;
-	_dotnetifyReact2.default.react.router.overrideUrl = iOverrideRouteFn;
-
-	// Insert initial states in the head tag.
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.text = 'window.ssr=' + iInitialStates + ';';
-	var head = document.getElementsByTagName('head')[0];
-	if (head) head.insertBefore(script, head.firstChild);else console.error('router> document head tag is required for server-side render.');
-
-	var routed = false;
-	var fallback = iTimeout ? setTimeout(function () {
-		if (!routed) iCallbackFn();
-	}, iTimeout) : 0;
-	window.addEventListener('dotnetify.routed', function () {
-		routed = true;
-		if (fallback != 0) clearTimeout(fallback);
-		iCallbackFn();
-	});
-
-	// Add initial states into the window scope for the server-renderd components.
-	window.ssr = JSON.parse(iInitialStates);
-};
-
-/***/ }),
-/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1052,7 +724,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _utils = __webpack_require__(2);
+var _utils = __webpack_require__(0);
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -1459,13 +1131,7 @@ var dotnetifyVMRouter = function () {
 exports.default = dotnetifyVMRouter;
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__13__;
-
-/***/ }),
-/* 14 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1475,25 +1141,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(1);
+var _vue = __webpack_require__(3);
 
-var _react2 = _interopRequireDefault(_react);
+var _vue2 = _interopRequireDefault(_vue);
 
-var _reactDom = __webpack_require__(13);
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
-var _dotnetifyVmRouter = __webpack_require__(12);
+var _dotnetifyVmRouter = __webpack_require__(7);
 
 var _dotnetifyVmRouter2 = _interopRequireDefault(_dotnetifyVmRouter);
 
-var _jqueryShim = __webpack_require__(3);
+var _jqueryShim = __webpack_require__(1);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
-var _utils = __webpack_require__(2);
+var _utils = __webpack_require__(0);
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -1504,7 +1168,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Copyright 2017-2018 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Copyright 2018 Dicky Suryadi
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                Licensed under the Apache License, Version 2.0 (the "License");
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                you may not use this file except in compliance with the License.
@@ -1565,7 +1229,7 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
     key: 'loadView',
     value: function loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
       var vm = this.vm;
-      var reactProps = void 0;
+      var componentProps = void 0;
 
       // If the view model supports routing, add the root path to the view, to be used
       // to build the absolute route path, and view model argument if provided.
@@ -1577,14 +1241,14 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
 
         var root = this.VMRoot;
         root = root != null ? '/' + _utils2.default.trim(this.RoutingState.Root) + '/' + _utils2.default.trim(root) : this.RoutingState.Root;
-        reactProps = { vmRoot: root, vmArg: iVmArg };
+        componentProps = { vmRoot: root, vmArg: iVmArg };
       }
 
       // Provide the opportunity to override the URL.
       iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
       iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);else this.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
+      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, componentProps, iCallbackFn);
     }
 
     // Loads an HTML view.
@@ -1593,13 +1257,6 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
     key: 'loadHtmlView',
     value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
       var vm = this.vm;
-
-      try {
-        // Unmount any React component before replacing with a new DOM.
-        _reactDom2.default.unmountComponentAtNode(document.querySelector(iTargetSelector));
-      } catch (e) {
-        console.error(e);
-      }
 
       // Load the HTML view.
       (0, _jqueryShim2.default)(iTargetSelector).load(iViewUrl, null, function () {
@@ -1611,31 +1268,24 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
       });
     }
 
-    // Loads a React view.
+    // Loads a Vue view.
 
   }, {
-    key: 'loadReactView',
-    value: function loadReactView(iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
+    key: 'loadVueView',
+    value: function loadVueView(iTargetSelector, iVueClassName, iJsModuleUrl, iVmArg, iProps, callbackFn) {
       var vm = this.vm;
       var createViewFunc = function createViewFunc() {
-        if (!window.hasOwnProperty(iReactClassName)) {
-          console.error('[' + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
+        if (!window.hasOwnProperty(iVueClassName)) {
+          console.error('[' + vm.$vmId + "] failed to load view '" + iVueClassName + "' because it's not a Vue element.");
           return;
         }
 
-        try {
-          _reactDom2.default.unmountComponentAtNode(document.querySelector(iTargetSelector));
-        } catch (e) {
-          console.error(e);
-        }
+        var vueClass = _vue2.default.extend(window[iVueClassName]);
+        var vueComponent = new vueClass({ propsData: _extends({}, iProps) });
 
-        try {
-          var reactElement = _react2.default.createElement(window[iReactClassName], iReactProps);
-          _reactDom2.default.render(reactElement, document.querySelector(iTargetSelector));
-        } catch (e) {
-          console.error(e);
-        }
-        if (typeof callbackFn === 'function') callbackFn.call(vm, reactElement);
+        vueComponent.$mount(iTargetSelector);
+
+        if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);
       };
 
       if (iJsModuleUrl == null) createViewFunc();else {
@@ -1654,7 +1304,7 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
 exports.default = dotnetifyReactVMRouter;
 
 /***/ }),
-/* 15 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1883,7 +1533,7 @@ Path.core.route.prototype = {
 exports.default = Path;
 
 /***/ }),
-/* 16 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1910,7 +1560,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _path = __webpack_require__(15);
+var _path = __webpack_require__(9);
 
 var _path2 = _interopRequireDefault(_path);
 
@@ -2020,32 +1670,32 @@ var dotnetifyRouter = function () {
 exports.default = dotnetifyRouter;
 
 /***/ }),
-/* 17 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyVue = __webpack_require__(2);
 
-var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
+var _dotnetifyVue2 = _interopRequireDefault(_dotnetifyVue);
 
-var _dotnetifyRouter = __webpack_require__(16);
+var _dotnetifyRouter = __webpack_require__(10);
 
 var _dotnetifyRouter2 = _interopRequireDefault(_dotnetifyRouter);
 
-var _dotnetifyReact3 = __webpack_require__(14);
+var _dotnetifyVue3 = __webpack_require__(8);
 
-var _dotnetifyReact4 = _interopRequireDefault(_dotnetifyReact3);
+var _dotnetifyVue4 = _interopRequireDefault(_dotnetifyVue3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Add plugin functions.
-_dotnetifyReact2.default.react.router = new _dotnetifyRouter2.default(_dotnetifyReact2.default.debug);
+_dotnetifyVue2.default.vue.router = new _dotnetifyRouter2.default(_dotnetifyVue2.default.debug);
 
 // Inject a view model with functions.
 /* 
-Copyright 2017 Dicky Suryadi
+Copyright 2018 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -2059,8 +1709,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-_dotnetifyReact2.default.react.router.$inject = function (iVM) {
-  var router = new _dotnetifyReact4.default(iVM, _dotnetifyReact2.default.react.router);
+_dotnetifyVue2.default.vue.router.$inject = function (iVM) {
+  var router = new _dotnetifyVue4.default(iVM, _dotnetifyVue2.default.vue.router);
 
   // Put functions inside $router namespace.
   iVM.$router = router;
@@ -2082,10 +1732,10 @@ _dotnetifyReact2.default.react.router.$inject = function (iVM) {
 };
 
 // Register the plugin to dotNetify.
-_dotnetifyReact2.default.react.plugins['router'] = _dotnetifyReact2.default.react.router;
+_dotnetifyVue2.default.vue.plugins['router'] = _dotnetifyVue2.default.vue.router;
 
 /***/ }),
-/* 18 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2114,7 +1764,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _jqueryShim = __webpack_require__(3);
+var _jqueryShim = __webpack_require__(1);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
@@ -2460,13 +2110,13 @@ var dotnetifyVM = function () {
 exports.default = dotnetifyVM;
 
 /***/ }),
-/* 19 */
+/* 13 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__19__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__13__;
 
 /***/ }),
-/* 20 */
+/* 14 */
 /***/ (function(module, exports) {
 
 /**
@@ -2627,10 +2277,10 @@ function extend() {
 
 
 /***/ }),
-/* 21 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var jQuery = module.exports = __webpack_require__(20),
+var jQuery = module.exports = __webpack_require__(14),
 	core_rspace = /\s+/;
 /**
 * jQuery Callbacks
@@ -2839,7 +2489,7 @@ jQuery.Callbacks = function( options ) {
 
 
 /***/ }),
-/* 22 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2853,7 +2503,7 @@ jQuery.Callbacks = function( options ) {
 * Library version.
 */
 
-var jQuery = module.exports = __webpack_require__(21),
+var jQuery = module.exports = __webpack_require__(15),
 	core_slice = Array.prototype.slice;
 
 /**
@@ -3008,14 +2658,14 @@ jQuery.extend({
 
 
 /***/ }),
-/* 23 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(22);
+module.exports = __webpack_require__(16);
 
 /***/ }),
-/* 24 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -3043,7 +2693,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 25 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3053,13 +2703,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jqueryShim = __webpack_require__(3);
+var _jqueryShim = __webpack_require__(1);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var signalRNetCore = __webpack_require__(19); /* 
+var signalRNetCore = __webpack_require__(13); /* 
                                                  Copyright 2017-2018 Dicky Suryadi
                                                  
                                                  Licensed under the Apache License, Version 2.0 (the "License");
@@ -3400,7 +3050,7 @@ exports.default = dotnetifyHub;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
 
 /***/ }),
-/* 26 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3410,11 +3060,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _dotnetifyHub = __webpack_require__(25);
+var _dotnetifyHub = __webpack_require__(19);
 
 var _dotnetifyHub2 = _interopRequireDefault(_dotnetifyHub);
 
-var _utils = __webpack_require__(2);
+var _utils = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3561,37 +3211,30 @@ var dotnetify = {
 exports.default = dotnetify;
 
 /***/ }),
-/* 27 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyVue = __webpack_require__(2);
 
-var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
-
-__webpack_require__(17);
+var _dotnetifyVue2 = _interopRequireDefault(_dotnetifyVue);
 
 __webpack_require__(11);
 
-var _Scope = __webpack_require__(10);
+var _Scope = __webpack_require__(6);
 
 var _Scope2 = _interopRequireDefault(_Scope);
 
-var _RouteLink = __webpack_require__(6);
-
-var _RouteLink2 = _interopRequireDefault(_RouteLink);
-
-var _RouteTarget = __webpack_require__(5);
-
-var _RouteTarget2 = _interopRequireDefault(_RouteTarget);
+__webpack_require__(5);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = Object.assign(_dotnetifyReact2.default, { Scope: _Scope2.default, RouteLink: _RouteLink2.default, RouteTarget: _RouteTarget2.default });
+_dotnetifyVue2.default.vue.Scope = _Scope2.default;
+module.exports = Object.assign(_dotnetifyVue2.default, { Scope: _Scope2.default });
 
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=dotnetify-react.js.map
+//# sourceMappingURL=dotnetify-vue.js.map

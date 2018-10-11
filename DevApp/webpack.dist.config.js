@@ -33,7 +33,8 @@ const baseExport = {
 				include: /\.min\.js$/
 			})
 		]
-	}
+	},
+	devtool: 'source-map'
 };
 
 module.exports = [
@@ -96,6 +97,35 @@ module.exports = [
 					commonjs2: 'jquery',
 					amd: 'jquery',
 					root: 'jQuery'
+				},
+				'@aspnet/signalr': {
+					commonjs: '@aspnet/signalr',
+					commonjs2: '@aspnet/signalr',
+					amd: '@aspnet/signalr',
+					root: 'signalR'
+				}
+			}
+		},
+		baseExport
+	),
+	Object.assign(
+		{
+			mode: 'production',
+			entry: {
+				'dotnetify-vue': './src/dotnetify/vue/index.js',
+				'dotnetify-vue.min': './src/dotnetify/vue/index.js'
+			},
+			output: {
+				path: __dirname + '/dist/dist',
+				library: 'dotnetify',
+				libraryTarget: 'umd'
+			},
+			externals: {
+				vue: {
+					commonjs: 'vue',
+					commonjs2: 'vue',
+					amd: 'vue',
+					root: 'Vue'
 				},
 				'@aspnet/signalr': {
 					commonjs: '@aspnet/signalr',

@@ -3847,3 +3847,4 @@ module.exports = _dotnetifyKo2.default;
 /***/ })
 /******/ ]);
 });
+//# sourceMappingURL=dotnetify-ko.js.map
