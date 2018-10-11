@@ -23,14 +23,27 @@ Vue.directive('vmOn', {
     if (match != null) {
       const propName = match[1].trim();
       const methodName = match[2].trim();
-      const vm = vnode.context;
+      const vue = vnode.context;
 
-      if (!vm.hasOwnProperty(propName)) throw new Error(`v-vmOn property '${propName}' is not defined`);
+      if (!vue.hasOwnProperty(propName)) throw new Error(`v-vmOn property '${propName}' is not defined`);
 
-      if (!vm.hasOwnProperty(methodName) && typeof vm[methodName] == 'function')
+      if (!vue.hasOwnProperty(methodName) && typeof vue[methodName] == 'function')
         throw new Error(`v-vmOn method '${propName}' is not defined or not a function`);
 
-      vm.$watch(propName, () => vm[methodName](el));
+      vue.$watch(propName, () => vue[methodName](el));
     }
+  }
+});
+
+// Route link directive for anchor tags.
+Vue.directive('vmRoute', {
+  bind: function(el, binding, vnode) {
+    const vue = vnode.context;
+    const route = binding.value;
+    el.href = route && vue.vm ? vue.vm.$route(route) : '';
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      vue.vm.$handleRoute(e);
+    });
   }
 });

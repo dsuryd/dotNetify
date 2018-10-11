@@ -82,7 +82,11 @@ dotnetify.vue = {
         return iVue.$data;
       },
       setState(state) {
-        Object.keys(state).forEach(key => (iVue[key] = state[key]));
+        Object.keys(state).forEach(key => {
+          const value = state[key];
+          if (iVue.hasOwnProperty(key)) iVue[key] = value;
+          else if (value) console.error(`'${key}' was received, but the property isn't defined in the Vue instance.`);
+        });
       }
     };
 

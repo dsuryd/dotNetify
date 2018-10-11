@@ -7,7 +7,7 @@
     <div>
       <div v-for="book in Books" :key="book.Info.Id">
         <center>
-          <a data-bind="vmRoute: Route">
+          <a v-vmRoute="book.Route">
             <img class="thumbnail" :src="book.Info.ImageUrl">
           </a>
           <div>
@@ -38,7 +38,8 @@ export default {
   },
   data: function () {
     return {
-      Books: []
+      Books: [],
+      RoutingState: {}
     }
   }
 }
