@@ -9,7 +9,6 @@ namespace DotNetify.DevApp
    {
       IEnumerable<string> Headers { get; }
       IEnumerable<T> Data { get; }
-      string ItemKey { get; }
       int SelectedKey { get; set; }
       int[] Pagination { get; }
       int SelectedPage { get; set; }
@@ -32,8 +31,6 @@ namespace DotNetify.DevApp
       }
 
       public IEnumerable<MovieRecord> Data => GetData();
-
-      public string ItemKey => nameof(MovieRecord.Rank);
 
       public int SelectedKey
       {

@@ -362,8 +362,6 @@ public class MovieTableVM : BaseVM, IPaginatedTable<MovieRecord>
 
   public IEnumerable<MovieRecord> Data => GetData();
 
-  public string ItemKey => nameof(MovieRecord.Rank);
-
   public int SelectedKey
   {
       get => Get<int>();
