@@ -155,11 +155,7 @@ namespace DotNetify.DevApp
 
         // Button
 
-        public bool ButtonClicked
-        {
-            get => false;
-            set => ClickCount++;
-        }
+        public Action<bool> ButtonClicked => _ => ClickCount++;
 
         public int ClickCount
         {

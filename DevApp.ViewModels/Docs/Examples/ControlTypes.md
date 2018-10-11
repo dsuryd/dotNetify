@@ -327,11 +327,8 @@ public class ControlTypesVM : BaseVM
 
     // Button
 
-    public bool ButtonClicked
-    {
-        get => false;
-        set => ClickCount++;
-    }
+    public Action<bool> ButtonClicked => _ => ClickCount++;
+    
     public int ClickCount
     {
         get => Get<int>(); 
