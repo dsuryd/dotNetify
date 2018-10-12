@@ -15,5 +15,12 @@ export default props => {
     window.BookDefault = BookDefaultVue;
     window.Book = BookVue;
   }
-  return <Example vm="BookStoreExample" react={<BookStoreReact {...props} />} ko={<BookStoreKo {...props} />} vue={<BookStoreVue />} />;
+  return (
+    <Example
+      vm="BookStoreExample"
+      react={<BookStoreReact {...props} />}
+      ko={<BookStoreKo {...props} />}
+      vue={<BookStoreVue {...props} />}
+    />
+  );
 };

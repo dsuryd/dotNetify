@@ -4,6 +4,7 @@ import Vue from 'vue';
 export default class RenderVue extends React.Component {
   constructor(props) {
     super(props);
+    this.setRoutingArgs();
   }
 
   componentDidMount() {
@@ -20,5 +21,16 @@ export default class RenderVue extends React.Component {
 
   render() {
     return <section className="example-root vue" dangerouslySetInnerHTML={{ __html: '<vue-example />' }} />;
+  }
+
+  setRoutingArgs() {
+    const { htmlAttrs } = this.props;
+    if (htmlAttrs) {
+      for (let key in htmlAttrs) {
+        debugger;
+        //if (key === 'vmRoot') $(vmElem).attr('data-vm-root', htmlAttrs[key]);
+        //else if (key === 'vmArg') $(vmElem).attr('data-vm-arg', JSON.stringify(htmlAttrs[key]));
+      }
+    }
   }
 }

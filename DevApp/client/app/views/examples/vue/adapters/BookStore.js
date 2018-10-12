@@ -10,8 +10,8 @@ const BookDefault = {
 
 export { BookDefault, Book };
 
-export default _ => (
+export default props => (
   <BookStoreCss>
-    <RenderVue src={BookStore} />
+    <RenderVue src={BookStore} htmlAttrs={props} />
   </BookStoreCss>
 );
