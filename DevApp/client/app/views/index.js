@@ -10,7 +10,7 @@ import ControlTypes from './examples/ControlTypes';
 import SimpleList from './examples/SimpleList';
 import CompositeView from './examples/CompositeView';
 import LiveChart from './examples/LiveChart';
-import BookStore, { BookDefault, Book } from './examples/BookStore';
+import BookStore from './examples/BookStore';
 import SecurePage from './examples/SecurePage';
 import ChatRoom from './examples/ChatRoom';
 import Connection from './apis/Connection';
@@ -36,8 +36,6 @@ export {
   CompositeView,
   LiveChart,
   BookStore,
-  BookDefault,
-  Book,
   SecurePage,
   ChatRoom,
   Connection,
