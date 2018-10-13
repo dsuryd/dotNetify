@@ -37,5 +37,10 @@ dotnetify.vue.router.$inject = function(iVM) {
   iVM.$routeTo = iRoute => router.routeToRoute(iRoute);
 };
 
+// Provide function to load a view.
+dotnetify.vue.router.$mount = function(iTargetSelector, iComponent, iProps, iCallbackFn) {
+  dotnetifyVueVMRouter.prototype.loadVueView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
+};
+
 // Register the plugin to dotNetify.
 dotnetify.vue.plugins['router'] = dotnetify.vue.router;

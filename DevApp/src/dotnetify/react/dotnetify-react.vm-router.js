@@ -65,12 +65,12 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
     iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-    if (utils.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
-    else this.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
+    if (utils.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
+    else this.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, reactProps, iCallbackFn);
   }
 
   // Loads an HTML view.
-  loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+  loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
     const vm = this.vm;
 
     try {
@@ -92,11 +92,17 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
   }
 
   // Loads a React view.
-  loadReactView(iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
+  loadReactView(iTargetSelector, iReactClassOrClassName, iJsModuleUrl, iReactProps, callbackFn) {
     const vm = this.vm;
     const createViewFunc = () => {
-      if (!window.hasOwnProperty(iReactClassName)) {
-        console.error('[' + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
+      // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
+      let reactClass = null;
+      if (typeof iReactClassOrClassName === 'string' && window.hasOwnProperty(iReactClassOrClassName))
+        reactClass = window[iReactClassOrClassName];
+      else if (typeof iReactClassOrClassName === 'object' && iReactClassOrClassName.name) reactClass = iReactClassOrClassName;
+
+      if (!reactClass) {
+        console.error('[' + vm.$vmId + "] failed to load view '" + iReactClassOrClassName + "' because it's not a React element.");
         return;
       }
 
@@ -107,7 +113,7 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
       }
 
       try {
-        var reactElement = React.createElement(window[iReactClassName], iReactProps);
+        var reactElement = React.createElement(reactClass, iReactProps);
         ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
       } catch (e) {
         console.error(e);

@@ -64,12 +64,12 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
     iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-    if (utils.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);
-    else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, componentProps, iCallbackFn);
+    if (utils.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
+    else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, componentProps, iCallbackFn);
   }
 
   // Loads an HTML view.
-  loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+  loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
     const vm = this.vm;
 
     // Load the HTML view.
@@ -84,19 +84,30 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
   }
 
   // Loads a Vue view.
-  loadVueView(iTargetSelector, iVueClassName, iJsModuleUrl, iVmArg, iProps, callbackFn) {
+  loadVueView(iTargetSelector, iVueClassOrClassName, iJsModuleUrl, iProps, callbackFn) {
     const vm = this.vm;
     const createViewFunc = () => {
-      if (!window.hasOwnProperty(iVueClassName)) {
-        console.error('[' + vm.$vmId + "] failed to load view '" + iVueClassName + "' because it's not a Vue element.");
+      // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
+      let vueClass = null;
+      if (typeof iVueClassOrClassName === 'string' && window.hasOwnProperty(iVueClassOrClassName))
+        vueClass = Object.assign({}, window[iVueClassOrClassName]);
+      else if (typeof iVueClassOrClassName === 'object' && iVueClassOrClassName.name) vueClass = iVueClassOrClassName;
+
+      if (!vueClass) {
+        console.error('[' + vm.$vmId + "] failed to load view '" + iVueClassOrClassName + "' because it's not a Vue element.");
         return;
       }
 
-      const vueClass = Vue.extend(window[iVueClassName]);
-      const vueComponent = new vueClass({ propsData: { ...iProps } });
+      // Add any undeclared property to the vue class.
+      if (iProps) {
+        vueClass.props = vueClass.props || {};
+        for (const prop in iProps) if (!vueClass.props.hasOwnProperty(prop)) vueClass.props[prop] = { type: null };
+      }
 
-      const target = document.querySelector(iTargetSelector);
-      target.innerHTML = '<div />';
+      const vueComponentType = Vue.extend(vueClass);
+      const vueComponent = new vueComponentType({ propsData: { ...iProps } });
+
+      document.querySelector(iTargetSelector).innerHTML = '<div />';
       vueComponent.$mount(iTargetSelector + ' > div');
 
       if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);

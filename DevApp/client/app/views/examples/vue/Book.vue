@@ -23,18 +23,14 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'Book',
-  props: {
-    vmRoot: String,
-    vmArg: Object
-  },
   created: function () {
     this.vm = dotnetify.vue.connect("BookDetailsVM", this);
   },
   mounted() {
-    const vm = this;
+    const self = this;
     $('#BookDetails').modal();
     $('#BookDetails').on('hidden.bs.modal', function (e) {
-      vm.$destroy();
+      self.$destroy();
       window.history.back();
     });
   },

@@ -37,7 +37,9 @@ export default class dotnetifyVMRouter {
   // Dispatch the active routing state to the server.
   dispatchActiveRoutingState(iPath) {
     this.vm.$dispatch({ 'RoutingState.Active': iPath });
-    this.vm.State({ 'RoutingState.Active': iPath });
+    let { RoutingState } = this.vm.State();
+    RoutingState = Object.assign(RoutingState || {}, { Active: iPath });
+    this.vm.State({ RoutingState });
   }
 
   // Handles click event from anchor tags.

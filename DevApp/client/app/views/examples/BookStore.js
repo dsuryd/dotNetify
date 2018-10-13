@@ -3,10 +3,9 @@ import BookStoreReact, { BookDefault as BookDefaultReact, Book as BookReact } fr
 import BookStoreVue, { BookDefault as BookDefaultVue, Book as BookVue } from './vue/adapters/BookStore';
 import BookStoreKo from './knockout/adapters/BookStore';
 import Example from './components/Example';
-import { getCurrentFramework } from 'app/components/SelectFramework';
+import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
 
-export default props => {
-  const framework = getCurrentFramework();
+const registerComponents = framework => {
   if (framework === 'React') {
     window.BookDefault = BookDefaultReact;
     window.Book = BookReact;
@@ -15,12 +14,28 @@ export default props => {
     window.BookDefault = BookDefaultVue;
     window.Book = BookVue;
   }
-  return (
-    <Example
-      vm="BookStoreExample"
-      react={<BookStoreReact {...props} />}
-      ko={<BookStoreKo {...props} />}
-      vue={<BookStoreVue {...props} />}
-    />
-  );
 };
+
+export default class extends React.Component {
+  constructor() {
+    super();
+    registerComponents(currentFramework);
+    this.unsubs = frameworkSelectEvent.subscribe(framework => registerComponents(framework));
+  }
+
+  componentWillUnmount() {
+    this.unsubs();
+  }
+
+  render() {
+    const props = this.props;
+    return (
+      <Example
+        vm="BookStoreExample"
+        react={<BookStoreReact {...props} />}
+        ko={<BookStoreKo {...props} />}
+        vue={<BookStoreVue {...props} />}
+      />
+    );
+  }
+}
