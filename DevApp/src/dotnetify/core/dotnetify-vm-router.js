@@ -216,7 +216,7 @@ export default class dotnetifyVMRouter {
   }
 
   // Routes to a path.
-  routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn) {
+  routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn, isRedirect) {
     const vm = this.vm;
     const viewModels = vm.$dotnetify.getViewModels();
 
@@ -245,9 +245,14 @@ export default class dotnetifyVMRouter {
 
     // If target DOM element isn't found, redirect URL to the path.
     if (document.getElementById(iTemplate.Target) == null) {
-      if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-
-      return this.router.redirect(this.toUrl(iPath), viewModels);
+      if (isRedirect === true) {
+        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
+        return;
+      }
+      else {
+        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+        return this.router.redirect(this.toUrl(iPath), viewModels);
+      }
     }
 
     // Load the view associated with the route asynchronously.
@@ -271,7 +276,7 @@ export default class dotnetifyVMRouter {
 
   // Routes the URL if the view model implements IRoutable.
   // Returns true if the view model handles the routing.
-  routeUrl() {
+  routeUrl(isRedirect) {
     if (!this.hasRoutingState) return false;
 
     var root = this.RoutingState.Root;
@@ -288,7 +293,7 @@ export default class dotnetifyVMRouter {
         return iTemplate.UrlPattern === '';
       });
       if (match.length > 0) {
-        this.routeTo('', match[0]);
+        this.routeTo('', match[0], null, null, isRedirect);
         this.router.urlPath = '';
         this.raiseRoutedEvent();
         return true;
@@ -319,7 +324,7 @@ export default class dotnetifyVMRouter {
 
           // If route's not already active, route to it.
           if (!utils.equal(this.RoutingState.Active, path)) {
-            this.routeTo(path, template, false, () => this.raiseRoutedEvent());
+            this.routeTo(path, template, false, () => this.raiseRoutedEvent(), isRedirect);
           }
           else this.raiseRoutedEvent();
           return true;

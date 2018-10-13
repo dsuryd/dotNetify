@@ -74,7 +74,7 @@ export default class dotnetifyRouter {
     this.urlPath = iUrl;
     for (let i = 0; i < viewModels.length; i++) {
       const vm = viewModels[i];
-      if (vm.$router.routeUrl()) {
+      if (vm.$router.routeUrl(true)) {
         if (this.debug) console.log('router> redirected');
         return;
       }
