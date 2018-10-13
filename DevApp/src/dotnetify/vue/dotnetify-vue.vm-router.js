@@ -95,7 +95,9 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
       const vueClass = Vue.extend(window[iVueClassName]);
       const vueComponent = new vueClass({ propsData: { ...iProps } });
 
-      vueComponent.$mount(iTargetSelector);
+      const target = document.querySelector(iTargetSelector);
+      target.innerHTML = '<div />';
+      vueComponent.$mount(iTargetSelector + ' > div');
 
       if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);
     };

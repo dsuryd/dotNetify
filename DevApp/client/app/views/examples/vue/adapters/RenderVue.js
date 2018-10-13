@@ -4,14 +4,15 @@ import Vue from 'vue';
 export default class RenderVue extends React.Component {
   constructor(props) {
     super(props);
-    this.setRoutingArgs();
+    this.template = `<${props.src.name} ${this.setRoutingArgs()} />`;
+    this.componentName = props.src.name.toLowerCase();
   }
 
   componentDidMount() {
     this.vue = new Vue({
       el: '.vue',
       components: {
-        'vue-example': this.props.src
+        [this.componentName]: this.props.src
       }
     });
   }
@@ -20,17 +21,18 @@ export default class RenderVue extends React.Component {
   }
 
   render() {
-    return <section className="example-root vue" dangerouslySetInnerHTML={{ __html: '<vue-example />' }} />;
+    return <section className="example-root vue" dangerouslySetInnerHTML={{ __html: this.template }} />;
   }
 
   setRoutingArgs() {
     const { htmlAttrs } = this.props;
+    let props = '';
     if (htmlAttrs) {
       for (let key in htmlAttrs) {
-        debugger;
-        //if (key === 'vmRoot') $(vmElem).attr('data-vm-root', htmlAttrs[key]);
-        //else if (key === 'vmArg') $(vmElem).attr('data-vm-arg', JSON.stringify(htmlAttrs[key]));
+        if (key === 'vmRoot') props += `vm-root='${htmlAttrs[key]}'`;
+        else if (key === 'vmArg') props += ` vm-arg='${JSON.stringify(htmlAttrs[key])}'`;
       }
     }
+    return props;
   }
 }

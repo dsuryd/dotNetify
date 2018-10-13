@@ -29,6 +29,10 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'BookStore',
+  props: {
+    vmRoot: String,
+    vmArg: String
+  },
   created: function () {
     this.vm = dotnetify.vue.connect("BookStoreVM", this);
     this.vm.onRouteEnter = (path, template) => (template.Target = 'BookPanel');
@@ -39,7 +43,8 @@ export default {
   data: function () {
     return {
       Books: [],
-      RoutingState: {}
+      RoutingState: {},
+      "RoutingState.Active": null
     }
   }
 }
