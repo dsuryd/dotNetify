@@ -39,8 +39,7 @@ export default {
   },
   data: function () {
     return {
-      Book: {},
-      RoutingState: {}
+      Book: {}
     }
   }
 }

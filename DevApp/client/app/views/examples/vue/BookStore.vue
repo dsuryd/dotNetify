@@ -38,8 +38,7 @@ export default {
   },
   data: function () {
     return {
-      Books: [],
-      RoutingState: {}
+      Books: []
     }
   }
 }

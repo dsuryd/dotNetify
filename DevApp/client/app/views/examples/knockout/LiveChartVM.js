@@ -45,10 +45,10 @@ var LiveChartVM = (function () {
                         borderWidth: 1
                     }
                 ]
-            }
+            },
+            options: { responsive: true, legend: { display: false } }
         };
-        var chartOptions = { responsive: true, legend: { display: false } };
-        return new Chart(iElement.getContext('2d'), chartData, chartOptions);
+        return new Chart(iElement.getContext('2d'), chartData);
     };
     LiveChartVM.prototype.createPieChart = function (iElement) {
         var chartData = {
@@ -64,10 +64,10 @@ var LiveChartVM = (function () {
                         borderWidth: 1
                     }
                 ]
-            }
+            },
+            options: { responsive: true }
         };
-        var chartOptions = { responsive: true };
-        return new Chart(iElement.getContext('2d'), chartData, chartOptions);
+        return new Chart(iElement.getContext('2d'), chartData);
     };
     LiveChartVM.prototype.updateLineChart = function (vm, element) {
         if (!this.lineChart)

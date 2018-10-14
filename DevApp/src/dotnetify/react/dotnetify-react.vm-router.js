@@ -93,41 +93,44 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
 
   // Loads a React view.
   loadReactView(iTargetSelector, iReactClassOrClassName, iJsModuleUrl, iReactProps, callbackFn) {
-    const vm = this.vm;
-    const createViewFunc = () => {
-      // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
-      let reactClass = null;
-      if (typeof iReactClassOrClassName === 'string' && window.hasOwnProperty(iReactClassOrClassName))
-        reactClass = window[iReactClassOrClassName];
-      else if (typeof iReactClassOrClassName === 'object' && iReactClassOrClassName.name) reactClass = iReactClassOrClassName;
+    return new Promise((resolve, reject) => {
+      const vm = this.vm;
+      const vmId = this.vm ? this.vm.$vmId : '';
+      const createViewFunc = () => {
+        // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
+        let reactClass = null;
+        if (typeof iReactClassOrClassName === 'string' && window.hasOwnProperty(iReactClassOrClassName))
+          reactClass = window[iReactClassOrClassName];
+        else if (typeof iReactClassOrClassName === 'object' && iReactClassOrClassName.name) reactClass = iReactClassOrClassName;
 
-      if (!reactClass) {
-        console.error('[' + vm.$vmId + "] failed to load view '" + iReactClassOrClassName + "' because it's not a React element.");
-        return;
+        if (!reactClass) {
+          console.error(`[${vmId}] failed to load view '${iReactClassOrClassName}' because it's not a React element.`);
+          reject();
+          return;
+        }
+
+        try {
+          ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
+        } catch (e) {
+          console.error(e);
+        }
+
+        try {
+          var reactElement = React.createElement(reactClass, iReactProps);
+          ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
+        } catch (e) {
+          console.error(e);
+        }
+        if (typeof callbackFn === 'function') callbackFn.call(vm, reactElement);
+        resolve(reactElement);
+      };
+
+      if (iJsModuleUrl == null) createViewFunc();
+      else {
+        // Load all javascripts first. Multiple files can be specified with comma delimiter.
+        var getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
+        $.when.apply($, getScripts).done(createViewFunc);
       }
-
-      try {
-        ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
-      } catch (e) {
-        console.error(e);
-      }
-
-      try {
-        var reactElement = React.createElement(reactClass, iReactProps);
-        ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
-      } catch (e) {
-        console.error(e);
-      }
-      if (typeof callbackFn === 'function') callbackFn.call(vm, reactElement);
-    };
-
-    if (iJsModuleUrl == null) createViewFunc();
-    else {
-      // Load all javascripts first. Multiple files can be specified with comma delimiter.
-      var getScripts = iJsModuleUrl.split(',').map(function(i) {
-        return $.getScript(i);
-      });
-      $.when.apply($, getScripts).done(createViewFunc);
-    }
+    });
   }
 }

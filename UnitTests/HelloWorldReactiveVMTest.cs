@@ -114,7 +114,7 @@ namespace UnitTests
          Assert.AreEqual("John World", response1["FullName"]);
          Assert.AreEqual("John Doe", response2["FullName"]);
 
-         autoResetEvent.WaitOne();
+         autoResetEvent.WaitOne(5000);
          Assert.AreEqual(10, data1.NameLengthAsync.Value);
          Assert.AreEqual(8, data2.NameLengthAsync.Value);
       }

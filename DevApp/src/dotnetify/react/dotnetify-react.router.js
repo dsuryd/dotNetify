@@ -39,7 +39,7 @@ dotnetify.react.router.$inject = function(iVM) {
 
 // Provide function to load a view.
 dotnetify.react.router.$mount = function(iTargetSelector, iComponent, iProps, iCallbackFn) {
-  dotnetifyReactVMRouter.prototype.loadReactView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
+  return dotnetifyReactVMRouter.prototype.loadReactView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
 };
 
 // Register the plugin to dotNetify.
