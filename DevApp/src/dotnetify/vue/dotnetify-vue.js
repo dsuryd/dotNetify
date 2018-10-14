@@ -77,25 +77,65 @@ dotnetify.vue = {
         return iVue.$props;
       },
       get state() {
-        return iVue.$data;
+        const vm = self.viewModels[iVMId];
+        return vm && vm.$useState ? { ...iVue.$data, ...iVue.state } : iVue.$data;
       },
       setState(state) {
         Object.keys(state).forEach(key => {
           const value = state[key];
-          if (iVue.hasOwnProperty(key)) iVue[key] = value;
-          else if (value) console.error(`'${key}' was received, but the property isn't defined in the Vue instance.`);
+
+          // If 'useState' option is enabled, store server state in the Vue instance's 'state' property.
+          const vm = self.viewModels[iVMId];
+          if (vm && vm.$useState) {
+            if (iVue.state.hasOwnProperty(key)) iVue.state[key] = value;
+            else if (value) iVue.$set(iVue.state, key, value);
+          }
+          else {
+            if (iVue.hasOwnProperty(key)) iVue[key] = value;
+            else if (value) console.error(`'${key}' is received, but the Vue instance doesn't declare the property.`);
+          }
         });
       }
     };
 
     self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self);
-    if (iOptions && Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, self.viewModels[iVMId], iVue);
+    if (iOptions) {
+      const vm = self.viewModels[iVMId];
+
+      // If 'useState' is true, server state will be placed in the Vue component's 'state' data property.
+      // Otherwise, they will be placed in the root data property.
+      if (iOptions.useState) {
+        if (iVue.hasOwnProperty('state')) vm.$useState = true;
+        else console.error(`Option 'useState' requires the 'state' data property on the Vue instance.`);
+      }
+
+      // 'watch' array specifies properties to dispatch to server when the values change.
+      if (Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, vm, iVue);
+    }
 
     self.init();
     return self.viewModels[iVMId];
   },
 
-  // Get all view models.
+  // Creates a Vue component with pre-configured connection to a server view model.
+  component: function(iComponentName, iVMId, iOptions) {
+    return {
+      name: iComponentName,
+      created: function() {
+        this.vm = dotnetify.vue.connect(iVMId, this, { ...iOptions, useState: true });
+      },
+      destroyed: function() {
+        this.vm.$destroy();
+      },
+      data: function() {
+        return {
+          state: {}
+        };
+      }
+    };
+  },
+
+  // Gets all view models.
   getViewModels: function() {
     const self = dotnetify.vue;
     return Object.keys(self.viewModels).map(vmId => self.viewModels[vmId]);
@@ -107,7 +147,7 @@ dotnetify.vue = {
         iVM.$serverUpdate === true && iVM.$dispatch({ [prop]: newValue });
       }.bind(iVM);
 
-    iWatchlist.forEach(prop => iVue.$watch(prop, callback(prop)));
+    iWatchlist.forEach(prop => iVue.$watch(iVM.$useState ? `state.${prop}` : prop, callback(prop)));
   },
 
   _responseVM: function(iVMId, iVMData) {
