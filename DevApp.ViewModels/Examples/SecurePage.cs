@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Linq;
 using System.Threading;
 using Microsoft.IdentityModel.Tokens;
 using DotNetify.Security;
@@ -14,9 +15,18 @@ namespace DotNetify.DevApp
       {
          var markdown = new Markdown("DotNetify.DevApp.Docs.Examples.SecurePage.md");
 
-         AddProperty("ViewSource", markdown.GetSection(null, "SecurePageVM.cs"));
+         AddProperty("ViewSource", markdown.GetSection(null, "SecurePageVM.cs"))
+            .SubscribeTo(AddInternalProperty<string>("Framework").Select(GetViewSource));
+
          AddProperty("ViewModelSource", markdown.GetSection("SecurePageVM.cs"));
       }
+
+        private string GetViewSource(string framework)
+        {
+            return framework == "Vue" ?
+               new Markdown("DotNetify.DevApp.Docs.Vue.Examples.SecurePage.md") :
+               new Markdown("DotNetify.DevApp.Docs.Examples.SecurePage.md").GetSection(null, "SecurePageVM.cs");
+        }      
    }
 
    [Authorize]
