@@ -33,12 +33,18 @@
         <h4>Not authenticated</h4>
       </div>
     </div>
+    <secure-view v-if="accessToken" :accessToken="accessToken" @expiredAccess="signOut"/>
   </div>
 </template>
 
 <script>
+import SecureView from './SecurePage.SecureView.vue'
+
 export default {
   name: "SecurePage",
+  components: {
+    'secure-view': SecureView
+  },
   data: function () {
     return {
       username: '',
