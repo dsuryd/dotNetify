@@ -185,7 +185,7 @@ public class ChatRoomVM : MulticastVM
         if (user != null)
         {
             Users.Remove(user);
-            this.RemoveList(nameof(Users), user);
+            this.RemoveList(nameof(Users), user.Id);
         }
       }
   };

@@ -1,6 +1,3 @@
-##### ChatRoom.vue
-
-```html
 <template>
     <div>
         <div class="chatPanel">
@@ -94,4 +91,3 @@ export default {
     }
 }
 </script>
-```

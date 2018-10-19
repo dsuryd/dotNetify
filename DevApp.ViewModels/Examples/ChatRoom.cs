@@ -22,7 +22,9 @@ namespace DotNetify.DevApp
 
       private string GetViewSource(string framework)
       {
-         return new Markdown("DotNetify.DevApp.Docs.Examples.ChatRoom.md").GetSection(null, "ChatRoomVM.cs");
+         return framework == "Vue" ?
+            new Markdown("DotNetify.DevApp.Docs.Vue.Examples.ChatRoom.md") :
+            new Markdown("DotNetify.DevApp.Docs.Examples.ChatRoom.md").GetSection(null, "ChatRoomVM.cs");
       }
    }
 
@@ -108,7 +110,7 @@ namespace DotNetify.DevApp
             if (user != null)
             {
                Users.Remove(user);
-               this.RemoveList(nameof(Users), user);
+               this.RemoveList(nameof(Users), user.Id);
             }
          }
       };
