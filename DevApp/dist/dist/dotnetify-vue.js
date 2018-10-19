@@ -384,6 +384,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /* 
+                                                                                                                                                                                                                                                                  Copyright 2018 Dicky Suryadi
+                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                  Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                  you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                  You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                      http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                  Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                  distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                  See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                  limitations under the License.
+                                                                                                                                                                                                                                                                   */
+
+
 var _dotnetify2 = __webpack_require__(20);
 
 var _dotnetify3 = _interopRequireDefault(_dotnetify2);
@@ -394,22 +411,7 @@ var _dotnetifyVm2 = _interopRequireDefault(_dotnetifyVm);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; } /* 
-                                                                                                                                                                                                                  Copyright 2018 Dicky Suryadi
-                                                                                                                                                                                                                  
-                                                                                                                                                                                                                  Licensed under the Apache License, Version 2.0 (the "License");
-                                                                                                                                                                                                                  you may not use this file except in compliance with the License.
-                                                                                                                                                                                                                  You may obtain a copy of the License at
-                                                                                                                                                                                                                  
-                                                                                                                                                                                                                      http://www.apache.org/licenses/LICENSE-2.0
-                                                                                                                                                                                                                  
-                                                                                                                                                                                                                  Unless required by applicable law or agreed to in writing, software
-                                                                                                                                                                                                                  distributed under the License is distributed on an "AS IS" BASIS,
-                                                                                                                                                                                                                  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                                                                                                                                                                                  See the License for the specific language governing permissions and
-                                                                                                                                                                                                                  limitations under the License.
-                                                                                                                                                                                                                   */
-
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 if (typeof window == 'undefined') window = global;
 var dotnetify = window.dotnetify || _dotnetify3.default;
@@ -474,31 +476,64 @@ dotnetify.vue = {
 
     var component = {
       get props() {
-        var props = {};
-        iVue.props && Object.keys(iVue.props).forEach(function (key) {
-          return props[key] = iVue.props[key];
-        });
-        return props;
+        return iVue.$props;
       },
       get state() {
-        return iVue.$data;
+        var vm = self.viewModels[iVMId];
+        return vm && vm.$useState ? _extends({}, iVue.$data, iVue.state) : iVue.$data;
       },
       setState: function setState(state) {
         Object.keys(state).forEach(function (key) {
           var value = state[key];
-          if (iVue.hasOwnProperty(key)) iVue[key] = value;else if (value) console.error('\'' + key + '\' was received, but the property isn\'t defined in the Vue instance.');
+
+          // If 'useState' option is enabled, store server state in the Vue instance's 'state' property.
+          var vm = self.viewModels[iVMId];
+          if (vm && vm.$useState) {
+            if (iVue.state.hasOwnProperty(key)) iVue.state[key] = value;else if (value) iVue.$set(iVue.state, key, value);
+          } else {
+            if (iVue.hasOwnProperty(key)) iVue[key] = value;else if (value) console.error('\'' + key + '\' is received, but the Vue instance doesn\'t declare the property.');
+          }
         });
       }
     };
 
     self.viewModels[iVMId] = new _dotnetifyVm2.default(iVMId, component, iOptions, self);
-    if (iOptions && Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, self.viewModels[iVMId], iVue);
+    if (iOptions) {
+      var vm = self.viewModels[iVMId];
+
+      // If 'useState' is true, server state will be placed in the Vue component's 'state' data property.
+      // Otherwise, they will be placed in the root data property.
+      if (iOptions.useState) {
+        if (iVue.hasOwnProperty('state')) vm.$useState = true;else console.error('Option \'useState\' requires the \'state\' data property on the Vue instance.');
+      }
+
+      // 'watch' array specifies properties to dispatch to server when the values change.
+      if (Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, vm, iVue);
+    }
 
     self.init();
     return self.viewModels[iVMId];
   },
 
-  // Get all view models.
+  // Creates a Vue component with pre-configured connection to a server view model.
+  component: function component(iComponentName, iVMId, iOptions) {
+    return {
+      name: iComponentName,
+      created: function created() {
+        this.vm = dotnetify.vue.connect(iVMId, this, _extends({}, iOptions, { useState: true }));
+      },
+      destroyed: function destroyed() {
+        this.vm.$destroy();
+      },
+      data: function data() {
+        return {
+          state: {}
+        };
+      }
+    };
+  },
+
+  // Gets all view models.
   getViewModels: function getViewModels() {
     var self = dotnetify.vue;
     return Object.keys(self.viewModels).map(function (vmId) {
@@ -514,7 +549,7 @@ dotnetify.vue = {
     };
 
     iWatchlist.forEach(function (prop) {
-      return iVue.$watch(prop, callback(prop));
+      return iVue.$watch(iVM.$useState ? 'state.' + prop : prop, callback(prop));
     });
   },
 
@@ -767,7 +802,12 @@ var dotnetifyVMRouter = function () {
     key: 'dispatchActiveRoutingState',
     value: function dispatchActiveRoutingState(iPath) {
       this.vm.$dispatch({ 'RoutingState.Active': iPath });
-      this.vm.State({ 'RoutingState.Active': iPath });
+
+      var _vm$State = this.vm.State(),
+          RoutingState = _vm$State.RoutingState;
+
+      RoutingState = Object.assign(RoutingState || {}, { Active: iPath });
+      this.vm.State({ RoutingState: RoutingState });
     }
 
     // Handles click event from anchor tags.
@@ -982,7 +1022,7 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeTo',
-    value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn) {
+    value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn, isRedirect) {
       var _this3 = this;
 
       var vm = this.vm;
@@ -1013,9 +1053,13 @@ var dotnetifyVMRouter = function () {
 
       // If target DOM element isn't found, redirect URL to the path.
       if (document.getElementById(iTemplate.Target) == null) {
-        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-
-        return this.router.redirect(this.toUrl(iPath), viewModels);
+        if (isRedirect === true) {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
+          return;
+        } else {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+          return this.router.redirect(this.toUrl(iPath), viewModels);
+        }
       }
 
       // Load the view associated with the route asynchronously.
@@ -1047,7 +1091,7 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeUrl',
-    value: function routeUrl() {
+    value: function routeUrl(isRedirect) {
       var _this5 = this;
 
       if (!this.hasRoutingState) return false;
@@ -1066,7 +1110,7 @@ var dotnetifyVMRouter = function () {
           return iTemplate.UrlPattern === '';
         });
         if (match.length > 0) {
-          this.routeTo('', match[0]);
+          this.routeTo('', match[0], null, null, isRedirect);
           this.router.urlPath = '';
           this.raiseRoutedEvent();
           return true;
@@ -1100,7 +1144,7 @@ var dotnetifyVMRouter = function () {
             if (!_utils2.default.equal(this.RoutingState.Active, path)) {
               this.routeTo(path, template, false, function () {
                 return _this5.raiseRoutedEvent();
-              });
+              }, isRedirect);
             } else this.raiseRoutedEvent();
             return true;
           }
@@ -1142,6 +1186,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1248,14 +1294,14 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
       iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
       iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, componentProps, iCallbackFn);
+      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, componentProps, iCallbackFn);
     }
 
     // Loads an HTML view.
 
   }, {
     key: 'loadHtmlView',
-    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
       var vm = this.vm;
 
       // Load the HTML view.
@@ -1272,29 +1318,58 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
 
   }, {
     key: 'loadVueView',
-    value: function loadVueView(iTargetSelector, iVueClassName, iJsModuleUrl, iVmArg, iProps, callbackFn) {
-      var vm = this.vm;
-      var createViewFunc = function createViewFunc() {
-        if (!window.hasOwnProperty(iVueClassName)) {
-          console.error('[' + vm.$vmId + "] failed to load view '" + iVueClassName + "' because it's not a Vue element.");
-          return;
+    value: function loadVueView(iTargetSelector, iVueClassOrClassName, iJsModuleUrl, iProps, callbackFn) {
+      var _this2 = this;
+
+      return new Promise(function (resolve, reject) {
+        var vm = _this2.vm;
+        var vmId = _this2.vm ? _this2.vm.$vmId : '';
+        var createViewFunc = function createViewFunc() {
+          // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
+          var vueClass = null;
+          if (typeof iVueClassOrClassName === 'string' && window.hasOwnProperty(iVueClassOrClassName)) vueClass = Object.assign({}, window[iVueClassOrClassName]);else if ((typeof iVueClassOrClassName === 'undefined' ? 'undefined' : _typeof(iVueClassOrClassName)) === 'object' && iVueClassOrClassName.name) vueClass = iVueClassOrClassName;
+
+          if (!vueClass) {
+            console.error('[' + vmId + '] failed to load view \'' + iVueClassOrClassName + '\' because it\'s not a Vue element.');
+            reject();
+            return;
+          }
+
+          // Declare 'RoutingState' property in the component.
+          var data = typeof vueClass.data == 'function' ? vueClass.data() : vueClass.data || {};
+          if (!data.hasOwnProperty('RoutingState')) {
+            data.RoutingState = {};
+            vueClass.data = function () {
+              return data;
+            };
+          }
+
+          // Add any undeclared property to the vue class.
+          if (iProps) {
+            vueClass.props = vueClass.props || {};
+            for (var prop in iProps) {
+              if (!vueClass.props.hasOwnProperty(prop)) vueClass.props[prop] = { type: null };
+            }
+          }
+
+          var vueComponentType = _vue2.default.extend(vueClass);
+          var vueComponent = new vueComponentType({ propsData: _extends({}, iProps) });
+
+          document.querySelector(iTargetSelector).innerHTML = '<div />';
+          vueComponent.$mount(iTargetSelector + ' > div');
+
+          if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);
+          resolve(vueComponent);
+        };
+
+        if (iJsModuleUrl == null) createViewFunc();else {
+          // Load all javascripts first. Multiple files can be specified with comma delimiter.
+          var getScripts = iJsModuleUrl.split(',').map(function (i) {
+            return _jqueryShim2.default.getScript(i);
+          });
+          _jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(createViewFunc);
         }
-
-        var vueClass = _vue2.default.extend(window[iVueClassName]);
-        var vueComponent = new vueClass({ propsData: _extends({}, iProps) });
-
-        vueComponent.$mount(iTargetSelector);
-
-        if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);
-      };
-
-      if (iJsModuleUrl == null) createViewFunc();else {
-        // Load all javascripts first. Multiple files can be specified with comma delimiter.
-        var getScripts = iJsModuleUrl.split(',').map(function (i) {
-          return _jqueryShim2.default.getScript(i);
-        });
-        _jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(createViewFunc);
-      }
+      });
     }
   }]);
 
@@ -1647,7 +1722,7 @@ var dotnetifyRouter = function () {
       this.urlPath = iUrl;
       for (var i = 0; i < viewModels.length; i++) {
         var vm = viewModels[i];
-        if (vm.$router.routeUrl()) {
+        if (vm.$router.routeUrl(true)) {
           if (this.debug) console.log('router> redirected');
           return;
         }
@@ -1729,6 +1804,11 @@ _dotnetifyVue2.default.vue.router.$inject = function (iVM) {
   iVM.$routeTo = function (iRoute) {
     return router.routeToRoute(iRoute);
   };
+};
+
+// Provide function to load a view.
+_dotnetifyVue2.default.vue.router.$mount = function (iTargetSelector, iComponent, iProps, iCallbackFn) {
+  return _dotnetifyVue4.default.prototype.loadVueView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
 };
 
 // Register the plugin to dotNetify.

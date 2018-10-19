@@ -1079,7 +1079,12 @@ var dotnetifyVMRouter = function () {
     key: 'dispatchActiveRoutingState',
     value: function dispatchActiveRoutingState(iPath) {
       this.vm.$dispatch({ 'RoutingState.Active': iPath });
-      this.vm.State({ 'RoutingState.Active': iPath });
+
+      var _vm$State = this.vm.State(),
+          RoutingState = _vm$State.RoutingState;
+
+      RoutingState = Object.assign(RoutingState || {}, { Active: iPath });
+      this.vm.State({ RoutingState: RoutingState });
     }
 
     // Handles click event from anchor tags.
@@ -1294,7 +1299,7 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeTo',
-    value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn) {
+    value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn, isRedirect) {
       var _this3 = this;
 
       var vm = this.vm;
@@ -1325,9 +1330,13 @@ var dotnetifyVMRouter = function () {
 
       // If target DOM element isn't found, redirect URL to the path.
       if (document.getElementById(iTemplate.Target) == null) {
-        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-
-        return this.router.redirect(this.toUrl(iPath), viewModels);
+        if (isRedirect === true) {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
+          return;
+        } else {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+          return this.router.redirect(this.toUrl(iPath), viewModels);
+        }
       }
 
       // Load the view associated with the route asynchronously.
@@ -1359,7 +1368,7 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeUrl',
-    value: function routeUrl() {
+    value: function routeUrl(isRedirect) {
       var _this5 = this;
 
       if (!this.hasRoutingState) return false;
@@ -1378,7 +1387,7 @@ var dotnetifyVMRouter = function () {
           return iTemplate.UrlPattern === '';
         });
         if (match.length > 0) {
-          this.routeTo('', match[0]);
+          this.routeTo('', match[0], null, null, isRedirect);
           this.router.urlPath = '';
           this.raiseRoutedEvent();
           return true;
@@ -1412,7 +1421,7 @@ var dotnetifyVMRouter = function () {
             if (!_utils2.default.equal(this.RoutingState.Active, path)) {
               this.routeTo(path, template, false, function () {
                 return _this5.raiseRoutedEvent();
-              });
+              }, isRedirect);
             } else this.raiseRoutedEvent();
             return true;
           }
@@ -2047,7 +2056,7 @@ var dotnetifyRouter = function () {
       this.urlPath = iUrl;
       for (var i = 0; i < viewModels.length; i++) {
         var vm = viewModels[i];
-        if (vm.$router.routeUrl()) {
+        if (vm.$router.routeUrl(true)) {
           if (this.debug) console.log('router> redirected');
           return;
         }

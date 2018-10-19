@@ -1095,7 +1095,12 @@ var dotnetifyVMRouter = function () {
     key: 'dispatchActiveRoutingState',
     value: function dispatchActiveRoutingState(iPath) {
       this.vm.$dispatch({ 'RoutingState.Active': iPath });
-      this.vm.State({ 'RoutingState.Active': iPath });
+
+      var _vm$State = this.vm.State(),
+          RoutingState = _vm$State.RoutingState;
+
+      RoutingState = Object.assign(RoutingState || {}, { Active: iPath });
+      this.vm.State({ RoutingState: RoutingState });
     }
 
     // Handles click event from anchor tags.
@@ -1310,7 +1315,7 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeTo',
-    value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn) {
+    value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn, isRedirect) {
       var _this3 = this;
 
       var vm = this.vm;
@@ -1341,9 +1346,13 @@ var dotnetifyVMRouter = function () {
 
       // If target DOM element isn't found, redirect URL to the path.
       if (document.getElementById(iTemplate.Target) == null) {
-        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-
-        return this.router.redirect(this.toUrl(iPath), viewModels);
+        if (isRedirect === true) {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
+          return;
+        } else {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+          return this.router.redirect(this.toUrl(iPath), viewModels);
+        }
       }
 
       // Load the view associated with the route asynchronously.
@@ -1375,7 +1384,7 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeUrl',
-    value: function routeUrl() {
+    value: function routeUrl(isRedirect) {
       var _this5 = this;
 
       if (!this.hasRoutingState) return false;
@@ -1394,7 +1403,7 @@ var dotnetifyVMRouter = function () {
           return iTemplate.UrlPattern === '';
         });
         if (match.length > 0) {
-          this.routeTo('', match[0]);
+          this.routeTo('', match[0], null, null, isRedirect);
           this.router.urlPath = '';
           this.raiseRoutedEvent();
           return true;
@@ -1428,7 +1437,7 @@ var dotnetifyVMRouter = function () {
             if (!_utils2.default.equal(this.RoutingState.Active, path)) {
               this.routeTo(path, template, false, function () {
                 return _this5.raiseRoutedEvent();
-              });
+              }, isRedirect);
             } else this.raiseRoutedEvent();
             return true;
           }
@@ -1474,6 +1483,8 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__13__;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1584,14 +1595,14 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
       iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
       iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn);else this.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, reactProps, iCallbackFn);
+      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);else this.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, reactProps, iCallbackFn);
     }
 
     // Loads an HTML view.
 
   }, {
     key: 'loadHtmlView',
-    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, callbackFn) {
+    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
       var vm = this.vm;
 
       try {
@@ -1615,36 +1626,47 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
 
   }, {
     key: 'loadReactView',
-    value: function loadReactView(iTargetSelector, iReactClassName, iJsModuleUrl, iVmArg, iReactProps, callbackFn) {
-      var vm = this.vm;
-      var createViewFunc = function createViewFunc() {
-        if (!window.hasOwnProperty(iReactClassName)) {
-          console.error('[' + vm.$vmId + "] failed to load view '" + iReactClassName + "' because it's not a React element.");
-          return;
-        }
+    value: function loadReactView(iTargetSelector, iReactClassOrClassName, iJsModuleUrl, iReactProps, callbackFn) {
+      var _this2 = this;
 
-        try {
-          _reactDom2.default.unmountComponentAtNode(document.querySelector(iTargetSelector));
-        } catch (e) {
-          console.error(e);
-        }
+      return new Promise(function (resolve, reject) {
+        var vm = _this2.vm;
+        var vmId = _this2.vm ? _this2.vm.$vmId : '';
+        var createViewFunc = function createViewFunc() {
+          // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
+          var reactClass = null;
+          if (typeof iReactClassOrClassName === 'string' && window.hasOwnProperty(iReactClassOrClassName)) reactClass = window[iReactClassOrClassName];else if ((typeof iReactClassOrClassName === 'undefined' ? 'undefined' : _typeof(iReactClassOrClassName)) === 'object' && iReactClassOrClassName.name) reactClass = iReactClassOrClassName;
 
-        try {
-          var reactElement = _react2.default.createElement(window[iReactClassName], iReactProps);
-          _reactDom2.default.render(reactElement, document.querySelector(iTargetSelector));
-        } catch (e) {
-          console.error(e);
-        }
-        if (typeof callbackFn === 'function') callbackFn.call(vm, reactElement);
-      };
+          if (!reactClass) {
+            console.error('[' + vmId + '] failed to load view \'' + iReactClassOrClassName + '\' because it\'s not a React element.');
+            reject();
+            return;
+          }
 
-      if (iJsModuleUrl == null) createViewFunc();else {
-        // Load all javascripts first. Multiple files can be specified with comma delimiter.
-        var getScripts = iJsModuleUrl.split(',').map(function (i) {
-          return _jqueryShim2.default.getScript(i);
-        });
-        _jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(createViewFunc);
-      }
+          try {
+            _reactDom2.default.unmountComponentAtNode(document.querySelector(iTargetSelector));
+          } catch (e) {
+            console.error(e);
+          }
+
+          try {
+            var reactElement = _react2.default.createElement(reactClass, iReactProps);
+            _reactDom2.default.render(reactElement, document.querySelector(iTargetSelector));
+          } catch (e) {
+            console.error(e);
+          }
+          if (typeof callbackFn === 'function') callbackFn.call(vm, reactElement);
+          resolve(reactElement);
+        };
+
+        if (iJsModuleUrl == null) createViewFunc();else {
+          // Load all javascripts first. Multiple files can be specified with comma delimiter.
+          var getScripts = iJsModuleUrl.split(',').map(function (i) {
+            return _jqueryShim2.default.getScript(i);
+          });
+          _jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(createViewFunc);
+        }
+      });
     }
   }]);
 
@@ -1997,7 +2019,7 @@ var dotnetifyRouter = function () {
       this.urlPath = iUrl;
       for (var i = 0; i < viewModels.length; i++) {
         var vm = viewModels[i];
-        if (vm.$router.routeUrl()) {
+        if (vm.$router.routeUrl(true)) {
           if (this.debug) console.log('router> redirected');
           return;
         }
@@ -2079,6 +2101,11 @@ _dotnetifyReact2.default.react.router.$inject = function (iVM) {
   iVM.$routeTo = function (iRoute) {
     return router.routeToRoute(iRoute);
   };
+};
+
+// Provide function to load a view.
+_dotnetifyReact2.default.react.router.$mount = function (iTargetSelector, iComponent, iProps, iCallbackFn) {
+  return _dotnetifyReact4.default.prototype.loadReactView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
 };
 
 // Register the plugin to dotNetify.
