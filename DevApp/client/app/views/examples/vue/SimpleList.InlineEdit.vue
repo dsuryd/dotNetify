@@ -19,7 +19,7 @@ export default {
   props: {
     value: String
   },
-  data: function () {
+  data() {
     return {
       edit: false,
       input: this.value

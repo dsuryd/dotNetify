@@ -71,13 +71,13 @@ export default {
 export default {
   name: 'MovieTable',
   inject: ['connect'],
-  created: function () {
+  created() {
     this.vm = this.connect("MovieTableVM", this, { watch: ['SelectedKey', 'SelectedPage'] });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Headers: [],
       Data: [],
@@ -114,13 +114,13 @@ export default {
 export default {
   name: 'MovieDetails',
   inject: ['connect'],
-  created: function () {
+  created() {
     this.vm = this.connect("MovieDetailsVM", this);
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Movie: { Cast: '' }
     }
@@ -178,13 +178,13 @@ export default {
 export default {
   name: 'MovieFilter',
   inject: ['connect'],
-  created: function () {
+  created() {
     this.vm = this.connect("FilterableMovieTableVM.MovieFilterVM", this);
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       filters: [],
       filterId: 0,

@@ -116,7 +116,7 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'ControlTypes',
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("ControlTypesVM", this, {
       watch: [
         'TextBoxValue', 'SearchBox', 'ShowMeCheckBox', 'EnableMeCheckBox',
@@ -124,10 +124,10 @@ export default {
       ]
     });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       TextBoxValue: '',
       TextBoxPlaceHolder: '',

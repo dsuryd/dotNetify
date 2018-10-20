@@ -15,17 +15,17 @@ export default {
   props: {
     accessToken: String
   },
-  created: function () {
+  created() {
     let authHeader = { Authorization: 'Bearer ' + this.accessToken };
     this.vm = dotnetify.vue.connect("AdminSecurePageVM", this, {
       headers: authHeader,
       exceptionHandler: ex => { }
     });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       TokenIssuer: null,
       TokenValidFrom: '',

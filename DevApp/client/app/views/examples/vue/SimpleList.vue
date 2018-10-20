@@ -47,13 +47,13 @@ export default {
   components: {
     'InlineEdit': InlineEdit
   },
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("SimpleListVM", this);
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       firstName: '',
       lastName: '',

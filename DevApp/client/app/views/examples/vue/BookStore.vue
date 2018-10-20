@@ -29,14 +29,14 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'BookStore',
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("BookStoreVM", this);
     this.vm.onRouteEnter = (path, template) => (template.Target = 'BookPanel');
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Books: []
     }

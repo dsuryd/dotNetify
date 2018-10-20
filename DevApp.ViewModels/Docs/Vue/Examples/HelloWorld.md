@@ -24,13 +24,13 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'HelloWorld',
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("HelloWorldVM", this, { watch: ['FirstName', 'LastName'] });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       FirstName: '',
       LastName: '',

@@ -28,14 +28,14 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'BookStore',
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("BookStoreVM", this);
     this.vm.onRouteEnter = (path, template) => (template.Target = 'BookPanel');
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Books: []
     }
@@ -72,7 +72,7 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'Book',
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("BookDetailsVM", this);
   },
   mounted() {
@@ -83,10 +83,10 @@ export default {
       window.history.back();
     });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Book: {}
     }

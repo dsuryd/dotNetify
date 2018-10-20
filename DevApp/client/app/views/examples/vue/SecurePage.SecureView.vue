@@ -22,17 +22,17 @@ export default {
   props: {
     accessToken: String
   },
-  created: function () {
+  created() {
     let authHeader = { Authorization: 'Bearer ' + this.accessToken };
     this.vm = dotnetify.vue.connect("SecurePageVM", this, {
       headers: authHeader,
       exceptionHandler: ex => this.onException(ex)
     });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       SecureCaption: 'Not authenticated',
       SecureData: '',

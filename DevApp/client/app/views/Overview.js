@@ -1,4 +1,5 @@
 import React from 'react';
+import Vue from 'vue';
 import dotnetify from 'dotnetify';
 import { Markdown, withTheme } from 'dotnetify-elements';
 import Article from '../components/Article';
@@ -45,8 +46,8 @@ const OverviewVue = _ => (
   <Article vm="OverviewVue" id="Content">
     <Markdown id="Content">
       <FromScratchLink framework="Vue" />
-      {/* <Expander label={<SeeItLive />} content={<RealTimePushVue />} connectOnExpand />
-			<Expander label={<SeeItLive />} content={<ServerUpdateVue />} /> */}
+      <Expander label={<SeeItLive />} content={<RealTimePushVue />} connectOnExpand />
+      {/* <Expander label={<SeeItLive />} content={<ServerUpdateVue />} /> */}
     </Markdown>
   </Article>
 );
@@ -73,7 +74,7 @@ class RealTimePush extends React.Component {
 }
 
 class RealTimePushKO extends React.Component {
-  componentDidUpdate() {
+  componentDidMount() {
     dotnetify.ko.init();
   }
   render() {
@@ -83,6 +84,30 @@ class RealTimePushKO extends React.Component {
         <p data-bind="text: ServerTime" />
       </div>
     );
+  }
+}
+
+class RealTimePushVue extends React.Component {
+  componentDidMount() {
+    this.app = new Vue({
+      template: '<div><p>{{Greetings}}</p><p>Server time is: {{ServerTime}}</p></div>',
+      created() {
+        this.vm = dotnetify.vue.connect('RealTimePush', this);
+      },
+      destroyed() {
+        this.vm.$destroy();
+      },
+      data() {
+        return { Greetings: '', ServerTime: '' };
+      }
+    });
+    this.app.$mount('#RealTimePushVue');
+  }
+  componentWillUnmount() {
+    this.app.$destroy();
+  }
+  render() {
+    return <div id="RealTimePushVue" />;
   }
 }
 

@@ -35,13 +35,13 @@
 export default {
   name: 'MovieTable',
   inject: ['connect'],
-  created: function () {
+  created() {
     this.vm = this.connect("MovieTableVM", this, { watch: ['SelectedKey', 'SelectedPage'] });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Headers: [],
       Data: [],

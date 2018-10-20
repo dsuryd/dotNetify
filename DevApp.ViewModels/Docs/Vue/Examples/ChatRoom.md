@@ -44,7 +44,7 @@
 <script>
 export default {
     name: 'ChatRoom',
-    created: function () {
+    created() {
         this.vm = dotnetify.vue.connect("ChatRoomVM", this);
 
         this.$watch("PrivateMessage", message => {
@@ -55,15 +55,15 @@ export default {
             this.PrivateMessage = null;
         })
     },
-    mounted: function () {
+    mounted() {
         this.vm.$dispatch({ AddUser: this.correlationId });
         this.scrollToBottom();
     },
-    destroyed: function () {
+    destroyed() {
         this.vm.$dispatch({ RemoveUser: null });
         this.vm.$destroy();
     },
-    data: function () {
+    data() {
         return {
             Users: [],
             Messages: [],

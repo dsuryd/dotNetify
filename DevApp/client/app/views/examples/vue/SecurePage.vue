@@ -45,7 +45,7 @@ export default {
   components: {
     'secure-view': SecureView
   },
-  data: function () {
+  data() {
     return {
       username: '',
       password: 'dotnetify',

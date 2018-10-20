@@ -18,13 +18,13 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'LiveChart',
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("LiveChartVM", this);
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Waveform: [],
       Bar: [],

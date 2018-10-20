@@ -19,13 +19,13 @@
 export default {
   name: 'MovieDetails',
   inject: ['connect'],
-  created: function () {
+  created() {
     this.vm = this.connect("MovieDetailsVM", this);
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Movie: { Cast: '' }
     }

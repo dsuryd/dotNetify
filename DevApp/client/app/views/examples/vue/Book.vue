@@ -23,7 +23,7 @@ import dotnetify from 'dotnetify/vue';
 
 export default {
   name: 'Book',
-  created: function () {
+  created() {
     this.vm = dotnetify.vue.connect("BookDetailsVM", this);
   },
   mounted() {
@@ -34,10 +34,10 @@ export default {
       window.history.back();
     });
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       Book: {}
     }

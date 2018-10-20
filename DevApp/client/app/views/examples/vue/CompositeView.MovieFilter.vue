@@ -44,13 +44,13 @@
 export default {
   name: 'MovieFilter',
   inject: ['connect'],
-  created: function () {
+  created() {
     this.vm = this.connect("FilterableMovieTableVM.MovieFilterVM", this);
   },
-  destroyed: function () {
+  destroyed() {
     this.vm.$destroy();
   },
-  data: function () {
+  data() {
     return {
       filters: [],
       filterId: 0,
