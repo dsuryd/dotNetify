@@ -47,7 +47,8 @@ const OverviewVue = _ => (
     <Markdown id="Content">
       <FromScratchLink framework="Vue" />
       <Expander label={<SeeItLive />} content={<RealTimePushVue />} connectOnExpand />
-      {/* <Expander label={<SeeItLive />} content={<ServerUpdateVue />} /> */}
+      <Expander label={<SeeItLive />} content={<ServerUpdateVue />} />
+      <Expander label={<SeeItLive />} content={<TwoWayBindingVue />} />
     </Markdown>
   </Article>
 );
@@ -135,16 +136,15 @@ class ServerUpdate extends React.Component {
   }
 }
 
-window.ServerUpdate = {
-  firstName: ko.observable(),
-  lastName: ko.observable(),
-  submit: function() {
-    this.Submit({ FirstName: this.firstName(), LastName: this.lastName() });
-  }
-};
-
 class ServerUpdateKO extends React.Component {
-  componentDidUpdate() {
+  componentDidMount() {
+    window.ServerUpdate = {
+      firstName: ko.observable(),
+      lastName: ko.observable(),
+      submit: function() {
+        this.Submit({ FirstName: this.firstName(), LastName: this.lastName() });
+      }
+    };
     dotnetify.ko.init();
   }
   render() {
@@ -156,6 +156,55 @@ class ServerUpdateKO extends React.Component {
         <button data-bind="vmCommand: submit">Submit</button>
       </div>
     );
+  }
+}
+
+class ServerUpdateVue extends React.Component {
+  componentDidMount() {
+    this.app = new Vue({
+      template: `
+      <div>
+        <div>{{Greetings}}</div>
+        <input type="text" v-model="firstName" />
+        <input type="text" v-model="lastName" />
+        <button @click="onSubmit">Submit</button>
+      </div>`,
+      created() {
+        this.vm = dotnetify.vue.connect('ServerUpdate', this);
+      },
+      destroyed() {
+        this.vm.$destroy();
+      },
+      data() {
+        return { Greetings: '', firstName: '', lastName: '' };
+      },
+      methods: {
+        onSubmit() {
+          this.vm.$dispatch({ Submit: { FirstName: this.firstName, LastName: this.lastName } });
+        }
+      }
+    });
+    this.app.$mount('#ServerUpdateVue');
+  }
+  render() {
+    return <div id="ServerUpdateVue" />;
+  }
+}
+
+class TwoWayBindingVue extends React.Component {
+  componentDidMount() {
+    this.app = new Vue({
+      ...dotnetify.vue.component('TwoWayBinding', 'TwoWayBinding', { watch: [ 'Name' ] }),
+      template: `
+      <div>
+        <div>{{state.Greetings}}</div>
+        <input type="text" v-model="state.Name" />
+      </div>`
+    });
+    this.app.$mount('#TwoWayBindingVue');
+  }
+  render() {
+    return <div id="TwoWayBindingVue" />;
   }
 }
 

@@ -114,7 +114,7 @@ export default {
   methods: {
     onSubmit() {
       this.vm.$dispatch({ 
-        Submit: { FirstName: firstName, LastName: lastName } 
+        Submit: { FirstName: this.firstName, LastName: this.lastName } 
       });
     }
   }
@@ -145,7 +145,6 @@ On the back-end, we set up the Submit property to be of an Action delegate type 
 
 Notice that we don't need to use __PushUpdates__ to get the new greetings sent. That's because dotNetify employs something similar to the request-response cycle, but in this case it's _action-reaction cycle_: the front-end initiates an action that mutates the state, the back-end processes the action and then sends back to the front-end any other states that mutate as the reaction to that action.
 
-
 #### Object Lifetime
 
 You probably think of those back-end classes as models, but in dotNetify's scheme of things, they are considered view models. Whereas a model represents your app's business domain, a view model is an abstraction of a view, which embodies data and behavior necessary for the view to fulfill its use case.
@@ -155,11 +154,67 @@ View-models gets their model data from the back-end service layer and shape them
 View model objects stay alive on the back-end until the browser page is closed, reloaded, navigated away, or the session times out. On a single-page app, when a component can be mounted and dismounted repeatedly, it is important that you manually destroy the view model when your Vue component dismounts by calling the __$destroy__ API.
 
 ```jsx
-componentWillUnmount() {
+destroyed() {
    this.vm.$destroy();
 }
 ```
 > When the browser is closing or reloading, SignalR will normally send a disconnection event to the server, which signals dotNetify to dispose the view models associated with the connection.  However, this event won't occur when the SignalR transport falls back to HTTP long polling.  Orphan view models will eventually be cleared, but for best practice, use the window's `beforeUnload` event as fallback to invoke `this.vm.$destroy()`.  
+
+#### Component Shorthand
+
+To make your code even more concise, dotNetify provides the __component__ API that produces a preconfigured Vue object.  Here's how it's used to refactor the real-time push example:
+```html
+<template>
+  <div>
+    <p>{{state.Greetings}}</p>
+    <p>Server time is: {{state.ServerTime}}</p>
+  </div>
+</template>
+
+<script>
+import dotnetify from 'dotnetify/vue';
+export default dotnetify.vue.component('MyApp', 'HelloWorld');
+</script>
+```
+
+The API's first argument assigns a name to the component; the second argument is the C# view model class to connect with; the optional third one is for the connection options.  Notice that the view model properties are made available from the _state_ property so that you won't need to explicitly define them in the _data_ function.  
+
+#### Two-Way Binding
+
+To keep the properties in the client in sync with the server without explicit __$dispatch__ call, include those property names in the  __watch__ property of the connection options argument:
+
+```html
+<template>
+  <div>
+    <div>{{state.Greetings}}</div>
+    <input type="text" v-model="state.Name" />
+  </div>`
+</template>
+
+<script>
+  import dotnetify from 'dotnetify/vue';
+  export default dotnetify.vue.component('MyApp', 'HelloWorld', { watch: [ 'Name' ] }),
+</script>
+```
+```csharp
+public class HelloWorld : BaseVM
+{
+  public string Greetings => $"Hello {Name}";
+  
+  private string _name = "World";
+  public string Name 
+  {
+    get => _name;
+    set 
+    {
+      _name = value;
+      Changed(nameof(Greetings));
+    }
+  }
+}
+```
+[inset]
+
 
 #### API Essentials
 
@@ -171,7 +226,7 @@ To get started, you only need these essential APIs to add to your Vue component:
    The options argument is an object with one or more of the following properties:
    - __getState__: function, provide your own component's state accessor.
    - __setState__: function, provide your own component's state mutator.
-   - __watch__: array of properties you want to set up two-way data-binding with the server.
+   - __watch__: array of properties you want to set up two-way binding with the server.
    - __vmArg__: object, initialize view model properties. 
       For example:
       ```jsx
@@ -184,6 +239,9 @@ To get started, you only need these essential APIs to add to your Vue component:
 
 - _vm_.__$dispatch__(_state_)
 - _vm_.__$destroy__()
+
+Custom directive:
+- __vmOn__: calls a Vue method on server property update.  For example: `data-bind="vmOn: {ServerTime: doSomething}`.
 
 To output debug logs to the browser's Console tab, add `dotnetify.debug = true`.
 
