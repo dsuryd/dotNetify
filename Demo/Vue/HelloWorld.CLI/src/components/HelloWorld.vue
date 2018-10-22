@@ -10,12 +10,7 @@
 
 <script>
 import dotnetify from 'dotnetify/vue';
-dotnetify.hubServerUrl = 'http://localhost:5000';
-
-export default {
-  props: { msg: String },
-  ...dotnetify.vue.component("hello-world", "HelloWorld")
-}
+export default dotnetify.vue.component({ name: "hello-world", props: { msg: String } }, "HelloWorld")
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

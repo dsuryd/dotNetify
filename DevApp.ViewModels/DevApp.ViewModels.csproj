@@ -40,6 +40,7 @@
     <EmbeddedResource Include="Docs\Vue\APIs\Routing.md" />    
     <EmbeddedResource Include="Docs\Vue\FromScratchWebPack.md" />
     <EmbeddedResource Include="Docs\Vue\FromScratchScriptTag.md" />
+    <EmbeddedResource Include="Docs\Vue\FromScratchCLI.md" />
     <EmbeddedResource Include="Docs\Vue\Examples\HelloWorld.md" />
     <EmbeddedResource Include="Docs\Vue\Examples\ControlTypes.md" />
     <EmbeddedResource Include="Docs\Vue\Examples\SimpleList.md" />    

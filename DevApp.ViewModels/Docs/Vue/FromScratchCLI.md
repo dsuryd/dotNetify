@@ -1,20 +1,20 @@
-## From Scratch with CRA
+## From Scratch with Vue CLI
 
-The following steps will create a simple real-time Hello World ASP.NET Core app from `create-react-app`. 
+The following steps will create a simple real-time Hello World ASP.NET Core app from Vue CLI. 
 
 Prerequisites:
 
 - Node.js
+- Vue CLI (`npm install -g @vue/cli`)
 
 ##### Create Project
 
 From the command line, run the following:
 ```jsx
-npx create-react-app helloworld
+vue create helloworld
 cd helloworld
 
 npm i --save dotnetify
-npm i --save tslib
 
 dotnet new web
 dotnet add package DotNetify.SignalR
@@ -50,7 +50,7 @@ namespace helloworld
       app.UseCors(builder => builder
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .WithOrigins("http://localhost:3000")
+        .WithOrigins("http://localhost:8080")
         .AllowCredentials());
           
       app.UseWebSockets();
@@ -67,60 +67,45 @@ namespace helloworld
 ```
 <br/>
 
-##### Configure NPM
+##### Configure Vue
 
-Add the following settings to _package.json_:
-```js
-  "proxy": "http://localhost:5000/"
+Add a new file _vue.config.js_ with the following content:
+```jsx
+module.exports = {
+  devServer: {
+    proxy: { 
+      '/dotnetify': { target: 'http://localhost:5000' } 
+    }
+  }
+};
 ```
 <br/>
 
 ##### Add Hello World
 
-Add a new file _src/HelloWorld.js_ with the following content:
-```jsx
-import React from 'react';
-import dotnetify from 'dotnetify';
+Replace the content of _src/components/HelloWorld.vue_ with the following:
+```html
+<template>
+  <div class="hello">
+    <h1>{{ msg }}</h1>
+    <div>
+      <h3>{{ state.Greetings }}</h3>
+      <p>Server time is: {{ state.ServerTime }}</p>
+    </div>
+  </div>
+</template>
 
-dotnetify.hubServerUrl = 'http://localhost:5000';
+<script>
+import dotnetify from 'dotnetify/vue';
+export default dotnetify.vue.component({ 
+  name: "hello-world", 
+  props: { msg: String } 
+}, "HelloWorld");
+</script>
 
-export default class HelloWorld extends React.Component {
-  constructor(props) {
-    super(props);
-    dotnetify.react.connect('HelloWorld', this);
-    this.state = { Greetings: '', ServerTime: '' };
-  }
-
-  render() {
-    return (
-      <div>
-        <p>{this.state.Greetings}</p>
-        <p>Server time is: {this.state.ServerTime}</p>
-      </div>
-    );
-  }
-}
-```
-
-Add the _HelloWorld_ component in _src/App.js_:
-```jsx
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import HelloWorld from './HelloWorld';
-
-class App extends Component {
-	render() {
-		return (
-			<div className="App">
-				{/* ... */}
-				<HelloWorld />
-			</div>
-		);
-	}
-}
-
-export default App;
+<style scoped>
+h3 { font-weight: 500; }
+</style>
 ```
 
 Add a new file _HelloWorld.cs_ with the following content:
@@ -154,4 +139,4 @@ namespace helloworld
 
 ##### Build and Run
 
-Open a new terminal and run `dotnet run`.  On another terminal, run `npm start`.  Hello World!
+Open a new terminal and run `dotnet run`.  On another terminal, run `npm run serve`.  Hello World!

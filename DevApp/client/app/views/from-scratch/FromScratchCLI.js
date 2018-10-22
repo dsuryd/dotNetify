@@ -3,7 +3,7 @@ import { Markdown, withTheme } from 'dotnetify-elements';
 import Article from 'app/components/Article';
 import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
 
-class FromScratchCRA extends React.Component {
+class FromScratchCLI extends React.Component {
   constructor() {
     super();
     this.state = { framework: currentFramework };
@@ -13,18 +13,18 @@ class FromScratchCRA extends React.Component {
     this.unsubs();
   }
   componentDidUpdate() {
-    if (this.state.framework !== 'React') dotnetify.react.router.pushState({}, null, '/core/overview');
+    if (this.state.framework !== 'Vue') dotnetify.react.router.pushState({}, null, '/core/overview');
   }
   render() {
     const { framework } = this.state;
-    return framework === 'React' ? <FromScratchReactCRA /> : null;
+    return framework === 'Vue' ? <FromScratchVueCLI /> : null;
   }
 }
 
-const FromScratchReactCRA = _ => (
-  <Article vm="FromScratchCRA" id="Content">
+const FromScratchVueCLI = _ => (
+  <Article vm="FromScratchVueCLI" id="Content">
     <Markdown id="Content" />
   </Article>
 );
 
-export default withTheme(FromScratchCRA);
+export default withTheme(FromScratchCLI);

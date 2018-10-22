@@ -193,14 +193,21 @@ class ServerUpdateVue extends React.Component {
 
 class TwoWayBindingVue extends React.Component {
   componentDidMount() {
-    this.app = new Vue({
-      ...dotnetify.vue.component('TwoWayBinding', 'TwoWayBinding', { watch: [ 'Name' ] }),
-      template: `
-      <div>
-        <div>{{state.Greetings}}</div>
-        <input type="text" v-model="state.Name" />
-      </div>`
-    });
+    this.app = new Vue(
+      dotnetify.vue.component(
+        {
+          name: 'TwoWayBinding',
+          template: `
+          <div>
+            <div>{{state.Greetings}}</div>
+            <input type="text" v-model="state.Name" />
+          </div>
+        `
+        },
+        'TwoWayBinding',
+        { watch: [ 'Name' ] }
+      )
+    );
     this.app.$mount('#TwoWayBindingVue');
   }
   render() {

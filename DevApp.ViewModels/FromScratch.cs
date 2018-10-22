@@ -39,7 +39,7 @@ namespace DotNetify.DevApp
     public string Content => new Markdown("DotNetify.DevApp.Docs.Vue.FromScratchScriptTag.md");
   }    
 
-  public class FromScratchCLI : BaseVM
+  public class FromScratchVueCLI : BaseVM
   {
     public string Content => new Markdown("DotNetify.DevApp.Docs.Vue.FromScratchCLI.md");
   }

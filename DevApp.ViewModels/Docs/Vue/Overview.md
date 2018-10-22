@@ -162,7 +162,7 @@ destroyed() {
 
 #### Component Shorthand
 
-To make your code even more concise, dotNetify provides the __component__ API that produces a preconfigured Vue object.  Here's how it's used to refactor the real-time push example:
+To make your code even more concise, dotNetify provides the __component__ API to produce a pre-configured Vue object.  Here's how it's used on the real-time push example:
 ```html
 <template>
   <div>
@@ -177,7 +177,7 @@ export default dotnetify.vue.component('MyApp', 'HelloWorld');
 </script>
 ```
 
-The API's first argument assigns a name to the component; the second argument is the C# view model class to connect with; the optional third one is for the connection options.  Notice that the view model properties are made available from the _state_ property so that you won't need to explicitly define them in the _data_ function.  
+The API's first argument assigns a name to the component; the second argument is the C# view model class to connect with; the optional third one is for the connection options.  Notice that the view model properties are made available from the _state_ property so that you won't need to explicitly define them in the _data_ function.  You can also replace the first argument with a Vue object if you need to provide more properties for the component.
 
 #### Two-Way Binding
 
