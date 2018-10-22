@@ -8,6 +8,8 @@
       "dist/*.js",
       "dist/*.ts",
       "dist/typings",
+      "ko/*.js",
+      "vue/*.js",
       "README.*",
       "LICENSE.*"
    ],

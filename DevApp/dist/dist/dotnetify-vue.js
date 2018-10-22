@@ -516,9 +516,8 @@ dotnetify.vue = {
   },
 
   // Creates a Vue component with pre-configured connection to a server view model.
-  component: function component(iComponentName, iVMId, iOptions) {
-    return {
-      name: iComponentName,
+  component: function component(iComponentOrName, iVMId, iOptions) {
+    var obj = {
       created: function created() {
         this.vm = dotnetify.vue.connect(iVMId, this, _extends({}, iOptions, { useState: true }));
       },
@@ -526,11 +525,11 @@ dotnetify.vue = {
         this.vm.$destroy();
       },
       data: function data() {
-        return {
-          state: {}
-        };
+        return { state: {} };
       }
     };
+
+    if (typeof iComponentOrName == 'string') return _extends({ name: iComponentOrName }, obj);else return _extends({}, obj, iComponentOrName);
   },
 
   // Gets all view models.
