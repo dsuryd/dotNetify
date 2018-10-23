@@ -79,6 +79,7 @@ Add a new file _wwwroot/index.html_ with the following content:
     <script>
       new Vue({
         el: '#App',
+        template: '<div><p>{{Greetings}}</p><p>Server time is: {{ServerTime}}</p></div>',
         created: function() { dotnetify.vue.connect("HelloWorld", this) },
         data: { Greetings: '', ServerTime: '' }
       })
