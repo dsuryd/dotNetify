@@ -27,7 +27,11 @@ export default {
     this.vm.$destroy();
   },
   data() {
-    return { LinkPage1: null, LinkPage2: null };
+    return { 
+      LinkPage1: null, 
+      LinkPage2: null, 
+      RoutingState: null 
+    };
   }
 }
 </script>  
@@ -37,6 +41,8 @@ The routing state that have been defined in the view model will be part of the i
 
 To set the target DOM element, implement the __vm.onRouteEnter__ function in the constructor of the code-behind. This API will pass the URL path and the route template object to the function whenever a route is activated, and you will just set the _Target_ property to the ID of the target DOM element. It also allows you to cancel the operation by returning false.
 
-To set up the route links, use the __vmRoute__ binding and pass in the route object that we have defined in the view model.  This binding will set the _href_ attribute with the appropriate path, and handles the _click_ event of the anchor tag.
+To set up the route links, use the __v-vmRoute__ binding and pass in the route object that we have defined in the view model.  This binding will set the _href_ attribute with the appropriate path, and handles the _click_ event of the anchor tag.
 
 You can register more routes inside the view model associated with the pages under _Index_, basically making nested routes. You only need to make sure that the root path of the routes registered inside the nested view model match the the component name (or URL pattern) of the parent route. For example, the routes registered in the _Page1_ view model should have "Page1" for root path. All routes defined this way support deep-linking: you can paste the URL to the browser and go directly to any deeply nested view.
+
+Notice that we need to explicitly add _RoutingState_ property to the component.  This won't be required if you let dotNetify handles the root component mounting by using this API: __dotnetify.vue.$router.$mount(_selector_, _component_)__.
