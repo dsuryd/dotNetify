@@ -5,13 +5,15 @@
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 [![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/) 
 
-DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket. 
+DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org), or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket. 
 
 ## What's New
 
-* v3.1 Release - [**release notes**](https://github.com/dsuryd/dotNetify/releases/tag/nuget_v.3.1).
+* v3.2: integrates with Vue.
+* v3.1: multicast - [**release notes**](https://github.com/dsuryd/dotNetify/releases/tag/nuget_v.3.1).
+* v3.0: integrates with SignalR for ASP.NET Core 2.1.
+<br/><br/>
 * **DotNetify-Elements** is out! <a href="http://dotnetify.net/elements">See documentation and live demo.</a> 
-* v3.0 Release: integrates with SignalR for ASP.NET Core 2.1.
 * React SPA template for ASP.NET Core 2.1 - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
 
 ## Features
