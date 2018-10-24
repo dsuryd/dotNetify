@@ -1181,7 +1181,7 @@ exports.default = dotnetifyVMRouter;
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1230,149 +1230,172 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
-  _inherits(dotnetifyReactVMRouter, _dotnetifyVMRouter);
+	_inherits(dotnetifyReactVMRouter, _dotnetifyVMRouter);
 
-  _createClass(dotnetifyReactVMRouter, [{
-    key: 'hasRoutingState',
-    get: function get() {
-      var state = this.vm.State();
-      return state && state.hasOwnProperty('RoutingState');
-    }
-  }, {
-    key: 'RoutingState',
-    get: function get() {
-      return this.vm.State().RoutingState;
-    }
-  }, {
-    key: 'VMRoot',
-    get: function get() {
-      return this.vm.Props('vmRoot');
-    }
-  }, {
-    key: 'VMArg',
-    get: function get() {
-      return this.vm.Props('vmArg');
-    }
-  }]);
+	_createClass(dotnetifyReactVMRouter, [{
+		key: 'hasRoutingState',
+		get: function get() {
+			var state = this.vm.State();
+			return state && state.hasOwnProperty('RoutingState');
+		}
+	}, {
+		key: 'RoutingState',
+		get: function get() {
+			return this.vm.State().RoutingState;
+		}
+	}, {
+		key: 'VMRoot',
+		get: function get() {
+			return this.vm.Props('vmRoot');
+		}
+	}, {
+		key: 'VMArg',
+		get: function get() {
+			return this.vm.Props('vmArg');
+		}
+	}]);
 
-  function dotnetifyReactVMRouter(iVM, iDotNetifyRouter) {
-    _classCallCheck(this, dotnetifyReactVMRouter);
+	function dotnetifyReactVMRouter(iVM, iDotNetifyRouter) {
+		_classCallCheck(this, dotnetifyReactVMRouter);
 
-    return _possibleConstructorReturn(this, (dotnetifyReactVMRouter.__proto__ || Object.getPrototypeOf(dotnetifyReactVMRouter)).call(this, iVM, iDotNetifyRouter));
-  }
+		return _possibleConstructorReturn(this, (dotnetifyReactVMRouter.__proto__ || Object.getPrototypeOf(dotnetifyReactVMRouter)).call(this, iVM, iDotNetifyRouter));
+	}
 
-  _createClass(dotnetifyReactVMRouter, [{
-    key: 'onRouteEnter',
-    value: function onRouteEnter(iPath, iTemplate) {
-      if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id;
-      return true;
-    }
+	_createClass(dotnetifyReactVMRouter, [{
+		key: 'onRouteEnter',
+		value: function onRouteEnter(iPath, iTemplate) {
+			if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id;
+			return true;
+		}
 
-    // Loads a view into a target element.
+		// Loads a view into a target element.
 
-  }, {
-    key: 'loadView',
-    value: function loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
-      var vm = this.vm;
-      var componentProps = void 0;
+	}, {
+		key: 'loadView',
+		value: function loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
+			var vm = this.vm;
+			var componentProps = void 0;
 
-      // If the view model supports routing, add the root path to the view, to be used
-      // to build the absolute route path, and view model argument if provided.
-      if (this.hasRoutingState) {
-        if (this.RoutingState === null) {
-          console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
-          return;
-        }
+			// If the view model supports routing, add the root path to the view, to be used
+			// to build the absolute route path, and view model argument if provided.
+			if (this.hasRoutingState) {
+				if (this.RoutingState === null) {
+					console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
+					return;
+				}
 
-        var root = this.VMRoot;
-        root = root != null ? '/' + _utils2.default.trim(this.RoutingState.Root) + '/' + _utils2.default.trim(root) : this.RoutingState.Root;
-        componentProps = { vmRoot: root, vmArg: iVmArg };
-      }
+				var root = this.VMRoot;
+				root = root != null ? '/' + _utils2.default.trim(this.RoutingState.Root) + '/' + _utils2.default.trim(root) : this.RoutingState.Root;
+				componentProps = { vmRoot: root, vmArg: iVmArg };
+			}
 
-      // Provide the opportunity to override the URL.
-      iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
-      iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
+			// Provide the opportunity to override the URL.
+			iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
+			iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, componentProps, iCallbackFn);
-    }
+			if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, componentProps, iCallbackFn);
+		}
 
-    // Loads an HTML view.
+		// Loads an HTML view.
 
-  }, {
-    key: 'loadHtmlView',
-    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
-      var vm = this.vm;
+	}, {
+		key: 'loadHtmlView',
+		value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
+			var vm = this.vm;
 
-      // Load the HTML view.
-      (0, _jqueryShim2.default)(iTargetSelector).load(iViewUrl, null, function () {
-        if (iJsModuleUrl != null) {
-          _jqueryShim2.default.getScript(iJsModuleUrl, function () {
-            if (typeof callbackFn === 'function') callbackFn.call(vm);
-          });
-        } else if (typeof callbackFn === 'function') callbackFn.call(vm);
-      });
-    }
+			// Unmount any existing Vue component on the target selector.
+			this.unmountVueView(iTargetSelector);
 
-    // Loads a Vue view.
+			// Load the HTML view.
+			(0, _jqueryShim2.default)(iTargetSelector).load(iViewUrl, null, function () {
+				if (iJsModuleUrl != null) {
+					_jqueryShim2.default.getScript(iJsModuleUrl, function () {
+						if (typeof callbackFn === 'function') callbackFn.call(vm);
+					});
+				} else if (typeof callbackFn === 'function') callbackFn.call(vm);
+			});
+		}
 
-  }, {
-    key: 'loadVueView',
-    value: function loadVueView(iTargetSelector, iVueClassOrClassName, iJsModuleUrl, iProps, callbackFn) {
-      var _this2 = this;
+		// Loads a Vue view.
 
-      return new Promise(function (resolve, reject) {
-        var vm = _this2.vm;
-        var vmId = _this2.vm ? _this2.vm.$vmId : '';
-        var createViewFunc = function createViewFunc() {
-          // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
-          var vueClass = null;
-          if (typeof iVueClassOrClassName === 'string' && window.hasOwnProperty(iVueClassOrClassName)) vueClass = Object.assign({}, window[iVueClassOrClassName]);else if ((typeof iVueClassOrClassName === 'undefined' ? 'undefined' : _typeof(iVueClassOrClassName)) === 'object' && iVueClassOrClassName.name) vueClass = iVueClassOrClassName;
+	}, {
+		key: 'loadVueView',
+		value: function loadVueView(iTargetSelector, iVueClassOrClassName, iJsModuleUrl, iProps, callbackFn) {
+			var _this2 = this;
 
-          if (!vueClass) {
-            console.error('[' + vmId + '] failed to load view \'' + iVueClassOrClassName + '\' because it\'s not a Vue element.');
-            reject();
-            return;
-          }
+			return new Promise(function (resolve, reject) {
+				var vm = _this2.vm;
+				var vmId = _this2.vm ? _this2.vm.$vmId : '';
+				var createViewFunc = function createViewFunc() {
+					// Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
+					var vueClass = null;
+					if (typeof iVueClassOrClassName === 'string' && window.hasOwnProperty(iVueClassOrClassName)) vueClass = Object.assign({}, window[iVueClassOrClassName]);else if ((typeof iVueClassOrClassName === 'undefined' ? 'undefined' : _typeof(iVueClassOrClassName)) === 'object' && typeof iVueClassOrClassName.render == 'function') vueClass = iVueClassOrClassName;
 
-          // Declare 'RoutingState' property in the component.
-          var data = typeof vueClass.data == 'function' ? vueClass.data() : vueClass.data || {};
-          if (!data.hasOwnProperty('RoutingState')) {
-            data.RoutingState = {};
-            vueClass.data = function () {
-              return data;
-            };
-          }
+					if (!vueClass) {
+						console.error('[' + vmId + '] failed to load view \'' + iVueClassOrClassName + '\' because it\'s not a Vue element.');
+						reject();
+						return;
+					}
 
-          // Add any undeclared property to the vue class.
-          if (iProps) {
-            vueClass.props = vueClass.props || {};
-            for (var prop in iProps) {
-              if (!vueClass.props.hasOwnProperty(prop)) vueClass.props[prop] = { type: null };
-            }
-          }
+					// Unmount any existing Vue component on the target selector.
+					_this2.unmountVueView(iTargetSelector);
 
-          var vueComponentType = _vue2.default.extend(vueClass);
-          var vueComponent = new vueComponentType({ propsData: _extends({}, iProps) });
+					// Declare 'RoutingState' property in the component.
+					var data = typeof vueClass.data == 'function' ? vueClass.data() : vueClass.data || {};
+					if (!data.hasOwnProperty('RoutingState')) {
+						data.RoutingState = {};
+						vueClass.data = function () {
+							return data;
+						};
+					}
 
-          document.querySelector(iTargetSelector).innerHTML = '<div />';
-          vueComponent.$mount(iTargetSelector + ' > div');
+					// Add any undeclared property to the vue class.
+					if (iProps) {
+						vueClass.props = vueClass.props || {};
+						for (var prop in iProps) {
+							if (!vueClass.props.hasOwnProperty(prop)) vueClass.props[prop] = { type: null };
+						}
+					}
 
-          if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);
-          resolve(vueComponent);
-        };
+					var vueComponentType = _vue2.default.extend(vueClass);
+					var vueComponent = new vueComponentType({ propsData: _extends({}, iProps) });
 
-        if (iJsModuleUrl == null) createViewFunc();else {
-          // Load all javascripts first. Multiple files can be specified with comma delimiter.
-          var getScripts = iJsModuleUrl.split(',').map(function (i) {
-            return _jqueryShim2.default.getScript(i);
-          });
-          _jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(createViewFunc);
-        }
-      });
-    }
-  }]);
+					document.querySelector(iTargetSelector).innerHTML = '<div />';
+					vueComponent.$mount(iTargetSelector + ' > div');
+					_this2.mountedComponents[iTargetSelector] = function () {
+						return vueComponent.$destroy();
+					};
 
-  return dotnetifyReactVMRouter;
+					if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);
+					resolve(vueComponent);
+				};
+
+				if (iJsModuleUrl == null) createViewFunc();else {
+					// Load all javascripts first. Multiple files can be specified with comma delimiter.
+					var getScripts = iJsModuleUrl.split(',').map(function (i) {
+						return _jqueryShim2.default.getScript(i);
+					});
+					_jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(createViewFunc);
+				}
+			});
+		}
+
+		// Unmount a Vue view if there's one on the target selector.
+
+	}, {
+		key: 'unmountVueView',
+		value: function unmountVueView(iTargetSelector) {
+			if (!this.mountedComponents) this.mountedComponents = {};
+
+			var unmount = this.mountedComponents[iTargetSelector];
+			if (typeof unmount == 'function') {
+				unmount();
+				delete this.mountedComponents[iTargetSelector];
+			}
+		}
+	}]);
+
+	return dotnetifyReactVMRouter;
 }(_dotnetifyVmRouter2.default);
 
 exports.default = dotnetifyReactVMRouter;
