@@ -5,7 +5,7 @@ To illustrate the scoped view model pattern, consider a master-details view cons
 When the interaction grows more complex and it's getting harder to keep your components from getting bloated, adhere to single responsibility and maintain good decoupling, consider using this pattern and offload the logic into the view models. Here's a simple example on how it can be done:
 
 ```jsx
-const MasterDetails = new Vue({
+new Vue({
   el: '#MasterDetails',
   components: {
     MasterList,
@@ -52,7 +52,7 @@ const MasterList = Vue.component('MasterList', {
   }
 });
 
-const Details = Vue.component('Details, {
+const Details = Vue.component('Details', {
   template: '<img v-if="ItemImageUrl" :src="ItemImageUrl" style="margin: 0 1rem" />',
   created() {
     this.vm = dotnetify.vue.connect('MasterDetails.Details', this);

@@ -83,7 +83,7 @@ namespace MyProject
 #### Client-Side Library
 
 If you use module bundler like WebPack, install __dotnetify__, `react`, and `react-dom` from NPM: 
-```js
+```jsx
 npm i --save dotnetify
 npm i --save react
 npm i --save react-dom
@@ -103,7 +103,7 @@ If using script tags, include _React_, _signalR_, and _dotNetify_ from their res
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
 ```
 
-To use SignalR .NET Framework client, use:
+To use SignalR .NET Framework client instead of .NET Core, replace _signalR_ script above with:
 ```html
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/signalr@2/jquery.signalR.min.js"></script>

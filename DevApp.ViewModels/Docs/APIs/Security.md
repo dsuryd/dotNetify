@@ -6,7 +6,7 @@ DotNetify relies on SignalR to integrate into the existing authentication struct
 
 To restrict access to your view models only to authenticated users, configure dotNetify to add the __AuthorizeFilter__:
 
-```jsx
+```csharp
 app.UseDotNetify(config => config.UseFilter<AuthorizeFilter>());
 ```
 

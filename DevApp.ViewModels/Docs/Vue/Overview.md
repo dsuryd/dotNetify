@@ -241,7 +241,7 @@ To get started, you only need these essential APIs to add to your Vue component:
 - _vm_.__$destroy__()
 
 Custom directive:
-- __vmOn__: calls a Vue method on server property update.  For example: `data-bind="vmOn: {ServerTime: doSomething}`.
+- __v-vmOn__: calls a Vue method on server property update.  For example: `v-vmOn="{ServerTime: doSomething}"`.
 
 To output debug logs to the browser's Console tab, add `dotnetify.debug = true`.
 

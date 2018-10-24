@@ -30,9 +30,17 @@ Any view model involved with routing must implement __IRoutable__ interface from
 
 In the constructor, create the route templates for _Page1_ and _Page2_ and register them using the __RegisterRoutes__ API. You are required to specify the root path for all the routes.
 
-The route template object, __RouteTemplate__ defines which component to render (e.g. _Page1_) when the route is activated, where to get the script (e.g. _/page1.js_), and maps a URL to a specific route. By default it assumes the URL will match the component name, but you can use the UrlPattern property to change the search pattern, such as mapping URL with only the root path to the Home route. You can leave out the script location if the component is already loaded by other means.
+The route template object, __RouteTemplate__ defines which component to render (e.g. _Page1_) when the route is activated, where to get the script (e.g. _/page1.js_), and maps a URL to a specific route. By default it assumes the URL will match the component name, but you can use the UrlPattern property to change the search pattern, such as mapping URL with only the root path to the Home route. 
 
 The nav-bar will need links to the pages, so we add some properties that return the Route objects for _Page1_ and _Page2_. To get the object, use the __GetRoute__ API, which will find it from the list of registered routes.
+
+You can leave out the script location if you plan to bundle the components, in which case you must add them to the _window_ variable during your application's bootstrap: 
+```jsx
+import Page1 from './page1.js';
+import Page2 from './page1.js';
+
+Object.assign(window, { Page1, Page2 });
+```
 
 #### Setting Up Route Links
 

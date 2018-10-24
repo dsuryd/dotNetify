@@ -26,7 +26,7 @@ If using script tags, include _jQuery_, _knockout_, _signalR_, and _dotNetify_ f
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-ko.min.js"></script>
 ```
 
-The _signalR_ script above is only for ASP.NET Core. If you are using ASP.NET Framework server, replace with:
+To use SignalR .NET Framework client instead of .NET Core, replace _signalR_ script above with:
 ```html
 <script src="https://cdn.jsdelivr.net/npm/signalr@2/jquery.signalR.min.js"></script>
 ```

@@ -22,5 +22,21 @@ namespace DotNetify.DevApp
                     + content.GetSection("Redirection", "Getting Initial State");
             }
         } 
-    } 
+    }
+
+    public class RoutingVue : BaseVM
+    {
+        public string Content 
+        {
+            get 
+            {
+                var content = new Markdown("DotNetify.DevApp.Docs.APIs.Routing.md");
+                var contentKO = new Markdown("DotNetify.DevApp.Docs.Vue.APIs.Routing.md");
+                return  contentKO.GetSection(null, "Setting Up Route Links")
+                    + content.GetSection("Defining the Routes", "Setting Up Route Links")
+                    + contentKO.GetSection("Setting Up Route Links")
+                    + content.GetSection("Redirection", "Getting Initial State");
+            }
+        } 
+    }      
 }
