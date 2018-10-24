@@ -30,12 +30,23 @@ class DataFlow extends React.Component {
 	}
 	render() {
 		const { framework } = this.state;
-		return framework === 'React' ? <DataFlowReact /> : null;
+		return framework === 'React' ? <DataFlowReact /> : framework === 'Vue' ? <DataFlowVue /> : null;
 	}
 }
 
 const DataFlowReact = props => (
 	<Article vm="DataFlow" id="Content">
+		<Markdown id="Content">
+			<Image src={SingleVMImage} width="350px" />
+			<Image src={SiloedVMImage} width="350px" />
+			<Image src={ScopedVMImage} width="400px" />
+			<Expander label={<SeeItLive />} content={<MasterDetails />} />
+		</Markdown>
+	</Article>
+);
+
+const DataFlowVue = props => (
+	<Article vm="DataFlowVue" id="Content">
 		<Markdown id="Content">
 			<Image src={SingleVMImage} width="350px" />
 			<Image src={SiloedVMImage} width="350px" />

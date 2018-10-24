@@ -9,6 +9,13 @@ namespace DotNetify.DevApp
       public string Content => new Markdown("DotNetify.DevApp.Docs.DataFlow.md");
    }
 
+  public class DataFlowVue : BaseVM
+  {
+    public string Content => 
+      new Markdown("DotNetify.DevApp.Docs.DataFlow.md").GetSection(null, "Master-Details") +
+      new Markdown("DotNetify.DevApp.Docs.Vue.DataFlow.md");
+  } 
+
    public class MasterDetails : BaseVM
    {
       private readonly IWebStoreService _webStoreService;

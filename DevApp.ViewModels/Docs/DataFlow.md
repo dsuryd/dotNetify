@@ -2,7 +2,7 @@
 
 #### Single View Model
 
-This is the simplest pattern that we've used so far, in which the root component is connected to a single back-end view model, serving the initial state and occasionally receiving updates to be persisted to the database. This works great for app with shallow component tree, or if integrating with client-side stores like Flux/Redux.
+This is the simplest pattern that we've used so far, in which the root component is connected to a single back-end view model, serving the initial state and occasionally receiving updates to be persisted to the database. This works great for app with shallow component tree, or if integrating with client-side stores.
 
 [inset]
 
@@ -187,7 +187,7 @@ class Details extends React.Component {
 }
 ```
 
-With the Scope component, you can now set the parent view model name through its vm property. When the nested components use this.context.connect to connect to the back-end, it will use the parent scope to resolve to the desired view model path, in this case _BookStore.MasterList_ and _BookStore.Details_.
+With the Scope component, you can now set the parent view model name through its vm property. When the nested components use __this.context.connect__ to connect to the back-end, it will use the parent scope to resolve to the desired view model path, in this case _BookStore.MasterList_ and _BookStore.Details_.
 
 The Scope component can be nested and helps make both your React view and their view models highly reusable. For a more fleshed-out example, see the [Composite View Example](/core/examples/compositeview).
 
