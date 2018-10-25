@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import dotnetify from 'dotnetify/vue';
 import App from './App.vue';
 import SimpleList from './SimpleList.vue';
