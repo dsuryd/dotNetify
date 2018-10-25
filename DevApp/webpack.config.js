@@ -38,7 +38,8 @@ module.exports = {
     'dotnetify-elements': 'dotNetifyElements',
     knockout: 'ko',
     react: 'React',
-    'react-dom': 'ReactDOM'
+    'react-dom': 'ReactDOM',
+    vue: 'Vue'
   },
   plugins: [ new VueLoaderPlugin(), new MiniCssExtractPlugin() ]
 };

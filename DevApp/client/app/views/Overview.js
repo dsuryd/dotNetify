@@ -186,6 +186,9 @@ class ServerUpdateVue extends React.Component {
     });
     this.app.$mount('#ServerUpdateVue');
   }
+  componentWillUnmount() {
+    this.app.$destroy();
+  }
   render() {
     return <div id="ServerUpdateVue" />;
   }
@@ -209,6 +212,9 @@ class TwoWayBindingVue extends React.Component {
       )
     );
     this.app.$mount('#TwoWayBindingVue');
+  }
+  componentWillUnmount() {
+    this.app.$destroy();
   }
   render() {
     return <div id="TwoWayBindingVue" />;
