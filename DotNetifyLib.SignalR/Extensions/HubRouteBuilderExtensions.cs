@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR;
+using System;
 
 namespace DotNetify
 {
    public static class HubRouteBuilderExtensions
    {
+      private static readonly string HUB_PATH = "/dotnetify";
+
       public static HubRouteBuilder MapDotNetifyHub(this HubRouteBuilder routes)
       {
-         routes.MapHub<DotNetifyHub>("/dotnetify");
+         routes.MapHub<DotNetifyHub>(HUB_PATH);
+         return routes;
+      }
+
+      public static HubRouteBuilder MapDotNetifyHub(this HubRouteBuilder routes, Action<HttpConnectionDispatcherOptions> options)
+      {
+         routes.MapHub<DotNetifyHub>(HUB_PATH, options);
          return routes;
       }
    }
