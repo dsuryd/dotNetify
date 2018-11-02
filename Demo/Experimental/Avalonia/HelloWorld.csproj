@@ -13,5 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="0.7.0" />
+    <PackageReference Include="DotNetify.SignalR" Version="3.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />    
   </ItemGroup>
 </Project>
