@@ -556,7 +556,7 @@ module.exports = g;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -597,42 +597,44 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 // <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
 var RouteTarget = function (_React$Component) {
-	_inherits(RouteTarget, _React$Component);
+  _inherits(RouteTarget, _React$Component);
 
-	function RouteTarget() {
-		_classCallCheck(this, RouteTarget);
+  function RouteTarget() {
+    _classCallCheck(this, RouteTarget);
 
-		return _possibleConstructorReturn(this, (RouteTarget.__proto__ || Object.getPrototypeOf(RouteTarget)).apply(this, arguments));
-	}
+    return _possibleConstructorReturn(this, (RouteTarget.__proto__ || Object.getPrototypeOf(RouteTarget)).apply(this, arguments));
+  }
 
-	_createClass(RouteTarget, [{
-		key: 'componentWillMount',
-		value: function componentWillMount() {
-			var elem = document.getElementById(this.props.id);
-			if (elem != null && window.ssr && !window.ssr[this.props.id]) {
-				window.ssr[this.props.id] = true;
-				this.initialHtml = { __html: elem.innerHTML };
-			} else this.initialHtml = { __html: '' };
-		}
-	}, {
-		key: 'getDOMNode',
-		value: function getDOMNode() {
-			return this.elem;
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _props = this.props,
-			    id = _props.id,
-			    props = _objectWithoutProperties(_props, ['id']);
+  _createClass(RouteTarget, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      var elem = document.getElementById(this.props.id);
+      if (elem != null && window.ssr && !window.ssr[this.props.id]) {
+        window.ssr[this.props.id] = true;
+        this.initialHtml = { __html: elem.innerHTML };
+      } else this.initialHtml = { __html: '' };
+    }
+  }, {
+    key: 'getDOMNode',
+    value: function getDOMNode() {
+      return this.elem;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
 
-			return _react2.default.createElement('div', _extends({ id: id, ref: function ref(el) {
-					return _this.elem = el;
-				} }, this.props, { dangerouslySetInnerHTML: this.initialHtml }));
-		}
-	}]);
+      var _props = this.props,
+          id = _props.id,
+          props = _objectWithoutProperties(_props, ['id']);
 
-	return RouteTarget;
+      return _react2.default.createElement('div', _extends({ id: id, ref: function ref(el) {
+          return _this2.elem = el;
+        } }, this.props, { dangerouslySetInnerHTML: this.initialHtml }));
+    }
+  }]);
+
+  return RouteTarget;
 }(_react2.default.Component);
 
 exports.default = RouteTarget;
@@ -1307,6 +1309,7 @@ var dotnetifyVMRouter = function () {
       // Set the absolute path to the HREF attribute, and prevent the default behavior of
       // the anchor click event and instead do push to HTML5 history state.
       var url = this.toUrl(path);
+      url = url.length > 0 ? url : '/';
       this.routes.push({ Path: path, Url: url });
       return url;
     }
@@ -1944,7 +1947,7 @@ var dotnetifyRouter = function () {
   function dotnetifyRouter(debug) {
     _classCallCheck(this, dotnetifyRouter);
 
-    this.version = '2.0.0';
+    this.version = '2.0.1';
     this.urlPath = document.location.pathname;
 
     this.debug = debug;
@@ -1972,6 +1975,7 @@ var dotnetifyRouter = function () {
   }, {
     key: 'mapTo',
     value: function mapTo(iPath, iFn) {
+      iPath = iPath.length > 0 ? iPath : '/';
       if (typeof _path2.default !== 'undefined') _path2.default.map(iPath).to(function () {
         iFn(this.params);
       });

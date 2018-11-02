@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>DotNetify</title>
@@ -6,6 +7,10 @@
   </head>
   <body>
     <div id="App"></div>
-    <script src="dist/main.js" charset="UTF-8"></script>
+
+    <!-- Polyfills for IE 11 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.min.js"></script>    
+    
+    <script src="/dist/main.js" charset="UTF-8"></script>
   </body>
 </html>
