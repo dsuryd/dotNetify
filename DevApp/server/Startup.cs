@@ -30,7 +30,7 @@ namespace DotNetify.DevApp
          services.AddSingleton<IWebStoreService, WebStoreService>();
       }
 
-      public void Configure(IApplicationBuilder app)
+      public void Configure(IApplicationBuilder app, IHostingEnvironment env)
       {
          app.UseAuthentication();
          app.UseWebSockets();
@@ -65,11 +65,14 @@ namespace DotNetify.DevApp
             config.UseFilter<SetAccessTokenFilter>();
          });
 
-         app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+         if (env.IsDevelopment())
          {
-            HotModuleReplacement = true,
-            HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
-         });
+            app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+            {
+               HotModuleReplacement = true,
+               HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
+            });
+         }
 
          app.UseStaticFiles();
 
