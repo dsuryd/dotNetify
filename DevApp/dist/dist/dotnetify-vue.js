@@ -1013,6 +1013,7 @@ var dotnetifyVMRouter = function () {
       // Set the absolute path to the HREF attribute, and prevent the default behavior of
       // the anchor click event and instead do push to HTML5 history state.
       var url = this.toUrl(path);
+      url = url.length > 0 ? url : '/';
       this.routes.push({ Path: path, Url: url });
       return url;
     }
@@ -1669,7 +1670,7 @@ var dotnetifyRouter = function () {
   function dotnetifyRouter(debug) {
     _classCallCheck(this, dotnetifyRouter);
 
-    this.version = '2.0.0';
+    this.version = '2.0.1';
     this.urlPath = document.location.pathname;
 
     this.debug = debug;
@@ -1697,6 +1698,7 @@ var dotnetifyRouter = function () {
   }, {
     key: 'mapTo',
     value: function mapTo(iPath, iFn) {
+      iPath = iPath.length > 0 ? iPath : '/';
       if (typeof _path2.default !== 'undefined') _path2.default.map(iPath).to(function () {
         iFn(this.params);
       });
