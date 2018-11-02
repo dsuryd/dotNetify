@@ -70,7 +70,12 @@ Add a new file _wwwroot/index.html_ with the following content:
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
   <body>
-    <div id="App"></div>
+    <div id="App">
+      <div>
+        <p>{{Greetings}}</p>
+        <p>Server time is: {{ServerTime}}</p>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
@@ -79,7 +84,6 @@ Add a new file _wwwroot/index.html_ with the following content:
     <script>
       new Vue({
         el: '#App',
-        template: '<div><p>{{Greetings}}</p><p>Server time is: {{ServerTime}}</p></div>',
         created: function() { dotnetify.vue.connect("HelloWorld", this) },
         data: { Greetings: '', ServerTime: '' }
       })
