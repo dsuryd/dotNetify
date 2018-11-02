@@ -16,7 +16,7 @@ limitations under the License.
 import Path from '../libs/path';
 
 export default class dotnetifyRouter {
-  version = '2.0.0';
+  version = '2.0.1';
 
   // URL path that will be parsed when performing routing.
   urlPath = document.location.pathname;
@@ -38,6 +38,7 @@ export default class dotnetifyRouter {
 
   // Map a route to an action.
   mapTo(iPath, iFn) {
+    iPath = iPath.length > 0 ? iPath : '/';
     if (typeof Path !== 'undefined')
       Path.map(iPath).to(function() {
         iFn(this.params);

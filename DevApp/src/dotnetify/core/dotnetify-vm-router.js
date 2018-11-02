@@ -212,7 +212,8 @@ export default class dotnetifyVMRouter {
 
     // Set the absolute path to the HREF attribute, and prevent the default behavior of
     // the anchor click event and instead do push to HTML5 history state.
-    var url = this.toUrl(path);
+    let url = this.toUrl(path);
+    url = url.length > 0 ? url : '/';
     this.routes.push({ Path: path, Url: url });
     return url;
   }
