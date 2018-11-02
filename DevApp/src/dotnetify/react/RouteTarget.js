@@ -19,22 +19,23 @@ import dotnetify from './dotnetify-react';
 
 // <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
 export default class RouteTarget extends React.Component {
-	componentWillMount() {
-		var elem = document.getElementById(this.props.id);
-		if (elem != null && window.ssr && !window.ssr[this.props.id]) {
-			window.ssr[this.props.id] = true;
-			this.initialHtml = { __html: elem.innerHTML };
-		} else this.initialHtml = { __html: '' };
-	}
+  componentWillMount() {
+    var elem = document.getElementById(this.props.id);
+    if (elem != null && window.ssr && !window.ssr[this.props.id]) {
+      window.ssr[this.props.id] = true;
+      this.initialHtml = { __html: elem.innerHTML };
+    }
+    else this.initialHtml = { __html: '' };
+  }
 
-	getDOMNode() {
-		return this.elem;
-	}
+  getDOMNode() {
+    return this.elem;
+  }
 
-	render() {
-		const { id, ...props } = this.props;
-		return <div id={id} ref={(el) => (_this.elem = el)} {...this.props} dangerouslySetInnerHTML={this.initialHtml} />;
-	}
+  render() {
+    const { id, ...props } = this.props;
+    return <div id={id} ref={el => (this.elem = el)} {...this.props} dangerouslySetInnerHTML={this.initialHtml} />;
+  }
 }
 
 dotnetify.react.router.RouteTarget = RouteTarget;
