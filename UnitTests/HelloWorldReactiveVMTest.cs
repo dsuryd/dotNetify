@@ -83,10 +83,10 @@ namespace UnitTests
       [TestMethod]
       public void HelloWorldReactiveVM_UpdateAsync()
       {
+         var autoResetEvent = new AutoResetEvent(false);
+
          var vmController = new MockVMController<HelloWorldReactiveVM>();
          vmController.RequestVM();
-
-         var autoResetEvent = new AutoResetEvent(false);
 
          dynamic data1 = null;
          dynamic data2 = null;
