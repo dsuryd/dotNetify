@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR.Client;
 
 namespace HelloWorld
 {
@@ -65,7 +64,7 @@ namespace HelloWorld
 
          _connection.Closed += OnConnectionClosed;
 
-         _subs.Add(_connection.On<string>("Response_VM", OnResponse_VM));
+         _subs.Add(_connection.On<object>("Response_VM", OnResponse_VM));
       }
 
       public async Task StartAsync()
@@ -98,7 +97,7 @@ namespace HelloWorld
          return Task.CompletedTask;
       }
 
-      private void OnResponse_VM(string payload)
+      private void OnResponse_VM(object payload)
       {
          System.Diagnostics.Trace.WriteLine(payload);
       }
