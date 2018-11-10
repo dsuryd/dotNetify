@@ -125,7 +125,7 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
         resolve(reactElement);
       };
 
-      if (iJsModuleUrl == null) createViewFunc();
+      if (iJsModuleUrl == null || dotnetify.ssr === true) createViewFunc();
       else {
         // Load all javascripts first. Multiple files can be specified with comma delimiter.
         var getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
