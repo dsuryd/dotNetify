@@ -45,7 +45,7 @@ module.exports = [
       entry: {
         'dotnetify-react': './src/dotnetify/react/index.js',
         'dotnetify-react.min': './src/dotnetify/react/index.js',
-        'dotnetify-react-native': './src/dotnetify/react/dotnetify-react.js'
+        dotnetify: './src/dotnetify/react/dotnetify-react.js'
       },
       output: {
         path: __dirname + '/dist/dist',

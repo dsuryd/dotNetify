@@ -1,1 +1,1 @@
-module.exports = require('../dist/dotnetify-react-native');
+module.exports = require('../dist/dotnetify');

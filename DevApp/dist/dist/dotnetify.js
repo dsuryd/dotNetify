@@ -2022,4 +2022,4 @@ exports.default = dotnetify;
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=dotnetify-react-native.js.map
+//# sourceMappingURL=dotnetify.js.map
