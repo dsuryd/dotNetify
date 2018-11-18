@@ -57,7 +57,7 @@ namespace UnitTests
 
          private async Task<int> GetNameLengthAsync(string name)
          {
-            await Task.Delay(100);
+            await Task.Delay(1000);
             return name.Length;
          }
 
@@ -95,23 +95,20 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveVM_UpdateAsync()
+      public async Task HelloWorldReactiveVM_UpdateAsync()
       {
          var vmController = new MockVMController<HelloWorldReactiveVMAsync>();
          vmController.RequestVM();
 
          dynamic data1 = null;
-         dynamic data2 = null;
          vmController.OnResponse += (sender, e) =>
          {
             dynamic data = JObject.Parse(e);
             if (data.NameLengthAsync != null)
             {
                if (data1 == null)
-                  data1 = data;
-               else
                {
-                  data2 = data;
+                  data1 = data;
                }
             }
          };
@@ -119,15 +116,10 @@ namespace UnitTests
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
          var response1 = vmController.UpdateVM(update);
 
-         update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         var response2 = vmController.UpdateVM(update);
-
          Assert.AreEqual("John World", response1["FullName"]);
-         Assert.AreEqual("John Doe", response2["FullName"]);
 
-         Thread.Sleep(1000);
+         await Task.Delay(2000);
          Assert.AreEqual(10, data1.NameLengthAsync.Value);
-         Assert.AreEqual(8, data2.NameLengthAsync.Value);
       }
 
       [TestMethod]
