@@ -25,10 +25,7 @@ namespace UnitTests
                .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
                .SubscribedBy(
                   AddProperty<int>("NameLength"), x => x.Select(name => name.Length)
-               )
-               .SubscribedByAsync(
-                  AddProperty<int>("NameLengthAsync").SubscribedBy(_ => PushUpdates(), out IDisposable subs),
-                  async x => await GetNameLengthAsync(x));
+               );
 
             AddInternalProperty<string>("Internal1");
             AddInternalProperty("Internal2", 0);
@@ -42,12 +39,29 @@ namespace UnitTests
          }
 
          private string FullNameDelegate(string firstName, string lastName) => $"{firstName} {lastName}";
+      }
+
+      private class HelloWorldReactiveVMAsync : BaseVM
+      {
+         public ReactiveProperty<string> FirstName { get; set; } = "Hello";
+         public ReactiveProperty<string> LastName { get; set; } = "World";
+
+         public HelloWorldReactiveVMAsync()
+         {
+            AddProperty<string>("FullName")
+               .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
+               .SubscribedByAsync(
+                  AddProperty<int>("NameLengthAsync").SubscribedBy(_ => PushUpdates(), out IDisposable subs),
+                  async x => await GetNameLengthAsync(x));
+         }
 
          private async Task<int> GetNameLengthAsync(string name)
          {
             await Task.Delay(100);
             return name.Length;
          }
+
+         private string FullNameDelegate(string firstName, string lastName) => $"{firstName} {lastName}";
       }
 
       [TestMethod]
@@ -83,9 +97,7 @@ namespace UnitTests
       [TestMethod]
       public void HelloWorldReactiveVM_UpdateAsync()
       {
-         var autoResetEvent = new AutoResetEvent(false);
-
-         var vmController = new MockVMController<HelloWorldReactiveVM>();
+         var vmController = new MockVMController<HelloWorldReactiveVMAsync>();
          vmController.RequestVM();
 
          dynamic data1 = null;
@@ -100,7 +112,6 @@ namespace UnitTests
                else
                {
                   data2 = data;
-                  autoResetEvent.Set();
                }
             }
          };
@@ -114,7 +125,7 @@ namespace UnitTests
          Assert.AreEqual("John World", response1["FullName"]);
          Assert.AreEqual("John Doe", response2["FullName"]);
 
-         autoResetEvent.WaitOne(5000);
+         Thread.Sleep(1000);
          Assert.AreEqual(10, data1.NameLengthAsync.Value);
          Assert.AreEqual(8, data2.NameLengthAsync.Value);
       }
