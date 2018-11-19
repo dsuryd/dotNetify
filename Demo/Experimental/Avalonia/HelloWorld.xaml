@@ -2,9 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HelloWorld;assembly=HelloWorld"
         Title="Hello World">
-  <Design.DataContext>
-    <vm:HelloWorldVM />
-  </Design.DataContext>
-  
-  <TextBlock Text="{Binding Greetings}" />    
+   <Design.DataContext>
+      <vm:HelloWorldVM />
+   </Design.DataContext>
+
+   <StackPanel>
+      <TextBlock Text="{Binding Greetings}" />
+      <TextBlock Text="{Binding ServerTime}" />
+   </StackPanel>
 </Window>

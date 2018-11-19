@@ -4,21 +4,26 @@ using System.Threading.Tasks;
 
 namespace HelloWorld
 {
-   public class HelloWorldVM
+   public class HelloWorldVM : INotifyPropertyChanged
    {
-      private Task _initialize;
+      private readonly Task _initializeTask;
+      private readonly IViewState _viewState;
 
-      public string Greetings => "Hello World";
+      public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+      public string Greetings { get; set; } = "";
+      public string ServerTime { get; set; } = "";
 
       public HelloWorldVM()
       {
-         _initialize = InitializeAsync();
+         _viewState = new ViewState(this);
+         _initializeTask = InitializeAsync();
       }
 
       private async Task InitializeAsync()
       {
          var vm = new DotNetifyClient(new DotNetifyHubProxy());
-         await vm.ConnectAsync("HelloWorld");
+         await vm.ConnectAsync("HelloWorld", _viewState);
       }
    }
 }
