@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
@@ -28,6 +29,10 @@ namespace DotNetify.Client
       Task ConnectAsync(string vmId, INotifyPropertyChanged view, RequestVMOptions options = null);
 
       Task ConnectAsync(string vmId, IViewState viewState, RequestVMOptions options = null);
+
+      Task DisposeAsync();
+
+      Task DispatchAsync(Dictionary<string, object> propertyValues);
    }
 
    /// <summary>
@@ -48,12 +53,22 @@ namespace DotNetify.Client
          _hubProxy = hubProxy;
       }
 
+      public void Dispose()
+      {
+         Task.Run(() => DisposeAsync());
+      }
+
       /// <summary>
       /// Disposes this instance.
       /// </summary>
-      public void Dispose()
+      public async Task DisposeAsync()
       {
-         _hubProxy.Response_VM -= OnResponseReceived;
+         if (!string.IsNullOrEmpty(_vmId))
+         {
+            _hubProxy.Response_VM -= OnResponseReceived;
+            await _hubProxy.Dispose_VM(_vmId);
+            _vmId = null;
+         }
       }
 
       /// <summary>
@@ -61,24 +76,37 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model to request.</param>
       /// <param name="view">The connecting view; must implement changed notification.</param>
-      /// <param name="options"></param>
-      /// <returns></returns>
+      /// <param name="options">View model initialization options.</param>
       public async Task ConnectAsync(string vmId, INotifyPropertyChanged view, RequestVMOptions options = null)
       {
-         _vmId = vmId;
-         _viewState = new ViewState(view);
-         await _hubProxy.StartAsync();
-         _hubProxy.Response_VM += OnResponseReceived;
-         _hubProxy.Request_VM(vmId, options);
+         await ConnectAsync(vmId, new ViewState(view), options);
       }
 
+      /// <summary>
+      /// Connects to the dotNetify hub server.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model to request.</param>
+      /// <param name="viewState">View state manager.</param>
+      /// <param name="options">View model initialization options.</param>
       public async Task ConnectAsync(string vmId, IViewState viewState, RequestVMOptions options = null)
       {
+         if (!string.IsNullOrEmpty(_vmId))
+            throw new ApplicationException($"The instance was connected to '{_vmId}'. Call Dispose to disconnect.");
+
          _vmId = vmId;
          _viewState = viewState;
          await _hubProxy.StartAsync();
          _hubProxy.Response_VM += OnResponseReceived;
-         _hubProxy.Request_VM(vmId, options);
+         await _hubProxy.Request_VM(vmId, options);
+      }
+
+      /// <summary>
+      /// Dispatches view model update to the dotNetify hub server.
+      /// </summary>
+      /// <param name="propertyValues">Dictionary of property names and updated values.</param>
+      public async Task DispatchAsync(Dictionary<string, object> propertyValues)
+      {
+         await _hubProxy.Update_VM(_vmId, propertyValues);
       }
 
       private void OnResponseReceived(object sender, ResponseVMEventArgs e)

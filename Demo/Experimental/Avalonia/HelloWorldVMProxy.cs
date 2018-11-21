@@ -1,6 +1,7 @@
 using HelloWorld.WebServer;
 using System.Collections.Generic;
 using DotNetify.Client;
+using System;
 
 namespace HelloWorld
 {
@@ -16,6 +17,17 @@ namespace HelloWorld
       public string Greetings { get; set; }
       public string ServerTime { get; set; }
       public List<EmployeeInfo> Employees { get; set; }
+
+      public string InputFirstName { get; set; }
+      public string InputLastName { get; set; }
+
+      public Action InputAdd => () =>
+      {
+         var task = DispatchAsync(nameof(HelloWorldVM.Add), $"{InputFirstName} {InputLastName}");
+
+         InputFirstName = string.Empty;
+         InputLastName = string.Empty;
+      };
 
       public HelloWorldVMProxy(IDotNetifyClient dotnetify) : base(dotnetify)
       {

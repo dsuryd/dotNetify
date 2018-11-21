@@ -20,6 +20,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.SignalR.Protocol;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify.Client
 {
@@ -34,9 +39,11 @@ namespace DotNetify.Client
 
       Task StartAsync();
 
-      void Request_VM(string vmId, RequestVMOptions options);
+      Task Request_VM(string vmId, RequestVMOptions options);
 
-      void Dispose_VM(string vmId);
+      Task Update_VM(string vmId, Dictionary<string, object> propertyValues);
+
+      Task Dispose_VM(string vmId);
    }
 
    /// <summary>
@@ -116,7 +123,10 @@ namespace DotNetify.Client
          _hubPath = string.IsNullOrWhiteSpace(hubPath) ? HUB_PATH : hubPath;
          _serverUrl = string.IsNullOrWhiteSpace(serverUrl) ? DEFAULT_URL + _hubPath : serverUrl + _hubPath;
 
-         _connection = new HubConnectionBuilder()
+         var hubConnectionBuilder = new HubConnectionBuilder();
+         hubConnectionBuilder.Services.AddSingleton(BuildHubProtocol());
+
+         _connection = hubConnectionBuilder
              .WithUrl(_serverUrl)
              .Build();
          _connection.Closed += OnConnectionClosed;
@@ -147,13 +157,34 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
       /// <param name="options">DotNetify connection options.</param>
-      public void Request_VM(string vmId, RequestVMOptions options) => _connection?.SendCoreAsync("Request_VM", new object[] { vmId, options });
+      public async Task Request_VM(string vmId, RequestVMOptions options) => await _connection?.SendCoreAsync("Request_VM", new object[] { vmId, options });
+
+      /// <summary>
+      /// Sends an Update_VM message to the server.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model to send the update to.</param>
+      /// <param name="propertyValues">Dictionary of property names and updated values.</param>
+      public async Task Update_VM(string vmId, Dictionary<string, object> propertyValues) => await _connection?.SendCoreAsync("Update_VM", new object[] { vmId, propertyValues });
 
       /// <summary>
       /// Sends a Dispose_VM message to the server.
       /// </summary>
       /// <param name="vmId">Identifies the view model to dispose.</param>
-      public void Dispose_VM(string vmId) => _connection?.SendCoreAsync("Dispose_VM", new object[] { vmId });
+      public async Task Dispose_VM(string vmId) => await _connection?.SendCoreAsync("Dispose_VM", new object[] { vmId });
+
+      /// <summary>
+      /// Builds SignalR hub protocol.
+      /// </summary>
+      /// <returns>Hub protocol.</returns>
+      protected virtual IHubProtocol BuildHubProtocol()
+      {
+         // Override JSON serializer to retain original case (don't force to camel case).
+         return new JsonHubProtocol(Options.Create(
+            new JsonHubProtocolOptions
+            {
+               PayloadSerializerSettings = new JsonSerializerSettings { ContractResolver = new DefaultContractResolver() }
+            }));
+      }
 
       /// <summary>
       /// Handles connection being closed.

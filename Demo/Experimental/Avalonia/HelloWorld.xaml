@@ -6,6 +6,11 @@
    <StackPanel>
       <TextBlock Text="{Binding Greetings}" />
       <TextBlock Text="{Binding ServerTime}" />
+      <StackPanel Orientation="Horizontal">
+         <TextBox Text="{Binding InputFirstName}" Width="200" />
+         <TextBox Text="{Binding InputLastName}" Width="200" Margin="5,0,0,0" />
+         <Button Command="{Binding InputAdd}">Add</Button>
+      </StackPanel>
       <ListBox Items="{Binding Employees}">
          <ListBox.ItemTemplate>
             <DataTemplate>
