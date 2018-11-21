@@ -18,7 +18,7 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace HelloWorld
+namespace DotNetify.Client
 {
    /// <summary>
    /// Defines a dotNetify client.

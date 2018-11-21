@@ -2,12 +2,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HelloWorld;assembly=HelloWorld"
         Title="Hello World">
-   <Design.DataContext>
-      <vm:HelloWorldVM />
-   </Design.DataContext>
 
    <StackPanel>
       <TextBlock Text="{Binding Greetings}" />
       <TextBlock Text="{Binding ServerTime}" />
+      <ListBox Items="{Binding Employees}">
+         <ListBox.ItemTemplate>
+            <DataTemplate>
+               <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{Binding FirstName}" />
+                  <TextBlock Text="{Binding LastName}" Margin="5,0,0,0" />
+               </StackPanel>
+            </DataTemplate>
+         </ListBox.ItemTemplate>
+      </ListBox>
    </StackPanel>
 </Window>

@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace HelloWorld
+namespace DotNetify.Client
 {
    public interface IViewState
    {
       T Get<T>(string name);
 
-      void Set(Dictionary<string, string> states);
+      void Set(Dictionary<string, object> states);
    }
 
    public class ViewState : IViewState
@@ -29,17 +29,24 @@ namespace HelloWorld
          return (T)propInfo?.GetValue(_view);
       }
 
-      public void Set(Dictionary<string, string> states)
+      public void Set(Dictionary<string, object> states)
       {
          foreach (string name in states.Keys)
          {
-            _deserializer.Deserialize(_view, name, states[name]);
+            var value = states[name]?.ToString() ?? string.Empty;
+            _deserializer.Deserialize(_view, name, value);
 
             var eventArgs = new object[] { this, new PropertyChangedEventArgs(name) };
-            var propChangedEvent = (MulticastDelegate)_view
-               .GetType()
-               .GetField(nameof(INotifyPropertyChanged.PropertyChanged), BindingFlags.Instance | BindingFlags.NonPublic)?
-               .GetValue(_view);
+
+            MulticastDelegate propChangedEvent = null;
+            Type viewType = _view.GetType();
+            while (propChangedEvent == null && viewType != null)
+            {
+               propChangedEvent = (MulticastDelegate)viewType
+                 .GetField(nameof(INotifyPropertyChanged.PropertyChanged), BindingFlags.Instance | BindingFlags.NonPublic)?
+                 .GetValue(_view);
+               viewType = viewType.BaseType;
+            };
 
             if (propChangedEvent != null)
                foreach (var d in propChangedEvent.GetInvocationList())

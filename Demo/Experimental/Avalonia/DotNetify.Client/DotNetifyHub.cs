@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
-namespace HelloWorld
+namespace DotNetify.Client
 {
    /// <summary>
    /// Defines a proxy of the dotNetify server hub.
@@ -57,7 +57,7 @@ namespace HelloWorld
    public class ResponseVMEventArgs : EventArgs
    {
       public string VMId { get; set; }
-      public Dictionary<string, string> Data { get; set; }
+      public Dictionary<string, object> Data { get; set; }
       public bool Handled { get; set; }
    }
 
@@ -175,7 +175,7 @@ namespace HelloWorld
          // SignalR .NET Core is sending an array of arguments.
          var vmId = $"{(payload as JArray)[0]}";
          var rawData = (payload as JArray)[1].ToString();
-         var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(rawData);
+         var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(rawData);
 
          var eventArgs = new ResponseVMEventArgs { VMId = vmId, Data = data };
          var args = new object[] { this, eventArgs };

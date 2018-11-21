@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HelloWorld
+namespace DotNetify.Client
 {
    public class RequestVMOptions
    {
