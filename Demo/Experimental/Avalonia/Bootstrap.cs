@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using DotNetify.Client;
 using System;
+using System.Threading.Tasks;
 
 namespace HelloWorld
 {
@@ -14,6 +15,7 @@ namespace HelloWorld
 
          builder.RegisterType<DotNetifyHubProxy>().As<IDotNetifyHubProxy>().SingleInstance();
          builder.RegisterType<DotNetifyClient>().As<IDotNetifyClient>().InstancePerDependency();
+         builder.RegisterType<AvaloniaUIThreadDispatcher>().As<IUIThreadDispatcher>().SingleInstance();
          builder.RegisterType<HelloWorldVMProxy>();
 
          _container = builder.Build();
@@ -31,5 +33,10 @@ namespace HelloWorld
             throw ex;
          }
       }
+   }
+
+   public class AvaloniaUIThreadDispatcher : IUIThreadDispatcher
+   {
+      public Task InvokeAsync(Action action) => Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(action);
    }
 }

@@ -10,7 +10,7 @@ namespace DotNetify.Client
       private readonly IDotNetifyClient _dotNetify;
       private readonly string _vmId;
 
-      public event PropertyChangedEventHandler PropertyChanged = delegate { };
+      public event PropertyChangedEventHandler PropertyChanged;
 
       public VMProxy(IDotNetifyClient dotnetify)
       {
@@ -22,6 +22,14 @@ namespace DotNetify.Client
       public void Dispose()
       {
          _dotNetify.Dispose();
+      }
+
+      public void Changed(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+
+      public void Changed<TProp>(string propName, TProp value)
+      {
+         GetType().GetProperty(propName)?.SetValue(this, value);
+         Changed(propName);
       }
 
       public async Task DispatchAsync(string key, object value) => await DispatchAsync(new Dictionary<string, object> { { key, value } });

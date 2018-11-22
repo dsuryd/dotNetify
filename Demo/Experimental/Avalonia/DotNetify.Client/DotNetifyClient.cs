@@ -17,6 +17,9 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DotNetify.Client
@@ -41,16 +44,20 @@ namespace DotNetify.Client
    public class DotNetifyClient : IDotNetifyClient
    {
       private readonly IDotNetifyHubProxy _hubProxy;
+      private readonly IUIThreadDispatcher _dispatcher;
       private string _vmId;
+      private Dictionary<string, string> _itemKeys;
       private IViewState _viewState;
 
       /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="hubProxy">DotNetify hub server proxy.</param>
-      public DotNetifyClient(IDotNetifyHubProxy hubProxy)
+      /// <param name="dispatcher">UI thread dispatcher.</param>
+      public DotNetifyClient(IDotNetifyHubProxy hubProxy, IUIThreadDispatcher dispatcher)
       {
          _hubProxy = hubProxy;
+         _dispatcher = dispatcher;
       }
 
       public void Dispose()
@@ -79,7 +86,7 @@ namespace DotNetify.Client
       /// <param name="options">View model initialization options.</param>
       public async Task ConnectAsync(string vmId, INotifyPropertyChanged view, RequestVMOptions options = null)
       {
-         await ConnectAsync(vmId, new ViewState(view), options);
+         await ConnectAsync(vmId, new ViewState(view, _dispatcher), options);
       }
 
       /// <summary>
@@ -109,13 +116,81 @@ namespace DotNetify.Client
          await _hubProxy.Update_VM(_vmId, propertyValues);
       }
 
+      /// <summary>
+      /// Preprocess view model update from the server before we set the state.
+      /// </summary>
+      /// <param name="data">Dictionary of property names and values.</param>
+      /// <returns>Preprocessed data.</returns>
+      protected virtual Dictionary<string, object> Preprocess(Dictionary<string, object> data)
+      {
+         foreach (var kvp in data.ToList())
+         {
+            string prop = kvp.Key;
+            Match match;
+
+            // Look for property that end with '_add'. Interpret the value as a list item to be added
+            // to an existing list whose property name precedes that suffix.
+            match = Regex.Match(prop, @"(.*)_add");
+            if (match.Success && kvp.Value != null)
+            {
+               var listName = match.Groups[1].Value;
+               if (_viewState.HasProperty(listName))
+               {
+                  string itemKey = null;
+                  if (_itemKeys != null)
+                     _itemKeys.TryGetValue(listName, out itemKey);
+
+                  try
+                  {
+                     _viewState.AddList(listName, kvp.Value, itemKey);
+                  }
+                  catch (Exception ex)
+                  {
+                     Trace.TraceWarning($"[{_vmId}] {ex.Message} {ex.InnerException?.Message}");
+                  }
+               }
+               else
+                  Trace.TraceWarning($"[{_vmId}] Unable to resolve `${prop}`");
+               data.Remove(prop);
+               continue;
+            }
+
+            // Look for property that end with '_itemKey'. Interpret the value as the property name that will
+            // uniquely identify items in the list.
+            match = Regex.Match(prop, @"(.*)_itemKey");
+            if (match.Success && kvp.Value != null)
+            {
+               var listName = match.Groups[1].Value;
+               SetItemKey(listName, kvp.Value.ToString());
+               data.Remove(prop);
+               continue;
+            }
+         }
+         return data;
+      }
+
+      /// <summary>
+      /// Handles response received from the server.
+      /// </summary>
       private void OnResponseReceived(object sender, ResponseVMEventArgs e)
       {
          if (e.VMId == _vmId)
          {
             e.Handled = true;
-            _viewState.Set(e.Data);
+            _viewState.Set(Preprocess(e.Data));
          }
+      }
+
+      /// <summary>
+      /// Sets items key to identify individual items in a list.
+      /// </summary>
+      /// <param name="listName">Property name of a list.</param>
+      /// <param name="itemKey">Item property name that identify items in the list.</param>
+      private void SetItemKey(string listName, string itemKey)
+      {
+         if (_itemKeys == null)
+            _itemKeys = new Dictionary<string, string>();
+         _itemKeys.Add(listName, itemKey);
       }
    }
 }

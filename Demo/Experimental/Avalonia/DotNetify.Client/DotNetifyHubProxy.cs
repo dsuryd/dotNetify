@@ -221,7 +221,9 @@ namespace DotNetify.Client
          // If we get to this point, that means the server holds a view model instance
          // whose view no longer existed.  So, tell the server to dispose the view model.
          if (!eventArgs.Handled)
-            Dispose_VM(vmId);
+         {
+            var task = Dispose_VM(vmId);
+         }
       }
 
       /// <summary>
