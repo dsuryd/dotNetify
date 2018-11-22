@@ -14,60 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using Microsoft.AspNetCore.SignalR;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DotNetify.Client
 {
-   /// <summary>
-   /// Defines a proxy of the dotNetify server hub.
-   /// </summary>
-   public interface IDotNetifyHubProxy
-   {
-      event EventHandler<ResponseVMEventArgs> Response_VM;
-
-      void Init(string hubPath, string serverUrl);
-
-      Task StartAsync();
-
-      Task Request_VM(string vmId, RequestVMOptions options);
-
-      Task Update_VM(string vmId, Dictionary<string, object> propertyValues);
-
-      Task Dispose_VM(string vmId);
-   }
-
-   /// <summary>
-   /// Possible SignalR hub connection states.
-   /// </summary>
-   public enum HubConnectionState
-   {
-      Connecting = 0,
-      Connected = 1,
-      Reconnecting = 2,
-      Disconnected = 4,
-      Terminated = 99
-   }
-
-   /// <summary>
-   /// Event arguments of the incoming Response_VM message.
-   /// </summary>
-   public class ResponseVMEventArgs : EventArgs
-   {
-      public string VMId { get; set; }
-      public Dictionary<string, object> Data { get; set; }
-      public bool Handled { get; set; }
-   }
-
    /// <summary>
    /// Class that serves as a proxy of the dotNetify server hub.
    /// </summary>
@@ -137,7 +97,6 @@ namespace DotNetify.Client
       /// <summary>
       /// Starts the connection with the server.
       /// </summary>
-      /// <returns></returns>
       public async Task StartAsync()
       {
          if (_connection == null)

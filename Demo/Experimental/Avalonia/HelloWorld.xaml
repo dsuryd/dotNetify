@@ -1,25 +1,37 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HelloWorld;assembly=HelloWorld"
-        Title="Hello World">
+        Title="DotNetify-Avalonia Demo"  Background="WhiteSmoke" FontSize="16">
 
-   <StackPanel>
-      <TextBlock Text="{Binding Greetings}" />
-      <TextBlock Text="{Binding ServerTime}" />
-      <StackPanel Orientation="Horizontal">
-         <TextBox Text="{Binding InputFirstName}" Width="200" />
-         <TextBox Text="{Binding InputLastName}" Width="200" Margin="5,0,0,0" />
-         <Button Command="{Binding InputAdd}">Add</Button>
+   <StackPanel Margin="10">
+      <TextBlock Text="{Binding Greetings}" FontSize="30" Margin="5" />
+      <StackPanel Orientation="Horizontal" Margin="5">
+         <TextBlock Text="Server time:" />
+         <TextBlock Text="{Binding ServerTime}" Margin="5,0,0,0" Foreground="Crimson" />
       </StackPanel>
-      <ListBox Items="{Binding Employees}">
-         <ListBox.ItemTemplate>
-            <DataTemplate>
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="{Binding FirstName}" />
-                  <TextBlock Text="{Binding LastName}" Margin="5,0,0,0" />
-               </StackPanel>
-            </DataTemplate>
-         </ListBox.ItemTemplate>
-      </ListBox>
+      <StackPanel>
+         <TextBlock Text="Simple List" FontSize="30" Margin="5,10,0,0" />
+         <StackPanel Orientation="Horizontal" Margin="5">
+            <TextBox Text="{Binding AddFirstName}" Width="200" />
+            <TextBox Text="{Binding AddLastName}" Width="200" Margin="10,0,10,0" />
+            <Button Command="{Binding AddCommand}" Width="100" Background="DeepSkyBlue" Foreground="White">Add</Button>
+         </StackPanel>
+         <ListBox Items="{Binding Employees}" SelectedItems="{Binding SelectedEmployee}" SelectionMode="Single" Margin="5" Height="300">
+            <ListBox.ItemTemplate>
+               <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                     <TextBlock Text="{Binding FirstName}" />
+                     <TextBlock Text="{Binding LastName}" Margin="5,0,0,0" />
+                  </StackPanel>
+               </DataTemplate>
+            </ListBox.ItemTemplate>
+         </ListBox>
+         <StackPanel Orientation="Horizontal" IsEnabled="{Binding CanEdit}" Margin="5">
+            <TextBox Text="{Binding EditFirstName}" Width="200" />
+            <TextBox Text="{Binding EditLastName}" Width="200" Margin="10,0,10,0" />
+            <Button Command="{Binding UpdateCommand}" Width="100" Background="DeepSkyBlue" Foreground="White">Update</Button>
+            <Button Command="{Binding RemoveCommand}" Width="100" Margin="10,0,0,0" Background="Tomato" Foreground="White">Remove</Button>
+         </StackPanel>
+      </StackPanel>
    </StackPanel>
 </Window>

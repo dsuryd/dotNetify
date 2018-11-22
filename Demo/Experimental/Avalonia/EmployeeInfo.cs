@@ -1,13 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DotNetify;
 
 namespace HelloWorld
 {
-   public class EmployeeInfo
+   public class EmployeeInfo : ObservableObject
    {
-      public int Id { get; set; }
-      public string FirstName { get; set; }
-      public string LastName { get; set; }
+      public int Id
+      {
+         get => Get<int>();
+         set => Set(value);
+      }
+
+      public string FirstName
+      {
+         get => Get<string>();
+         set => Set(value);
+      }
+
+      public string LastName
+      {
+         get => Get<string>();
+         set => Set(value);
+      }
    }
 }

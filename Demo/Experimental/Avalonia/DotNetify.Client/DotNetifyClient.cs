@@ -29,13 +29,32 @@ namespace DotNetify.Client
    /// </summary>
    public interface IDotNetifyClient : IDisposable
    {
+      /// <summary>
+      /// Connects to the dotNetify hub server.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model to request.</param>
+      /// <param name="view">The connecting view; must implement changed notification.</param>
+      /// <param name="options">View model initialization options.</param>
       Task ConnectAsync(string vmId, INotifyPropertyChanged view, RequestVMOptions options = null);
 
+      /// <summary>
+      /// Connects to the dotNetify hub server.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model to request.</param>
+      /// <param name="viewState">View state manager.</param>
+      /// <param name="options">View model initialization options.</param>
       Task ConnectAsync(string vmId, IViewState viewState, RequestVMOptions options = null);
 
-      Task DisposeAsync();
-
+      /// <summary>
+      /// Dispatches view model update to the dotNetify hub server.
+      /// </summary>
+      /// <param name="propertyValues">Dictionary of property names and updated values.</param>
       Task DispatchAsync(Dictionary<string, object> propertyValues);
+
+      /// <summary>
+      /// Disposes the instance.
+      /// </summary>
+      Task DisposeAsync();
    }
 
    /// <summary>
@@ -46,7 +65,7 @@ namespace DotNetify.Client
       private readonly IDotNetifyHubProxy _hubProxy;
       private readonly IUIThreadDispatcher _dispatcher;
       private string _vmId;
-      private Dictionary<string, string> _itemKeys;
+      private Dictionary<string, string> _itemKeys = new Dictionary<string, string>();
       private IViewState _viewState;
 
       /// <summary>
@@ -60,6 +79,9 @@ namespace DotNetify.Client
          _dispatcher = dispatcher;
       }
 
+      /// <summary>
+      /// Disposes this instance synchronously.
+      /// </summary>
       public void Dispose()
       {
          Task.Run(() => DisposeAsync());
@@ -125,45 +147,79 @@ namespace DotNetify.Client
       {
          foreach (var kvp in data.ToList())
          {
-            string prop = kvp.Key;
+            string propName = kvp.Key;
             Match match;
 
-            // Look for property that end with '_add'. Interpret the value as a list item to be added
-            // to an existing list whose property name precedes that suffix.
-            match = Regex.Match(prop, @"(.*)_add");
-            if (match.Success && kvp.Value != null)
+            try
             {
-               var listName = match.Groups[1].Value;
-               if (_viewState.HasProperty(listName))
+               // Look for property that end with '_add'. Interpret the value as a list item to be added
+               // to an existing list whose property name precedes that suffix.
+               match = Regex.Match(propName, @"(.*)_add");
+               if (match.Success && kvp.Value != null)
                {
-                  string itemKey = null;
-                  if (_itemKeys != null)
-                     _itemKeys.TryGetValue(listName, out itemKey);
-
-                  try
+                  var listName = match.Groups[1].Value;
+                  if (_viewState.HasProperty(listName))
                   {
+                     _itemKeys.TryGetValue(listName, out string itemKey);
                      _viewState.AddList(listName, kvp.Value, itemKey);
                   }
-                  catch (Exception ex)
-                  {
-                     Trace.TraceWarning($"[{_vmId}] {ex.Message} {ex.InnerException?.Message}");
-                  }
-               }
-               else
-                  Trace.TraceWarning($"[{_vmId}] Unable to resolve `${prop}`");
-               data.Remove(prop);
-               continue;
-            }
+                  else
+                     throw new Exception($"Unable to resolve `${propName}`");
 
-            // Look for property that end with '_itemKey'. Interpret the value as the property name that will
-            // uniquely identify items in the list.
-            match = Regex.Match(prop, @"(.*)_itemKey");
-            if (match.Success && kvp.Value != null)
+                  data.Remove(propName);
+                  continue;
+               }
+
+               // Look for property that end with '_update'. Interpret the value as a list item to be updated
+               // to an existing list whose property name precedes that suffix.
+               match = Regex.Match(propName, @"(.*)_update");
+               if (match.Success && kvp.Value != null)
+               {
+                  var listName = match.Groups[1].Value;
+                  if (_viewState.HasProperty(listName))
+                  {
+                     _itemKeys.TryGetValue(listName, out string itemKey);
+                     _viewState.UpdateList(listName, kvp.Value, itemKey);
+                  }
+                  else
+                     throw new Exception($"Unable to resolve `${propName}`");
+                  data.Remove(propName);
+                  continue;
+               }
+
+               // Look for property that end with '_remove'. Interpret the value as a list item key to remove
+               // from an existing list whose property name precedes that suffix.
+               match = Regex.Match(propName, @"(.*)_remove");
+               if (match.Success && kvp.Value != null)
+               {
+                  var listName = match.Groups[1].Value;
+                  if (_viewState.HasProperty(listName))
+                  {
+                     _itemKeys.TryGetValue(listName, out string itemKey);
+                     _viewState.RemoveList(listName, kvp.Value, itemKey);
+                  }
+                  else
+                     throw new Exception($"Unable to resolve `${propName}`");
+                  data.Remove(propName);
+                  continue;
+               }
+
+               // Look for property that end with '_itemKey'. Interpret the value as the property name that will
+               // uniquely identify items in the list.
+               match = Regex.Match(propName, @"(.*)_itemKey");
+               if (match.Success && kvp.Value != null)
+               {
+                  var listName = match.Groups[1].Value;
+                  SetItemKey(listName, kvp.Value.ToString());
+
+                  data.Remove(propName);
+                  continue;
+               }
+            }
+            catch (Exception ex)
             {
-               var listName = match.Groups[1].Value;
-               SetItemKey(listName, kvp.Value.ToString());
-               data.Remove(prop);
-               continue;
+               Trace.TraceWarning($"[{_vmId}] {ex.Message} {ex.InnerException?.Message}");
+               data.Remove(propName);
             }
          }
          return data;
@@ -188,9 +244,10 @@ namespace DotNetify.Client
       /// <param name="itemKey">Item property name that identify items in the list.</param>
       private void SetItemKey(string listName, string itemKey)
       {
-         if (_itemKeys == null)
-            _itemKeys = new Dictionary<string, string>();
-         _itemKeys.Add(listName, itemKey);
+         if (!_itemKeys.ContainsKey(listName))
+            _itemKeys.Add(listName, itemKey);
+         else
+            throw new Exception($"[{_vmId}] Item key for {listName} was already set.");
       }
    }
 }

@@ -48,7 +48,7 @@ namespace HelloWorld.WebServer
          };
 
          // Use CRUD base method to add the list item on the client.
-         this.AddList("Employees", new EmployeeInfo
+         this.AddList(nameof(Employees), new EmployeeInfo
          {
             Id = ++_id,
             FirstName = employee.FirstName,
@@ -63,6 +63,9 @@ namespace HelloWorld.WebServer
          {
             employee.FirstName = employeeInfo.FirstName ?? employee.FirstName;
             employee.LastName = employeeInfo.LastName ?? employee.LastName;
+
+            // Use CRUD base method to update the list item on the client.
+            this.UpdateList(nameof(Employees), employee);
          }
       };
 
