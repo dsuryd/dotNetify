@@ -35,7 +35,7 @@ namespace DotNetify.Client
       /// <param name="vmId">Identifies the view model to request.</param>
       /// <param name="view">The connecting view; must implement changed notification.</param>
       /// <param name="options">View model initialization options.</param>
-      Task ConnectAsync(string vmId, INotifyPropertyChanged view, RequestVMOptions options = null);
+      Task ConnectAsync(string vmId, INotifyPropertyChanged view, VMConnectOptions options = null);
 
       /// <summary>
       /// Connects to the dotNetify hub server.
@@ -43,7 +43,14 @@ namespace DotNetify.Client
       /// <param name="vmId">Identifies the view model to request.</param>
       /// <param name="viewState">View state manager.</param>
       /// <param name="options">View model initialization options.</param>
-      Task ConnectAsync(string vmId, IViewState viewState, RequestVMOptions options = null);
+      Task ConnectAsync(string vmId, IViewState viewState, VMConnectOptions options = null);
+
+      /// <summary>
+      /// Dispatches a property value to the dotNetify hub server.
+      /// </summary>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="value">Property value.</param>
+      Task DispatchAsync(string propertyName, object value);
 
       /// <summary>
       /// Dispatches view model update to the dotNetify hub server.
@@ -106,7 +113,7 @@ namespace DotNetify.Client
       /// <param name="vmId">Identifies the view model to request.</param>
       /// <param name="view">The connecting view; must implement changed notification.</param>
       /// <param name="options">View model initialization options.</param>
-      public async Task ConnectAsync(string vmId, INotifyPropertyChanged view, RequestVMOptions options = null)
+      public async Task ConnectAsync(string vmId, INotifyPropertyChanged view, VMConnectOptions options = null)
       {
          await ConnectAsync(vmId, new ViewState(view, _dispatcher), options);
       }
@@ -117,17 +124,35 @@ namespace DotNetify.Client
       /// <param name="vmId">Identifies the view model to request.</param>
       /// <param name="viewState">View state manager.</param>
       /// <param name="options">View model initialization options.</param>
-      public async Task ConnectAsync(string vmId, IViewState viewState, RequestVMOptions options = null)
+      public async Task ConnectAsync(string vmId, IViewState viewState, VMConnectOptions options = null)
       {
          if (!string.IsNullOrEmpty(_vmId))
             throw new ApplicationException($"The instance was connected to '{_vmId}'. Call Dispose to disconnect.");
 
          _vmId = vmId;
          _viewState = viewState;
+
          await _hubProxy.StartAsync();
          _hubProxy.Response_VM += OnResponseReceived;
-         await _hubProxy.Request_VM(vmId, options);
+
+         Dictionary<string, object> data = null;
+         if (options?.VMArg != null)
+         {
+            data = new Dictionary<string, object>();
+            data.Add("$vmArg", options.VMArg);
+            if (options?.Headers != null)
+               data.Add("headers", options.Headers);
+         }
+
+         await _hubProxy.Request_VM(vmId, data);
       }
+
+      /// <summary>
+      /// Dispatches a property value to the dotNetify hub server.
+      /// </summary>
+      /// <param name="propertyName">Property name.</param>
+      /// <param name="value">Property value.</param>
+      public async Task DispatchAsync(string propertyName, object value) => await DispatchAsync(new Dictionary<string, object> { { propertyName, value } });
 
       /// <summary>
       /// Dispatches view model update to the dotNetify hub server.

@@ -1,12 +1,11 @@
-using System.IO;
-using System.Collections.Generic;
+using DotNetify;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using DotNetify;
+using System.IO;
 
-namespace HelloWorld.WebServer
+namespace HelloWorld.Server
 {
    public class Startup
    {

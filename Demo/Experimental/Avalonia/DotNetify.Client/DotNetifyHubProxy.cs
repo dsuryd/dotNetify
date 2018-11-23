@@ -116,7 +116,7 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
       /// <param name="options">DotNetify connection options.</param>
-      public async Task Request_VM(string vmId, RequestVMOptions options) => await _connection?.SendCoreAsync("Request_VM", new object[] { vmId, options });
+      public async Task Request_VM(string vmId, Dictionary<string, object> options) => await _connection?.SendCoreAsync("Request_VM", new object[] { vmId, options });
 
       /// <summary>
       /// Sends an Update_VM message to the server.

@@ -1,13 +1,16 @@
 using DotNetify.Client;
-using HelloWorld.WebServer;
+using HelloWorld.Server;
 using System;
-using System.Collections.Specialized;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace HelloWorld
 {
-   public class HelloWorldVMProxy : VMProxy<HelloWorldVM>
+   public class HelloWorldVMProxy : INotifyPropertyChanged, IDisposable
    {
+      private readonly IDotNetifyClient _dotnetify;
+
       #region Server Bindings
 
       public string Greetings { get; set; }
@@ -29,7 +32,7 @@ namespace HelloWorld
 
       public Action AddCommand => async () =>
       {
-         await DispatchAsync(nameof(HelloWorldVM.Add), $"{AddFirstName} {AddLastName}");
+         await _dotnetify.DispatchAsync(nameof(HelloWorldVM.Add), $"{AddFirstName} {AddLastName}");
 
          AddFirstName = AddLastName = string.Empty;
          Changed(nameof(AddFirstName));
@@ -42,13 +45,13 @@ namespace HelloWorld
          employee.FirstName = EditFirstName;
          employee.LastName = EditLastName;
 
-         await DispatchAsync(nameof(HelloWorldVM.Update), employee);
+         await _dotnetify.DispatchAsync(nameof(HelloWorldVM.Update), employee);
       };
 
       public Action RemoveCommand => async () =>
       {
          var employee = SelectedEmployee[0];
-         await DispatchAsync(nameof(HelloWorldVM.Remove), employee.Id);
+         await _dotnetify.DispatchAsync(nameof(HelloWorldVM.Remove), employee.Id);
 
          SelectedEmployee.RemoveAt(0);
          EditFirstName = EditLastName = string.Empty;
@@ -59,10 +62,21 @@ namespace HelloWorld
 
       #endregion Local Bindings
 
-      public HelloWorldVMProxy(IDotNetifyClient dotnetify) : base(dotnetify)
+      public event PropertyChangedEventHandler PropertyChanged;
+
+      public HelloWorldVMProxy(IDotNetifyClient dotnetify)
       {
+         _dotnetify = dotnetify;
+
+         var connectOptions = new VMConnectOptions { VMArg = new { Greetings = "Hello World!" } };
+         _dotnetify.ConnectAsync(nameof(HelloWorldVM), this, connectOptions);
+
          SelectedEmployee.CollectionChanged += OnSelectedEmployee;
       }
+
+      public void Dispose() => _dotnetify.Dispose();
+
+      private void Changed(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 
       private void OnSelectedEmployee(object sender, NotifyCollectionChangedEventArgs e)
       {

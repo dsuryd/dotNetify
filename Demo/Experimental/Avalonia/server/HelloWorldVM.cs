@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Bogus;
 using System.Linq;
 
-namespace HelloWorld.WebServer
+namespace HelloWorld.Server
 {
    public class HelloWorldVM : BaseVM
    {
@@ -13,7 +13,7 @@ namespace HelloWorld.WebServer
       private int _id;
       private List<EmployeeInfo> _employees;
 
-      public string Greetings => "Hello World!";
+      public string Greetings { get; set; }
 
       public DateTime ServerTime => DateTime.Now;
 

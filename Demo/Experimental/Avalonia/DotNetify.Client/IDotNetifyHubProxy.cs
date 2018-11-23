@@ -57,7 +57,7 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
       /// <param name="options">DotNetify connection options.</param>
-      Task Request_VM(string vmId, RequestVMOptions options);
+      Task Request_VM(string vmId, Dictionary<string, object> options);
 
       /// <summary>
       /// Sends an Update_VM message to the server.

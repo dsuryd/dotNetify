@@ -19,13 +19,18 @@ using System.Collections.Generic;
 namespace DotNetify.Client
 {
    /// <summary>
-   /// Configuration options that can be sent along with the Request_VM message.
+   /// Configuration options that can be sent along with request to connect to a server-side view model.
    /// </summary>
-   public class RequestVMOptions
+   public class VMConnectOptions
    {
       /// <summary>
       /// Arguments to initialize the view model.
       /// </summary>
-      public Dictionary<string, object> VmArg { get; set; }
+      public object VMArg { get; set; }
+
+      /// <summary>
+      /// Request headers.
+      /// </summary>
+      public object Headers { get; set; }
    }
 }
