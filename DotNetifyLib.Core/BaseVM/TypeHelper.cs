@@ -39,11 +39,6 @@ namespace DotNetify
       public string Name { get; }
 
       /// <summary>
-      /// Whether it's a multicast type.
-      /// </summary>
-      public bool IsMulticast => typeof(MulticastVM).GetTypeInfo().IsAssignableFrom(Type);
-
-      /// <summary>
       /// Full type name.
       /// </summary>
       public string FullName { get; }
@@ -91,6 +86,11 @@ namespace DotNetify
       /// <param name="args">Constructor arguments.</param>
       /// <returns></returns>
       public object CreateInstance(object[] args = null) => _factoryDelegate?.Invoke(args);
+
+      /// <summary>
+      /// Whether it's assignable from a type.
+      /// </summary>
+      public bool Is<T>() => typeof(T).GetTypeInfo().IsAssignableFrom(Type);
 
       /// <summary>
       /// Checks equality of two objects.

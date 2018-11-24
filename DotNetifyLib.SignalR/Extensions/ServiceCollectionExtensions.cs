@@ -17,6 +17,7 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using DotNetify.Client;
 using DotNetify.Security;
 
 namespace DotNetify
@@ -51,6 +52,15 @@ namespace DotNetify
          // Add middleware and filter factories.
          services.AddSingleton<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>(p => new List<Tuple<Type, Func<IMiddlewarePipeline>>>());
          services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
+
+         return services;
+      }
+
+      public static IServiceCollection AddDotNetifyClient(this IServiceCollection services)
+      {
+         services.AddSingleton<IDotNetifyHubProxy, DotNetifyHubProxy>();
+         services.AddTransient<IDotNetifyClient, DotNetifyClient>();
+         services.AddSingleton<IUIThreadDispatcher, DefaultUIThreadDispatcher>();
 
          return services;
       }

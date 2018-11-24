@@ -65,7 +65,7 @@ namespace DotNetify
          if (vmType == null)
             return null;
 
-         return vmType.IsMulticast ? GetMulticastInstance(vmType, vmInstanceId) : Create(vmType, vmInstanceId);
+         return vmType.Is<MulticastVM>() ? GetMulticastInstance(vmType, vmInstanceId) : Create(vmType, vmInstanceId);
       }
 
       /// <summary>
