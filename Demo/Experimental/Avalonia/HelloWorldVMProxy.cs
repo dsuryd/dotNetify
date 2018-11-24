@@ -7,6 +7,10 @@ using System.ComponentModel;
 
 namespace HelloWorld
 {
+   /// <summary>
+   /// This is Avalonia view model that serves as a proxy to the server-side view model.
+   /// Properties in the "Server bindings" region will be initialized with data coming from the server on successful connection.
+   /// </summary>
    public class HelloWorldVMProxy : INotifyPropertyChanged, IDisposable
    {
       private readonly IDotNetifyClient _dotnetify;
@@ -60,24 +64,6 @@ namespace HelloWorld
          Changed(nameof(CanEdit));
       };
 
-      #endregion Local Bindings
-
-      public event PropertyChangedEventHandler PropertyChanged;
-
-      public HelloWorldVMProxy(IDotNetifyClient dotnetify)
-      {
-         _dotnetify = dotnetify;
-
-         var connectOptions = new VMConnectOptions { VMArg = new { Greetings = "Hello World!" } };
-         _dotnetify.ConnectAsync(nameof(HelloWorldVM), this, connectOptions);
-
-         SelectedEmployee.CollectionChanged += OnSelectedEmployee;
-      }
-
-      public void Dispose() => _dotnetify.Dispose();
-
-      private void Changed(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-
       private void OnSelectedEmployee(object sender, NotifyCollectionChangedEventArgs e)
       {
          if (e.Action == NotifyCollectionChangedAction.Add)
@@ -90,5 +76,35 @@ namespace HelloWorld
             Changed(nameof(CanEdit));
          }
       }
+
+      #endregion Local Bindings
+
+      #region INotifyPropertyChanged
+
+      public event PropertyChangedEventHandler PropertyChanged;
+
+      private void Changed(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+
+      #endregion INotifyPropertyChanged
+
+      public HelloWorldVMProxy(IDotNetifyClient dotnetify)
+      {
+         _dotnetify = dotnetify;
+         SelectedEmployee.CollectionChanged += OnSelectedEmployee;
+
+         Connect();
+      }
+
+      public void Connect()
+      {
+         // Connect to the server-side view model.
+         _dotnetify.ConnectAsync(
+            nameof(HelloWorldVM),
+            this,
+            new VMConnectOptions { VMArg = new { Greetings = "Hello World!" } }
+         );
+      }
+
+      public void Dispose() => _dotnetify.Dispose();
    }
 }

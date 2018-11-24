@@ -11,7 +11,10 @@ namespace HelloWorld
    {
       private static void Main(string[] args)
       {
-         Task.Run(() => BuildAvaloniaApp().Start<HelloWorld>());
+         // Run Avalonia window on a separate thread.
+         Task.Run(() => BuildAvaloniaApp().Start<HelloWorld>(() => Bootstrap.Resolve<HelloWorldVMProxy>()));
+
+         // Run ASP.NET Core web server.
          CreateWebHostBuilder(args).Build().Run();
       }
 

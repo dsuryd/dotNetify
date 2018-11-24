@@ -1,6 +1,6 @@
 ﻿using DotNetify;
 
-namespace HelloWorld
+namespace HelloWorld.Server
 {
    public class EmployeeInfo : ObservableObject
    {

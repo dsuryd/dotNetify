@@ -9,9 +9,7 @@ namespace HelloWorld
       public HelloWorld()
       {
          InitializeComponent();
-         DataContext = Bootstrap.Resolve<HelloWorldVMProxy>();
-
-         Closing += (sender, e) => (DataContext as IDisposable).Dispose();
+         Closing += (sender, e) => (DataContext as IDisposable)?.Dispose();
       }
 
       private void InitializeComponent()

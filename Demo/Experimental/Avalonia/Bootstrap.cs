@@ -1,5 +1,6 @@
-﻿using Autofac;
+﻿using DotNetify;
 using DotNetify.Client;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -7,34 +8,20 @@ namespace HelloWorld
 {
    public static class Bootstrap
    {
-      private static IContainer _container;
+      private static IServiceProvider _serviceProvider;
 
       static Bootstrap()
       {
          DotNetifyHubProxy.ServerUrl = "http://localhost:5000";
 
-         var builder = new ContainerBuilder();
-
-         builder.RegisterType<DotNetifyHubProxy>().As<IDotNetifyHubProxy>().SingleInstance();
-         builder.RegisterType<DotNetifyClient>().As<IDotNetifyClient>().InstancePerDependency();
-         builder.RegisterType<AvaloniaUIThreadDispatcher>().As<IUIThreadDispatcher>().SingleInstance();
-         builder.RegisterType<HelloWorldVMProxy>();
-
-         _container = builder.Build();
+         _serviceProvider = new ServiceCollection()
+            .AddDotNetifyClient()
+            .AddSingleton<IUIThreadDispatcher, AvaloniaUIThreadDispatcher>()
+            .AddTransient<HelloWorldVMProxy>()
+            .BuildServiceProvider();
       }
 
-      public static T Resolve<T>()
-      {
-         try
-         {
-            return _container.Resolve<T>();
-         }
-         catch (Exception ex)
-         {
-            System.Diagnostics.Trace.TraceError(ex.ToString());
-            throw ex;
-         }
-      }
+      public static T Resolve<T>() => _serviceProvider.GetRequiredService<T>();
    }
 
    public class AvaloniaUIThreadDispatcher : IUIThreadDispatcher
