@@ -72,8 +72,21 @@ namespace DotNetify
       public override void Dispose()
       {
          if (Interlocked.Decrement(ref _reference) == 0)
+         {
+            Dispose(true);
             base.Dispose();
+         }
+         else
+            Dispose(false);
       }
+
+      /// <summary>
+      /// Override this to dispose resources.
+      /// </summary>
+      /// <param name="disposing">True if it's the final dispose.</param>
+      protected virtual void Dispose(bool disposing) 
+      {  
+      }  
 
       /// <summary>
       /// Initializes the group name asssociated with this view model.

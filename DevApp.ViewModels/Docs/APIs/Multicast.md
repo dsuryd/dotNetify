@@ -13,8 +13,7 @@ public class HelloWorld : MulticastVM
 }
 ```
 
-When a client disconnects, the _Dispose_ method will be invoked to give you the chance to process the disconnection, but the instance will only be disposed after the last client disconnects.
-> If you override the _Dispose_ method, you must call the base method to keep the client reference count accurate.
+When a client disconnects, the _Dispose(bool disposing)_ method will be invoked to give you the chance to process the disconnection.  The instance is actually disposed only after the last client disconnects, in which case the _disposing_ argument is set to true.
 
 #### Partitioned Instances
 
