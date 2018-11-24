@@ -4,7 +4,7 @@ View models that inherit from __BaseVM__ maintain 1-to-1 association with their 
 
 #### Single Instance
 
-By default, a view model that inherits from __MulticastVM__ will always produce one instance at any given time.  After an initial request for the view model from one connection, subsequent requests from other connections will be given the same instance.  The instance will be disposed after the last one disconnects.
+By default, a view model that inherits from __MulticastVM__ will always produce one instance at any given time.  After an initial request for the view model from one connection, subsequent requests from other connections will be given the same instance.  Any data update that goes through __Changed__ or __PushUpdates__ will apply to all clients.  
 
 ```csharp
 public class HelloWorld : MulticastVM
@@ -13,8 +13,8 @@ public class HelloWorld : MulticastVM
 }
 ```
 
-Any data update that goes through __Changed__ or __PushUpdates__ will apply to all clients.
-
+When a client disconnects, the _Dispose_ method will be invoked to give you the chance to process the disconnection, but the instance will only be disposed after the last client disconnects.
+> If you override the _Dispose_ method, you must call the base method to keep the client reference count accurate.
 
 #### Partitioned Instances
 
