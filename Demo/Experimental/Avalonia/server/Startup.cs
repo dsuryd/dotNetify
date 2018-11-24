@@ -22,9 +22,11 @@ namespace HelloWorld.Server
          app.UseSignalR(routes => routes.MapDotNetifyHub());
          app.UseDotNetify(config => config.UseDeveloperLogging());
 
+         app.UseStaticFiles();
          app.Run(async (context) =>
          {
-            await context.Response.WriteAsync("HelloWorld Server");
+            using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
+               await context.Response.WriteAsync(reader.ReadToEnd());
          });
       }
    }

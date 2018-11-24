@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HelloWorld;assembly=HelloWorld"
-        Title="DotNetify-Avalonia Demo"  Background="WhiteSmoke" FontSize="16">
+        Title="DotNetify-Avalonia Demo" Width="800" Background="WhiteSmoke" FontSize="16">
 
    <StackPanel Margin="10">
       <TextBlock Text="{Binding Greetings}" FontSize="30" Margin="5" />

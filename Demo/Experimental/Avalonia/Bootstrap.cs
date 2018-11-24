@@ -11,6 +11,8 @@ namespace HelloWorld
 
       static Bootstrap()
       {
+         DotNetifyHubProxy.ServerUrl = "http://localhost:5000";
+
          var builder = new ContainerBuilder();
 
          builder.RegisterType<DotNetifyHubProxy>().As<IDotNetifyHubProxy>().SingleInstance();

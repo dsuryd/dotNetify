@@ -33,14 +33,21 @@ namespace DotNetify.Client
    /// </summary>
    public class DotNetifyHubProxy : IDotNetifyHubProxy, IDisposable
    {
-      private static readonly string HUB_PATH = "/dotnetify";
-      private static readonly string DEFAULT_URL = "http://localhost:5000";
-
       private string _hubPath;
       private string _serverUrl;
       private HubConnection _connection;
       private HubConnectionState _connectionState;
       private List<IDisposable> _subs = new List<IDisposable>();
+
+      /// <summary>
+      /// DotNetify hub path.
+      /// </summary>
+      public static string HubPath { get; set; } = "/dotnetify";
+
+      /// <summary>
+      /// DotNetify hub server URL.
+      /// </summary>
+      public static string ServerUrl { get; set; } = "http://localhost:5000";
 
       /// <summary>
       /// Occurs when the connection is disconnected.
@@ -80,8 +87,8 @@ namespace DotNetify.Client
          if (_connection != null)
             Dispose();
 
-         _hubPath = string.IsNullOrWhiteSpace(hubPath) ? HUB_PATH : hubPath;
-         _serverUrl = string.IsNullOrWhiteSpace(serverUrl) ? DEFAULT_URL + _hubPath : serverUrl + _hubPath;
+         _hubPath = string.IsNullOrWhiteSpace(hubPath) ? HubPath : hubPath;
+         _serverUrl = string.IsNullOrWhiteSpace(serverUrl) ? ServerUrl + _hubPath : serverUrl + _hubPath;
 
          var hubConnectionBuilder = new HubConnectionBuilder();
          hubConnectionBuilder.Services.AddSingleton(BuildHubProtocol());

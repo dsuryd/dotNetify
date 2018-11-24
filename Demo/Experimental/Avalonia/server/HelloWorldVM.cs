@@ -7,13 +7,21 @@ using System.Linq;
 
 namespace HelloWorld.Server
 {
-   public class HelloWorldVM : BaseVM
+   public class HelloWorldVM : MulticastVM
    {
       private Timer _timer;
       private int _id;
       private List<EmployeeInfo> _employees;
 
-      public string Greetings { get; set; }
+      public string Greetings
+      {
+         get => Get<string>();
+         set
+         {
+            Set(value);
+            PushUpdates();
+         }
+      }
 
       public DateTime ServerTime => DateTime.Now;
 
@@ -34,7 +42,11 @@ namespace HelloWorld.Server
          }, null, 0, 1000);
       }
 
-      public override void Dispose() => _timer.Dispose();
+      protected override void Dispose(bool disposing)
+      {
+         if (disposing)
+            _timer.Dispose();
+      }
 
       public string Employees_itemKey => nameof(EmployeeInfo.Id);
 
@@ -43,14 +55,16 @@ namespace HelloWorld.Server
          var names = fullName.Split(new char[] { ' ' }, 2);
          var employee = new EmployeeInfo
          {
+            Id = ++_id,
             FirstName = names.First(),
             LastName = names.Length > 1 ? names.Last() : ""
          };
+         _employees.Add(employee);
 
          // Use CRUD base method to add the list item on the client.
          this.AddList(nameof(Employees), new EmployeeInfo
          {
-            Id = ++_id,
+            Id = employee.Id,
             FirstName = employee.FirstName,
             LastName = employee.LastName
          });
