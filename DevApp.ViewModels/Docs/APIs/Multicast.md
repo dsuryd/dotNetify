@@ -13,7 +13,7 @@ public class HelloWorld : MulticastVM
 }
 ```
 
-When a client disconnects, the _Dispose(bool disposing)_ method will be invoked to give you the chance to process the disconnection.  The instance is actually disposed only after the last client disconnects, in which case the _disposing_ argument is set to true.
+When a client disconnects, the _Dispose(bool disposing)_ method will be invoked to give you the chance to process the disconnection.  The instance is only disposed  after the last client disconnects, in which case the _disposing_ argument will be true.
 
 #### Partitioned Instances
 
