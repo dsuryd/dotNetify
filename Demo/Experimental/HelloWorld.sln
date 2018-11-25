@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloWorld", "Avalonia\HelloWorld.csproj", "{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf", "Wpf\Wpf.csproj", "{6EB804D3-59F9-4DAA-B775-C7136DE47819}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B443408F-6DEA-468C-A7B8-EFC7F91ED400}
+	EndGlobalSection
+EndGlobal

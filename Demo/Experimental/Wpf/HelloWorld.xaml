@@ -1,7 +1,10 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window x:Class="HelloWorld.HelloWorld"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:HelloWorld;assembly=HelloWorld"
-        Title="DotNetify-Avalonia Demo" Width="800" Background="WhiteSmoke" FontSize="16">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="DotNetify-WPF Demo" Width="800" Background="WhiteSmoke" FontSize="16">
 
    <StackPanel Margin="10">
       <TextBlock Text="{Binding Greetings}" FontSize="30" Margin="5" />
@@ -16,7 +19,7 @@
             <TextBox Text="{Binding AddLastName}" Width="150" Margin="10,0,10,0" />
             <Button Command="{Binding AddCommand}" Width="100" Background="DeepSkyBlue" Foreground="White">Add</Button>
          </StackPanel>
-         <ListBox Items="{Binding Employees}" SelectedItems="{Binding SelectedEmployee}" SelectionMode="Single" Margin="5" Height="300">
+         <ListBox ItemsSource="{Binding Employees}" SelectedItem="{Binding SelectedEmployee, Mode=OneWayToSource}" SelectionMode="Single" Margin="5" Height="300">
             <ListBox.ItemTemplate>
                <DataTemplate>
                   <StackPanel Orientation="Horizontal">
