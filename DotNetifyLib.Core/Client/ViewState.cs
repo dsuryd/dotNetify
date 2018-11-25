@@ -303,7 +303,7 @@ namespace DotNetify.Client
 
          if (_propChangedEvent != null)
          {
-            var eventArgs = new object[] { this, new PropertyChangedEventArgs(propertyName) };
+            var eventArgs = new object[] { _view, new PropertyChangedEventArgs(propertyName) };
             foreach (var d in _propChangedEvent.GetInvocationList())
                d.DynamicInvoke(eventArgs);
          }

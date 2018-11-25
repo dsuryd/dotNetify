@@ -12,6 +12,7 @@ namespace DotNetify
    public class Command : ICommand
    {
       private Action _executeAction;
+      private Func<object, bool> _canExecuteAction;
 
       /// <summary>
       /// Not implemented.
@@ -19,18 +20,18 @@ namespace DotNetify
       public event EventHandler CanExecuteChanged { add { } remove { } }
 
       /// <summary>
-      /// Not implemented.
+      /// Can execute the command.
       /// </summary>
-      public bool CanExecute( object parameter )
+      public bool CanExecute(object parameter)
       {
-         throw new NotImplementedException();
+         return _canExecuteAction != null ? _canExecuteAction.Invoke(parameter) : true;
       }
 
       /// <summary>
       /// Executes the command.
       /// </summary>
       /// <param name="parameter">Not used.</param>
-      public void Execute( object parameter )
+      public void Execute(object parameter)
       {
          _executeAction?.Invoke();
       }
@@ -39,9 +40,11 @@ namespace DotNetify
       /// Constructor.
       /// </summary>
       /// <param name="executeAction">Execute action.</param>
-      public Command( Action executeAction )
+      /// <param name="canExecuteAction">Can execute action.</param>
+      public Command(Action executeAction, Func<object, bool> canExecuteAction = null)
       {
          _executeAction = executeAction;
+         _canExecuteAction = canExecuteAction;
       }
    }
 
@@ -52,6 +55,7 @@ namespace DotNetify
    public class Command<T> : ICommand
    {
       private Action<T> _executeAction;
+      private Func<object, bool> _canExecuteAction;
 
       /// <summary>
       /// Not implemented.
@@ -59,18 +63,18 @@ namespace DotNetify
       public event EventHandler CanExecuteChanged { add { } remove { } }
 
       /// <summary>
-      /// Not implemented.
+      /// Can execute the command.
       /// </summary>
-      public bool CanExecute( object parameter )
+      public bool CanExecute(object parameter)
       {
-         throw new NotImplementedException();
+         return _canExecuteAction != null ? _canExecuteAction.Invoke(parameter) : true;
       }
 
       /// <summary>
       /// Executes the command.
       /// </summary>
       /// <param name="parameter">command parameter.</param>
-      public void Execute( object parameter )
+      public void Execute(object parameter)
       {
          // Convert the parameter to the expected type.
          if (parameter != null)
@@ -85,16 +89,18 @@ namespace DotNetify
             }
          }
 
-         _executeAction?.Invoke((T) parameter);
+         _executeAction?.Invoke((T)parameter);
       }
 
       /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="executeAction">Execute action.</param>
-      public Command( Action<T> executeAction )
+      /// <param name="canExecuteAction">Can execute action.</param>
+      public Command(Action<T> executeAction, Func<object, bool> canExecuteAction = null)
       {
          _executeAction = executeAction;
+         _canExecuteAction = canExecuteAction;
       }
    }
 }
