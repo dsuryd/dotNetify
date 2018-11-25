@@ -1,8 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Logging.Serilog;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using System.Threading.Tasks;
 
 namespace HelloWorld
 {
@@ -10,20 +7,12 @@ namespace HelloWorld
    {
       private static void Main(string[] args)
       {
-         // Run Avalonia window on a separate thread.
-         Task.Run(() => BuildAvaloniaApp().Start<HelloWorld>(() => Bootstrap.Resolve<HelloWorldVMProxy>()));
-
-         // Run ASP.NET Core web server.
-         CreateWebHostBuilder(args).Build().Run();
+         BuildAvaloniaApp().Start<HelloWorld>(() => Bootstrap.Resolve<HelloWorldVMProxy>());
       }
 
       public static AppBuilder BuildAvaloniaApp() =>
           AppBuilder.Configure<App>()
               .UsePlatformDetect()
               .LogToDebug();
-
-      public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-          WebHost.CreateDefaultBuilder(args)
-              .UseStartup<Startup>();
    }
 }

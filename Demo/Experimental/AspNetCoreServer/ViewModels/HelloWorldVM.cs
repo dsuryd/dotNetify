@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace HelloWorld
+namespace ViewModels
 {
    /// <summary>
    /// This view model inherits from DotNetify.MulticastVM so that multiple clients can use the same instance.

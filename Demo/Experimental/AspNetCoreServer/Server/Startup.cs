@@ -1,11 +1,11 @@
-using DotNetify;
+﻿using DotNetify;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 
-namespace HelloWorld
+namespace Server
 {
    public class Startup
    {
@@ -20,7 +20,11 @@ namespace HelloWorld
       {
          app.UseWebSockets();
          app.UseSignalR(routes => routes.MapDotNetifyHub());
-         app.UseDotNetify(config => config.UseDeveloperLogging());
+         app.UseDotNetify(config =>
+         {
+            config.RegisterAssembly("ViewModels");
+            config.UseDeveloperLogging();
+         });
 
          app.UseStaticFiles();
          app.Run(async (context) =>

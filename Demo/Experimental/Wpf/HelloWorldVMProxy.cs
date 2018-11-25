@@ -2,9 +2,9 @@ using DotNetify;
 using DotNetify.Client;
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Input;
+using ViewModels;
 
 namespace HelloWorld
 {
@@ -15,37 +15,6 @@ namespace HelloWorld
    public class HelloWorldVMProxy : INotifyPropertyChanged, IDisposable
    {
       private readonly IDotNetifyClient _dotnetify;
-
-      /// <summary>
-      /// This class is a representation of the server-side view model, to provide this proxy with data types and strongly-typed names.
-      /// </summary>
-      public class HelloWorldVM
-      {
-         public class EmployeeInfo : ObservableObject
-         {
-            public int Id
-            {
-               get => Get<int>();
-               set => Set(value);
-            }
-
-            public string FirstName
-            {
-               get => Get<string>();
-               set => Set(value);
-            }
-
-            public string LastName
-            {
-               get => Get<string>();
-               set => Set(value);
-            }
-         }
-
-         public Action<string> Add { get; }
-         public Action<EmployeeInfo> Update { get; }
-         public Action<int> Remove { get; }
-      }
 
       #region Server Bindings
 

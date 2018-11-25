@@ -1,4 +1,5 @@
 using DotNetify.Client;
+using ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
