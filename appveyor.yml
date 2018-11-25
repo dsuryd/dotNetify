@@ -1,4 +1,0 @@
-image: Visual Studio 2017
-
-build:
-  project: DotNetify.sln
