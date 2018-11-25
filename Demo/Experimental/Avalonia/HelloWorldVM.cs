@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace HelloWorld.Server
+namespace HelloWorld
 {
    /// <summary>
    /// This view model inherits from DotNetify.MulticastVM so that multiple clients can use the same instance.
@@ -15,6 +15,27 @@ namespace HelloWorld.Server
       private Timer _timer;
       private int _idCounter;
       private List<EmployeeInfo> _employees;
+
+      public class EmployeeInfo : ObservableObject
+      {
+         public int Id
+         {
+            get => Get<int>();
+            set => Set(value);
+         }
+
+         public string FirstName
+         {
+            get => Get<string>();
+            set => Set(value);
+         }
+
+         public string LastName
+         {
+            get => Get<string>();
+            set => Set(value);
+         }
+      }
 
       /// <summary>
       /// This property will be initialized by the Avalonia client.

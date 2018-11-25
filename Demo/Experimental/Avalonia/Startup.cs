@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 
-namespace HelloWorld.Server
+namespace HelloWorld
 {
    public class Startup
    {

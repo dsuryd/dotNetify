@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Logging.Serilog;
-using HelloWorld.Server;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;

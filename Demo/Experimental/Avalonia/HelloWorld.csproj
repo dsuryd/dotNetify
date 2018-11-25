@@ -16,10 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="0.7.0" />
     <PackageReference Include="Bogus" Version="24.3.1" />
+    <PackageReference Include="DotNetify.SignalR" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.3" />    
-  </ItemGroup>  
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\DotNetifyLib.Core\DotNetifyLib.Core.csproj" />
-    <ProjectReference Include="..\..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
   </ItemGroup>
 </Project>

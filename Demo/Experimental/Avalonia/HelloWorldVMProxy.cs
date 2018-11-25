@@ -1,5 +1,4 @@
 using DotNetify.Client;
-using HelloWorld.Server;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -19,7 +18,7 @@ namespace HelloWorld
 
       public string Greetings { get; set; }
       public string ServerTime { get; set; }
-      public ObservableCollection<EmployeeInfo> Employees { get; set; }
+      public ObservableCollection<HelloWorldVM.EmployeeInfo> Employees { get; set; }
 
       #endregion Server Bindings
 
@@ -32,7 +31,7 @@ namespace HelloWorld
       public string EditLastName { get; set; }
       public bool CanEdit => SelectedEmployee.Count > 0;
 
-      public ObservableCollection<EmployeeInfo> SelectedEmployee { get; } = new ObservableCollection<EmployeeInfo>();
+      public ObservableCollection<HelloWorldVM.EmployeeInfo> SelectedEmployee { get; } = new ObservableCollection<HelloWorldVM.EmployeeInfo>();
 
       public Action AddCommand => async () =>
       {
@@ -68,7 +67,7 @@ namespace HelloWorld
       {
          if (e.Action == NotifyCollectionChangedAction.Add)
          {
-            var selectedItem = e.NewItems[0] as EmployeeInfo;
+            var selectedItem = e.NewItems[0] as HelloWorldVM.EmployeeInfo;
             EditFirstName = selectedItem.FirstName;
             EditLastName = selectedItem.LastName;
             Changed(nameof(EditFirstName));
