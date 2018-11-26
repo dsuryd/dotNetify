@@ -41,7 +41,7 @@ namespace DotNetify
       {
          try
          {
-            if (viewModel is string || !viewModel.GetType().GetTypeInfo().IsClass)
+            if (viewModel is string || viewModel is JArray || !viewModel.GetType().GetTypeInfo().IsClass)
                return Convert.ToString(viewModel);
 
             var serializer = new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) };

@@ -48,7 +48,9 @@ namespace UnitTests
 
          public void Update(EmployeeRecord record) => _employeeRecords[record.Id] = record;
          public void Delete(int id) => _employeeRecords.Remove(id);
-      }
+
+         public void DeleteMany(List<int> ids) => ids.ForEach(id => _employeeRecords.Remove(id));
+        }
 
       private class SimpleListVM : BaseVM
       {
@@ -105,7 +107,18 @@ namespace UnitTests
             ShowNotification = true;
          };
 
-         private bool _showNotification;
+
+         public Action<int[]> RemoveMany => ids =>
+          {
+            _employeeService.DeleteMany(ids.ToList());
+            foreach(var id in ids)
+            {
+                this.RemoveList(nameof(Employees), id);
+            }
+              ShowNotification = true;
+          };
+
+            private bool _showNotification;
          public bool ShowNotification
          {
             get
@@ -202,7 +215,25 @@ namespace UnitTests
          Assert.IsFalse(employees.Exists(i => i.Id == 2));
       }
 
-      [TestMethod]
+        [TestMethod]
+        public void SimpleListVM_DeleteMany()
+        {
+            var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+            var vmEmployees = vmController.RequestVM();
+
+            var employees = _employeeService.GetAll();
+            Assert.AreEqual(3, employees.Count);
+            Assert.IsTrue(employees.Exists(i => i.Id == 2));
+
+            vmController.UpdateVM(new Dictionary<string, object>() { { "RemoveMany", "[1,2]" } });
+
+            employees = _employeeService.GetAll();
+            Assert.AreEqual(1, employees.Count);
+            Assert.IsFalse(employees.Exists(i => i.Id == 2));
+            Assert.IsFalse(employees.Exists(i => i.Id == 1));
+        }
+
+        [TestMethod]
       public void SimpleListVM_ShowNotification()
       {
          var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
