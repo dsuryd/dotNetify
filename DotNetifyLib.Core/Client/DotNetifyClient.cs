@@ -69,6 +69,9 @@ namespace DotNetify.Client
    /// </summary>
    public class DotNetifyClient : IDotNetifyClient
    {
+      public const string TOKEN_VMARG = "$vmArg";
+      public const string TOKEN_HEADERS = "$headers";
+
       private readonly IDotNetifyHubProxy _hubProxy;
       private readonly IUIThreadDispatcher _dispatcher;
       private string _vmId;
@@ -91,7 +94,7 @@ namespace DotNetify.Client
       /// </summary>
       public void Dispose()
       {
-         Task.Run(() => DisposeAsync());
+         DisposeAsync().GetAwaiter().GetResult();
       }
 
       /// <summary>
@@ -139,9 +142,9 @@ namespace DotNetify.Client
          if (options?.VMArg != null)
          {
             data = new Dictionary<string, object>();
-            data.Add("$vmArg", options.VMArg);
+            data.Add(TOKEN_VMARG, options.VMArg);
             if (options?.Headers != null)
-               data.Add("headers", options.Headers);
+               data.Add(TOKEN_HEADERS, options.Headers);
          }
 
          await _hubProxy.Request_VM(vmId, data);

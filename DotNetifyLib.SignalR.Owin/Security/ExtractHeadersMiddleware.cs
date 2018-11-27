@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json.Linq;
+using DotNetify.Client;
 
 namespace DotNetify.Security
 {
@@ -27,11 +28,8 @@ namespace DotNetify.Security
    /// </summary>
    public class ExtractHeadersMiddleware : IMiddleware, IDisconnectionMiddleware
    {
-      private const string JTOKEN_VMARG = "$vmArg";
-      private const string JTOKEN_HEADERS = "$headers";
-
       private readonly IMemoryCache _headersCache;
-      private readonly Func<string, string> _headersKey = (string connectionId) => JTOKEN_HEADERS + connectionId;
+      private readonly Func<string, string> _headersKey = (string connectionId) => DotNetifyClient.TOKEN_HEADERS + connectionId;
 
       /// <summary>
       /// Constructor.
@@ -48,7 +46,7 @@ namespace DotNetify.Security
       /// <param name="context">DotNetify hub context.</param>
       /// <param name="next">Next middleware delegate.</param>
       public Task Invoke(DotNetifyHubContext context, NextDelegate next)
-      {       
+      {
          // Set initial headers from previously cached headers.
          context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
 
@@ -89,10 +87,10 @@ namespace DotNetify.Security
          if (typeof(T) == typeof(Dictionary<string, object>))
          {
             var vmData = data as Dictionary<string, object>;
-            if (vmData.ContainsKey(JTOKEN_HEADERS))
+            if (vmData.ContainsKey(DotNetifyClient.TOKEN_HEADERS))
             {
-               headers = vmData[JTOKEN_HEADERS];
-               vmData.Remove(JTOKEN_HEADERS);
+               headers = vmData[DotNetifyClient.TOKEN_HEADERS];
+               vmData.Remove(DotNetifyClient.TOKEN_HEADERS);
                if (vmData.Count == 0)
                   data = null;
             }
@@ -100,13 +98,13 @@ namespace DotNetify.Security
          else
          {
             JObject arg = data as JObject;
-            if (arg?.Property(JTOKEN_HEADERS) != null)
+            if (arg?.Property(DotNetifyClient.TOKEN_HEADERS) != null)
             {
-               headers = arg[JTOKEN_HEADERS];
-               arg.Remove(JTOKEN_HEADERS);
+               headers = arg[DotNetifyClient.TOKEN_HEADERS];
+               arg.Remove(DotNetifyClient.TOKEN_HEADERS);
             }
-            if (arg?.Property(JTOKEN_VMARG) != null)
-               data = arg[JTOKEN_VMARG] as T;
+            if (arg?.Property(DotNetifyClient.TOKEN_VMARG) != null)
+               data = arg[DotNetifyClient.TOKEN_VMARG] as T;
          }
 
          return Tuple.Create(headers, data);
