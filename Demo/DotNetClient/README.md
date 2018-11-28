@@ -10,3 +10,5 @@ This solution demonstrates a WPF desktop app, an Avalonia desktop app, and a Vue
 - Open _Project -> Set Startup Projects_ menu.
 - Select _Multiple Startup Projects_ and set `AvaloniaClient`, `Server`, `WpfClient` to _Start_.
 - Start (F5).
+
+_Note: the server port is set to 5000 in launchSettings.json.  If changed, update the client's settings in Bootstrap.cs._
