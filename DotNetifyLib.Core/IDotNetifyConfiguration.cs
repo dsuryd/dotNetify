@@ -17,6 +17,7 @@ limitations under the License.
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace DotNetify
 {
@@ -35,6 +36,11 @@ namespace DotNetify
       /// The method accepts a class type and constructor arguments, and returns an instance of that type.
       /// </summary>
       void SetFactoryMethod(Func<Type, object[], object> factoryMethod);
+
+      /// <summary>
+      /// Provides custom global json serializer settings.
+      /// </summary>
+      void UseJsonSerializerSettings(JsonSerializerSettings settings);
 
       /// <summary>
       /// Register view model classes in an assembly that are subtypes of BaseVM.
