@@ -32,6 +32,7 @@ namespace DotNetify.DevApp
          Connection,
          CRUD,
          DI,
+         DotNetClient,
          Filter,
          Middleware,
          Multicast,
@@ -63,6 +64,7 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.Connection))     { UrlPattern = "api/connection" },
                 new RouteTemplate(nameof(Route.CRUD))           { UrlPattern = "api/crud" },
                 new RouteTemplate(nameof(Route.DI))             { UrlPattern = "api/di" },
+                new RouteTemplate(nameof(Route.DotNetClient))   { UrlPattern = "api/dotnetclient" },
                 new RouteTemplate(nameof(Route.Filter))         { UrlPattern = "api/filter" },
                 new RouteTemplate(nameof(Route.Middleware))     { UrlPattern = "api/middleware" },
                 new RouteTemplate(nameof(Route.Multicast))      { UrlPattern = "api/multicast" },
@@ -111,6 +113,7 @@ namespace DotNetify.DevApp
                     Label = "API Reference",
                     Routes = new NavRoute[]
                     {
+                        new NavRoute(".NET Client",            this.GetRoute(nameof(Route.DotNetClient))),                        
                         new NavRoute("Connection Management",  this.GetRoute(nameof(Route.Connection))),
                         new NavRoute("CRUD",                   this.GetRoute(nameof(Route.CRUD))),
                         new NavRoute("Dependency Injection",   this.GetRoute(nameof(Route.DI))),

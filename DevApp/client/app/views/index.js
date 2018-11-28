@@ -17,6 +17,7 @@ import ChatRoom from './examples/ChatRoom';
 import Connection from './apis/Connection';
 import CRUD from './apis/CRUD';
 import DI from './apis/DI';
+import DotNetClient from './apis/DotNetClient';
 import Filter from './apis/Filter';
 import Middleware from './apis/Middleware';
 import Multicast from './apis/Multicast';
@@ -43,6 +44,7 @@ export {
   Connection,
   CRUD,
   DI,
+  DotNetClient,
   Filter,
   Middleware,
   Multicast,
