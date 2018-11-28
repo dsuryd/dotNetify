@@ -9,6 +9,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
+* v3.3: .NET client.
 * v3.2: integrates with Vue.
 * v3.1: multicast - [**release notes**](https://github.com/dsuryd/dotNetify/releases/tag/nuget_v.3.1).
 * v3.0: integrates with SignalR for ASP.NET Core 2.1.

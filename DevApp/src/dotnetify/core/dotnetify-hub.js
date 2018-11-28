@@ -111,7 +111,9 @@ dotnetifyHub.init = function(iHubPath, iServerUrl, signalR) {
         return {
           done: function(iHandler) {
             dotnetifyHub._startDoneHandler = iHandler;
-            promise.then(iHandler).catch(function() {});
+            promise.then(iHandler).catch(function(error) {
+              throw error;
+            });
             return this;
           },
           fail: function(iHandler) {

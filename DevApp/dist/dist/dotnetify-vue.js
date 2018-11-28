@@ -2919,7 +2919,9 @@ dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
         return {
           done: function done(iHandler) {
             dotnetifyHub._startDoneHandler = iHandler;
-            promise.then(iHandler).catch(function () {});
+            promise.then(iHandler).catch(function (error) {
+              throw error;
+            });
             return this;
           },
           fail: function fail(iHandler) {
@@ -3270,11 +3272,23 @@ var dotnetify = {
     var failHandler = function failHandler(ex) {
       dotnetify.connectionFailedEvent.emit();
       dotnetify._triggerConnectionStateEvent('error', ex);
+      throw ex;
     };
 
     if (dotnetify._hub === null) {
-      dotnetify._hub = _dotnetifyHub2.default.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
-    } else dotnetify._hub.done(doneHandler);
+      try {
+        dotnetify._hub = _dotnetifyHub2.default.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
+      } catch (err) {
+        dotnetify._hub = null;
+      }
+    } else {
+      try {
+        dotnetify._hub.done(doneHandler);
+      } catch (err) {
+        dotnetify._hub = null;
+        return dotnetify.startHub();
+      }
+    }
   },
 
   checkServerSideException: function checkServerSideException(iVMId, iVMData, iExceptionHandler) {

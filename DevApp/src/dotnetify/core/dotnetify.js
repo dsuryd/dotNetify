@@ -98,12 +98,24 @@ const dotnetify = {
     const failHandler = function(ex) {
       dotnetify.connectionFailedEvent.emit();
       dotnetify._triggerConnectionStateEvent('error', ex);
+      throw ex;
     };
 
     if (dotnetify._hub === null) {
-      dotnetify._hub = dotnetifyHub.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
+      try {
+        dotnetify._hub = dotnetifyHub.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
+      } catch (err) {
+        dotnetify._hub = null;
+      }
     }
-    else dotnetify._hub.done(doneHandler);
+    else {
+      try {
+        dotnetify._hub.done(doneHandler);
+      } catch (err) {
+        dotnetify._hub = null;
+        return dotnetify.startHub();
+      }
+    }
   },
 
   checkServerSideException: function(iVMId, iVMData, iExceptionHandler) {
