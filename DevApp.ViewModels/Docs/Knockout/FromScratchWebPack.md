@@ -74,7 +74,7 @@ Add NPM configuration file _package.json_ with the following content:
     "build": "webpack"
   },
   "dependencies": {
-    "dotnetify": "~3.0.3",
+    "dotnetify": "~3.3.0",
     "jquery": "~3.3.1",
     "knockout": "~3.4.2"
   },

@@ -80,7 +80,7 @@ Add NPM configuration file _package.json_ with the following content:
     ]
   },
   "dependencies": {
-    "dotnetify": "~3.0.3",
+    "dotnetify": "~3.3.0",
     "react": "~16.5.0",
     "react-dom": "~16.5.0"
   },

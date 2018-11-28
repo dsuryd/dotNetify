@@ -74,7 +74,7 @@ Add NPM configuration file _package.json_ with the following content:
     "build": "webpack"
   },
   "dependencies": {
-    "dotnetify": "~3.2.0",
+    "dotnetify": "~3.3.0",
     "vue": "~2.5.17"
   },
   "devDependencies": {
