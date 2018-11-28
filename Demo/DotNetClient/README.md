@@ -2,7 +2,7 @@
 
 This solution demonstrates a WPF desktop app, an Avalonia desktop app, and a Vue webpage communicating in real-time with a C# view model running on an ASP.NET Core server.
 
-<img src="http://dotnetify.net/content/images/Wpf_Avalonia_Demo.gif" />
+<img src="https://github.com/dsuryd/dotNetify/blob/master/Demo/DotNetClient/screenshot.gif" />
 
 ### How to run
 
