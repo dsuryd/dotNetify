@@ -12,8 +12,10 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void UseJsonSerializerSettings_OverridesDefaultSettings()
+      public void UseJsonSerializerSettings_OverridesCurrentSettings()
       {
+         var currentSettings = VMSerializer.SerializerSettings;
+
          var config = new DotNetifyConfiguration();
 
          Assert.IsInstanceOfType(VMSerializer.SerializerSettings.ContractResolver, typeof(VMContractResolver));
@@ -24,6 +26,8 @@ namespace UnitTests
          });
 
          Assert.IsInstanceOfType(VMSerializer.SerializerSettings.ContractResolver, typeof(MyContractResolver));
+
+         VMSerializer.SerializerSettings = currentSettings;
       }
    }
 }

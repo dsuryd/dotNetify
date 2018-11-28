@@ -18,9 +18,7 @@ namespace UnitTests
       public void Serialize_SetsIgnoredPropertyNames()
       {
          var resolver = VMSerializer.SerializerSettings.ContractResolver as VMContractResolver;
-
          Assert.IsNotNull(resolver);
-         Assert.IsNull(resolver.IgnoredPropertyNames);
 
          var serializer = new VMSerializer();
          var ignoredPropertyNames = new List<String> {"World"};
