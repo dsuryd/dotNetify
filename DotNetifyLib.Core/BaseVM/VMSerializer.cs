@@ -31,6 +31,11 @@ namespace DotNetify
    /// </summary>
    public sealed class VMSerializer : ISerializer, IDeserializer
    {
+      internal static JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+      {
+         ContractResolver = new VMContractResolver()
+      };
+
       /// <summary>
       /// Serializes a view model into JSON-formatted string.
       /// </summary>
@@ -44,7 +49,12 @@ namespace DotNetify
             if (viewModel is string || viewModel is JArray || !viewModel.GetType().GetTypeInfo().IsClass)
                return Convert.ToString(viewModel);
 
-            var serializer = new JsonSerializer() { ContractResolver = new VMContractResolver(ignoredPropertyNames) };
+            if (SerializerSettings.ContractResolver is VMContractResolver resolver)
+            {
+               resolver.IgnoredPropertyNames = ignoredPropertyNames;
+            }
+
+            var serializer = JsonSerializer.Create(SerializerSettings);
             var vmJObject = JObject.FromObject(viewModel, serializer);
 
             if (viewModel is IReactiveProperties)

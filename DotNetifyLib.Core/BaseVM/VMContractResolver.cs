@@ -26,9 +26,9 @@ namespace DotNetify
    /// <summary>
    /// Custom view model resolver for JSON serializer.
    /// </summary>
-   internal class VMContractResolver : DefaultContractResolver
+   public class VMContractResolver : DefaultContractResolver
    {
-      private List<string> _ignoredPropertyNames;
+      internal List<string> IgnoredPropertyNames { get; set; }
 
       /// <summary>
       /// Converter for properties of ICommand type which simply serializes the value to null.
@@ -73,15 +73,6 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Constructor that accepts list of property names to exclude from serialization.
-      /// </summary>
-      /// <param name="ignoredPropertyNames">Property names to exclude from serialization.</param>
-      public VMContractResolver(List<string> ignoredPropertyNames = null) : base()
-      {
-         _ignoredPropertyNames = ignoredPropertyNames;
-      }
-
-      /// <summary>
       /// Overrides this method to exclude properties with [Ignore] attribute or those that are in the given list.
       /// </summary>
       protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
@@ -91,7 +82,7 @@ namespace DotNetify
          // Don't serialize properties that are decorated with [Ignore] or whose name are in the given list.
          if (member.GetCustomAttribute(typeof(IgnoreAttribute)) != null)
             property.Ignored = true;
-         else if (_ignoredPropertyNames != null && _ignoredPropertyNames.Contains(property.PropertyName))
+         else if (IgnoredPropertyNames != null && IgnoredPropertyNames.Contains(property.PropertyName))
             property.Ignored = true;
 
          return property;
