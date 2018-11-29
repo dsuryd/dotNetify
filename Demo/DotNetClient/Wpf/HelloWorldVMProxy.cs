@@ -9,7 +9,7 @@ using ViewModels;
 namespace HelloWorld
 {
    /// <summary>
-   /// This is Avalonia view model that serves as a proxy to the server-side view model.
+   /// This is WPF view model that serves as a proxy to the server-side view model.
    /// Properties in the "Server bindings" region will be initialized with data coming from the server on successful connection.
    /// </summary>
    public class HelloWorldVMProxy : INotifyPropertyChanged, IDisposable
