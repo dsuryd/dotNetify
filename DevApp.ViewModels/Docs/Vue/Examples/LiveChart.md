@@ -15,6 +15,7 @@
 
 <script>
 import dotnetify from 'dotnetify/vue';
+import 'chartjs-plugin-streaming';
 
 export default {
   name: 'LiveChart',
@@ -32,7 +33,7 @@ export default {
     }
   },
   methods: {
-    createLineChart: function (elem) {
+    createLineChart: function (elem, initialData) {
       const chartData = {
         type: 'line',
         data: {
@@ -40,12 +41,28 @@ export default {
           datasets: [
             {
               label: 'Waveform',
-              data: [],
-              backgroundColor: ['rgba(217,237,245,0.4)'],
-              borderColor: ['#9acfea'],
+              data: initialData,
+              backgroundColor: 'rgba(217,237,245,0.4)',
+              borderColor: '#9acfea',
               borderWidth: 2
             }
           ]
+        },
+        options: {
+          scales: {
+            xAxes: [
+              {
+                type: 'realtime',
+                realtime: { delay: 2000 }
+              }
+            ],
+            yAxes: [{
+              ticks: {
+                suggestedMin: -1,
+                suggestedMax: 1
+              }
+            }]
+          }
         }
       };
       const chartOptions = { responsive: true };
@@ -104,13 +121,15 @@ export default {
       return new Chart(elem.getContext('2d'), chartData);
     },
     updateLineChart: function (element) {
-      if (!this.lineChart) this.lineChart = this.createLineChart(element);
-
-      let data = this.Waveform;
-      data = this.Waveform.slice(Math.max(data.length - 30, 0));
-      this.lineChart.data.labels = data.map(x => x[0]);
-      this.lineChart.data.datasets[0].data = data.map(x => +x[1]);
-      this.lineChart.update();
+      if (!this.lineChart) {
+        const maxIdx = this.Waveform.length - 1;
+        const initialData = this.Waveform.map((data, idx) => ({ x: Date.now() - (maxIdx - idx) * 1000, y: data[1] }));
+        this.lineChart = this.createLineChart(element, initialData);
+      }
+      else {
+        const data = this.Waveform[this.Waveform.length - 1];
+        this.lineChart.data.datasets[0].data.push({ x: Date.now(), y: data[1] });
+      }
     },
     updateBarChart(element) {
       if (!this.barChart) this.barChart = this.createBarChart(element);
