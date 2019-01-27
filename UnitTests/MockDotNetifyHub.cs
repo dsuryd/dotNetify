@@ -18,7 +18,7 @@ namespace UnitTests
       private List<Tuple<Type, Func<IMiddlewarePipeline>>> _middlewareFactories = new List<Tuple<Type, Func<IMiddlewarePipeline>>>();
       private Dictionary<Type, Func<IVMFilter>> _vmFilterFactories = new Dictionary<Type, Func<IVMFilter>>();
       private Func<Type, object[], object> _factoryMethod = (type, args) => VMController.CreateInstance(type, args);
-      private IVMFactory _vmFactory = new VMFactory(new MemoryCache());
+      private IVMFactory _vmFactory = new VMFactory(new MemoryCache(), new VMTypesAccessor());
 
       public string ConnectionId { get; } = Guid.NewGuid().ToString();
 

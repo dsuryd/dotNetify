@@ -36,7 +36,7 @@ namespace UnitTests
          var id1 = "1";
          var id2 = "2";
          var memoryCache = new MemoryCache();
-         var factory = new VMControllerFactory(memoryCache, new VMFactory(memoryCache), new ServiceScopeFactory());
+         var factory = new VMControllerFactory(memoryCache, new VMFactory(memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          factory.ResponseDelegate = (string connectionId, string vmId, string vmData) => { };
 
          Assert.IsNotNull(factory as IVMControllerFactory);

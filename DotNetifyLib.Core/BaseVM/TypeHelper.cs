@@ -59,12 +59,13 @@ namespace DotNetify
       /// Constructor that accepts type.
       /// </summary>
       /// <param name="type">Type.</param>
-      public TypeHelper(Type type)
+      /// <param name="factoryDelegate">Factory delegate to create objects of this type.</param>
+      public TypeHelper(Type type, Func<object[], object> factoryDelegate = null)
       {
          Type = type;
          Name = type.Name;
          FullName = type.FullName;
-         _factoryDelegate = args => VMController.CreateInstance(Type, args);
+         _factoryDelegate = factoryDelegate ?? (args => VMController.CreateInstance(Type, args));
       }
 
       /// <summary>
@@ -72,10 +73,10 @@ namespace DotNetify
       /// </summary>
       /// <param name="typeName">Type name.</param>
       /// <param name="factoryDelegate">Factory delegate to create objects of this type.</param>
-      public TypeHelper(string typeName, Func<object[], object> factoryDelegate)
+      public TypeHelper(string typeName, Func<object[], object> factoryDelegate = null)
       {
          _isRuntimeType = true;
-         _factoryDelegate = factoryDelegate;
+         _factoryDelegate = factoryDelegate ?? (args => VMController.CreateInstance(Type, args));
          Name = typeName.Contains(".") ? typeName.Split('.').Last() : typeName;
          FullName = typeName;
       }

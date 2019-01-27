@@ -69,7 +69,7 @@ namespace UnitTests
       [TestInitialize]
       public void Initialize()
       {
-         _vmFactory = new VMFactory(new MemoryCache());
+         _vmFactory = new VMFactory(new MemoryCache(), new VMTypesAccessor());
       }
 
       [TestMethod]

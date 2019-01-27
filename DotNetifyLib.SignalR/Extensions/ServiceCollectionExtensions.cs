@@ -33,6 +33,7 @@ namespace DotNetify
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
 
          // Add view model factory.
+         services.AddSingleton<IVMTypesAccessor, VMTypesAccessor>();
          services.AddSingleton<IVMFactory, VMFactory>();
 
          // Add the dependency injection service scope factory for view model controllers.

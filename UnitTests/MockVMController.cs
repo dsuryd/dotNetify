@@ -40,7 +40,7 @@ namespace UnitTests
       private readonly Response _response = new Response();
       private readonly string _vmId;
       private readonly VMController _vmController;
-      private readonly IVMFactory _vmFactory = new VMFactory(new MemoryCache());
+      private readonly IVMFactory _vmFactory = new VMFactory(new MemoryCache(), new VMTypesAccessor());
       private string _connectionId;
       private static int IdCount = 1;
 
@@ -110,6 +110,6 @@ namespace UnitTests
          _vmController.OnDisposeVM(_connectionId, vmId ?? _vmId);
       }
 
-      public static IVMFactory GetVMFactory() => new VMFactory(new MemoryCache());
+      public static IVMFactory GetVMFactory() => new VMFactory(new MemoryCache(), new VMTypesAccessor());
    }
 }

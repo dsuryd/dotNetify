@@ -29,6 +29,9 @@ namespace DotNetify
 
          // Use built-in DI to inject the dotNetify's view model controller factory to the dotNetify's SignalR hub.
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
+
+         // Add view model factory.
+         services.AddSingleton<IVMTypesAccessor, VMTypesAccessor>();
          services.AddSingleton<IVMFactory, VMFactory>();
 
          // Add service to get the hub principal.

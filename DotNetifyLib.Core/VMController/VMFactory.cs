@@ -31,7 +31,7 @@ namespace DotNetify
       /// <summary>
       /// Registered view model types.
       /// </summary>
-      private IEnumerable<TypeHelper> VMTypes => VMController.VMTypes;
+      private IVMTypesAccessor _vmTypesAccessor;
 
       /// <summary>
       /// For caching multicast view models.
@@ -47,9 +47,10 @@ namespace DotNetify
       /// Constructor.
       /// </summary>
       /// <param name="memoryCache">Memory cache for caching multicast view models.</param>
-      public VMFactory(IMemoryCache memoryCache)
+      public VMFactory(IMemoryCache memoryCache, IVMTypesAccessor vmTypesAccessor)
       {
          _memoryCache = memoryCache;
+         _vmTypesAccessor = vmTypesAccessor;
       }
 
       /// <summary>
@@ -136,8 +137,8 @@ namespace DotNetify
       private TypeHelper GetVMTypeHelper(string vmTypeName, string vmNamespace)
       {
          return vmNamespace != null ?
-            VMTypes.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}") :
-            VMTypes.FirstOrDefault(i => i.Name == vmTypeName);
+            _vmTypesAccessor.Types.FirstOrDefault(i => i.FullName == $"{vmNamespace}.{vmTypeName}") :
+            _vmTypesAccessor.Types.FirstOrDefault(i => i.Name == vmTypeName);
       }
 
       /// <summary>
@@ -147,7 +148,7 @@ namespace DotNetify
       /// <param name="vmInstanceId">Optional view model instance identifier.</param>
       /// <param name="key">Key to the cache collection, which is the view model's type name.</param>
       /// <returns>Multicast view model.</returns>
-      private MulticastVM CreateMulticastInstance(Type vmType, string vmInstanceId, string key)
+      private MulticastVM CreateMulticastInstance(TypeHelper vmType, string vmInstanceId, string key)
       {
          var vm = Create(vmType, vmInstanceId) as MulticastVM;
          vm.Disposed += (sender, e) => RemoveMulticastInstance(vm, key);

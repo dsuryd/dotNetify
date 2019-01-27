@@ -9,7 +9,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>3.3.1</Version>
+    <Version>3.3.2</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Dicky Suryadi</Authors>
     <Description>Simple, lightweight, yet powerful way to build reactive, real-time web apps. SignalR hub for ASP.NET Core.</Description>
