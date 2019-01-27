@@ -48,6 +48,11 @@ namespace DotNetify
       public event EventHandler<SendEventArgs> RequestSend;
 
       /// <summary>
+      /// Occurs the the view model was requested.
+      /// </summary>
+      public event EventHandler Requested;
+
+      /// <summary>
       /// Multicast group name.
       /// </summary>
       [Ignore]
@@ -64,6 +69,7 @@ namespace DotNetify
       internal void AddRef()
       {
          Interlocked.Increment(ref _reference);
+         Requested?.Invoke(this, null);
       }
 
       /// <summary>
@@ -84,9 +90,9 @@ namespace DotNetify
       /// Override this to dispose resources.
       /// </summary>
       /// <param name="disposing">True if it's the final dispose.</param>
-      protected virtual void Dispose(bool disposing) 
-      {  
-      }  
+      protected virtual void Dispose(bool disposing)
+      {
+      }
 
       /// <summary>
       /// Initializes the group name asssociated with this view model.
