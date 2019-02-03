@@ -219,7 +219,7 @@ namespace DotNetify
             var vmData = vmInstance.Serialize();
 
             // Send the view model data back to the browser client.
-            _vmResponse?.Invoke(connectionId, vmId, vmData);
+            ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => _vmResponse(connectionId, vmId, (string)filteredData));
 
             // Reset the changed property states.
             vmInstance.AcceptChangedProperties();

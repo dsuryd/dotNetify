@@ -126,6 +126,9 @@ namespace UnitTests
          Action middleware1Assertions = null;
          _middleware1.Invoked += (sender, context) =>
          {
+            if (middleware1Assertions != null)
+               return;
+
             var callType = context.CallType;
             var connectionId = context.CallerContext.ConnectionId;
             var testVMPropValue = (context.Data as JObject)[nameof(MiddlewareTestVM.Property)];
@@ -147,6 +150,9 @@ namespace UnitTests
          Action middleware2Assertions = null;
          _middleware2.Invoked += (sender, context) =>
          {
+            if (middleware2Assertions != null)
+               return;
+
             var callType = context.CallType;
             var connectionId = context.CallerContext.ConnectionId;
             var testVMPropValue = (context.Data as JObject)[nameof(MiddlewareTestVM.Property)];

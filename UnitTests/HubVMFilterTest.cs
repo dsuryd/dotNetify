@@ -140,6 +140,9 @@ namespace UnitTests
          Action filter1Assertions = null;
          _filter1.Invoked += (sender, tuple) =>
          {
+            if (filter1Assertions != null)
+               return;
+
             var attr = tuple.Item1;
             var vmContext = tuple.Item2;
             var context = vmContext.HubContext;
@@ -166,6 +169,9 @@ namespace UnitTests
          Action filter2Assertions = null;
          _filter2.Invoked += (sender, tuple) =>
          {
+            if (filter2Assertions != null)
+               return;
+
             var attr = tuple.Item1;
             var vmContext = tuple.Item2;
             var context = vmContext.HubContext;
@@ -192,7 +198,7 @@ namespace UnitTests
          hub.RequestVM(nameof(FilterTestVM), _vmArg);
 
          Assert.AreEqual(nameof(FilterTestVM), vmName);
-         Assert.AreEqual("World", vmData.Property.ToString());
+         Assert.AreEqual("WORLD", vmData.Property.ToString());
          filter1Assertions();
          filter2Assertions();
       }
