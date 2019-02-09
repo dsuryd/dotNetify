@@ -35,7 +35,7 @@ namespace DotNetify.Client.Blazor
       /// <param name="vmId">Identifies the view model to request.</param>
       /// <param name="view">The connecting view; must implement changed notification.</param>
       /// <param name="options">View model initialization options.</param>
-      Task ConnectAsync(string vmId, INotifyPropertyChanged view, VMConnectOptions options = null);
+      Task ConnectAsync(string vmId, object view, VMConnectOptions options = null);
 
       /// <summary>
       /// Connects to the dotNetify hub server.
@@ -116,7 +116,7 @@ namespace DotNetify.Client.Blazor
       /// <param name="vmId">Identifies the view model to request.</param>
       /// <param name="view">The connecting view; must implement changed notification.</param>
       /// <param name="options">View model initialization options.</param>
-      public async Task ConnectAsync(string vmId, INotifyPropertyChanged view, VMConnectOptions options = null)
+      public async Task ConnectAsync(string vmId, object view, VMConnectOptions options = null)
       {
          await ConnectAsync(vmId, new ViewState(view, _dispatcher), options);
       }

@@ -29,7 +29,7 @@ namespace DotNetify.Client.Blazor
    /// </summary>
    public class ViewState : IViewState
    {
-      private readonly INotifyPropertyChanged _view;
+      private readonly object _view;
       private readonly IUIThreadDispatcher _dispatcher;
       private readonly IDeserializer _deserializer = new VMSerializer();
       private MulticastDelegate _propChangedEvent;
@@ -39,7 +39,7 @@ namespace DotNetify.Client.Blazor
       /// </summary>
       /// <param name="view">View object.</param>
       /// <param name="dispatcher">UI thread dispatcher.</param>
-      public ViewState(INotifyPropertyChanged view, IUIThreadDispatcher dispatcher)
+      public ViewState(object view, IUIThreadDispatcher dispatcher)
       {
          _view = view;
          _dispatcher = dispatcher;
