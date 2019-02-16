@@ -1,8 +1,20 @@
-﻿@page "/counter"
-@inherits CounterVMProxy
+﻿@using DotNetify.Client.Blazor;
+@implements IDisposable
+@page "/counter"
 
 <h1>Counter</h1>
 
 <p>Current count: @CurrentCount</p>
 
 <button class="btn btn-primary" onclick="@IncrementCount">Click me</button>
+
+@functions {
+   [Inject]
+   protected IDotNetifyClient DotNetify { get; set; }
+
+   public int CurrentCount { get; set; }
+   public async Task IncrementCount() => await DotNetify.DispatchAsync("IncrementCount", null);
+
+   protected override async Task OnInitAsync() => await DotNetify.ConnectAsync("CounterVM", this);
+   public void Dispose() => DotNetify.DisposeAsync();
+}

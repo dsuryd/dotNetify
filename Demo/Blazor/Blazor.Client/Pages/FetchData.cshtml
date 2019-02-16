@@ -1,6 +1,7 @@
 ﻿@using Blazor.Shared
+@using DotNetify.Client.Blazor;
+@implements IDisposable
 @page "/fetchdata"
-@inherits FetchDataVMProxy
 
 <h1>Weather forecast</h1>
 
@@ -33,4 +34,14 @@ else
          }
       </tbody>
    </table>
+}
+
+@functions {
+   [Inject]
+   protected IDotNetifyClient DotNetify { get; set; }
+
+   public WeatherForecast[] Forecasts { get; set; }
+
+   protected override async Task OnInitAsync() => await DotNetify.ConnectAsync("FetchDataVM", this);
+   public void Dispose() => DotNetify.DisposeAsync();
 }
