@@ -21,7 +21,7 @@
   "dependencies": {
     "@aspnet/signalr": "~1.0.3",
     "chartjs-plugin-streaming": "~1.7.1",
-    "dotnetify-elements": "~0.1.2",
+    "dotnetify-elements": "~0.4.1",
     "jquery": "~3.3.1",
     "knockout": "~3.4.2",
     "react": "~16.3.2",

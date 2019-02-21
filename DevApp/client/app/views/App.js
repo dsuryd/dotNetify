@@ -42,7 +42,7 @@ class App extends React.Component {
             <NavDrawerButton show css="margin-left: 1rem" />
             <Logo />
             <MenuLinks active="core" />
-            <Panel center middle right padding="1rem">
+            <Panel horizontal center middle right padding="1rem">
               <ThemeToggle name={theme.name} onClick={_ => themeToggleEvent.emit()} />
               <TwitterLink />
             </Panel>
@@ -60,7 +60,7 @@ class App extends React.Component {
           </Section>
           <Footer>
             <LicenseNotice>
-              © 2015-2018 Dicky Suryadi. Licensed under the{' '}
+              © 2015-2019 Dicky Suryadi. Licensed under the{' '}
               <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license version 2.0</a>
             </LicenseNotice>
           </Footer>
