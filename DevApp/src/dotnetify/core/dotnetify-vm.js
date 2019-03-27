@@ -220,7 +220,7 @@ export default class dotnetifyVM {
   // Sets items key to identify individual items in a list.
   // Accepts object literal: { "<list name>": "<key prop name>", ... }
   $setItemKey(iItemKey) {
-    this.$itemKey = iItemKey;
+    Object.assign(this.$itemKey, iItemKey);
   }
 
   //// Adds a new item to a state array.
