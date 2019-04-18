@@ -80,7 +80,7 @@ namespace DotNetify.Client
    /// </summary>
    public class ViewState : IViewState
    {
-      private readonly INotifyPropertyChanged _view;
+      private readonly object _view;
       private readonly IUIThreadDispatcher _dispatcher;
       private readonly IDeserializer _deserializer = new VMSerializer();
       private MulticastDelegate _propChangedEvent;
@@ -89,10 +89,19 @@ namespace DotNetify.Client
       /// Constructor.
       /// </summary>
       /// <param name="view">View object.</param>
-      /// <param name="dispatcher">UI thread dispatcher.</param>
-      public ViewState(INotifyPropertyChanged view, IUIThreadDispatcher dispatcher)
+      public ViewState(object view)
       {
          _view = view;
+         _dispatcher = new DefaultUIThreadDispatcher();
+      }
+
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="view">View object.</param>
+      /// <param name="dispatcher">UI thread dispatcher.</param>
+      public ViewState(INotifyPropertyChanged view, IUIThreadDispatcher dispatcher) : this(view)
+      {
          _dispatcher = dispatcher;
       }
 
@@ -102,7 +111,7 @@ namespace DotNetify.Client
       /// <typeparam name="T">Property type.</typeparam>
       /// <param name="name">Property name.</param>
       /// <returns>Property value.</returns>
-      public T Get<T>(string name)
+      public virtual T Get<T>(string name)
       {
          var propInfo = PropertyInfoHelper.Find(_view, name);
          return (T)propInfo?.GetValue(_view);
@@ -288,6 +297,9 @@ namespace DotNetify.Client
       /// <param name="propertyName">Property name.</param>
       private void RaisePropertyChanged(string propertyName)
       {
+         if (_view is INotifyPropertyChanged == false)
+            return;
+
          if (_propChangedEvent == null)
          {
             Type viewType = _view.GetType();
