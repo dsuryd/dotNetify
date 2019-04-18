@@ -18,6 +18,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -407,7 +408,7 @@ namespace DotNetify
       {
          vmInfo.Instance.RequestPushUpdates -= VmInstance_RequestPushUpdates;
 
-         if (vmInfo.Instance is MulticastVM)
+         if (typeof(MulticastVM).GetTypeInfo().IsAssignableFrom(vmInfo.Instance.GetType()))
          {
             var multicastVM = vmInfo.Instance as MulticastVM;
             multicastVM.RequestMulticastPushUpdates -= VMInstance_RequestMulticastPushUpdates;
