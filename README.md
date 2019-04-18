@@ -27,7 +27,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## Documentation
 
-Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
+Documentation and live demo can be found at [https://dotnetify.net](http://dotnetify.net).
 
 ## React/React Native Code Example   
 
