@@ -1,52 +1,60 @@
 ﻿@page "/fetchdata"
 @using Blazor.Shared
-@inject HttpClient Http
+@using DotNetify.Blazor;
+@using Microsoft.AspNetCore.Components;
+@inject IVMContext<FetchDataState> VMContext;
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-<d-vm-context class="test" vm="FetchDataVM" onstatechange="e => console.warn(e)">
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
+<d-vm-context ref="vmContextRef" class="test" vm="FetchDataVM">
+    @if (state == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <th>Date</th>
+                    <th>Temp. (C)</th>
+                    <th>Temp. (F)</th>
+                    <th>Summary</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var forecast in state.Forecasts)
+                {
+                    <tr>
+                        <td>@forecast.Date.ToShortDateString()</td>
+                        <td>@forecast.TemperatureC</td>
+                        <td>@forecast.TemperatureF</td>
+                        <td>@forecast.Summary</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </d-vm-context>
 
 @functions {
-    WeatherForecast[] forecasts;
+    FetchDataState state;
+    ElementRef vmContextRef;
 
-    protected override async Task OnInitAsync()
+    public class FetchDataState
     {
-        forecasts = await Http.GetJsonAsync<WeatherForecast[]>("api/SampleData/WeatherForecasts");
+        public WeatherForecast[] Forecasts { get; set; }
     }
 
-    public void Test()
+    protected override async Task OnAfterRenderAsync()
     {
-        System.Console.WriteLine("test");
+        VMContext.StateChanged += (sender, e) =>
+        {
+            state = e;
+            StateHasChanged();
+        };
+        await VMContext.InitAsync(vmContextRef);
     }
 }

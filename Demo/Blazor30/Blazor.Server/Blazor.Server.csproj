@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\dotNetify-Elements\DotNetifyLib.Blazor\DotNetifyLib.Blazor.csproj" />
     <ProjectReference Include="..\Blazor.Client\Blazor.Client.csproj" />
     <ProjectReference Include="..\Blazor.Shared\Blazor.Shared.csproj" />
   </ItemGroup>

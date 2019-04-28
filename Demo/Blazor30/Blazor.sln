@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Client", "Blazor.Cli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Shared", "Blazor.Shared\Blazor.Shared.csproj", "{951E9008-61CF-4539-9CD2-5259911164D0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Blazor", "..\..\..\dotNetify-Elements\DotNetifyLib.Blazor\DotNetifyLib.Blazor.csproj", "{BF87347F-3750-4152-BBF1-D81A945FA460}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{951E9008-61CF-4539-9CD2-5259911164D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{951E9008-61CF-4539-9CD2-5259911164D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{951E9008-61CF-4539-9CD2-5259911164D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF87347F-3750-4152-BBF1-D81A945FA460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF87347F-3750-4152-BBF1-D81A945FA460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF87347F-3750-4152-BBF1-D81A945FA460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF87347F-3750-4152-BBF1-D81A945FA460}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

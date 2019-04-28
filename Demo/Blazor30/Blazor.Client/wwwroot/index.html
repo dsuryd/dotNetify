@@ -11,8 +11,6 @@
 <body>
     <app>Loading...</app>
 
-
-
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2/custom-elements-es5-adapter.js"></script>
@@ -21,7 +19,10 @@
     <script src="https://unpkg.com/styled-components@4.1/dist/styled-components.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
     <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
-    <script src="/dotnetify-elements.bundle.js"></script>
-    <script>dotnetify.debug = true</script>
+    <script src="/_content/DotNetifyLib.Blazor/dotnetify-elements.bundle.js"></script>
+    <script src="/_content/DotNetifyLib.Blazor/dotnetify-blazor.js"></script>
+    <script>
+        dotnetify.debug = true;
+    </script>
 </body>
 </html>
