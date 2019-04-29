@@ -1,14 +1,13 @@
 ﻿@page "/fetchdata"
 @using Blazor.Shared
 @using DotNetify.Blazor;
-@using Microsoft.AspNetCore.Components;
 @inject IVMContext<FetchDataState> VMContext;
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-<d-vm-context ref="vmContextRef" vm="FetchDataVM">
+<d-vm-context ref="VMContext.ElementRef" vm="FetchDataVM">
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -41,20 +40,14 @@
 
 @functions {
     FetchDataState state;
-    ElementRef vmContextRef;
 
     public class FetchDataState
     {
         public WeatherForecast[] Forecasts { get; set; }
     }
 
-    protected override void OnInit()
-    {
-        VMContext.StateChanged += (sender, e) => { state = e; StateHasChanged(); };
-    }
-
     protected override async Task OnAfterRenderAsync()
     {
-        await VMContext.InitAsync(vmContextRef);
+        await VMContext.InitAsync((sender, e) => { state = e; StateHasChanged(); });
     }
 }
