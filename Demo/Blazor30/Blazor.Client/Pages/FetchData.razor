@@ -48,13 +48,13 @@
         public WeatherForecast[] Forecasts { get; set; }
     }
 
+    protected override void OnInit()
+    {
+        VMContext.StateChanged += (sender, e) => { state = e; StateHasChanged(); };
+    }
+
     protected override async Task OnAfterRenderAsync()
     {
-        VMContext.StateChanged += (sender, e) =>
-        {
-            state = e;
-            StateHasChanged();
-        };
         await VMContext.InitAsync(vmContextRef);
     }
 }
