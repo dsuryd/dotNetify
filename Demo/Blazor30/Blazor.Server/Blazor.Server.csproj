@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="26.0.2" />
     <PackageReference Include="DotNetify.Elements" Version="0.4.0" />
     <PackageReference Include="DotNetify.SignalR" Version="3.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.0.0-preview4-19216-03" />
@@ -20,10 +21,6 @@
     <ProjectReference Include="..\..\..\..\dotNetify-Elements\DotNetifyLib.Blazor\DotNetifyLib.Blazor.csproj" />
     <ProjectReference Include="..\Blazor.Client\Blazor.Client.csproj" />
     <ProjectReference Include="..\Blazor.Shared\Blazor.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 
 </Project>

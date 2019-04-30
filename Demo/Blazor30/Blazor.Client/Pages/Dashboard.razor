@@ -1,0 +1,93 @@
+﻿@page "/dashboard"
+@using Blazor.Shared
+@using DotNetify.Blazor;
+@using Newtonsoft.Json;
+@inject IVMContext<object> VMContext;
+
+<d-vm-context ref="VMContext.ElementRef" vm="Dashboard">
+    @if (state == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <template id="info-card">
+            <d-card horizontal="true" css=".card-body {padding:.5rem 1.5rem; min-width: 12rem} h3 {font:600 2rem Helvetica}">
+                <d-card-image css="i {font-size:3rem; padding:1.5rem; color:white; opacity:.8}">
+                    <i class="material-icons info-icon" slot="icon"></i>
+                </d-card-image>
+                <label slot="label"></label>
+                <h3 slot="value"></h3>
+            </d-card>
+        </template>
+
+        <d-vm-context vm="Dashboard">
+            <d-panel>
+                <d-panel horizontal="true" wrap="true">
+                    <d-panel>
+                        <d-element id="Download" css="i {background: #1c8adb}" template="info-card"></d-element>
+                    </d-panel>
+                    <d-panel>
+                        <d-element id="Upload" css="i {background: #5cb85c}" template="info-card"></d-element>
+                    </d-panel>
+                    <d-panel>
+                        <d-element id="Latency" css="i {background: #f0ad4e}" template="info-card"></d-element>
+                    </d-panel>
+                    <d-panel>
+                        <d-element id="Users" css="i {background: #d9534f}" template="info-card"></d-element>
+                    </d-panel>
+                </d-panel>
+                <d-panel>
+                    <d-card>
+                        <d-panel horizontal="true">
+                            <d-panel flex="70%">
+                                <h4>Network Traffic</h4>
+                                <d-line-chart id="Traffic" height="75px" config="@lineChartConfig" />
+                            </d-panel>
+                            <d-panel flex="30%">
+                                <h4>Utilization</h4>
+                                <d-pie-chart id="Utilization" />
+                            </d-panel>
+                        </d-panel>
+                    </d-card>
+                    <d-panel>
+                        <d-card width="1000px">
+                            <h4>Server Usage</h4>
+                            <d-bar-chart id="ServerUsage" height="70px"></d-bar-chart>
+                        </d-card>
+                    </d-panel>
+                </d-panel>
+            </d-panel>
+        </d-vm-context>
+    }
+</d-vm-context>
+
+@functions {
+    object state;
+    string lineChartConfig = GetStreamingLineChartConfig();
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        await VMContext.HandleStateChangedAsync((sender, e) => { state = e; StateHasChanged(); });
+    }
+
+    public void Dispose()
+    {
+        VMContext.Dispose();
+    }
+
+    static string GetStreamingLineChartConfig()
+    {
+        return JsonConvert.SerializeObject(new
+        {
+            options = new
+            {
+                scales = new
+                {
+                    xAxes = new[] { new { type = "realtime", realtime = new { delay = 2000 } } },
+                    yAxes = new[] { new { ticks = new { suggestedMin = 1000, suggestedMax = 10000 } } }
+                }
+            }
+        });
+    }
+}

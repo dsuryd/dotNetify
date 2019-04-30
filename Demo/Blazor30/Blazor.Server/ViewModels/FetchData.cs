@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Blazor.Server
 {
-   public class FetchDataVM : BaseVM
+   public class FetchData : BaseVM
    {
       private static string[] Summaries = new[]
       {

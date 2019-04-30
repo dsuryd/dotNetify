@@ -3,13 +3,8 @@ using System.Windows.Input;
 
 namespace Blazor.Server
 {
-   public class CounterVM : BaseVM
+   public class Counter : BaseVM
    {
-      public CounterVM()
-      {
-         CurrentCount = 100;
-      }
-
       public int CurrentCount
       {
          get => Get<int>();
