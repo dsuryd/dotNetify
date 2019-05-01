@@ -78,7 +78,7 @@ namespace Blazor.Server
          Traffic = Observable
             .Interval(TimeSpan.FromMilliseconds(600))
             .StartWith(0)
-            .Select(_ => Enumerable.Range(1, 7).Select(i => _random.Next(1000, 10000)).ToArray());
+            .Select(_ => new int[] { _random.Next(1000, 10000) });
 
          ServerUsage = Observable
             .Interval(TimeSpan.FromMilliseconds(400))
