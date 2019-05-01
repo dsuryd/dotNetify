@@ -1,0 +1,145 @@
+﻿@page "/form"
+@using DotNetify.Blazor;
+@inject IVMContext<object> VMContext;
+
+<d-vm-context ref="VMContext.ElementRef" vm="CustomerForm">
+    @if (state == null)
+    {
+    <p><em>Loading...</em></p>
+    }
+    else
+    {
+    <d-panel css="padding-right: 2rem">
+        <d-data-grid id="Contacts" enable="true"></d-data-grid>
+        <d-form id="_form" plaintext="true">
+            <d-panel>
+                <d-panel horizontal="true">
+                    <d-panel horizontal="true">
+                        <d-button id="_edit" label="Edit" enable="true" onclick="onEdit()"></d-button>
+                        <d-button id="Submit" label="Update" submit="true" show="false" onclick="onUpdateOrCancel()"></d-button>
+                        <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="false" onclick="onUpdateOrCancel()"></d-button>
+                    </d-panel>
+                    <d-panel right="true">
+                        <d-button id="_new" label="New Customer" enable="true" onclick="openDialog()"></d-button>
+                    </d-panel>
+                </d-panel>
+                <d-tab margin="1.5rem 0">
+                    <d-tab-item itemkey="basic" label="Basic Info">
+                        <d-panel horizontal="true" nogap="true">
+                            <d-panel horizontal="true">
+                                <d-cell header="Person" flex="true">
+                                    <d-vm-context vm="PersonForm">
+                                        <d-form id="Person">
+                                            <d-panel>
+                                                <d-text-field id="FullName" plaintext="true" horizontal="true"></d-text-field>
+                                                <d-dropdown-list id="Prefix" horizontal="true"></d-dropdown-list>
+                                                <d-text-field id="FirstName" horizontal="true"></d-text-field>
+                                                <d-text-field id="MiddleName" horizontal="true"></d-text-field>
+                                                <d-text-field id="LastName" horizontal="true"></d-text-field>
+                                                <d-dropdown-list id="Suffix" horizontal="true"></d-dropdown-list>
+                                            </d-panel>
+                                        </d-form>
+                                    </d-vm-context>
+                                </d-cell>
+                                <d-cell header="Phone" flex="1" borders="top, right, bottom">
+                                    <d-vm-context vm="PhoneForm">
+                                        <d-form id="Phone">
+                                            <d-panel>
+                                                <d-text-field id="Work" horizontal="true"></d-text-field>
+                                                <d-text-field id="Home" horizontal="true"></d-text-field>
+                                                <d-text-field id="Mobile" horizontal="true"></d-text-field>
+                                                <drop-down-list id="Primary" horizontal="true"></drop-down-list>
+                                            </d-panel>
+                                        </d-form>
+                                    </d-vm-context>
+                                </d-cell>
+                            </d-panel>
+                        </d-panel>
+                    </d-tab-item>
+                    <d-tab-item itemkey="address" label="Address">
+                        <d-panel>
+                            <d-cell header="Primary Address">
+                                <d-vm-context vm="AddressForm">
+                                    <d-form id="Address">
+                                        <d-panel>
+                                            <d-text-field id="Address1" horizontal="true"></d-text-field>
+                                            <d-text-field id="Address2" horizontal="true"></d-text-field>
+                                            <d-text-field id="City" horizontal="true"></d-text-field>
+                                            <d-dropdown-list id="State" horizontal="true"></d-dropdown-list>
+                                            <d-number-field id="ZipCode" horizontal="true"></d-number-field>
+                                        </d-panel>
+                                    </d-form>
+                                </d-vm-context>
+                            </d-cell>
+                        </d-panel>
+                    </d-tab-item>
+                </d-tab>
+            </d-panel>
+            <d-vm-context vm="NewCustomerForm">
+                <d-modal id="_dialog" header="New Customer" open="false" large="true">
+                    <d-tab>
+                        <d-tab-item key="Person" label="Person">
+                            <d-vm-context vm="PersonForm">
+                                <d-form id="Person">
+                                    <d-panel>
+                                        <d-dropdown-list id="Prefix"></d-dropdown-list>
+                                        <d-text-field id="FirstName"></d-text-field>
+                                        <d-text-field id="MiddleName"></d-text-field>
+                                        <d-text-field id="LastName"></d-text-field>
+                                        <d-dropdown-list id="Suffix"></d-dropdown-list>
+                                    </d-panel>
+                                </d-form>
+                            </d-vm-context>
+                        </d-tab-item>
+                        <d-tab-item key="Phone" label="Phone">
+                            <d-vm-context vm="PhoneForm">
+                                <d-form id="Phone">
+                                    <d-panel>
+                                        <d-text-field id="Work"></d-text-field>
+                                        <d-text-field id="Home"></d-text-field>
+                                        <d-text-field id="Mobile"></d-text-field>
+                                        <d-dropdown-list id="Primary"></d-dropdown-list>
+                                    </d-panel>
+                                </d-form>
+                            </d-vm-context>
+                        </d-tab-item>
+                        <d-tab-item key="Address" label="Address">
+                            <d-vm-context vm="AddressForm">
+                                <d-form id="Address">
+                                    <d-panel>
+                                        <d-text-field id="Address1"></d-text-field>
+                                        <d-text-field id="Address2"></d-text-field>
+                                        <d-text-field id="City"></d-text-field>
+                                        <d-dropdown-list id="State"></d-dropdown-list>
+                                        <d-number-field id="ZipCode"></d-number-field>
+                                    </d-panel>
+                                </d-form>
+                            </d-vm-context>
+                        </d-tab-item>
+                    </d-tab>
+                    <footer>
+                        <d-panel horizontal="true" right="true">
+                            <d-button label="Cancel" cancel="true" secondary="true" onclick="closeDialog()"></d-button>
+                            <d-button label="Submit" id="Submit" submit onclick="closeDialog()"></d-button>
+                        </d-panel>
+                    </footer>
+                </d-modal>
+            </d-vm-context>
+        </d-form>
+    </d-panel>
+        }
+</d-vm-context>
+
+@functions {
+    object state;
+
+    protected override async Task OnAfterRenderAsync()
+    {
+    await VMContext.HandleStateChangedAsync((sender, e) => { state = e; StateHasChanged(); });
+    }
+
+    public void Dispose()
+    {
+    VMContext.Dispose();
+    }
+}

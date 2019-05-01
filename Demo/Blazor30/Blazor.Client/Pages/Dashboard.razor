@@ -1,5 +1,4 @@
 ﻿@page "/dashboard"
-@using Blazor.Shared
 @using DotNetify.Blazor;
 @using Newtonsoft.Json;
 @inject IVMContext<object> VMContext;
@@ -39,7 +38,7 @@
                         </d-panel>
                     </d-panel>
                 </d-card>
-                <d-panel>
+                <d-panel horizontal="true" center="true">
                     <d-card width="1000px">
                         <h4>Server Usage</h4>
                         <d-bar-chart id="ServerUsage" height="70px"></d-bar-chart>
@@ -53,6 +52,11 @@
 @functions {
     object state;
     string lineChartConfig = GetStreamingLineChartConfig();
+
+    protected override void OnInit()
+    {
+        VMContext.RedrawOnResize();
+    }
 
     protected override async Task OnAfterRenderAsync()
     {
