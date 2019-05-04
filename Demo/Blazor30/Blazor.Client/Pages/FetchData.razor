@@ -1,14 +1,11 @@
 ﻿@page "/fetchdata"
 @using Blazor.Shared
-@using DotNetify.Blazor;
-@implements IDisposable
-@inject IVMContext<FetchDataState> VMContext;
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-<d-vm-context ref="VMContext.ElementRef" vm="FetchData">
+<VMContext VM="FetchData" TState="FetchDataState" OnStateChanged=@(e => { state = e; StateHasChanged(); })>
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -37,7 +34,7 @@
             </tbody>
         </table>
     }
-</d-vm-context>
+</VMContext>
 
 @functions {
     FetchDataState state;
@@ -45,15 +42,5 @@
     class FetchDataState
     {
         public WeatherForecast[] Forecasts { get; set; }
-    }
-
-    protected override async Task OnAfterRenderAsync()
-    {
-        await VMContext.HandleStateChangedAsync((sender, e) => { state = e; StateHasChanged(); });
-    }
-
-    public void Dispose()
-    {
-        VMContext.Dispose();
     }
 }

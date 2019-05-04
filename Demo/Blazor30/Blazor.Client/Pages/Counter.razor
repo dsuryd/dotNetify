@@ -1,36 +1,24 @@
 ﻿@page "/counter"
-@using DotNetify.Blazor;
-@implements IDisposable
-@inject IVMContext<CounterState> VMContext;
 
 <h1>Counter</h1>
 
-<d-vm-context ref="@VMContext.ElementRef" vm="Counter">
+<VMContext ref="@vm" VM="Counter" TState="CounterState" OnStateChanged=@(e => { state = e; StateHasChanged(); })>
     <p>Current count: @state.CurrentCount</p>
 
     <button class="btn btn-primary" onclick="@IncrementCount">Click me</button>
-</d-vm-context>
+</VMContext>
 
 @functions {
     CounterState state = new CounterState();
+    VMContext<CounterState> vm;
 
     class CounterState
     {
         public int CurrentCount { get; set; }
     }
 
-    protected override async Task OnAfterRenderAsync()
-    {
-        await VMContext.HandleStateChangedAsync((sender, e) => { state = e; StateHasChanged(); });
-    }
-
-    public void Dispose()
-    {
-        VMContext.Dispose();
-    }
-
     void IncrementCount()
     {
-        VMContext.DispatchAsync(nameof(IncrementCount));
+        vm.DispatchAsync(nameof(IncrementCount));
     }
 }

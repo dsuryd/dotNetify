@@ -1,9 +1,7 @@
 ﻿@page "/dashboard"
-@using DotNetify.Blazor;
 @using Newtonsoft.Json;
-@inject IVMContext<object> VMContext;
 
-<d-vm-context ref="VMContext.ElementRef" vm="Dashboard">
+<VMContext VM="Dashboard" TState="object" OnStateChanged=@(e => { state = e; StateHasChanged(); })>
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -47,26 +45,11 @@
             </d-panel>
         </d-panel>
     }
-</d-vm-context>
+</VMContext>
 
 @functions {
     object state;
     string lineChartConfig = GetStreamingLineChartConfig();
-
-    protected override void OnInit()
-    {
-        VMContext.RedrawOnResize();
-    }
-
-    protected override async Task OnAfterRenderAsync()
-    {
-        await VMContext.HandleStateChangedAsync((sender, e) => { state = e; StateHasChanged(); });
-    }
-
-    public void Dispose()
-    {
-        VMContext.Dispose();
-    }
 
     static string GetStreamingLineChartConfig()
     {
