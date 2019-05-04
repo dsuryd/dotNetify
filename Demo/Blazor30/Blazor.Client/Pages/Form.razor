@@ -1,6 +1,6 @@
 ﻿@page "/form"
 
-<VMContext ref="@vm" VM="CustomerForm" OnStateChanged=@(e => { state = e; StateHasChanged(); })>
+<VMContext VM="CustomerForm" TState="object" OnStateChanged=@(e => { state = e; StateHasChanged(); })>
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -8,17 +8,20 @@
     else
     {
         <d-panel>
+            <button onclick="@OnEdit">Say hello</button>
+        </d-panel>
+        <d-panel>
             <d-data-grid id="Contacts" enable="true"></d-data-grid>
             <d-form id="_form" plaintext="true">
                 <d-panel>
                     <d-panel horizontal="true">
                         <d-panel horizontal="true">
-                            <button id="_edit" label="Edit" enable="true">Edit</button>
-                            <d-button id="Submit" label="Update" submit="true" show="false"></d-button>
+
+                            <d-button id="Submit" label="Update" enable="true" submit="true" show="true"></d-button>
                             <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="false"></d-button>
                         </d-panel>
                         <d-panel right="true">
-                            <d-button id="_new" label="New Customer" enable="true" onclick="openDialog()"></d-button>
+                            <d-button id="_new" label="New Customer" enable="true" onclick="@OnEdit"></d-button>
                         </d-panel>
                     </d-panel>
                     <d-tab margin="1.5rem 0">
