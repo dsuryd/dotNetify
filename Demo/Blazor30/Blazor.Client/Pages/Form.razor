@@ -1,6 +1,6 @@
 ﻿@page "/form"
 
-<VMContext VM="CustomerForm" TState="object" OnStateChanged=@(e => { state = e; StateHasChanged(); })>
+<VMContext ref="@vm" VM="CustomerForm" OnStateChanged=@((object e) => { state = e; StateHasChanged(); })>
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -8,20 +8,17 @@
     else
     {
         <d-panel>
-            <button onclick="@OnEdit">Say hello</button>
-        </d-panel>
-        <d-panel>
             <d-data-grid id="Contacts" enable="true"></d-data-grid>
             <d-form id="_form" plaintext="true">
                 <d-panel>
                     <d-panel horizontal="true">
                         <d-panel horizontal="true">
-
+                            <d-button id="_edit" label="Edit" enable="true"></d-button>
                             <d-button id="Submit" label="Update" enable="true" submit="true" show="true"></d-button>
                             <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="false"></d-button>
                         </d-panel>
                         <d-panel right="true">
-                            <d-button id="_new" label="New Customer" enable="true" onclick="@OnEdit"></d-button>
+                            <d-button id="_new" label="New Customer" enable="true"></d-button>
                         </d-panel>
                     </d-panel>
                     <d-tab margin="1.5rem 0">
@@ -133,6 +130,18 @@
 
 @functions {
     object state;
+    VMContext<object> vm;
+    bool listen = false;
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        if (!listen && state != null)
+        {
+            listen = true;
+            await System.Threading.Tasks.Task.Delay(1000);
+            vm.On("onClick", "_edit", () => Console.WriteLine("Edit clicked"));
+        }
+    }
 
     void OnEdit()
     {

@@ -5,7 +5,7 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-<VMContext VM="FetchData" TState="FetchDataState" OnStateChanged=@(e => { state = e; StateHasChanged(); })>
+<VMContext VM="FetchData" OnStateChanged=@((FetchDataState e) => { state = e; StateHasChanged(); })>
     @if (state == null)
     {
         <p><em>Loading...</em></p>
