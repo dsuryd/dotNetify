@@ -1,19 +1,19 @@
 ﻿@page "/form"
 
 <VMContext ref="@vm" VM="CustomerForm" OnStateChanged=@((object e) => { state = e; StateHasChanged(); })>
-    @if (state == null)
+    @if (false)//state == null)
     {
         <p><em>Loading...</em></p>
     }
     else
     {
         <d-panel>
-            <d-data-grid id="Contacts" enable="true"></d-data-grid>
+            <d-data-grid id="Contacts"></d-data-grid>
             <d-form id="_form" plaintext="true">
                 <d-panel>
                     <d-panel horizontal="true">
                         <d-panel horizontal="true">
-                            <d-button id="_edit" label="Edit" enable="true"></d-button>
+                            <d-button id="_edit" label="Edit" enable="true" onclick="@OnClicked"></d-button>
                             <d-button id="Submit" label="Update" enable="true" submit="true" show="true"></d-button>
                             <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="false"></d-button>
                         </d-panel>
@@ -131,20 +131,9 @@
 @functions {
     object state;
     VMContext<object> vm;
-    bool listen = false;
 
-    protected override async Task OnAfterRenderAsync()
+    void OnClicked()
     {
-        if (!listen && state != null)
-        {
-            listen = true;
-            await System.Threading.Tasks.Task.Delay(1000);
-            vm.On("onClick", "_edit", () => Console.WriteLine("Edit clicked"));
-        }
-    }
-
-    void OnEdit()
-    {
-        System.Console.WriteLine("EDIT");
+        System.Console.WriteLine("CLICKED");
     }
 }
