@@ -42,12 +42,16 @@ export default class dotnetifyVMRouter {
     this.vm.State({ RoutingState });
   }
 
-  // Handles click event from anchor tags.
-  handleRoute(iEvent) {
-    iEvent.preventDefault();
-    var path = iEvent.currentTarget.pathname;
-    if (path == null || path == '') throw new Error('The event passed to $handleRoute has no path name.');
+  // Handles click event from anchor tags.  Argument can be event object or path string.
+  handleRoute(iArg) {
+    let path = null;
+    if (typeof iArg === 'object') {
+      iArg.preventDefault();
+      path = iArg.currentTarget.pathname;
+    }
+    else if (typeof iArg === 'string') path = iArg;
 
+    if (path == null || path == '') throw new Error('$handleRoute requires path argument or event with pathname.');
     setTimeout(() => this.router.pushState({}, '', path));
   }
 
