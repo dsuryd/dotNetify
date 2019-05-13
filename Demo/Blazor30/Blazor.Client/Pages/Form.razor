@@ -1,7 +1,7 @@
 ﻿@page "/form"
 
 <VMContext ref="@vm" VM="CustomerForm" OnStateChanged=@((object e) => { state = e; StateHasChanged(); })>
-    @if (false)//state == null)
+    @if (state == null)
     {
         <p><em>Loading...</em></p>
     }
@@ -9,16 +9,16 @@
     {
         <d-panel>
             <d-data-grid id="Contacts"></d-data-grid>
-            <d-form id="_form" plaintext="true">
+            <d-form id="_form" plaintext="@NotEdit">
                 <d-panel>
                     <d-panel horizontal="true">
                         <d-panel horizontal="true">
-                            <d-button id="_edit" label="Edit" enable="true" onclick="@OnClicked"></d-button>
-                            <d-button id="Submit" label="Update" enable="true" submit="true" show="true"></d-button>
-                            <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="false"></d-button>
+                            <d-button id="_edit" ref="@editBtn" label="Edit" enable="@NotEdit"></d-button>
+                            <d-button id="Submit" ref="@updateBtn" label="Update" submit="true" show="@Edit"></d-button>
+                            <d-button id="_cancel" ref="@cancelBtn" label="Cancel" cancel="true" secondary="true" show="@Edit"></d-button>
                         </d-panel>
                         <d-panel right="true">
-                            <d-button id="_new" label="New Customer" enable="true"></d-button>
+                            <d-button id="_new" ref="@newBtn" label="New Customer" enable="@NotEdit"></d-button>
                         </d-panel>
                     </d-panel>
                     <d-tab margin="1.5rem 0">
@@ -74,7 +74,7 @@
                     </d-tab>
                 </d-panel>
                 <d-vm-context vm="NewCustomerForm">
-                    <d-modal id="_dialog" header="New Customer" open="false" large="true">
+                    <d-modal id="_dialog" header="New Customer" open="@OpenDialog" large="true">
                         <d-tab>
                             <d-tab-item key="Person" label="Person">
                                 <d-vm-context vm="PersonForm">
@@ -131,9 +131,34 @@
 @functions {
     object state;
     VMContext<object> vm;
+    ElementRef editBtn;
+    ElementRef updateBtn;
+    ElementRef cancelBtn;
+    ElementRef newBtn;
+    bool editMode = false;
+    bool openDialog = false;
 
-    void OnClicked()
+    string Edit => editMode.ToString().ToLower();
+    string NotEdit => (!editMode).ToString().ToLower();
+    string OpenDialog => openDialog.ToString().ToLower();
+
+    protected override void OnAfterRender()
     {
-        System.Console.WriteLine("CLICKED");
+        vm.HandleEvent(editBtn, "onClick", ToggleEdit);
+        vm.HandleEvent(updateBtn, "onClick", ToggleEdit);
+        vm.HandleEvent(cancelBtn, "onClick", ToggleEdit);
+        vm.HandleEvent(newBtn, "onClick", ToggleDialog);
+    }
+
+    void ToggleEdit()
+    {
+        editMode = !editMode;
+        StateHasChanged();
+    }
+
+    void ToggleDialog()
+    {
+        openDialog = !openDialog;
+        StateHasChanged();
     }
 }
