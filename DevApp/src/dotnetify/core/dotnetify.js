@@ -156,4 +156,17 @@ const dotnetify = {
   _hub: null
 };
 
+// Support changing hub server URL after first init.
+Object.defineProperty(dotnetify, 'hubServerUrl', {
+  get: () => dotnetify.hub.url,
+  set: url => {
+    dotnetify.hub.url = url;
+    if (dotnetify.debug) console.log('SignalR: connecting to ' + dotnetify.hubServerUrl);
+    if (dotnetify._hub) {
+      dotnetify._hub = null;
+      dotnetify.startHub();
+    }
+  }
+});
+
 export default dotnetify;

@@ -27,11 +27,11 @@ dotnetify.react.router.$inject = function(iVM) {
   // Put functions inside $router namespace.
   iVM.$router = router;
 
+  // Handles click event from anchor tags.  Argument can be event object or path string.
+  iVM.$handleRoute = iArg => router.handleRoute(iArg);
+
   // Returns the URL for an anchor tag.
   iVM.$route = (iRoute, iTarget) => router.route(iRoute, iTarget);
-
-  // Handles click event from anchor tags.
-  iVM.$handleRoute = iEvent => router.handleRoute(iEvent);
 
   // Executes the given route.
   iVM.$routeTo = iRoute => router.routeToRoute(iRoute);
