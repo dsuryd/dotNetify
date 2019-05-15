@@ -73,56 +73,7 @@
                         </d-tab-item>
                     </d-tab>
                 </d-panel>
-                <d-vm-context vm="NewCustomerForm">
-                    <d-modal id="_dialog" header="New Customer" open="@OpenDialog" large="true">
-                        <d-tab>
-                            <d-tab-item key="Person" label="Person">
-                                <d-vm-context vm="PersonForm">
-                                    <d-form id="Person">
-                                        <d-panel>
-                                            <d-dropdown-list id="Prefix"></d-dropdown-list>
-                                            <d-text-field id="FirstName"></d-text-field>
-                                            <d-text-field id="MiddleName"></d-text-field>
-                                            <d-text-field id="LastName"></d-text-field>
-                                            <d-dropdown-list id="Suffix"></d-dropdown-list>
-                                        </d-panel>
-                                    </d-form>
-                                </d-vm-context>
-                            </d-tab-item>
-                            <d-tab-item key="Phone" label="Phone">
-                                <d-vm-context vm="PhoneForm">
-                                    <d-form id="Phone">
-                                        <d-panel>
-                                            <d-text-field id="Work"></d-text-field>
-                                            <d-text-field id="Home"></d-text-field>
-                                            <d-text-field id="Mobile"></d-text-field>
-                                            <d-dropdown-list id="Primary"></d-dropdown-list>
-                                        </d-panel>
-                                    </d-form>
-                                </d-vm-context>
-                            </d-tab-item>
-                            <d-tab-item key="Address" label="Address">
-                                <d-vm-context vm="AddressForm">
-                                    <d-form id="Address">
-                                        <d-panel>
-                                            <d-text-field id="Address1"></d-text-field>
-                                            <d-text-field id="Address2"></d-text-field>
-                                            <d-text-field id="City"></d-text-field>
-                                            <d-dropdown-list id="State"></d-dropdown-list>
-                                            <d-number-field id="ZipCode"></d-number-field>
-                                        </d-panel>
-                                    </d-form>
-                                </d-vm-context>
-                            </d-tab-item>
-                        </d-tab>
-                        <footer>
-                            <d-panel horizontal="true" right="true">
-                                <d-button label="Cancel" ref="dlgCancelBtn" cancel="true" secondary="true"></d-button>
-                                <d-button label="Submit" ref="dlgSubmitBtn" id="Submit" submit="true"></d-button>
-                            </d-panel>
-                        </footer>
-                    </d-modal>
-                </d-vm-context>
+                <NewFormDialog Show="@showDialog" OnClosed="@ToggleDialog"></NewFormDialog>
             </d-form>
         </d-panel>
     }
@@ -135,14 +86,11 @@
     ElementRef updateBtn;
     ElementRef cancelBtn;
     ElementRef newBtn;
-    ElementRef dlgCancelBtn;
-    ElementRef dlgSubmitBtn;
     bool editMode = false;
-    bool openDialog = false;
+    bool showDialog = false;
 
     string Edit => editMode.ToString().ToLower();
     string NotEdit => (!editMode).ToString().ToLower();
-    string OpenDialog => openDialog.ToString().ToLower();
 
     protected override void OnAfterRender()
     {
@@ -150,8 +98,6 @@
         vm.HandleEvent(updateBtn, "onClick", ToggleEdit);
         vm.HandleEvent(cancelBtn, "onClick", ToggleEdit);
         vm.HandleEvent(newBtn, "onClick", ToggleDialog);
-        vm.HandleEvent(dlgCancelBtn, "onClick", ToggleDialog);
-        vm.HandleEvent(dlgSubmitBtn, "onClick", ToggleDialog);
     }
 
     void ToggleEdit()
@@ -162,7 +108,7 @@
 
     void ToggleDialog()
     {
-        openDialog = !openDialog;
+        showDialog = !showDialog;
         StateHasChanged();
     }
 }
