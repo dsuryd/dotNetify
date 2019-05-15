@@ -1,0 +1,38 @@
+﻿<VMContext ref="@vm" VM="NewCustomerForm" TState="object" OnElementEvent="@HandleElementEvent">
+    <d-modal id="_dialog" header="New Customer" open="@Open" large="true">
+        <d-tab>
+            <d-tab-item key="Person" label="Person">
+                <PersonForm />
+            </d-tab-item>
+            <d-tab-item key="Phone" label="Phone">
+                <PhoneForm />
+            </d-tab-item>
+            <d-tab-item key="Address" label="Address">
+                <AddressForm />
+            </d-tab-item>
+        </d-tab>
+        <footer>
+            <d-panel horizontal="true" right="true">
+                <d-button id="_cancel" label="Cancel" cancel="true" secondary="true"></d-button>
+                <d-button id="Submit" label="Submit" submit="true"></d-button>
+            </d-panel>
+        </footer>
+    </d-modal>
+</VMContext>
+
+@functions {
+    VMContext<object> vm;
+
+    string Open => Show.ToString().ToLower();
+
+    [Parameter] public Action OnClosed { get; set; }
+    [Parameter] public bool Show { get; set; }
+
+    void HandleElementEvent(ElementEvent e)
+    {
+        if (e.TargetId == "_cancel" || e.TargetId == "Submit")
+        {
+            OnClosed?.Invoke();
+        }
+    }
+}
