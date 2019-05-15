@@ -26,7 +26,7 @@ namespace Blazor.Server
         {
             _customerRepository = customerRepository;
 
-            _selectedContact = AddProperty<int>("SelectedContact");
+            _selectedContact = AddProperty<int>("SelectedContact", 1);
 
             AddProperty("Contacts", customerRepository.GetAll().Select(customer => ToContact(customer)))
                .WithItemKey(nameof(Contact.Id))

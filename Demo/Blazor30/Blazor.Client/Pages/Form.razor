@@ -117,8 +117,8 @@
                         </d-tab>
                         <footer>
                             <d-panel horizontal="true" right="true">
-                                <d-button label="Cancel" cancel="true" secondary="true" onclick="closeDialog()"></d-button>
-                                <d-button label="Submit" id="Submit" submit onclick="closeDialog()"></d-button>
+                                <d-button label="Cancel" ref="dlgCancelBtn" cancel="true" secondary="true"></d-button>
+                                <d-button label="Submit" ref="dlgSubmitBtn" id="Submit" submit="true"></d-button>
                             </d-panel>
                         </footer>
                     </d-modal>
@@ -135,6 +135,8 @@
     ElementRef updateBtn;
     ElementRef cancelBtn;
     ElementRef newBtn;
+    ElementRef dlgCancelBtn;
+    ElementRef dlgSubmitBtn;
     bool editMode = false;
     bool openDialog = false;
 
@@ -148,6 +150,8 @@
         vm.HandleEvent(updateBtn, "onClick", ToggleEdit);
         vm.HandleEvent(cancelBtn, "onClick", ToggleEdit);
         vm.HandleEvent(newBtn, "onClick", ToggleDialog);
+        vm.HandleEvent(dlgCancelBtn, "onClick", ToggleDialog);
+        vm.HandleEvent(dlgSubmitBtn, "onClick", ToggleDialog);
     }
 
     void ToggleEdit()
