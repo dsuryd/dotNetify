@@ -1,6 +1,6 @@
 ﻿@page "/form"
 
-<VMContext ref="@vm" VM="CustomerForm" OnStateChanged=@((object e) => { state = e; StateHasChanged(); }) OnElementEvent="@HandleElementEvent">
+<VMContext ref="@vm" VM="CustomerForm" OnStateChanged="@HandleStateChanged" OnElementEvent="@HandleElementEvent">
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -9,16 +9,16 @@
     {
         <d-panel>
             <d-data-grid id="Contacts"></d-data-grid>
-            <d-form id="_form" plaintext="@((string)!editMode)">
+            <d-form id="_form" plaintext="@((!editMode).AsLiteral())">
                 <d-panel>
                     <d-panel horizontal="true">
                         <d-panel horizontal="true">
-                            <d-button id="_edit" label="Edit" enable="@((string)!editMode)"></d-button>
-                            <d-button id="Submit" label="Update" submit="true" show="@((string)editMode)"></d-button>
-                            <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="@((string)editMode)"></d-button>
+                            <d-button id="_edit" label="Edit" enable="@((!editMode).AsLiteral())"></d-button>
+                            <d-button id="Submit" label="Update" submit="true" show="@editMode.AsLiteral()"></d-button>
+                            <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="@editMode.AsLiteral()"></d-button>
                         </d-panel>
                         <d-panel right="true">
-                            <d-button id="_new" label="New Customer" enable="@((string)!editMode)"></d-button>
+                            <d-button id="_new" label="New Customer" enable="@((!editMode).AsLiteral())"></d-button>
                         </d-panel>
                     </d-panel>
                     <d-tab margin="1.5rem 0">
@@ -51,9 +51,15 @@
 
 @functions {
     private object state;
-    private VMContext<object> vm;
-    private BooleanLiteral editMode = false;
-    private BooleanLiteral showDialog = false;
+    private VMContext vm;
+    private bool editMode = false;
+    private bool showDialog = false;
+
+    private void HandleStateChanged(object newState)
+    {
+        state = newState;
+        StateHasChanged();
+    }
 
     private void HandleElementEvent(ElementEvent elementEvent)
     {
