@@ -9,16 +9,16 @@
     {
         <d-panel>
             <d-data-grid id="Contacts"></d-data-grid>
-            <d-form id="_form" plaintext="@NotEdit">
+            <d-form id="_form" plaintext="@((string)!editMode)">
                 <d-panel>
                     <d-panel horizontal="true">
                         <d-panel horizontal="true">
-                            <d-button id="_edit" label="Edit" enable="@NotEdit"></d-button>
-                            <d-button id="Submit" label="Update" submit="true" show="@Edit"></d-button>
-                            <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="@Edit"></d-button>
+                            <d-button id="_edit" label="Edit" enable="@((string)!editMode)"></d-button>
+                            <d-button id="Submit" label="Update" submit="true" show="@((string)editMode)"></d-button>
+                            <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="@((string)editMode)"></d-button>
                         </d-panel>
                         <d-panel right="true">
-                            <d-button id="_new" label="New Customer" enable="@NotEdit"></d-button>
+                            <d-button id="_new" label="New Customer" enable="@((string)!editMode)"></d-button>
                         </d-panel>
                     </d-panel>
                     <d-tab margin="1.5rem 0">
@@ -50,24 +50,17 @@
 </VMContext>
 
 @functions {
-    object state;
-    VMContext<object> vm;
-    bool editMode = false;
-    bool showDialog = false;
+    private object state;
+    private VMContext<object> vm;
+    private BooleanLiteral editMode = false;
+    private BooleanLiteral showDialog = false;
 
-    string Edit => editMode.ToString().ToLower();
-    string NotEdit => (!editMode).ToString().ToLower();
-
-    void HandleStateChanged(object e)
+    private void HandleElementEvent(ElementEvent elementEvent)
     {
-
-    }
-
-    void HandleElementEvent(ElementEvent elementEvent)
-    {
-        if (elementEvent.TargetId == "_edit" || elementEvent.TargetId == "Submit" || elementEvent.TargetId == "_cancel")
+        if (elementEvent.TargetId == "_edit" || elementEvent.TargetId == "_cancel" || elementEvent.TargetId == "Submit")
         {
-            ToggleEdit();
+            editMode = !editMode;
+            StateHasChanged();
         }
         else if (elementEvent.TargetId == "_new")
         {
@@ -75,13 +68,7 @@
         }
     }
 
-    void ToggleEdit()
-    {
-        editMode = !editMode;
-        StateHasChanged();
-    }
-
-    void ToggleDialog()
+    private void ToggleDialog()
     {
         showDialog = !showDialog;
         StateHasChanged();

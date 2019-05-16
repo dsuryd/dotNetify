@@ -1,5 +1,4 @@
 ﻿@page "/fetchdata"
-@using Blazor.Shared
 
 <h1>Weather forecast</h1>
 
@@ -37,10 +36,5 @@
 </VMContext>
 
 @functions {
-    FetchDataState state;
-
-    class FetchDataState
-    {
-        public WeatherForecast[] Forecasts { get; set; }
-    }
+    private FetchDataState state;
 }

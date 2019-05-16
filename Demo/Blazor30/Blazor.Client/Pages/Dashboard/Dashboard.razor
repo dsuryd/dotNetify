@@ -48,11 +48,12 @@
 </VMContext>
 
 @functions {
-    object state;
-    string lineChartConfig = GetStreamingLineChartConfig();
+    private object state;
+    private string lineChartConfig = GetStreamingLineChartConfig();
 
-    static string GetStreamingLineChartConfig()
+    private static string GetStreamingLineChartConfig()
     {
+        // ChartJS options for real-time streaming (source: https://nagix.github.io/chartjs-plugin-streaming/ ).
         return JsonConvert.SerializeObject(new
         {
             options = new
