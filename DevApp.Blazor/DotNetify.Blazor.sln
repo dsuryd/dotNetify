@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.0.0
 MinimumVisualStudioVersion = 16.0.0.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevApp.Blazor.Server", "DevApp.Blazor\DevApp.Blazor.Server\DevApp.Blazor.Server.csproj", "{2C8AD746-AD49-401E-9764-785E90983357}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevApp.Blazor.Server", "DevApp.Blazor.Server\DevApp.Blazor.Server.csproj", "{2C8AD746-AD49-401E-9764-785E90983357}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevApp.Blazor.Client", "DevApp.Blazor\DevApp.Blazor.Client\DevApp.Blazor.Client.csproj", "{173FB53D-6BEE-4D1F-AF23-6B324EA4609A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevApp.Blazor.Client", "DevApp.Blazor.Client\DevApp.Blazor.Client.csproj", "{173FB53D-6BEE-4D1F-AF23-6B324EA4609A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
