@@ -15,7 +15,7 @@ namespace DevApp.Blazor.Server
       public void ConfigureServices( IServiceCollection services )
       {
          services.AddMemoryCache();
-         services.AddSignalR();
+         services.AddSignalR().AddNewtonsoftJsonProtocol();
          services.AddDotNetify();
 
          services.AddMvc().AddNewtonsoftJson();
