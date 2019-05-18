@@ -1,46 +1,35 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Blazor</a>
+﻿@inject Microsoft.AspNetCore.Components.IUriHelper UriHelper
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">DotNetify-Blazor</a>
     <button class="navbar-toggler" onclick="@ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
 </div>
 
-<div class="@NavMenuCssClass" onclick="@ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="dashboard">
-                <span class="oi oi-graph" aria-hidden="true"></span> Dashboard
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="form">
-                <span class="oi oi-document" aria-hidden="true"></span> Form
-            </NavLink>
-        </li>
-    </ul>
+<div class="@navMenuCssClass" onclick="@ToggleNavMenu">
+    <VMContext VM="MainNav">
+        <d-nav-menu id="NavMenu" selected="@selectedRoute"></d-nav-menu>
+    </VMContext>
 </div>
 
 @functions {
+    string selectedRoute;
     bool collapseNavMenu = true;
+    string navMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    protected override void OnInit()
+    {
+        selectedRoute = GetRelativePath(UriHelper.GetAbsoluteUri());
+        UriHelper.OnLocationChanged += (sender, url) => { selectedRoute = GetRelativePath(url); };
+    }
 
-    void ToggleNavMenu()
+    private string GetRelativePath(string url)
+    {
+        return UriHelper.ToBaseRelativePath(UriHelper.GetBaseUri(), url);
+    }
+
+    private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
