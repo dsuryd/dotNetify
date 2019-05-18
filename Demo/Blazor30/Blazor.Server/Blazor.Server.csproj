@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="26.0.2" />
-    <PackageReference Include="DotNetify.Elements" Version="0.4.0" />
+    <PackageReference Include="DotNetify.Elements" Version="0.5.0-alpha1" />
     <PackageReference Include="DotNetify.SignalR" Version="3.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.0.0-preview4-19216-03" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview4-19216-03" />
