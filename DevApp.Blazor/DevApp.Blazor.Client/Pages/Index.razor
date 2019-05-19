@@ -1,5 +1,10 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<VMContext VM="OverviewBlazor">
+    <d-frame horizontal="true" gap="10%">
+        <d-panel>
+            <d-markdown id="Content">
+            </d-markdown>
+        </d-panel>
+    </d-frame>
+</VMContext>

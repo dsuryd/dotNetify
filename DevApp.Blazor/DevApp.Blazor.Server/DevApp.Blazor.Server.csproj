@@ -12,13 +12,14 @@
   <ItemGroup>
      <PackageReference Include="Bogus" Version="27.0.1" />
      <PackageReference Include="DotNetify.Elements" Version="0.5.0-alpha1" />
-     <PackageReference Include="DotNetify.SignalR" Version="3.3.1" />
      <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.0.0-preview5-19227-01" />
      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview5-19227-01" />
      <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.0.0-preview5-19227-01" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DevApp.ViewModels\DevApp.ViewModels.csproj" />
+    <ProjectReference Include="..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
     <ProjectReference Include="..\DevApp.Blazor.Client\DevApp.Blazor.Client.csproj" />
   </ItemGroup>
 

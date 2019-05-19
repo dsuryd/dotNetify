@@ -12,36 +12,38 @@ namespace DevApp.Blazor.Server
    {
       // This method gets called by the runtime. Use this method to add services to the container.
       // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-      public void ConfigureServices( IServiceCollection services )
+      public void ConfigureServices(IServiceCollection services)
       {
          services.AddMemoryCache();
          services.AddSignalR().AddNewtonsoftJsonProtocol();
          services.AddDotNetify();
 
          services.AddMvc().AddNewtonsoftJson();
-         services.AddResponseCompression( opts =>
-         {
-            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                   new[] { "application/octet-stream" } );
-         } );
+         services.AddResponseCompression(opts =>
+        {
+           opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                  new[] { "application/octet-stream" });
+        });
 
          services.AddTransient<ILiveDataService, MockLiveDataService>();
          services.AddScoped<ICustomerRepository, CustomerRepository>();
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-      public void Configure( IApplicationBuilder app, IWebHostEnvironment env )
+      public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
       {
          app.UseWebSockets();
-         app.UseSignalR( routes => routes.MapDotNetifyHub() );
-         app.UseDotNetify( config =>
-         {
-            config.UseDeveloperLogging();
-         } );
+         app.UseSignalR(routes => routes.MapDotNetifyHub());
+         app.UseDotNetify(config =>
+        {
+           config.RegisterAssembly("DevApp.Blazor.Server");
+           config.RegisterAssembly("DotNetify.DevApp.ViewModels");
+           config.UseDeveloperLogging();
+        });
 
          app.UseResponseCompression();
 
-         if ( env.IsDevelopment() )
+         if(env.IsDevelopment())
          {
             app.UseDeveloperExceptionPage();
             app.UseBlazorDebugging();
@@ -49,10 +51,10 @@ namespace DevApp.Blazor.Server
 
          app.UseRouting();
 
-         app.UseEndpoints( endpoints =>
-         {
-            endpoints.MapDefaultControllerRoute();
-         } );
+         app.UseEndpoints(endpoints =>
+        {
+           endpoints.MapDefaultControllerRoute();
+        });
 
          app.UseBlazor<Client.Startup>();
       }
