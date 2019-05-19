@@ -18,6 +18,7 @@ app {
 
 .main {
     flex: 1;
+    min-width: 0;
 }
 
     .main .top-row {
@@ -26,7 +27,7 @@ app {
     }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-color: #f4f4f4;
 }
 
     .sidebar .top-row {
@@ -82,6 +83,18 @@ app {
 
 .navbar-toggler {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
 }
 
 @media (max-width: 767.98px) {

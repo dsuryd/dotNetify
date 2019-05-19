@@ -1,16 +1,30 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width" />
     <title>Blazor</title>
     <base href="/" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
+    <link href="https://unpkg.com/dotnetify-elements@0/dotnetify-elements.css" rel="stylesheet" />
 </head>
 <body>
     <app>Loading...</app>
 
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2/custom-elements-es5-adapter.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/styled-components@4.1/dist/styled-components.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
+    <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="/_content/DotNetifyLib.Blazor/dotnetify-elements.bundle.js"></script>
+    <script src="/_content/DotNetifyLib.Blazor/dotnetify-blazor.js"></script>
+    <script>
+        dotnetify.debug = true;
+    </script>
 </body>
 </html>

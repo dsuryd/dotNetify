@@ -1,19 +1,19 @@
-using DotNetify.Client.Blazor;
-using Microsoft.AspNetCore.Blazor.Builder;
+using DotNetify.Blazor;
+using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Blazor.Client
 {
-   public class Startup
-   {
-      public void ConfigureServices(IServiceCollection services)
-      {
-         services.AddDotNetifyClient("http://localhost:61624");
-      }
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.UseDotNetifyBlazor();
+        }
 
-      public void Configure(IBlazorApplicationBuilder app)
-      {
-         app.AddComponent<App>("app");
-      }
-   }
+        public void Configure(IComponentsApplicationBuilder app)
+        {
+            app.AddComponent<App>("app");
+        }
+    }
 }

@@ -1,10 +1,11 @@
 using DotNetify;
+using Microsoft.AspNetCore.Blazor.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Net.Mime;
 
 namespace Blazor.Server
 {
@@ -18,19 +19,20 @@ namespace Blazor.Server
          services.AddSignalR();
          services.AddDotNetify();
 
-         services.AddMvc().AddNewtonsoftJson();
-         services.AddResponseCompression(opts =>
-         {
-            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                   new[] { "application/octet-stream" });
-         });
+         services.AddMvc();
 
-         services.AddTransient<ILiveDataService, MockLiveDataService>();
-         services.AddScoped<ICustomerRepository, CustomerRepository>();
+         services.AddResponseCompression(options =>
+         {
+            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+               {
+                    MediaTypeNames.Application.Octet,
+                    WasmMediaTypeNames.Application.Wasm,
+             });
+         });
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-      public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+      public void Configure(IApplicationBuilder app, IHostingEnvironment env)
       {
          app.UseWebSockets();
          app.UseSignalR(routes => routes.MapDotNetifyHub());
@@ -44,15 +46,7 @@ namespace Blazor.Server
          if (env.IsDevelopment())
          {
             app.UseDeveloperExceptionPage();
-            app.UseBlazorDebugging();
          }
-
-         app.UseRouting();
-
-         app.UseEndpoints(endpoints =>
-         {
-            endpoints.MapDefaultControllerRoute();
-         });
 
          app.UseBlazor<Client.Startup>();
       }
