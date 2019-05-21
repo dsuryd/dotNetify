@@ -10,13 +10,15 @@
         </d-panel>
     </d-nav>
     <d-header>
-        <d-nav-drawer-button></d-nav-drawer-button>
-        <div>
+        <d-nav-drawer-button css="margin-left: 1rem"></d-nav-drawer-button>
+        <d-panel css="margin-left: 1rem">
             <a href="/"><img width="200px" src="@dotNetifyIcon"></a>
-        </div>
+        </d-panel>
     </d-header>
     <d-section>
-        @Body
+        <d-frame>
+            @Body
+        </d-frame>
     </d-section>
 </d-main>
 

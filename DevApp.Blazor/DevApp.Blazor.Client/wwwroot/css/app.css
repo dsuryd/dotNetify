@@ -10,7 +10,6 @@ d-header {
 
     d-header > * {
         height: unset !important;
-        padding-left: 1rem;
     }
 
 strong {
