@@ -24,6 +24,11 @@ namespace DotNetify.DevApp
       public string Content => new Markdown("DotNetify.DevApp.Docs.Blazor.Overview.md");
    }
 
+   public class HelloWorld : BaseVM
+   {
+      public string Greetings => "Hello World!";
+   }
+
    public class RealTimePush : BaseVM
    {
       private Timer _timer;
