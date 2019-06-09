@@ -1,24 +1,8 @@
 ﻿@page "/"
 
-<VMContext VM="HelloWorld" OnStateChanged="@HandleStateChanged">
-    <div>@state?.Greetings</div>
-</VMContext>
 <ArticleLayout VM="OverviewBlazor" id="Content">
+
     <d-markdown id="Content">
+        <HelloWorld />
     </d-markdown>
 </ArticleLayout>
-
-@functions {
-    public class HelloWorldState
-    {
-        public string Greetings { get; set; }
-    }
-    HelloWorldState state;
-
-    void HandleStateChanged(object newState)
-    {
-        System.Console.WriteLine(newState);
-        state = newState.As<HelloWorldState>();
-        StateHasChanged();
-    }
-}

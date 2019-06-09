@@ -4,13 +4,14 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-<VMContext VM="FetchData" OnStateChanged="@HandleStateChanged">
-    @if (state == null)
-    {
+<d-card>
+    <VMContext VM="FetchData" OnStateChanged="@HandleStateChanged">
+        @if(state == null)
+        {
         <p><em>Loading...</em></p>
-    }
-    else
-    {
+        }
+        else
+        {
         <table class="table">
             <thead>
                 <tr>
@@ -21,26 +22,29 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var forecast in state.Forecasts)
+                @foreach(var forecast in state.Forecasts)
                 {
-                    <tr>
-                        <td>@forecast.Date.ToShortDateString()</td>
-                        <td>@forecast.TemperatureC</td>
-                        <td>@forecast.TemperatureF</td>
-                        <td>@forecast.Summary</td>
-                    </tr>
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
                 }
             </tbody>
         </table>
-    }
-</VMContext>
+        }
+    </VMContext>
+</d-card>
 
 @functions {
     private FetchDataState state;
 
     private void HandleStateChanged(object newState)
     {
-        state = newState.As<FetchDataState>();
-        StateHasChanged();
+        System.Console.WriteLine(newState);
+        state = newState.As<FetchDataState>
+    ();
+    StateHasChanged();
     }
-}
+    }

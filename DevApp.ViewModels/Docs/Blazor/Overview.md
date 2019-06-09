@@ -31,7 +31,6 @@ public class HelloWorld : BaseVM
 ```
 
 [inset]
-
 Write a C# class that inherits from __BaseVM__ in your ASP.NET project, and add public properties for all the data your component will need. When the connection is established, the class instance will be serialized to JSON and sent as the initial state for the component.
 
 #### Real-Time Push

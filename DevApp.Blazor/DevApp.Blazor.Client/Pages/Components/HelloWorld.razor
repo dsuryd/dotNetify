@@ -1,0 +1,18 @@
+﻿<VMContext VM="HelloWorld" OnStateChanged="@HandleStateChanged">
+    <div>@state?.Greetings</div>
+</VMContext>
+
+@functions {
+    HelloWorldState state;
+
+    class HelloWorldState
+    {
+        public string Greetings { get; set; }
+    }
+
+    void HandleStateChanged(object newState)
+    {
+        state = newState.As<HelloWorldState>();
+        StateHasChanged();
+    }
+}
