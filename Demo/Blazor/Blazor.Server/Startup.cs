@@ -1,10 +1,10 @@
+using System.Linq;
 using DotNetify;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
 
 namespace Blazor.Server
 {
@@ -15,7 +15,7 @@ namespace Blazor.Server
       public void ConfigureServices(IServiceCollection services)
       {
          services.AddMemoryCache();
-         services.AddSignalR();
+         services.AddSignalR().AddNewtonsoftJsonProtocol();
          services.AddDotNetify();
 
          services.AddMvc().AddNewtonsoftJson();
@@ -41,7 +41,7 @@ namespace Blazor.Server
 
          app.UseResponseCompression();
 
-         if (env.IsDevelopment())
+         if(env.IsDevelopment())
          {
             app.UseDeveloperExceptionPage();
             app.UseBlazorDebugging();

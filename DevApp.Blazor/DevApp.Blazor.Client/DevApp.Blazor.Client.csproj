@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetify.Blazor" Version="1.0.6-alpha2" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview5-19227-01" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.0.0-preview5-19227-01" PrivateAssets="all" />
-    <PackageReference Include="DotNetify.Blazor" Version="1.0.3-alpha2" />
   </ItemGroup>
 
 </Project>

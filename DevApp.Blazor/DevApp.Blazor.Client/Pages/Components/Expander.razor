@@ -1,0 +1,19 @@
+﻿<d-panel css="@expanderCss">
+    <d-collapsible collapsed="true" label="@Label">
+        @ChildContent
+    </d-collapsible>
+</d-panel>
+
+@functions {
+    [Parameter] RenderFragment ChildContent { get; set; }
+    [Parameter] string Label { get; set; }
+
+    string expanderCss = @"
+margin: 1rem 0;
+padding: .5rem;
+border-radius: 5px;
+border: 1px solid #ccc;
+background: #ddd;
+[class^='Label__LabelContainer'] { font-weight: bold; }
+";
+}

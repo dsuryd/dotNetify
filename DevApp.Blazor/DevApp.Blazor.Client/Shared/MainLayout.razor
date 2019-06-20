@@ -29,7 +29,7 @@
     protected override void OnInit()
     {
         selectedRoute = GetRelativePath(UriHelper.GetAbsoluteUri());
-        UriHelper.OnLocationChanged += (sender, url) => { selectedRoute = GetRelativePath(url); };
+        UriHelper.OnLocationChanged += (sender, url) => { selectedRoute = GetRelativePath(url); StateHasChanged(); };
     }
 
     private string GetRelativePath(string url)

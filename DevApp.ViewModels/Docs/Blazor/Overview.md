@@ -38,21 +38,13 @@ Write a C# class that inherits from __BaseVM__ in your ASP.NET project, and add 
 With very little effort, you can make your app gets real-time data update from the back-end:
 
 ```jsx
-class MyApp extends React.Component {
-   constructor(props) {
-      super(props);
-      dotnetify.react.connect("HelloWorld", this);
-      this.state = { Greetings: "", ServerTime: "" };
-   }
-   render() {
-      return (
-         <div>
-            <p>{this.state.Greetings}</p>
-            <p>Server time is: {this.state.ServerTime}</p>
-         </div>
-      );
-   }
-}
+<VMContext VM="HelloWorld" OnStateChanged="@HandleStateChanged">
+    <div>@state?.Greetings</div>
+    <div>
+      <p>@state?.Greetings</p>
+      <p>Server time is: @state?ServerTime</p>
+    </div>    
+</VMContext>
 ```
 ```csharp
 public class HelloWorld : BaseVM

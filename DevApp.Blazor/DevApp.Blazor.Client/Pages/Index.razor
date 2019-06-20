@@ -1,8 +1,12 @@
 ﻿@page "/"
 
 <ArticleLayout VM="OverviewBlazor" id="Content">
-
     <d-markdown id="Content">
-        <HelloWorld />
+        <Expander Label="See It Live!">
+            <HelloWorld />
+        </Expander>
+        <Expander Label="See It Live!">
+            <RealtimePush />
+        </Expander>
     </d-markdown>
 </ArticleLayout>
