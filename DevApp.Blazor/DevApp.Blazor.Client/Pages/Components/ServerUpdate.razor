@@ -1,0 +1,36 @@
+﻿<VMContext ref="@vm" VM="ServerUpdate" OnStateChanged="@HandleStateChanged">
+    <div>
+        <p>@state?.Greetings</p>
+        <input type="text" bind="@person.FirstName" />
+        <input type="text" bind="@person.LastName" />
+        <button onclick="@HandleSubmit">Submit</button>
+    </div>
+</VMContext>
+
+@functions {
+    VMContext vm;
+    ServerUpdateState state;
+    Person person = new Person();
+
+    class ServerUpdateState
+    {
+        public string Greetings { get; set; }
+    }
+
+    class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    void HandleSubmit()
+    {
+        vm.DispatchAsync("Submit", person);
+    }
+
+    void HandleStateChanged(object newState)
+    {
+        state = newState.As<ServerUpdateState>();
+        StateHasChanged();
+    }
+}

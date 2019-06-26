@@ -1,24 +1,28 @@
-﻿<VMContext VM="@VM">
-
-    <d-panel horizontal="true" css="@layoutCss" gap="10%">
-        <d-panel css="@articleCss">
-            @ChildContent
+﻿<VMContext VM="@VM" OnStateChanged=@((object e) => { state = e; StateHasChanged(); })>
+    @if(state != null)
+    {
+        <d-panel horizontal="true" css="@layoutCss" gap="10%">
+            <d-panel css="@articleCss">
+                @ChildContent
+            </d-panel>
+            <d-panel css="width: 16%">
+                @if(!string.IsNullOrEmpty(Id))
+                {
+                    <d-panel css="@sidebarCss">
+                        <d-markdown-toc id="@Id"></d-markdown-toc>
+                    </d-panel>
+                }
+            </d-panel>
         </d-panel>
-        <d-panel css="width: 16%">
-            @if(!string.IsNullOrEmpty(Id))
-            {
-                <d-panel css="@sidebarCss">
-                    <d-markdown-toc id="@Id"></d-markdown-toc>
-                </d-panel>
-            }
-        </d-panel>
-    </d-panel>
+    }
 </VMContext>
 
 @functions {
     [Parameter] string VM { get; set; }
     [Parameter] string Id { get; set; } = "Content";
     [Parameter] RenderFragment ChildContent { get; set; }
+
+    private object state;
 
     string layoutCss = @"
 margin-left: 10%;
