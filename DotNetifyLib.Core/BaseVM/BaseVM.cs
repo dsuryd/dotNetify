@@ -183,7 +183,7 @@ namespace DotNetify
 
          property.Subscribe(_ => Changed(property.Name));
          RuntimeProperties.Add(property);
-         Set(property, property.Name);
+         Set(property.Value, property.Name);
          return property;
       }
 
