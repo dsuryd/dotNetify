@@ -41,6 +41,11 @@ namespace DotNetify
       /// Provides custom global json serializer settings.
       /// </summary>
       void UseJsonSerializerSettings(JsonSerializerSettings settings);
+      
+      /// <summary>
+      /// Provides custom global json serializer settings.
+      /// </summary>
+      void UseJsonSerializerSettings(Action<JsonSerializerSettings> setupAction);
 
       /// <summary>
       /// Register view model classes in an assembly that are subtypes of BaseVM.
