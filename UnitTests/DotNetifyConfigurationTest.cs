@@ -28,6 +28,22 @@ namespace UnitTests
          Assert.IsInstanceOfType(VMSerializer.SerializerSettings.ContractResolver, typeof(MyContractResolver));
 
          VMSerializer.SerializerSettings = currentSettings;
-      }
-   }
+        }
+
+        [TestMethod]
+        public void UseJsonSerializerSettings_OverridesCurrentSettings_WithAccessToDefaultSettings()
+        {
+            var config = new DotNetifyConfiguration();
+
+            config.UseJsonSerializerSettings(settings =>
+            {
+                Assert.AreSame(settings.ContractResolver, VMSerializer.SerializerSettings.ContractResolver);
+                Assert.IsInstanceOfType(settings.ContractResolver, typeof(VMContractResolver));
+
+                settings.ContractResolver = new MyContractResolver();
+            });
+
+            Assert.IsInstanceOfType(VMSerializer.SerializerSettings.ContractResolver, typeof(MyContractResolver));
+        }
+    }
 }

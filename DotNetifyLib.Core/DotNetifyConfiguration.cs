@@ -43,6 +43,11 @@ namespace DotNetify
       public void UseJsonSerializerSettings(JsonSerializerSettings settings) => VMSerializer.SerializerSettings = settings;
 
       /// <summary>
+      /// Provides a second customized global json serializer settings to allow parent project to access original SerializerSettings
+      /// </summary>
+      public void UseJsonSerializerSettings(Action<JsonSerializerSettings> setupAction) => setupAction(VMSerializer.SerializerSettings);
+
+      /// <summary>
       /// Register view model classes in an assembly that are subtypes of BaseVM.
       /// </summary>
       public void RegisterAssembly(Assembly assembly) => VMController.RegisterAssembly(assembly);
