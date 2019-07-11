@@ -848,7 +848,7 @@ var dotnetifyVM = function () {
   }, {
     key: '$setItemKey',
     value: function $setItemKey(iItemKey) {
-      this.$itemKey = iItemKey;
+      Object.assign(this.$itemKey, iItemKey);
     }
 
     //// Adds a new item to a state array.
@@ -2030,6 +2030,21 @@ var dotnetify = {
   // Internal variables. Do not modify!
   _hub: null
 };
+
+// Support changing hub server URL after first init.
+Object.defineProperty(dotnetify, 'hubServerUrl', {
+  get: function get() {
+    return dotnetify.hub.url;
+  },
+  set: function set(url) {
+    dotnetify.hub.url = url;
+    if (dotnetify.debug) console.log('SignalR: connecting to ' + dotnetify.hubServerUrl);
+    if (dotnetify._hub) {
+      dotnetify._hub = null;
+      dotnetify.startHub();
+    }
+  }
+});
 
 exports.default = dotnetify;
 

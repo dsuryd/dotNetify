@@ -853,7 +853,7 @@ var dotnetifyVM = function () {
   }, {
     key: '$setItemKey',
     value: function $setItemKey(iItemKey) {
-      this.$itemKey = iItemKey;
+      Object.assign(this.$itemKey, iItemKey);
     }
 
     //// Adds a new item to a state array.
@@ -2036,6 +2036,21 @@ var dotnetify = {
   _hub: null
 };
 
+// Support changing hub server URL after first init.
+Object.defineProperty(dotnetify, 'hubServerUrl', {
+  get: function get() {
+    return dotnetify.hub.url;
+  },
+  set: function set(url) {
+    dotnetify.hub.url = url;
+    if (dotnetify.debug) console.log('SignalR: connecting to ' + dotnetify.hubServerUrl);
+    if (dotnetify._hub) {
+      dotnetify._hub = null;
+      dotnetify.startHub();
+    }
+  }
+});
+
 exports.default = dotnetify;
 
 /***/ }),
@@ -2550,6 +2565,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Copyright 2017-2018 Dicky Suryadi
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -2618,17 +2635,20 @@ var dotnetifyVMRouter = function () {
       this.vm.State({ RoutingState: RoutingState });
     }
 
-    // Handles click event from anchor tags.
+    // Handles click event from anchor tags.  Argument can be event object or path string.
 
   }, {
     key: 'handleRoute',
-    value: function handleRoute(iEvent) {
+    value: function handleRoute(iArg) {
       var _this = this;
 
-      iEvent.preventDefault();
-      var path = iEvent.currentTarget.pathname;
-      if (path == null || path == '') throw new Error('The event passed to $handleRoute has no path name.');
+      var path = null;
+      if ((typeof iArg === 'undefined' ? 'undefined' : _typeof(iArg)) === 'object') {
+        iArg.preventDefault();
+        path = iArg.currentTarget.pathname;
+      } else if (typeof iArg === 'string') path = iArg;
 
+      if (path == null || path == '') throw new Error('$handleRoute requires path argument or event with pathname.');
       setTimeout(function () {
         return _this.router.pushState({}, '', path);
       });
@@ -3604,14 +3624,14 @@ _dotnetifyReact2.default.react.router.$inject = function (iVM) {
   // Put functions inside $router namespace.
   iVM.$router = router;
 
+  // Handles click event from anchor tags.  Argument can be event object or path string.
+  iVM.$handleRoute = function (iArg) {
+    return router.handleRoute(iArg);
+  };
+
   // Returns the URL for an anchor tag.
   iVM.$route = function (iRoute, iTarget) {
     return router.route(iRoute, iTarget);
-  };
-
-  // Handles click event from anchor tags.
-  iVM.$handleRoute = function (iEvent) {
-    return router.handleRoute(iEvent);
   };
 
   // Executes the given route.
