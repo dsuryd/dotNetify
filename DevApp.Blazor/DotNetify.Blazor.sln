@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Core", "..\Dot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.SignalR", "..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj", "{629D9EDD-C9B8-4B89-9C06-47CE7176C5F6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Blazor", "..\DotNetifyLib.Blazor\DotNetifyLib.Blazor.csproj", "{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,18 @@ Global
 		{629D9EDD-C9B8-4B89-9C06-47CE7176C5F6}.Release|x64.Build.0 = Release|Any CPU
 		{629D9EDD-C9B8-4B89-9C06-47CE7176C5F6}.Release|x86.ActiveCfg = Release|Any CPU
 		{629D9EDD-C9B8-4B89-9C06-47CE7176C5F6}.Release|x86.Build.0 = Release|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Debug|x64.Build.0 = Debug|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Debug|x86.Build.0 = Debug|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Release|x64.ActiveCfg = Release|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Release|x64.Build.0 = Release|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Release|x86.ActiveCfg = Release|Any CPU
+		{70AFF5B8-D8DA-43B1-9B5F-50101C5D4B5B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

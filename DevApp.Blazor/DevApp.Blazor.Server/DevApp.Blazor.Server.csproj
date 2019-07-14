@@ -10,11 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-     <PackageReference Include="Bogus" Version="27.0.1" />
-     <PackageReference Include="DotNetify.Elements" Version="0.5.0-alpha1" />
-     <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.0.0-preview5-19227-01" />
-     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview5-19227-01" />
-     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.0.0-preview5-19227-01" />
+     <PackageReference Include="Bogus" Version="22.1.3" />
+     <PackageReference Include="DotNetify.Elements" Version="1.0.0" />
+     <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.0.0-preview6.19307.2" />
+     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview6.19307.2" />
+     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.0.0-preview6.19307.2" />
   </ItemGroup>
 
   <ItemGroup>

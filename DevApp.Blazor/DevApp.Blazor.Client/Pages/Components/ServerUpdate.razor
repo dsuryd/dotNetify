@@ -1,13 +1,13 @@
-﻿<VMContext ref="@vm" VM="ServerUpdate" OnStateChanged="@HandleStateChanged">
+﻿<VMContext @ref="@vm" VM="ServerUpdate" OnStateChanged="@HandleStateChanged">
     <div>
         <p>@state?.Greetings</p>
-        <input type="text" bind="@person.FirstName" />
-        <input type="text" bind="@person.LastName" />
-        <button onclick="@HandleSubmit">Submit</button>
+        <input type="text" @bind="person.FirstName" />
+        <input type="text" @bind="person.LastName" />
+        <button @onclick="@HandleSubmit">Submit</button>
     </div>
 </VMContext>
 
-@functions {
+@code {
     VMContext vm;
     ServerUpdateState state;
     Person person = new Person();

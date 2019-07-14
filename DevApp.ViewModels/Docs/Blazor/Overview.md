@@ -15,7 +15,7 @@ In the most basic form, you can just use dotNetify to quickly fetch from the ser
     <div>@state?.Greetings</div>
 </VMContext>
 
-@functions {
+@code {
     HelloWorldState state;
 
     class HelloWorldState
@@ -51,7 +51,7 @@ With very little effort, you can make your app gets real-time data update from t
     </div>    
 </VMContext>
 
-@functions {
+@code {
     HelloWorldState state;
 
     class HelloWorldState
@@ -93,7 +93,7 @@ We added two new back-end APIs, __Changed__ that accepts the name of the propert
 At some point in your app, you probably want to send data back to the server to be persisted. Let's add to this example something to submit:
 
 ```jsx
-<VMContext ref="@vm" VM="ServerUpdate" OnStateChanged="@HandleStateChanged">
+<VMContext @ref="@vm" VM="ServerUpdate" OnStateChanged="@HandleStateChanged">
     <div>
         <p>@state?.Greetings</p>
         <input type="text" bind="@person.FirstName" />
@@ -102,7 +102,7 @@ At some point in your app, you probably want to send data back to the server to 
     </div>
 </VMContext>
 
-@functions {
+@code {
     VMContext vm;
     ServerUpdateState state;
     Person person = new Person();

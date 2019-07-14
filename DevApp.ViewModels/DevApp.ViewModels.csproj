@@ -63,7 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetify.Elements" Version="0.1.0" />
+    <PackageReference Include="DotNetify.Elements" Version="1.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Bogus" Version="22.1.3" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.2.4" />
