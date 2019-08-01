@@ -32,7 +32,7 @@ dotnetify.vue = {
   _connectionFailedSubs: null,
 
   // Initializes connection to SignalR server hub.
-  init: function() {
+  init: function(iVMId) {
     const self = dotnetify.vue;
 
     if (!self._responseSubs) {
@@ -54,7 +54,7 @@ dotnetify.vue = {
       self._reconnectedSubs = dotnetify.reconnectedEvent.subscribe(start);
     }
 
-    dotnetify.initHub();
+    dotnetify.initHub(iVMId);
     start();
   },
 
@@ -113,7 +113,7 @@ dotnetify.vue = {
       if (Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, vm, iVue);
     }
 
-    self.init();
+    self.init(iVMId);
     return self.viewModels[iVMId];
   },
 

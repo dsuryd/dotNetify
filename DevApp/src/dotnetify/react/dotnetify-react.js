@@ -32,7 +32,7 @@ dotnetify.react = {
   _connectionFailedSubs: null,
 
   // Initializes connection to SignalR server hub.
-  init: function() {
+  init: function(iVMId) {
     const self = dotnetify.react;
 
     if (!self._responseSubs) {
@@ -54,7 +54,7 @@ dotnetify.react = {
       self._reconnectedSubs = dotnetify.reconnectedEvent.subscribe(start);
     }
 
-    dotnetify.initHub();
+    dotnetify.initHub(iVMId);
     start();
   },
 
@@ -90,7 +90,7 @@ dotnetify.react = {
     };
     self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, dotnetify.react);
 
-    self.init();
+    self.init(iVMId);
     return self.viewModels[iVMId];
   },
 
