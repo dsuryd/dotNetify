@@ -14,7 +14,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 * v3.2: integrates with Vue.
 <br/><br/>
 * **DotNetify-Elements** is out! <a href="http://dotnetify.net/elements">See documentation and live demo.</a> 
-* React SPA template for ASP.NET Core 2.1 - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
+* React SPA template for ASP.NET Core 2.x - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
 
 ## Features
 
