@@ -203,7 +203,7 @@ export default class dotnetifyVMRouter {
         }
       }
       urlRedirect += redirectRoot + '/' + path;
-      this.routes.push({ Path: path, Url: urlRedirect });
+      if (!this.routes.some(x => x.Path === path)) this.routes.push({ Path: path, Url: urlRedirect });
       return urlRedirect;
     }
 
@@ -218,7 +218,7 @@ export default class dotnetifyVMRouter {
     // the anchor click event and instead do push to HTML5 history state.
     let url = this.toUrl(path);
     url = url.length > 0 ? url : '/';
-    this.routes.push({ Path: path, Url: url });
+    if (!this.routes.some(x => x.Path === path)) this.routes.push({ Path: path, Url: url });
     return url;
   }
 
