@@ -20,7 +20,7 @@ if (typeof window == 'undefined') window = global;
 let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.vue = {
-  version: '1.0.0',
+  version: '2.0.0',
   viewModels: {},
   plugins: {},
   controller: dotnetify,
@@ -32,30 +32,31 @@ dotnetify.vue = {
   _connectionFailedSubs: null,
 
   // Initializes connection to SignalR server hub.
-  init: function(iVMId) {
+  init: function(iVMId, iVMArg) {
     const self = dotnetify.vue;
+    const hub = dotnetify.getHub(iVMId, iVMArg);
 
     if (!self._responseSubs) {
-      self._responseSubs = dotnetify.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
+      self._responseSubs = hub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
     }
 
     if (!self._connectedSubs) {
-      self._connectedSubs = dotnetify.connectedEvent.subscribe(() =>
+      self._connectedSubs = hub.connectedEvent.subscribe(() =>
         Object.keys(self.viewModels).forEach(vmId => !self.viewModels[vmId].$requested && self.viewModels[vmId].$request())
       );
     }
 
     const start = function() {
-      if (!dotnetify.isHubStarted) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
-      dotnetify.startHub();
+      if (!hub.isHubStarted()) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
+      dotnetify.startHub(hub);
+      return hub;
     };
 
     if (!self._reconnectedSubs) {
-      self._reconnectedSubs = dotnetify.reconnectedEvent.subscribe(start);
+      self._reconnectedSubs = hub.reconnectedEvent.subscribe(start);
     }
 
-    dotnetify.initHub(iVMId);
-    start();
+    return start();
   },
 
   // Connects to a server view model.
@@ -98,7 +99,10 @@ dotnetify.vue = {
       }
     };
 
-    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self);
+    const vmArg = iOptions && iOptions['vmArg'];
+    const hub = self.init(iVMId, vmArg);
+    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
+
     if (iOptions) {
       const vm = self.viewModels[iVMId];
 
@@ -113,7 +117,6 @@ dotnetify.vue = {
       if (Array.isArray(iOptions.watch)) self._addWatchers(iOptions.watch, vm, iVue);
     }
 
-    self.init(iVMId);
     return self.viewModels[iVMId];
   },
 

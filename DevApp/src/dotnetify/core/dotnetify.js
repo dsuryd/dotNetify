@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import dotnetifyHub, { dotnetifyHubFactory } from './dotnetify-hub';
-import { createEventEmitter } from '../libs/utils';
 
 export class dotnetifyFactory {
   static create() {
@@ -35,111 +34,50 @@ export class dotnetifyFactory {
       offlineCacheFn: null,
 
       // Use this to get notified of connection state changed events.
-      connectionStateHandler: null, // (state, exception) => void
+      connectionStateHandler: null, // (state, exception, hub) => void
 
       // Use this to assign a hub to which a view model will connect.
-      hubHandler: null, // (vmId) => dotnetifyHub
-
-      // Connection events.
-      responseEvent: createEventEmitter(),
-      reconnectedEvent: createEventEmitter(),
-      connectedEvent: createEventEmitter(),
-      connectionFailedEvent: createEventEmitter(),
-
-      // Whether connected to SignalR hub server.
-      isConnected: function() {
-        return dotnetify.hub.isConnected;
-      },
-
-      // Whether SignalR hub is started.
-      isHubStarted: function() {
-        return !!dotnetify.hub.startInfo;
-      },
+      hubHandler: null, // (vmId, vmArg) => hub
 
       // Generic connect function for non-React app.
       connect: function(iVMId, iOptions) {
         return dotnetify.react.connect(iVMId, null, iOptions);
       },
 
-      // Creates a SignalR hub.
+      // Creates a SignalR hub client.
       createHub(hubServerUrl, hubPath, hubLib) {
-        const hub = dotnetifyHubFactory.create();
-        dotnetify._initHub(hub, hubPath, hubServerUrl, hubLib);
-        return hub;
+        return dotnetify.initHub(dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
       },
 
-      initHub(iVMId) {
+      getHub(iVMId, iVMArg) {
         // Allow switching to another hub by providing hubHandler function that returns a signalR hub object.
-        if (typeof dotnetify.hubHandler == 'function') {
-          const hub = dotnetify.hubHandler(iVMId);
-          dotnetify.hub = hub || dotnetify.hub;
-        }
-        dotnetify._initHub(dotnetify.hub);
+        const hub = typeof dotnetify.hubHandler == 'function' && dotnetify.hubHandler(iVMId, iVMArg);
+        return hub || dotnetify.initHub();
       },
 
-      _initHub(hub, hubPath, hubServerUrl, hubLib) {
-        if (hub.startInfo !== null) return;
-
+      initHub(hub, hubPath, hubServerUrl, hubLib) {
+        hub = hub || dotnetify.hub;
         hubPath = hubPath || dotnetify.hubPath;
         hubServerUrl = hubServerUrl || dotnetify.hubServerUrl;
         hubLib = hubLib || dotnetify.hubLib;
 
-        hub.init(hubPath, hubServerUrl, hubLib);
+        if (!hub.isHubStarted()) {
+          hub.init(hubPath, hubServerUrl, hubLib);
 
-        // Setup SignalR server method handler.
-        hub.client.response_VM = function(iVMId, iVMData) {
-          // SignalR .NET Core is sending an array of arguments.
-          if (Array.isArray(iVMId)) {
-            iVMData = iVMId[1];
-            iVMId = iVMId[0];
-          }
-
-          let handled = dotnetify.responseEvent.emit(iVMId, iVMData);
-
-          // If we get to this point, that means the server holds a view model instance
-          // whose view no longer existed.  So, tell the server to dispose the view model.
-          if (!handled) hub.server.dispose_VM(iVMId);
-        };
-
-        // On disconnected, keep attempting to start the connection.
-        hub.disconnected(function() {
-          hub.startInfo = null;
-          hub.reconnect(function() {
-            dotnetify.reconnectedEvent.emit();
+          // Use SignalR event to raise the connection state event.
+          hub.stateChanged(function(state) {
+            dotnetify._triggerConnectionStateEvent(state, null, hub);
           });
-        });
-
-        // Use SignalR event to raise the connection state event.
-        hub.stateChanged(function(state) {
-          dotnetify._triggerConnectionStateEvent(state);
-        });
+        }
+        return hub;
       },
 
-      startHub: function() {
-        const doneHandler = function() {
-          dotnetify.connectedEvent.emit();
-        };
-        const failHandler = function(ex) {
-          dotnetify.connectionFailedEvent.emit();
-          dotnetify._triggerConnectionStateEvent('error', ex);
-          throw ex;
-        };
+      startHub(hub) {
+        hub = hub || dotnetify.hub;
 
-        if (dotnetify.hub.startInfo === null) {
-          try {
-            dotnetify.hub.startInfo = dotnetify.hub.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
-          } catch (err) {
-            dotnetify.hub.startInfo = null;
-          }
-        }
-        else {
-          try {
-            dotnetify.hub.startInfo.done(doneHandler);
-          } catch (err) {
-            dotnetify.hub.startInfo = null;
-            return dotnetify.startHub();
-          }
-        }
+        const doneHandler = () => {};
+        const failHandler = ex => dotnetify._triggerConnectionStateEvent('error', ex, hub);
+        hub.startHub(dotnetify.hubOptions, doneHandler, failHandler);
       },
 
       checkServerSideException: function(iVMId, iVMData, iExceptionHandler) {
@@ -157,22 +95,10 @@ export class dotnetifyFactory {
         }
       },
 
-      requestVM(iVMId, iOptions) {
-        dotnetify.hub.server.request_VM(iVMId, iOptions);
-      },
-
-      updateVM(iVMId, iValue) {
-        dotnetify.hub.server.update_VM(iVMId, iValue);
-      },
-
-      disposeVM(iVMId) {
-        dotnetify.hub.server.dispose_VM(iVMId);
-      },
-
-      _triggerConnectionStateEvent: function(iState, iException) {
+      _triggerConnectionStateEvent: function(iState, iException, iHub) {
         if (dotnetify.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
 
-        if (typeof dotnetify.connectionStateHandler === 'function') dotnetify.connectionStateHandler(iState, iException);
+        if (typeof dotnetify.connectionStateHandler === 'function') dotnetify.connectionStateHandler(iState, iException, iHub);
         else if (iException) console.error(iException);
       }
     };

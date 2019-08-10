@@ -25,7 +25,8 @@ export default class dotnetifyVM {
   //    vmArg: view model arguments.
   //    headers: request headers, for things like authentication token.
   // iDotNetify - framework-specific dotNetify library.
-  constructor(iVMId, iComponent, iOptions, iDotNetify) {
+  // iHub - hub connection.
+  constructor(iVMId, iComponent, iOptions, iDotNetify, iHub) {
     this.$vmId = iVMId;
     this.$component = iComponent;
     this.$vmArg = iOptions && iOptions['vmArg'];
@@ -35,6 +36,7 @@ export default class dotnetifyVM {
     this.$loaded = false;
     this.$itemKey = {};
     this.$dotnetify = iDotNetify;
+    this.$hub = iHub;
 
     let getState = iOptions && iOptions['getState'];
     let setState = iOptions && iOptions['setState'];
@@ -56,12 +58,11 @@ export default class dotnetifyVM {
     // Call any plugin's $destroy function if provided.
     this.$getPlugins().map(plugin => (typeof plugin['$destroy'] == 'function' ? plugin.$destroy.apply(this) : null));
 
-    const controller = this.$dotnetify.controller;
-    if (controller.isConnected()) {
+    if (this.$hub.isConnected) {
       try {
-        controller.disposeVM(this.$vmId);
+        this.$hub.disposeVM(this.$vmId);
       } catch (ex) {
-        controller._triggerConnectionStateEvent('error', ex);
+        this.$dotnetify.controller._triggerConnectionStateEvent('error', ex, this.$hub);
       }
     }
 
@@ -72,9 +73,9 @@ export default class dotnetifyVM {
   // iValue - Vvalue to dispatch.
   $dispatch(iValue) {
     const controller = this.$dotnetify.controller;
-    if (controller.isConnected()) {
+    if (this.$hub.isConnected) {
       try {
-        controller.updateVM(this.$vmId, iValue);
+        this.$hub.updateVM(this.$vmId, iValue);
 
         if (controller.debug) {
           console.log('[' + this.$vmId + '] sent> ');
@@ -83,7 +84,7 @@ export default class dotnetifyVM {
           controller.debugFn && controller.debugFn(this.$vmId, 'sent', iValue);
         }
       } catch (ex) {
-        controller._triggerConnectionStateEvent('error', ex);
+        controller._triggerConnectionStateEvent('error', ex, this.$hub);
       }
     }
   }
@@ -180,9 +181,8 @@ export default class dotnetifyVM {
 
   // Requests state from the server view model.
   $request() {
-    const controller = this.$dotnetify.controller;
-    if (controller.isConnected()) {
-      controller.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
+    if (this.$hub.isConnected) {
+      this.$hub.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
       this.$requested = true;
     }
   }

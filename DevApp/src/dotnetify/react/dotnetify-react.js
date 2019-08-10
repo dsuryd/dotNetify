@@ -20,7 +20,7 @@ if (typeof window == 'undefined') window = global;
 let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.react = {
-  version: '2.0.0',
+  version: '3.0.0',
   viewModels: {},
   plugins: {},
   controller: dotnetify,
@@ -32,42 +32,44 @@ dotnetify.react = {
   _connectionFailedSubs: null,
 
   // Initializes connection to SignalR server hub.
-  init: function(iVMId) {
+  init: function(iVMId, iVMArg) {
     const self = dotnetify.react;
+    const hub = dotnetify.getHub(iVMId, iVMArg);
 
     if (!self._responseSubs) {
-      self._responseSubs = dotnetify.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
+      self._responseSubs = hub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
     }
 
     if (!self._connectedSubs) {
-      self._connectedSubs = dotnetify.connectedEvent.subscribe(() =>
+      self._connectedSubs = hub.connectedEvent.subscribe(() =>
         Object.keys(self.viewModels).forEach(vmId => !self.viewModels[vmId].$requested && self.viewModels[vmId].$request())
       );
     }
 
     const start = function() {
-      if (!dotnetify.isHubStarted) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
-      dotnetify.startHub();
+      if (!hub.isHubStarted()) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
+      dotnetify.startHub(hub);
+      return hub;
     };
 
     if (!self._reconnectedSubs) {
-      self._reconnectedSubs = dotnetify.reconnectedEvent.subscribe(start);
+      self._reconnectedSubs = hub.reconnectedEvent.subscribe(start);
     }
 
-    dotnetify.initHub(iVMId);
-    start();
+    return start();
   },
 
   // Connects to a server view model.
   connect: function(iVMId, iReact, iOptions) {
     if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
 
+    const vmArg = iOptions && iOptions['vmArg'];
+
     if (dotnetify.ssr && dotnetify.react.ssrConnect) {
-      var vmArg = iOptions && iOptions['vmArg'];
       return dotnetify.react.ssrConnect(iVMId, iReact, vmArg);
     }
 
-    var self = dotnetify.react;
+    const self = dotnetify.react;
     if (self.viewModels.hasOwnProperty(iVMId)) {
       console.error(
         `Component is attempting to connect to an already active '${iVMId}'. ` +
@@ -88,9 +90,9 @@ dotnetify.react = {
         iReact.setState(state);
       }
     };
-    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, dotnetify.react);
 
-    self.init(iVMId);
+    const hub = self.init(iVMId, vmArg);
+    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
     return self.viewModels[iVMId];
   },
 

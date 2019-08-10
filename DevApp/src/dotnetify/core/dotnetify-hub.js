@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+import { createEventEmitter } from '../libs/utils';
 import jQueryShim from '../libs/jquery-shim';
 const signalRNetCore = require('@aspnet/signalr');
 let $ = jQueryShim;
@@ -22,10 +23,29 @@ if (typeof window == 'undefined') window = global;
 export class dotnetifyHubFactory {
   static create() {
     let dotnetifyHub = $.extend(dotnetifyHub, {
-      version: '1.2.0',
+      version: '2.0.0',
       type: null,
       startInfo: null,
-      _init: false
+      _init: false,
+
+      isHubStarted: function() {
+        return !!dotnetifyHub.startInfo;
+      },
+      requestVM: function(iVMId, iOptions) {
+        dotnetifyHub.server.request_VM(iVMId, iOptions);
+      },
+      updateVM: function(iVMId, iValue) {
+        dotnetifyHub.server.update_VM(iVMId, iValue);
+      },
+      disposeVM: function(iVMId) {
+        dotnetifyHub.server.dispose_VM(iVMId);
+      },
+
+      // Connection events.
+      responseEvent: createEventEmitter(),
+      reconnectedEvent: createEventEmitter(),
+      connectedEvent: createEventEmitter(),
+      connectionFailedEvent: createEventEmitter()
     });
 
     dotnetifyHub.init = function(iHubPath, iServerUrl, signalR) {
@@ -356,6 +376,57 @@ export class dotnetifyHubFactory {
             }
           }
         });
+      }
+
+      // Setup SignalR server method handler.
+      dotnetifyHub.client.response_VM = function(iVMId, iVMData) {
+        // SignalR .NET Core is sending an array of arguments.
+        if (Array.isArray(iVMId)) {
+          iVMData = iVMId[1];
+          iVMId = iVMId[0];
+        }
+
+        let handled = dotnetifyHub.responseEvent.emit(iVMId, iVMData);
+
+        // If we get to this point, that means the server holds a view model instance
+        // whose view no longer existed.  So, tell the server to dispose the view model.
+        if (!handled) dotnetifyHub.server.dispose_VM(iVMId);
+      };
+
+      // On disconnected, keep attempting to start the connection.
+      dotnetifyHub.disconnected(function() {
+        dotnetifyHub.startInfo = null;
+        dotnetifyHub.reconnect(function() {
+          dotnetifyHub.reconnectedEvent.emit();
+        });
+      });
+    };
+
+    dotnetifyHub.startHub = function(hubOptions, doneHandler, failHandler) {
+      const _doneHandler = function() {
+        doneHandler();
+        dotnetifyHub.connectedEvent.emit();
+      };
+      const _failHandler = function(ex) {
+        failHandler();
+        dotnetifyHub.connectionFailedEvent.emit();
+        throw ex;
+      };
+
+      if (dotnetifyHub.startInfo === null) {
+        try {
+          dotnetifyHub.startInfo = dotnetifyHub.start(hubOptions).done(_doneHandler).fail(_failHandler);
+        } catch (err) {
+          dotnetifyHub.startInfo = null;
+        }
+      }
+      else {
+        try {
+          dotnetifyHub.startInfo.done(_doneHandler);
+        } catch (err) {
+          dotnetifyHub.startInfo = null;
+          return dotnetifyHub.startHub();
+        }
       }
     };
 

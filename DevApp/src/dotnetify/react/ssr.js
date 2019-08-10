@@ -35,7 +35,7 @@ dotnetify.react.ssrConnect = function(iVMId, iReact, iVMArg) {
     setState: setState,
     vmArg: iVMArg
   };
-  var vm = (self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, options, dotnetify.react));
+  var vm = (self.viewModels[iVMId] = new dotnetifyVM(iVMId, iReact, options, self));
 
   // Need to be asynch to allow initial state to be processed.
   setTimeout(function() {
