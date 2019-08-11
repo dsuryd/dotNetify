@@ -45,5 +45,10 @@ Vue.directive('vmRoute', {
       e.preventDefault();
       vue.vm.$handleRoute(e);
     });
+  },
+  componentUpdated: function(el, binding, vnode) {
+    const vue = vnode.context;
+    const route = binding.value;
+    if (route && vue.vm) el.href = vue.vm.$route(route);
   }
 });
