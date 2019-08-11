@@ -1,5 +1,5 @@
 /* 
-Copyright 2017-2018 Dicky Suryadi
+Copyright 2017-2019 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,54 +33,83 @@ export class dotnetifyFactory {
       offlineTimeout: 5000,
       offlineCacheFn: null,
 
+      // Internal variables.
+      _vmAccessors: [],
+
       // Use this to get notified of connection state changed events.
-      connectionStateHandler: null, // (state, exception, hub) => void
+      // (state, exception, hub) => void
+      connectionStateHandler: null,
 
       // Use this to assign a hub to which a view model will connect.
-      hubHandler: null, // (vmId, vmArg) => hub
+      // (vmId, vmArg) => hub
+      hubHandler: null,
+
+      // Support changing hub server URL after first init.
+      get hubServerUrl() {
+        return this.hub.url;
+      },
+
+      set hubServerUrl(url) {
+        this.hub.url = url;
+        if (this.debug) console.log('SignalR: connecting to ' + this.hubServerUrl);
+        if (this.hub.isHubStarted) this.startHub(this.hub, true);
+      },
+
+      // Get all view models.
+      get viewModels() {
+        return this._vmAccessors
+          .reduce((prev, current) => [ ...prev, ...current() ], [])
+          .filter((val, idx, self) => self.indexOf(val) !== idx); // returns distinct items.
+      },
 
       // Generic connect function for non-React app.
-      connect: function(iVMId, iOptions) {
-        return dotnetify.react.connect(iVMId, null, iOptions);
+      connect(iVMId, iOptions) {
+        dotnetify.react.connect(iVMId, null, iOptions);
       },
 
       // Creates a SignalR hub client.
       createHub(hubServerUrl, hubPath, hubLib) {
-        return dotnetify.initHub(dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
+        return this.initHub(dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
       },
 
-      getHub(iVMId, iVMArg) {
-        // Allow switching to another hub by providing hubHandler function that returns a signalR hub object.
-        const hub = typeof dotnetify.hubHandler == 'function' && dotnetify.hubHandler(iVMId, iVMArg);
-        return hub || dotnetify.initHub();
-      },
-
+      // Configures hub connection to SignalR hub server.
       initHub(hub, hubPath, hubServerUrl, hubLib) {
-        hub = hub || dotnetify.hub;
-        hubPath = hubPath || dotnetify.hubPath;
-        hubServerUrl = hubServerUrl || dotnetify.hubServerUrl;
-        hubLib = hubLib || dotnetify.hubLib;
+        hub = hub || this.hub;
+        hubPath = hubPath || this.hubPath;
+        hubServerUrl = hubServerUrl || this.hubServerUrl;
+        hubLib = hubLib || this.hubLib;
 
-        if (!hub.isHubStarted()) {
+        if (!hub.isHubStarted) {
           hub.init(hubPath, hubServerUrl, hubLib);
 
           // Use SignalR event to raise the connection state event.
-          hub.stateChanged(function(state) {
-            dotnetify._triggerConnectionStateEvent(state, null, hub);
-          });
+          hub.stateChanged(state => this.handleConnectionStateChanged(state, null, hub));
         }
         return hub;
       },
 
-      startHub(hub) {
-        hub = hub || dotnetify.hub;
-
-        const doneHandler = () => {};
-        const failHandler = ex => dotnetify._triggerConnectionStateEvent('error', ex, hub);
-        hub.startHub(dotnetify.hubOptions, doneHandler, failHandler);
+      // Used by a view to select a hub.
+      selectHub(iVMId, iVMArg) {
+        // Allow switching to another hub by providing hubHandler function that returns a signalR hub object.
+        const hub = typeof this.hubHandler == 'function' && this.hubHandler(iVMId, iVMArg);
+        return hub || this.initHub();
       },
 
-      checkServerSideException: function(iVMId, iVMData, iExceptionHandler) {
+      // Starts hub connection to SignalR hub server.
+      startHub(hub, forceRestart) {
+        hub = hub || this.hub;
+
+        const doneHandler = () => {};
+        const failHandler = ex => this.handleConnectionStateChanged('error', ex, hub);
+        hub.startHub(this.hubOptions, doneHandler, failHandler, forceRestart);
+      },
+
+      // Used by dotnetify-react and -vue to expose their view model accessors.
+      addVMAccessor(vmAccessor) {
+        !this._vmAccessors.includes(vmAccessor) && this._vmAccessors.push(vmAccessor);
+      },
+
+      checkServerSideException(iVMId, iVMData, iExceptionHandler) {
         const vmData = JSON.parse(iVMData);
         if (vmData && vmData.hasOwnProperty('ExceptionType') && vmData.hasOwnProperty('Message')) {
           const exception = { name: vmData.ExceptionType, message: vmData.Message };
@@ -95,26 +124,12 @@ export class dotnetifyFactory {
         }
       },
 
-      _triggerConnectionStateEvent: function(iState, iException, iHub) {
-        if (dotnetify.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
-
-        if (typeof dotnetify.connectionStateHandler === 'function') dotnetify.connectionStateHandler(iState, iException, iHub);
+      handleConnectionStateChanged(iState, iException, iHub) {
+        if (this.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
+        if (typeof this.connectionStateHandler === 'function') this.connectionStateHandler(iState, iException, iHub);
         else if (iException) console.error(iException);
       }
     };
-
-    // Support changing hub server URL after first init.
-    Object.defineProperty(dotnetify, 'hubServerUrl', {
-      get: () => dotnetify.hub.url,
-      set: url => {
-        dotnetify.hub.url = url;
-        if (dotnetify.debug) console.log('SignalR: connecting to ' + dotnetify.hubServerUrl);
-        if (dotnetify.hub.startInfo) {
-          dotnetify.hub.startInfo = null;
-          dotnetify.startHub();
-        }
-      }
-    });
 
     return dotnetify;
   }

@@ -62,7 +62,7 @@ export default class dotnetifyVM {
       try {
         this.$hub.disposeVM(this.$vmId);
       } catch (ex) {
-        this.$dotnetify.controller._triggerConnectionStateEvent('error', ex, this.$hub);
+        this.$dotnetify.controller.handleConnectionStateChanged('error', ex, this.$hub);
       }
     }
 
@@ -84,7 +84,7 @@ export default class dotnetifyVM {
           controller.debugFn && controller.debugFn(this.$vmId, 'sent', iValue);
         }
       } catch (ex) {
-        controller._triggerConnectionStateEvent('error', ex, this.$hub);
+        controller.handleConnectionStateChanged('error', ex, this.$hub);
       }
     }
   }

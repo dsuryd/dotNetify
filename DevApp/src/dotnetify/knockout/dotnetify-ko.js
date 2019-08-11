@@ -67,7 +67,7 @@ dotnetify.ko = {
 
   init: function() {
     const self = dotnetify.ko;
-    const hub = dotnetify.getHub();
+    const hub = dotnetify.selectHub();
 
     var applyWidget = function() {
       $.each($('[data-vm]'), function() {

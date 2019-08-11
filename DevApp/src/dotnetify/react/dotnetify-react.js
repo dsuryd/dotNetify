@@ -34,7 +34,7 @@ dotnetify.react = {
   // Initializes connection to SignalR server hub.
   init: function(iVMId, iVMArg) {
     const self = dotnetify.react;
-    const hub = dotnetify.getHub(iVMId, iVMArg);
+    const hub = dotnetify.selectHub(iVMId, iVMArg);
 
     if (!self._responseSubs) {
       self._responseSubs = hub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
@@ -47,7 +47,7 @@ dotnetify.react = {
     }
 
     const start = function() {
-      if (!hub.isHubStarted()) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
+      if (!hub.isHubStarted) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
       dotnetify.startHub(hub);
       return hub;
     };
@@ -114,5 +114,7 @@ dotnetify.react = {
     return false;
   }
 };
+
+dotnetify.addVMAccessor(dotnetify.react.getViewModels);
 
 export default dotnetify;

@@ -22,32 +22,58 @@ if (typeof window == 'undefined') window = global;
 
 export class dotnetifyHubFactory {
   static create() {
-    let dotnetifyHub = $.extend(dotnetifyHub, {
+    let dotnetifyHub = {
       version: '2.0.0',
       type: null,
       startInfo: null,
       _init: false,
 
-      isHubStarted: function() {
-        return !!dotnetifyHub.startInfo;
-      },
-      requestVM: function(iVMId, iOptions) {
-        dotnetifyHub.server.request_VM(iVMId, iOptions);
-      },
-      updateVM: function(iVMId, iValue) {
-        dotnetifyHub.server.update_VM(iVMId, iValue);
-      },
-      disposeVM: function(iVMId) {
-        dotnetifyHub.server.dispose_VM(iVMId);
-      },
+      // Hub server methods.
+      requestVM: (iVMId, iOptions) => dotnetifyHub.server.request_VM(iVMId, iOptions),
+      updateVM: (iVMId, iValue) => dotnetifyHub.server.update_VM(iVMId, iValue),
+      disposeVM: iVMId => dotnetifyHub.server.dispose_VM(iVMId),
 
       // Connection events.
       responseEvent: createEventEmitter(),
       reconnectedEvent: createEventEmitter(),
       connectedEvent: createEventEmitter(),
-      connectionFailedEvent: createEventEmitter()
-    });
+      connectionFailedEvent: createEventEmitter(),
 
+      get isHubStarted() {
+        return !!this.startInfo;
+      },
+
+      // Starts connection with SignalR hub server.
+      startHub(hubOptions, doneHandler, failHandler, forceRestart) {
+        const _doneHandler = () => {
+          if (typeof doneHandler == 'function') doneHandler();
+          this.connectedEvent.emit();
+        };
+        const _failHandler = ex => {
+          if (typeof failHander == 'function') failHandler();
+          this.connectionFailedEvent.emit();
+          throw ex;
+        };
+
+        if (this.startInfo === null || forceRestart) {
+          try {
+            this.startInfo = this.start(hubOptions).done(_doneHandler).fail(_failHandler);
+          } catch (err) {
+            this.startInfo = null;
+          }
+        }
+        else {
+          try {
+            this.startInfo.done(_doneHandler);
+          } catch (err) {
+            this.startInfo = null;
+            return this.startHub(hubOptions, doneHandler, failHandler, forceRestart);
+          }
+        }
+      }
+    };
+
+    // Configures connection to SignalR hub server.
     dotnetifyHub.init = function(iHubPath, iServerUrl, signalR) {
       if (dotnetifyHub._init) return;
 
@@ -400,34 +426,6 @@ export class dotnetifyHubFactory {
           dotnetifyHub.reconnectedEvent.emit();
         });
       });
-    };
-
-    dotnetifyHub.startHub = function(hubOptions, doneHandler, failHandler) {
-      const _doneHandler = function() {
-        doneHandler();
-        dotnetifyHub.connectedEvent.emit();
-      };
-      const _failHandler = function(ex) {
-        failHandler();
-        dotnetifyHub.connectionFailedEvent.emit();
-        throw ex;
-      };
-
-      if (dotnetifyHub.startInfo === null) {
-        try {
-          dotnetifyHub.startInfo = dotnetifyHub.start(hubOptions).done(_doneHandler).fail(_failHandler);
-        } catch (err) {
-          dotnetifyHub.startInfo = null;
-        }
-      }
-      else {
-        try {
-          dotnetifyHub.startInfo.done(_doneHandler);
-        } catch (err) {
-          dotnetifyHub.startInfo = null;
-          return dotnetifyHub.startHub();
-        }
-      }
     };
 
     return dotnetifyHub;

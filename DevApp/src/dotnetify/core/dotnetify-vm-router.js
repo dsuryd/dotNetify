@@ -260,7 +260,7 @@ export default class dotnetifyVMRouter {
       }
       else {
         if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-        return this.router.redirect(this.toUrl(iPath), [ ...viewModels, ...vm.$dotnetify.controller.viewModels ]);
+        return this.router.redirect(this.toUrl(iPath), [ ...viewModels, ...vm.$dotnetify.controller.getViewModels() ]);
       }
     }
 
