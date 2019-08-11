@@ -189,20 +189,22 @@ export default class dotnetifyVMRouter {
     // would attempt to resolve the path first before resorting to hard browser redirect.
     if (iRoute.RedirectRoot != null) {
       // Combine the redirect root with the view model's root.
-      var redirectRoot = iRoute.RedirectRoot;
+      let redirectRoot = iRoute.RedirectRoot;
       if (redirectRoot.charAt(0) == '/') redirectRoot = redirectRoot.substr(0, redirectRoot.length - 1);
-      var redirectRootPath = iRoute.RedirectRoot.split('/');
+      let redirectRootPath = iRoute.RedirectRoot.split('/');
 
-      var urlRedirect = '';
-      var absRoot = this.VMRoot;
+      let urlRedirect = '';
+      let absRoot = this.VMRoot;
       if (absRoot != null) {
-        var absRootPath = absRoot.split('/');
-        for (var i = 0; i < absRootPath.length; i++) {
+        let absRootPath = absRoot.split('/');
+        for (let i = 0; i < absRootPath.length; i++) {
           if (absRootPath[i] != '' && absRootPath[i] == redirectRootPath[0]) break;
           urlRedirect += absRootPath[i] + '/';
         }
       }
+
       urlRedirect += redirectRoot + '/' + path;
+      urlRedirect = urlRedirect.replace(/\/\/+/g, '/');
       if (!this.routes.some(x => x.Path === path)) this.routes.push({ Path: path, Url: urlRedirect });
       return urlRedirect;
     }
@@ -258,7 +260,7 @@ export default class dotnetifyVMRouter {
       }
       else {
         if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-        return this.router.redirect(this.toUrl(iPath), viewModels);
+        return this.router.redirect(this.toUrl(iPath), [ ...viewModels, ...vm.$dotnetify.controller.viewModels ]);
       }
     }
 
@@ -283,20 +285,21 @@ export default class dotnetifyVMRouter {
 
   // Routes the URL if the view model implements IRoutable.
   // Returns true if the view model handles the routing.
-  routeUrl(isRedirect) {
+  routeUrl(redirectUrlPath) {
     if (!this.hasRoutingState) return false;
 
-    var root = this.RoutingState.Root;
+    const isRedirect = !!redirectUrlPath;
+    let root = this.RoutingState.Root;
     if (root == null) return false;
 
     // Get the URL path to route.
-    var urlPath = this.router.urlPath;
+    let urlPath = isRedirect ? redirectUrlPath : this.router.urlPath;
 
     if (this.debug) console.log('router> routing ' + urlPath);
 
     // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
     if (utils.equal(urlPath, root) || utils.equal(urlPath, root + '/') || urlPath === '/') {
-      var match = utils.grep(this.RoutingState.Templates, function(iTemplate) {
+      let match = utils.grep(this.RoutingState.Templates, function(iTemplate) {
         return iTemplate.UrlPattern === '';
       });
       if (match.length > 0) {
@@ -312,18 +315,18 @@ export default class dotnetifyVMRouter {
     // anchor tags in this view that are bound with the vmRoute binding type.  If there is match, route to that path.
     root = root + '/';
     if (utils.startsWith(urlPath, root)) {
-      var routeElem = null;
-      var match = utils.grep(this.routes, function(elem) {
+      let routeElem = null;
+      let match = utils.grep(this.routes, function(elem) {
         return utils.startsWith(urlPath + '/', elem.Url + '/');
       });
       if (match.length > 0) {
         // If more than one match, find the best match.
-        for (var i = 0; i < match.length; i++) if (routeElem == null || routeElem.Url.length < match[i].Url.length) routeElem = match[i];
+        for (let i = 0; i < match.length; i++) if (routeElem == null || routeElem.Url.length < match[i].Url.length) routeElem = match[i];
       }
 
       if (routeElem != null) {
-        var path = routeElem.Path;
-        var template =
+        let path = routeElem.Path;
+        let template =
           this.hasOwnProperty('pathToRoute') && this.pathToRoute.hasOwnProperty(path) ? this.pathToRoute[path].$template : null;
         if (template != null) {
           // If the URL path is completely routed, clear it.
