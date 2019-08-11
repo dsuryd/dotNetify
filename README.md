@@ -9,6 +9,8 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
+>**_Coming soon_: [micro-frontend](https://martinfowler.com/articles/micro-frontends.html) support.**
+
 * v3.4: [**release notes**](https://github.com/dsuryd/dotNetify/releases/tag/v3.4).
 * v3.3: **.NET client support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.3.1).**
 * v3.2: integrates with Vue.
