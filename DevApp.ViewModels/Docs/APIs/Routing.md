@@ -85,7 +85,16 @@ As an alternative to route links, you can also call __vm.$routeTo__ from your sc
 
 #### Redirection
 
-A view can navigate to another view that's not part of its registered route templates by creating a redirect route. This type of route is specified by using __Redirect__ API. The first parameter specifies the root path, which doesn't have to start from the top since the routing logic will attempt to find the best match. The second parameter is optional, and is used only when the path requires parameters, in which case it should be set to the parameter value.
+A view can navigate to another view that's not part of its registered route templates by creating a redirect route. This type of route is specified by using __Redirect__ API:
+```csharp
+public class Page3 : BaseVM, IRoutable
+{
+   public RoutingState RoutingState { get; set; }
+   public Route LinkPage1 => this.Redirect("index", "Page1");
+}
+```
+
+ The first parameter specifies the root path, which doesn't have to start from the top since the routing logic will attempt to find the best match. The second parameter is optional, and is used only when the path requires parameters, in which case it should be set to the parameter value.
 
 #### Back-End Routing Events
 

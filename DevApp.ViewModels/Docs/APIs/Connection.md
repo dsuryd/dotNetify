@@ -22,7 +22,6 @@ dotnetify.hubOptions = { transport: ["webSockets", "serverSentEvent", "longPolli
 If the connection gets disconnected, as part of its resiliency feature, dotNetify will automatically attempt to reconnect indefinitely, with the increasing delay between attempts up to every 10 seconds. This, too, is configurable as below:
 
 ```jsx
-dotnetify.hub.init();
 dotnetify.hub.reconnectRetry = 10;
 dotnetify.hub.reconnectDelay = [5, 30];
 ```

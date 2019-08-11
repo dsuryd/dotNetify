@@ -10,10 +10,12 @@ By default, a view model that inherits from __MulticastVM__ will always produce 
 public class HelloWorld : MulticastVM
 {
   public string Greetings => "Hello World!";
+
+  protected override void Dispose(bool disposing) {}
 }
 ```
 
-When a client disconnects, the _Dispose(bool disposing)_ method will be invoked to give you the chance to process the disconnection.  The instance is only disposed  after the last client disconnects, in which case the _disposing_ argument will be true.
+When a client disconnects, the _Dispose(bool disposing)_ method will be invoked to give you the chance to process the disconnection.  The instance is only disposed  after the last client disconnects, marked by _disposing_ argument value of true.
 
 #### Partitioned Instances
 
