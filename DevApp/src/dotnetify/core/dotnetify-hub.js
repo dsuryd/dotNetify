@@ -25,7 +25,11 @@ export class dotnetifyHubFactory {
     let dotnetifyHub = {
       version: '2.0.0',
       type: null,
-      startInfo: null,
+
+      reconnectDelay: [ 2, 5, 10 ],
+      reconnectRetry: null,
+
+      _startInfo: null,
       _init: false,
 
       // Hub server methods.
@@ -40,7 +44,7 @@ export class dotnetifyHubFactory {
       connectionFailedEvent: createEventEmitter(),
 
       get isHubStarted() {
-        return !!this.startInfo;
+        return !!this._startInfo;
       },
 
       // Starts connection with SignalR hub server.
@@ -55,18 +59,18 @@ export class dotnetifyHubFactory {
           throw ex;
         };
 
-        if (this.startInfo === null || forceRestart) {
+        if (this._startInfo === null || forceRestart) {
           try {
-            this.startInfo = this.start(hubOptions).done(_doneHandler).fail(_failHandler);
+            this._startInfo = this.start(hubOptions).done(_doneHandler).fail(_failHandler);
           } catch (err) {
-            this.startInfo = null;
+            this._startInfo = null;
           }
         }
         else {
           try {
-            this.startInfo.done(_doneHandler);
+            this._startInfo.done(_doneHandler);
           } catch (err) {
-            this.startInfo = null;
+            this._startInfo = null;
             return this.startHub(hubOptions, doneHandler, failHandler, forceRestart);
           }
         }
@@ -93,8 +97,6 @@ export class dotnetifyHubFactory {
         dotnetifyHub = $.extend(dotnetifyHub, {
           hubPath: iHubPath || '/dotnetify',
           url: iServerUrl,
-          reconnectDelay: [ 2, 5, 10 ],
-          reconnectRetry: null,
 
           // Internal variables. Do not modify!
           _connection: null,
@@ -348,8 +350,6 @@ export class dotnetifyHubFactory {
         dotnetifyHub = $.extend(dotnetifyHub, {
           hubPath: iHubPath || '/signalr',
           url: iServerUrl,
-          reconnectDelay: [ 2, 5, 10 ],
-          reconnectRetry: null,
 
           _reconnectCount: 0,
           _stateChangedHandler: function(iNewState) {},
@@ -421,7 +421,7 @@ export class dotnetifyHubFactory {
 
       // On disconnected, keep attempting to start the connection.
       dotnetifyHub.disconnected(function() {
-        dotnetifyHub.startInfo = null;
+        dotnetifyHub._startInfo = null;
         dotnetifyHub.reconnect(function() {
           dotnetifyHub.reconnectedEvent.emit();
         });
