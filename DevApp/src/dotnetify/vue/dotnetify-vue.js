@@ -147,7 +147,7 @@ dotnetify.vue = {
   _addWatchers(iWatchlist, iVM, iVue) {
     const callback = prop =>
       function(newValue) {
-        iVM.$serverUpdate === true && iVM.$dispatch({ [prop]: newValue });
+        iVM.$serverUpdate !== false && iVM.$dispatch({ [prop]: newValue });
       }.bind(iVM);
 
     iWatchlist.forEach(prop => iVue.$watch(iVM.$useState ? `state.${prop}` : prop, callback(prop)));

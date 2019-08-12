@@ -23,6 +23,7 @@ import Middleware from './apis/Middleware';
 import Multicast from './apis/Multicast';
 import Routing from './apis/Routing';
 import Security from './apis/Security';
+import Serverless from './apis/Serverless';
 
 export {
   Overview,
@@ -49,5 +50,6 @@ export {
   Middleware,
   Multicast,
   Routing,
-  Security
+  Security,
+  Serverless
 };

@@ -24,19 +24,27 @@ export default class dotnetifyVM {
   //    setState: state mutator.
   //    vmArg: view model arguments.
   //    headers: request headers, for things like authentication token.
+  //    exceptionHandler: called when receiving server-side exception.
+  //    mode: 'local' (serverless).
+  //    initialState: provides initial state, mainly for local mode.
+  //    onDispatch: intercepts dispatch calls.
   // iDotNetify - framework-specific dotNetify library.
   // iHub - hub connection.
   constructor(iVMId, iComponent, iOptions, iDotNetify, iHub) {
     this.$vmId = iVMId;
     this.$component = iComponent;
+    this.$options = iOptions || {};
     this.$vmArg = iOptions && iOptions['vmArg'];
     this.$headers = iOptions && iOptions['headers'];
     this.$exceptionHandler = iOptions && iOptions['exceptionHandler'];
+    this.$localMode = iOptions && iOptions['mode'] === 'local';
     this.$requested = false;
     this.$loaded = false;
     this.$itemKey = {};
     this.$dotnetify = iDotNetify;
     this.$hub = iHub;
+
+    if (iOptions) iOptions.update = iVMData => this.$update(typeof iVMData === 'object' ? JSON.stringify(iVMData) : iVMData);
 
     let getState = iOptions && iOptions['getState'];
     let setState = iOptions && iOptions['setState'];
@@ -58,7 +66,7 @@ export default class dotnetifyVM {
     // Call any plugin's $destroy function if provided.
     this.$getPlugins().map(plugin => (typeof plugin['$destroy'] == 'function' ? plugin.$destroy.apply(this) : null));
 
-    if (this.$hub.isConnected) {
+    if (!this.$localMode && this.$hub.isConnected) {
       try {
         this.$hub.disposeVM(this.$vmId);
       } catch (ex) {
@@ -72,8 +80,10 @@ export default class dotnetifyVM {
   // Dispatches a value to the server view model.
   // iValue - Vvalue to dispatch.
   $dispatch(iValue) {
-    const controller = this.$dotnetify.controller;
-    if (this.$hub.isConnected) {
+    if (typeof this.$options.onDispatch == 'function') this.$options.onDispatch(iValue);
+
+    if (!this.$localMode && this.$hub.isConnected) {
+      const controller = this.$dotnetify.controller;
       try {
         this.$hub.updateVM(this.$vmId, iValue);
 
@@ -181,10 +191,13 @@ export default class dotnetifyVM {
 
   // Requests state from the server view model.
   $request() {
-    if (this.$hub.isConnected) {
-      this.$hub.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
-      this.$requested = true;
+    if (this.$options.initialState) {
+      const state = this.$options.initialState;
+      this.$update(typeof state === 'object' ? JSON.stringify(state) : state);
     }
+
+    if (!this.$localMode && this.$hub.isConnected) this.$hub.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
+    this.$requested = true;
   }
 
   // Updates state from the server view model to the view.

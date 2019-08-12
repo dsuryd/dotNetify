@@ -37,7 +37,8 @@ namespace DotNetify.DevApp
          Middleware,
          Multicast,
          Routing,
-         Security
+         Security,
+         Serverless
       }
 
       private NavMenuItem[] _navMenuItems;
@@ -70,6 +71,7 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.Multicast))      { UrlPattern = "api/multicast" },
                 new RouteTemplate(nameof(Route.Routing))        { UrlPattern = "api/routing" },
                 new RouteTemplate(nameof(Route.Security))       { UrlPattern = "api/security" },
+                new RouteTemplate(nameof(Route.Serverless))     { UrlPattern = "api/serverless" },
 
                 new RouteTemplate(nameof(Route.FromScratchWebPack))     { UrlPattern = "fromscratch-webpack" },
                 new RouteTemplate(nameof(Route.FromScratchScriptTag))   { UrlPattern = "fromscratch-scripttag" },
@@ -113,7 +115,7 @@ namespace DotNetify.DevApp
                     Label = "API Reference",
                     Routes = new NavRoute[]
                     {
-                        new NavRoute(".NET Client",            this.GetRoute(nameof(Route.DotNetClient))),                        
+                        new NavRoute(".NET Client",            this.GetRoute(nameof(Route.DotNetClient))),
                         new NavRoute("Connection Management",  this.GetRoute(nameof(Route.Connection))),
                         new NavRoute("CRUD",                   this.GetRoute(nameof(Route.CRUD))),
                         new NavRoute("Dependency Injection",   this.GetRoute(nameof(Route.DI))),
@@ -122,6 +124,7 @@ namespace DotNetify.DevApp
                         new NavRoute("Multicast",              this.GetRoute(nameof(Route.Multicast))),
                         new NavRoute("Routing",                this.GetRoute(nameof(Route.Routing))),
                         new NavRoute("Security",               this.GetRoute(nameof(Route.Security))),
+                        new NavRoute("Serverless",             this.GetRoute(nameof(Route.Serverless))),
                     },
                     IsExpanded = false
                 }
@@ -134,9 +137,10 @@ namespace DotNetify.DevApp
       private NavMenu GetNavMenu(string framework)
       {
          var navMenuItems = new List<NavMenuItem>(_navMenuItems);
-         if (framework == "Knockout")
+         if(framework == "Knockout")
          {
-            navMenuItems[5] = new NavGroup
+            navMenuItems.RemoveAt(1);  // Remove "Data Flow Pattern".
+            navMenuItems[4] = new NavGroup
             {
                Label = "Further Examples",
                Routes = new NavRoute[]
@@ -146,7 +150,12 @@ namespace DotNetify.DevApp
                 },
                IsExpanded = false
             };
-            navMenuItems.RemoveAt(1);  // Remove "Data Flow Pattern".
+            navMenuItems[5] = new NavGroup
+            {
+               Label = "API Reference",
+               Routes = (navMenuItems[5] as NavGroup).Routes.Where(x => x.Label != "Serverless").ToArray(),
+               IsExpanded = false
+            };
          }
          return new NavMenu(navMenuItems.ToArray());
       }
