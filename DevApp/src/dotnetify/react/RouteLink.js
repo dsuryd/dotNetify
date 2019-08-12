@@ -19,30 +19,30 @@ import dotnetify from './dotnetify-react';
 
 // <RouteLink> is a helper component to set anchor tags for routes.
 export default class RouteLink extends React.Component {
-	render() {
-		const props = this.props;
-		if (props.vm == null) console.error("RouteLink requires 'vm' property.");
+  render() {
+    const props = this.props;
+    if (props.vm == null) console.error("RouteLink requires 'vm' property.");
 
-		const handleClick = (event) => {
-			event.preventDefault();
-			if (props.route == null) {
-				console.error("RouteLink requires 'route' property.");
-				return;
-			}
-			if (typeof props.onClick === 'function') props.onClick(event);
-			return props.vm.$handleRoute(event);
-		};
+    const handleClick = event => {
+      event.preventDefault();
+      if (props.route == null) {
+        console.error("RouteLink requires 'route' property.");
+        return;
+      }
+      if (typeof props.onClick === 'function' && props.onClick(event) === false) return;
+      return props.vm.$handleRoute(event);
+    };
 
-		return (
-			<a
-				style={props.style}
-				className={props.className}
-				href={props.route != null ? props.vm.$route(props.route) : ''}
-				children={props.children}
-				onClick={handleClick}
-			/>
-		);
-	}
+    return (
+      <a
+        style={props.style}
+        className={props.className}
+        href={props.route != null ? props.vm.$route(props.route) : ''}
+        children={props.children}
+        onClick={handleClick}
+      />
+    );
+  }
 }
 
 dotnetify.react.router.RouteLink = RouteLink;
