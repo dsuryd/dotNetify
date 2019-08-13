@@ -157,17 +157,17 @@ export default class dotnetifyVMRouter {
     // No route to process. Return silently.
     if (iRoute == null) return;
 
-    if (!iRoute.hasOwnProperty('Path') || !iRoute.hasOwnProperty('TemplateId')) throw new Error('Not a valid route');
+    if (!iRoute.hasOwnProperty('Path') && !iRoute.hasOwnProperty('TemplateId')) throw new Error('Not a valid route');
 
     // Build the absolute root path.
     this.initRoot();
 
     // If the route path is not defined, use the URL pattern from the associated template.
     // This is so that we don't send the same data twice if both are equal.
-    var path = iRoute.Path;
-    var template = null;
-    if (this.hasRoutingState && this.RoutingState.Templates != null) {
-      var match = this.RoutingState.Templates.filter(function(iTemplate) {
+    let path = iRoute.Path;
+    let template = null;
+    if (this.hasRoutingState && this.RoutingState.Templates != null && iRoute.TemplateId != null) {
+      let match = this.RoutingState.Templates.filter(function(iTemplate) {
         return iTemplate.Id == iRoute.TemplateId;
       });
       if (match.length > 0) {
@@ -180,7 +180,7 @@ export default class dotnetifyVMRouter {
           iRoute.Path = path;
         }
       }
-      else if (iRoute.RedirectRoot == null) throw new Error("vmRoute cannot find route template '" + iRoute.TemplateId);
+      else if (iRoute.RedirectRoot == null) throw new Error(`vmRoute cannot find route template ${iRoute.TemplateId}`);
     }
 
     // If the path has a redirect root, the path doesn't belong to the current root and needs to be
