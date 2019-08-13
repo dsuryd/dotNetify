@@ -13,39 +13,36 @@ When writing client-side unit tests, there's often a need to mock your component
 Of course this feature can go beyond unit tests, and be used in other scenarios, for example, providing elements from _dotNetify-Elements_ with a local __VMContext__:
 
 ```jsx
-const localNav = {
+window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
+window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
+
+const localVM = {
   mode: 'local',
   initialState: {
-    RoutingState: {},
+    RoutingState: {
+      Templates: [
+        { Id: 'Page1', Root: '', UrlPattern: 'page1', ViewUrl: 'LocalPage1' },
+        { Id: 'Page2', Root: '', UrlPattern: 'page2', ViewUrl: 'LocalPage2' }
+      ],
+      Root: 'core/api/localmode'
+    },
     NavMenu: [
-      {
-        Route: { TemplateId: null, Path: 'core/overview', RedirectRoot: '' },
-        Label: 'Introduction'
-      },
-      {
-        IsExpanded: true,
-        Routes: [
-          {
-            Route: { TemplateId: null, Path: 'core/examples/helloworld', RedirectRoot: '' },
-            Label: 'Hello World',
-            Icon: 'material-icons web'
-          },
-          {
-            Route: { TemplateId: null, Path: 'core/examples/livechart', RedirectRoot: '' },
-            Label: 'Live Chart',
-            Icon: 'material-icons show_chart'
-          }
-        ],
-        Label: 'Examples'
-      }
+      { Route: { TemplateId: 'Page1', Path: 'page1' }, Label: 'Page 1' },
+      { Route: { TemplateId: 'Page2', Path: 'page2' }, Label: 'Page 2' }
     ]
   }
 };
 
-<VMContext vm="localNav" options={localNav}>
-  <NavMenu id="NavMenu" />
+<VMContext vm="localVM" options={localVM}>
+  <Panel horizontal>
+    <Panel flex="30%">
+      <NavMenu id="NavMenu" target="localTarget" />
+    </Panel>
+    <Panel flex="70%" css="padding-top: .5rem">
+      <div id="localTarget" />
+    </Panel>
+  </Panel>
 </VMContext>
 ```
-
 [inset]
 
