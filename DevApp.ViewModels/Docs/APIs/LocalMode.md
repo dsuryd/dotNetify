@@ -1,4 +1,4 @@
-## Serverless
+## Local Mode
 
 When writing client-side unit tests, there's often a need to mock your component's connection so it won't talk to the real server.  DotNetify facilitates this by supporting "local" mode connection option.   You would do this by passing an object as the __connect__ API's _options_ parameter with the following properties:
 - __mode__: "local".

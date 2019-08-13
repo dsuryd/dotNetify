@@ -34,11 +34,11 @@ namespace DotNetify.DevApp
          DI,
          DotNetClient,
          Filter,
+         LocalMode,
          Middleware,
          Multicast,
          Routing,
          Security,
-         Serverless
       }
 
       private NavMenuItem[] _navMenuItems;
@@ -67,11 +67,11 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.DI))             { UrlPattern = "api/di" },
                 new RouteTemplate(nameof(Route.DotNetClient))   { UrlPattern = "api/dotnetclient" },
                 new RouteTemplate(nameof(Route.Filter))         { UrlPattern = "api/filter" },
+                new RouteTemplate(nameof(Route.LocalMode))     { UrlPattern = "api/localmode" },
                 new RouteTemplate(nameof(Route.Middleware))     { UrlPattern = "api/middleware" },
                 new RouteTemplate(nameof(Route.Multicast))      { UrlPattern = "api/multicast" },
                 new RouteTemplate(nameof(Route.Routing))        { UrlPattern = "api/routing" },
                 new RouteTemplate(nameof(Route.Security))       { UrlPattern = "api/security" },
-                new RouteTemplate(nameof(Route.Serverless))     { UrlPattern = "api/serverless" },
 
                 new RouteTemplate(nameof(Route.FromScratchWebPack))     { UrlPattern = "fromscratch-webpack" },
                 new RouteTemplate(nameof(Route.FromScratchScriptTag))   { UrlPattern = "fromscratch-scripttag" },
@@ -120,11 +120,11 @@ namespace DotNetify.DevApp
                         new NavRoute("CRUD",                   this.GetRoute(nameof(Route.CRUD))),
                         new NavRoute("Dependency Injection",   this.GetRoute(nameof(Route.DI))),
                         new NavRoute("Filter",                 this.GetRoute(nameof(Route.Filter))),
+                        new NavRoute("Local Mode",             this.GetRoute(nameof(Route.LocalMode))),
                         new NavRoute("Middleware",             this.GetRoute(nameof(Route.Middleware))),
                         new NavRoute("Multicast",              this.GetRoute(nameof(Route.Multicast))),
                         new NavRoute("Routing",                this.GetRoute(nameof(Route.Routing))),
                         new NavRoute("Security",               this.GetRoute(nameof(Route.Security))),
-                        new NavRoute("Serverless",             this.GetRoute(nameof(Route.Serverless))),
                     },
                     IsExpanded = false
                 }
@@ -153,7 +153,7 @@ namespace DotNetify.DevApp
             navMenuItems[5] = new NavGroup
             {
                Label = "API Reference",
-               Routes = (navMenuItems[5] as NavGroup).Routes.Where(x => x.Label != "Serverless").ToArray(),
+               Routes = (navMenuItems[5] as NavGroup).Routes.Where(x => x.Label != "LocalMode").ToArray(),
                IsExpanded = false
             };
          }

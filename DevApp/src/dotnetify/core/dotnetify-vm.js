@@ -25,7 +25,7 @@ export default class dotnetifyVM {
   //    vmArg: view model arguments.
   //    headers: request headers, for things like authentication token.
   //    exceptionHandler: called when receiving server-side exception.
-  //    mode: 'local' (serverless).
+  //    mode: 'local' (localMode).
   //    initialState: provides initial state, mainly for local mode.
   //    onDispatch: intercepts dispatch calls.
   // iDotNetify - framework-specific dotNetify library.

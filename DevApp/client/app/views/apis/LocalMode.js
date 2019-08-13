@@ -5,7 +5,7 @@ import Article from '../../components/Article';
 import Expander from '../../components/Expander';
 import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
 
-class Serverless extends React.Component {
+class LocalMode extends React.Component {
   constructor() {
     super();
     this.state = { framework: currentFramework };
@@ -16,32 +16,32 @@ class Serverless extends React.Component {
   }
   render() {
     const { framework } = this.state;
-    return framework === 'Vue' ? <ServerlessVue /> : <ServerlessReact />;
+    return framework === 'Vue' ? <LocalModeVue /> : <LocalModeReact />;
   }
 }
 
-const ServerlessReact = _ => (
-  <Article vm="Serverless" id="Content">
+const LocalModeReact = _ => (
+  <Article vm="LocalMode" id="Content">
     <Markdown id="Content">
-      <Markdown>{serverlessHelloWorldReactCode()}</Markdown>
-      <Expander label={<SeeItLive />} content={<ServerlessHelloWorld />} />
-      <Expander label={<SeeItLive />} content={<ServerlessNav />} />
+      <Markdown>{localModeHelloWorldReactCode()}</Markdown>
+      <Expander label={<SeeItLive />} content={<LocalModeHelloWorld />} />
+      <Expander label={<SeeItLive />} content={<LocalModeNav />} />
     </Markdown>
   </Article>
 );
 
-const ServerlessVue = _ => (
-  <Article vm="ServerlessVue" id="Content">
+const LocalModeVue = _ => (
+  <Article vm="LocalModeVue" id="Content">
     <Markdown id="Content">
-      <Markdown>{serverlessHelloWorldVueCode()}</Markdown>
-      <Expander label={<SeeItLive />} content={<ServerlessHelloWorldVue />} />
+      <Markdown>{localModeHelloWorldVueCode()}</Markdown>
+      <Expander label={<SeeItLive />} content={<LocalModeHelloWorldVue />} />
     </Markdown>
   </Article>
 );
 
 const SeeItLive = _ => <b>See It Live!</b>;
 
-const serverlessHelloWorldReactCode = () =>
+const localModeHelloWorldReactCode = () =>
   `
 \`\`\`jsx
 const mockHelloWorld = {
@@ -80,10 +80,10 @@ const localHelloWorld = {
   }
 };
 
-class ServerlessHelloWorld extends React.Component {
+class LocalModeHelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    this.vm = dotnetify.react.connect('ServerlessHelloWorld', this, localHelloWorld);
+    this.vm = dotnetify.react.connect('LocalModeHelloWorld', this, localHelloWorld);
     this.state = { Greetings: '', name: '' };
   }
   componentWillUnmount() {
@@ -102,7 +102,7 @@ class ServerlessHelloWorld extends React.Component {
   }
 }
 
-const serverlessHelloWorldVueCode = () =>
+const localModeHelloWorldVueCode = () =>
   `
 \`\`\`jsx
 <template>
@@ -138,12 +138,12 @@ const localHelloWorldVue = {
   }
 };
 
-class ServerlessHelloWorldVue extends React.Component {
+class LocalModeHelloWorldVue extends React.Component {
   componentDidMount() {
     this.app = new Vue(
       dotnetify.vue.component(
         {
-          name: 'ServerlessHelloWorld',
+          name: 'LocalModeHelloWorld',
           template: `
           <div>
             <div>{{state.Greetings}}</div>
@@ -151,17 +151,17 @@ class ServerlessHelloWorldVue extends React.Component {
           </div>
         `
         },
-        'ServerlessHelloWorld',
+        'LocalModeHelloWorld',
         { watch: [ 'Name' ], ...localHelloWorldVue }
       )
     );
-    this.app.$mount('#ServerlessHelloWorldVue');
+    this.app.$mount('#LocalModeHelloWorldVue');
   }
   componentWillUnmount() {
     this.app.$destroy();
   }
   render() {
-    return <div id="ServerlessHelloWorldVue" />;
+    return <div id="LocalModeHelloWorldVue" />;
   }
 }
 
@@ -206,10 +206,10 @@ const localNav = {
   }
 };
 
-const ServerlessNav = _ => (
+const LocalModeNav = _ => (
   <VMContext vm="localNav" options={localNav}>
     <NavMenu id="NavMenu" />
   </VMContext>
 );
 
-export default withTheme(Serverless);
+export default withTheme(LocalMode);

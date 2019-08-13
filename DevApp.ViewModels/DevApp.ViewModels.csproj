@@ -55,11 +55,11 @@
     <EmbeddedResource Include="Docs\APIs\DI.md" />
     <EmbeddedResource Include="Docs\APIs\DotNetClient.md" />
     <EmbeddedResource Include="Docs\APIs\Filter.md" />
+    <EmbeddedResource Include="Docs\APIs\LocalMode.md" />
     <EmbeddedResource Include="Docs\APIs\Middleware.md" />
     <EmbeddedResource Include="Docs\APIs\Multicast.md" />
     <EmbeddedResource Include="Docs\APIs\Routing.md" />
     <EmbeddedResource Include="Docs\APIs\Security.md" />
-    <EmbeddedResource Include="Docs\APIs\Serverless.md" />
     <EmbeddedResource Include="Docs\Blazor\Overview.md" />
   </ItemGroup>
 
