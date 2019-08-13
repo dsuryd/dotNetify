@@ -55,13 +55,6 @@ export class dotnetifyFactory {
         if (this.hub.isHubStarted) this.startHub(this.hub, true);
       },
 
-      // Get all view models.
-      get viewModels() {
-        return this._vmAccessors
-          .reduce((prev, current) => [ ...prev, ...current() ], [])
-          .filter((val, idx, self) => self.indexOf(val) !== idx); // returns distinct items.
-      },
-
       // Generic connect function for non-React app.
       connect(iVMId, iOptions) {
         dotnetify.react.connect(iVMId, null, iOptions);
@@ -122,6 +115,13 @@ export class dotnetifyFactory {
             throw exception;
           }
         }
+      },
+
+      // Get all view models.
+      getViewModels() {
+        return this._vmAccessors
+          .reduce((prev, current) => [ ...prev, ...current() ], [])
+          .filter((val, idx, self) => self.indexOf(val) !== idx); // returns distinct items.
       },
 
       handleConnectionStateChanged(iState, iException, iHub) {
