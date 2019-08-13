@@ -1,6 +1,6 @@
 import React from 'react';
 import { Markdown, withTheme } from 'dotnetify-elements';
-import { NavMenu, VMContext } from 'dotnetify-elements';
+import { Alert, Frame, NavMenu, Panel, VMContext } from 'dotnetify-elements';
 import Article from '../../components/Article';
 import Expander from '../../components/Expander';
 import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
@@ -25,7 +25,7 @@ const LocalModeReact = _ => (
     <Markdown id="Content">
       <Markdown>{localModeHelloWorldReactCode()}</Markdown>
       <Expander label={<SeeItLive />} content={<LocalModeHelloWorld />} />
-      <Expander label={<SeeItLive />} content={<LocalModeNav />} />
+      <Expander label={<SeeItLive />} content={<LocalModeApp />} />
     </Markdown>
   </Article>
 );
@@ -164,51 +164,58 @@ class LocalModeHelloWorldVue extends React.Component {
     return <div id="LocalModeHelloWorldVue" />;
   }
 }
+window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
+window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
 
-const localNav = {
+const localVM = {
   mode: 'local',
   initialState: {
-    RoutingState: {},
+    RoutingState: {
+      Templates: [
+        {
+          Id: 'Page1',
+          Root: '',
+          UrlPattern: 'page1',
+          ViewUrl: 'LocalPage1'
+        },
+        {
+          Id: 'Page2',
+          Root: '',
+          UrlPattern: 'page2',
+          ViewUrl: 'LocalPage2'
+        }
+      ],
+      Root: 'core/api/localmode'
+    },
     NavMenu: [
       {
         Route: {
-          TemplateId: null,
-          Path: 'core/overview',
-          RedirectRoot: ''
+          TemplateId: 'Page1',
+          Path: 'page1'
         },
-        Label: 'Introduction'
+        Label: 'Page 1'
       },
       {
-        IsExpanded: true,
-        Routes: [
-          {
-            Route: {
-              TemplateId: null,
-              Path: 'core/examples/helloworld',
-              RedirectRoot: ''
-            },
-            Label: 'Hello World',
-            Icon: 'material-icons web'
-          },
-          {
-            Route: {
-              TemplateId: null,
-              Path: 'core/examples/livechart',
-              RedirectRoot: ''
-            },
-            Label: 'Live Chart',
-            Icon: 'material-icons show_chart'
-          }
-        ],
-        Label: 'Examples'
+        Route: {
+          TemplateId: 'Page2',
+          Path: 'page2'
+        },
+        Label: 'Page 2'
       }
     ]
   }
 };
 
-const LocalModeNav = _ => (
-  <VMContext vm="localNav" options={localNav}>
-    <NavMenu id="NavMenu" />
+const LocalModeApp = _ => (
+  <VMContext vm="localVM" options={localVM}>
+    <Panel horizontal>
+      <Panel flex="30%">
+        <NavMenu id="NavMenu" target="localTarget" />
+      </Panel>
+      <Panel flex="70%" css="padding-top: .5rem">
+        <div id="localTarget" />
+      </Panel>
+    </Panel>
   </VMContext>
 );
 
