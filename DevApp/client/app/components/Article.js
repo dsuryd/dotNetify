@@ -16,6 +16,7 @@ const Sidebar = styled.div`
 
 const Title = styled.div`
   ${props => (!props.show ? 'display: none' : '')};
+  ${props => props.theme.MarkdownTOC.Container};
   margin-bottom: 1rem;
   font-size: 1.1rem;
 `;

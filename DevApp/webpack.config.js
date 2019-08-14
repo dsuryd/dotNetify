@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -19,7 +20,10 @@ module.exports = {
   resolve: {
     modules: [ 'src', 'client', 'node_modules' ],
     extensions: [ '.js', '.jsx', '.tsx', '.vue' ],
-    alias: { vue$: 'vue/dist/vue.esm.js' }
+    alias: {
+      vue$: 'vue/dist/vue.esm.js',
+      'styled-components': path.resolve(__dirname, 'node_modules', 'dotnetify-elements/node_modules/styled-components')
+    }
   },
   module: {
     rules: [
@@ -39,6 +43,7 @@ module.exports = {
     knockout: 'ko',
     react: 'React',
     'react-dom': 'ReactDOM',
+    'styled-components': 'styled',
     vue: 'Vue'
   },
   plugins: [ new VueLoaderPlugin(), new MiniCssExtractPlugin() ]

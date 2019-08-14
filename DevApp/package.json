@@ -27,7 +27,6 @@
     "react": "~16.3.2",
     "react-chartjs-2": "~2.7.4",
     "react-dom": "~16.3.2",
-    "styled-components": "~3.3.3",
     "vue": "~2.5.17",
     "whatwg-fetch": "^2.0.4"
   },
