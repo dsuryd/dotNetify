@@ -1,5 +1,5 @@
 /* 
-Copyright 2017-2018 Dicky Suryadi
+Copyright 2017-2019 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -66,71 +66,55 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
     if (utils.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
-    else this.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, reactProps, iCallbackFn);
-  }
+    else {
+      let component = iViewUrl;
+      if (typeof iViewUrl === 'string' && window.hasOwnProperty(iViewUrl)) component = window[iViewUrl];
 
-  // Loads an HTML view.
-  loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
-    const vm = this.vm;
-
-    try {
-      // Unmount any React component before replacing with a new DOM.
-      ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
-    } catch (e) {
-      console.error(e);
+      if (component instanceof HTMLElement) this.loadHtmlElementView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
+      else this.loadReactView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
     }
-
-    // Load the HTML view.
-    $(iTargetSelector).load(iViewUrl, null, function() {
-      if (iJsModuleUrl != null) {
-        $.getScript(iJsModuleUrl, function() {
-          if (typeof callbackFn === 'function') callbackFn.call(vm);
-        });
-      }
-      else if (typeof callbackFn === 'function') callbackFn.call(vm);
-    });
   }
 
   // Loads a React view.
-  loadReactView(iTargetSelector, iReactClassOrClassName, iJsModuleUrl, iReactProps, callbackFn) {
+  loadReactView(iTargetSelector, iComponent, iJsModuleUrl, iReactProps, iCallbackFn) {
     return new Promise((resolve, reject) => {
       const vm = this.vm;
       const vmId = this.vm ? this.vm.$vmId : '';
-      const createViewFunc = () => {
-        // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
-        let reactClass = null;
-        if (typeof iReactClassOrClassName === 'string' && window.hasOwnProperty(iReactClassOrClassName))
-          reactClass = window[iReactClassOrClassName];
-        else if (typeof iReactClassOrClassName === 'object' && iReactClassOrClassName.name) reactClass = iReactClassOrClassName;
 
-        if (!reactClass) {
-          console.error(`[${vmId}] failed to load view '${iReactClassOrClassName}' because it's not a React element.`);
+      const mountViewFunc = () => {
+        if (typeof iComponent !== 'function' && (typeof iComponent !== 'object' || iComponent.name == null)) {
+          console.error(`[${vmId}] failed to load view '${iComponent}' because it's not a valid React element.`);
           reject();
           return;
         }
 
-        try {
-          ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
-        } catch (e) {
-          console.error(e);
-        }
+        this.unmountView(iTargetSelector);
 
         try {
-          var reactElement = React.createElement(reactClass, iReactProps);
+          var reactElement = React.createElement(iComponent, iReactProps);
           ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
         } catch (e) {
           console.error(e);
         }
-        if (typeof callbackFn === 'function') callbackFn.call(vm, reactElement);
+        if (typeof callbackFn === 'function') iCallbackFn.call(vm, reactElement);
         resolve(reactElement);
       };
 
-      if (iJsModuleUrl == null || dotnetify.ssr === true) createViewFunc();
+      if (iJsModuleUrl == null || dotnetify.ssr === true) mountViewFunc();
       else {
         // Load all javascripts first. Multiple files can be specified with comma delimiter.
         var getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
-        $.when.apply($, getScripts).done(createViewFunc);
+        $.when.apply($, getScripts).done(mountViewFunc);
       }
     });
+  }
+
+  // Unmount a React view if there's one on the target selector.
+  unmountView(iTargetSelector) {
+    try {
+      ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
+    } catch (e) {
+      console.warn(e);
+    }
   }
 }

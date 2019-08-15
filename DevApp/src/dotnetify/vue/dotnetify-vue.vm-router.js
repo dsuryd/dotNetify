@@ -1,5 +1,5 @@
 /* 
-Copyright 2018 Dicky Suryadi
+Copyright 2018-2019 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -65,48 +65,31 @@ export default class dotnetifyVueVMRouter extends dotnetifyVMRouter {
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
     if (utils.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
-    else this.loadVueView(iTargetSelector, iViewUrl, iJsModuleUrl, componentProps, iCallbackFn);
-  }
+    else {
+      let component = iViewUrl;
+      if (typeof iViewUrl === 'string' && window.hasOwnProperty(iViewUrl)) component = Object.assign({}, window[iViewUrl]);
 
-  // Loads an HTML view.
-  loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
-    const vm = this.vm;
-
-    // Unmount any existing Vue component on the target selector.
-    this.unmountVueView(iTargetSelector);
-
-    // Load the HTML view.
-    $(iTargetSelector).load(iViewUrl, null, function() {
-      if (iJsModuleUrl != null) {
-        $.getScript(iJsModuleUrl, function() {
-          if (typeof callbackFn === 'function') callbackFn.call(vm);
-        });
-      }
-      else if (typeof callbackFn === 'function') callbackFn.call(vm);
-    });
+      if (component instanceof HTMLElement) this.loadHtmlElementView(iTargetSelector, component, iJsModuleUrl, componentProps, iCallbackFn);
+      else this.loadVueView(iTargetSelector, component, iJsModuleUrl, componentProps, iCallbackFn);
+    }
   }
 
   // Loads a Vue view.
-  loadVueView(iTargetSelector, iVueClassOrClassName, iJsModuleUrl, iProps, callbackFn) {
+  loadVueView(iTargetSelector, iComponent, iJsModuleUrl, iProps, callbackFn) {
     return new Promise((resolve, reject) => {
       const vm = this.vm;
       const vmId = this.vm ? this.vm.$vmId : '';
       const createViewFunc = () => {
         // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
-        let vueClass = null;
-        if (typeof iVueClassOrClassName === 'string' && window.hasOwnProperty(iVueClassOrClassName))
-          vueClass = Object.assign({}, window[iVueClassOrClassName]);
-        else if (typeof iVueClassOrClassName === 'object' && typeof iVueClassOrClassName.render == 'function')
-          vueClass = iVueClassOrClassName;
-
-        if (!vueClass) {
-          console.error(`[${vmId}] failed to load view '${iVueClassOrClassName}' because it's not a Vue element.`);
+        let vueClass = iComponent;
+        if (typeof iComponent !== 'object' || (typeof iComponent.render !== 'function' && !iComponent.template)) {
+          console.error(`[${vmId}] failed to load view '${iComponent}' because it's not a Vue element.`);
           reject();
           return;
         }
 
         // Unmount any existing Vue component on the target selector.
-        this.unmountVueView(iTargetSelector);
+        this.unmountView(iTargetSelector);
 
         // Declare 'RoutingState' property in the component.
         let data = typeof vueClass.data == 'function' ? vueClass.data() : vueClass.data || {};
@@ -144,7 +127,7 @@ export default class dotnetifyVueVMRouter extends dotnetifyVMRouter {
   }
 
   // Unmount a Vue view if there's one on the target selector.
-  unmountVueView(iTargetSelector) {
+  unmountView(iTargetSelector) {
     if (!this.mountedComponents) this.mountedComponents = {};
 
     const unmount = this.mountedComponents[iTargetSelector];

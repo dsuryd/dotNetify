@@ -126,6 +126,41 @@ export default class dotnetifyVMRouter {
     return false;
   }
 
+  // Loads an HTML view.
+  loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn) {
+    const vm = this.vm;
+    this.unmountView(iTargetSelector);
+
+    // Load the HTML view.
+    $(iTargetSelector).load(iViewUrl, null, function() {
+      if (iJsModuleUrl != null) {
+        const getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
+        $.when.apply($, getScripts).done(() => typeof callbackFn === 'function' && iCallbackFn.call(vm));
+      }
+      else if (typeof callbackFn === 'function') iCallbackFn.call(vm);
+    });
+  }
+
+  loadHtmlElementView(iTargetSelector, iHtmlElement, iJsModuleUrl, iVmArg, iCallbackFn) {
+    const vm = this.vm;
+    const mountViewFunc = () => {
+      this.unmountView(iTargetSelector);
+
+      const target = document.querySelector(iTargetSelector);
+      while (target.firstChild) target.removeChild(target.firstChild);
+      target.appendChild(iHtmlElement);
+
+      if (typeof callbackFn === 'function') iCallbackFn.call(vm);
+    };
+
+    if (iJsModuleUrl == null) mountViewFunc();
+    else {
+      // Load all javascripts first. Multiple files can be specified with comma delimiter.
+      const getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
+      $.when.apply($, getScripts).done(mountViewFunc);
+    }
+  }
+
   // Loads a view into a target element.
   loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
     throw new Error('Not implemented');
@@ -355,5 +390,10 @@ export default class dotnetifyVMRouter {
     let path = utils.trim(iPath);
     if (path.charAt(0) != '(' && path != '') path = '/' + path;
     return this.hasRoutingState ? this.RoutingState.Root + path : iPath;
+  }
+
+  // Unmount a view if there's one on the target selector.
+  unmountView(iTargetSelector) {
+    throw new Error('Not implemented');
   }
 }
