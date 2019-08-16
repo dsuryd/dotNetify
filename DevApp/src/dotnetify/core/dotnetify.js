@@ -121,7 +121,7 @@ export class dotnetifyFactory {
       getViewModels() {
         return this._vmAccessors
           .reduce((prev, current) => [ ...prev, ...current() ], [])
-          .filter((val, idx, self) => self.indexOf(val) !== idx); // returns distinct items.
+          .filter((val, idx, self) => self.indexOf(val) === idx); // returns distinct items.
       },
 
       handleConnectionStateChanged(iState, iException, iHub) {
