@@ -18,6 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dotnetify from './dotnetify-react';
 
+const window = window || global || {};
+
 // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
 // of the parent component, so that when the child component connects to its back-end view model, the child view model
 // instance is created within the scope of the parent view model.
@@ -25,42 +27,42 @@ import dotnetify from './dotnetify-react';
 // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
 // injects properties and dispatch functions into the component.
 export default class Scope extends React.Component {
-	static displayName = 'Scope';
-	static version = '1.2.0';
+  static displayName = 'Scope';
+  static version = '1.2.0';
 
-	static propTypes = { vm: PropTypes.string };
-	static contextTypes = { scoped: PropTypes.func };
-	static childContextTypes = {
-		scoped: PropTypes.func.isRequired,
-		connect: PropTypes.func.isRequired
-	};
+  static propTypes = { vm: PropTypes.string };
+  static contextTypes = { scoped: PropTypes.func };
+  static childContextTypes = {
+    scoped: PropTypes.func.isRequired,
+    connect: PropTypes.func.isRequired
+  };
 
-	scoped(vmId) {
-		var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
-		return scope ? scope + '.' + vmId : vmId;
-	}
+  scoped(vmId) {
+    var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
+    return scope ? scope + '.' + vmId : vmId;
+  }
 
-	getChildContext() {
-		const _this = this;
+  getChildContext() {
+    const _this = this;
 
-		return {
-			scoped: (vmId) => _this.scoped(vmId),
-			connect: (vmId, component, options) => {
-				component.vmId = _this.scoped(vmId);
-				component.vm = dotnetify.react.connect(component.vmId, component, options);
-				component.dispatch = (state) => component.vm.$dispatch(state);
+    return {
+      scoped: vmId => _this.scoped(vmId),
+      connect: (vmId, component, options) => {
+        component.vmId = _this.scoped(vmId);
+        component.vm = dotnetify.react.connect(component.vmId, component, options);
+        component.dispatch = state => component.vm.$dispatch(state);
 
-				component.dispatchState = (state) => {
-					component.vm.State(state);
-					component.vm.$dispatch(state);
-				};
-				return window.vmStates ? window.vmStates[component.vmId] : null;
-			}
-		};
-	}
-	render() {
-		return this.props.children;
-	}
+        component.dispatchState = state => {
+          component.vm.State(state);
+          component.vm.$dispatch(state);
+        };
+        return window.vmStates ? window.vmStates[component.vmId] : null;
+      }
+    };
+  }
+  render() {
+    return this.props.children;
+  }
 }
 
 dotnetify.react.Scope = Scope;

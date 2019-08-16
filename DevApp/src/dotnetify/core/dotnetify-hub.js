@@ -18,7 +18,7 @@ import jQueryShim from '../libs/jquery-shim';
 const signalRNetCore = require('@aspnet/signalr');
 let $ = jQueryShim;
 
-if (typeof window == 'undefined') window = global;
+const window = window || global || {};
 
 export class dotnetifyHubFactory {
   static create() {

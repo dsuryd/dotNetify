@@ -19,6 +19,8 @@ import dotnetifyVMRouter from '../core/dotnetify-vm-router';
 import $ from '../libs/jquery-shim';
 import utils from '../libs/utils';
 
+const window = window || global || {};
+
 export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
   get hasRoutingState() {
     const state = this.vm.State();

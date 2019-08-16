@@ -20,6 +20,7 @@ import * as ko from 'knockout';
 
 ko.mapping = require('./knockout.mapping-latest');
 
+const window = window || global || {};
 let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.ko = {

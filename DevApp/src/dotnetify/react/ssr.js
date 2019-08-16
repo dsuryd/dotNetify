@@ -17,6 +17,8 @@ import dotnetify from './dotnetify-react';
 import dotnetifyVM from '../core/dotnetify-vm';
 import $ from '../libs/jquery-shim';
 
+const window = window || global || {};
+
 // Used by server-side rendering in lieu of connect method.
 dotnetify.react.ssrConnect = function(iVMId, iReact, iVMArg) {
   if (window.ssr == null || !window.ssr.hasOwnProperty(iVMId))

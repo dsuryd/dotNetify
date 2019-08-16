@@ -15,6 +15,8 @@ limitations under the License.
  */
 import Path from '../libs/path';
 
+const window = window || global || {};
+
 export default class dotnetifyRouter {
   version = '2.0.1';
 
