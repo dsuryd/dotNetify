@@ -15,6 +15,8 @@ limitations under the License.
  */
 import $ from '../libs/jquery-shim';
 
+const window = window || global || {};
+
 // Client-side view model that acts as a proxy of the server view model.
 export default class dotnetifyVM {
   // iVMId - identifies the view model.
@@ -56,6 +58,16 @@ export default class dotnetifyVM {
 
     const vmArg = this.Props('vmArg');
     if (vmArg) this.$vmArg = $.extend(this.$vmArg, vmArg);
+
+    if (this.$localMode) {
+      const localVMId = iVMId.replace(/\./g, '_');
+      if (typeof window[localVMId] === 'object') {
+        this.$options.initialState = this.$options.initialState || window[localVMId].initialState;
+        this.$options.onDispatch = this.$options.onDispatch || window[localVMId].onDispatch;
+      }
+      window[localVMId] = Object.assign(window[localVMId] || {}, { update: iOptions.update });
+      setTimeout(() => this.$request());
+    }
 
     // Inject plugin functions into this view model.
     this.$getPlugins().map(plugin => (typeof plugin['$inject'] == 'function' ? plugin.$inject(this) : null));
