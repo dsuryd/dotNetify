@@ -16,7 +16,7 @@ limitations under the License.
 import _dotnetify from '../core/dotnetify';
 import dotnetifyVM from '../core/dotnetify-vm';
 
-if (typeof window == 'undefined') window = global;
+const window = window || global || {};
 let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.vue = {
@@ -100,7 +100,9 @@ dotnetify.vue = {
     };
 
     const vmArg = iOptions && iOptions['vmArg'];
-    const hub = self.init(iVMId, vmArg);
+    const localMode = iOptions && iOptions['mode'] === 'local';
+
+    const hub = !localMode ? self.init(iVMId, vmArg) : null;
     self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
 
     if (iOptions) {

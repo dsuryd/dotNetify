@@ -16,7 +16,7 @@ limitations under the License.
 import _dotnetify from '../core/dotnetify';
 import dotnetifyVM from '../core/dotnetify-vm';
 
-if (typeof window == 'undefined') window = global;
+const window = window || global || {};
 let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.react = {
@@ -64,6 +64,7 @@ dotnetify.react = {
     if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
 
     const vmArg = iOptions && iOptions['vmArg'];
+    const localMode = iOptions && iOptions['mode'] === 'local';
 
     if (dotnetify.ssr && dotnetify.react.ssrConnect) {
       return dotnetify.react.ssrConnect(iVMId, iReact, vmArg);
@@ -91,8 +92,9 @@ dotnetify.react = {
       }
     };
 
-    const hub = self.init(iVMId, vmArg);
+    const hub = !localMode ? self.init(iVMId, vmArg) : null;
     self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
+
     return self.viewModels[iVMId];
   },
 
