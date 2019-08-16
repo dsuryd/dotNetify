@@ -167,8 +167,7 @@ class LocalModeHelloWorldVue extends React.Component {
 window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
 window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
 
-const localVM = {
-  mode: 'local',
+window.LocalMode_LocalVM = {
   initialState: {
     RoutingState: {
       Templates: [
@@ -207,7 +206,7 @@ const localVM = {
 };
 
 const LocalModeApp = _ => (
-  <VMContext vm="localVM" options={localVM}>
+  <VMContext vm="LocalVM" options={{ mode: 'local' }}>
     <Panel horizontal>
       <Panel flex="30%">
         <NavMenu id="NavMenu" target="localTarget" />

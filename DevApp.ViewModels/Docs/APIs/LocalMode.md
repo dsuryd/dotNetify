@@ -10,14 +10,14 @@ When writing client-side unit tests, there's often a need to mock your component
 
 #### Local View Model
 
-Of course this feature can go beyond unit tests, and be used in other scenarios, for example, providing elements from _dotNetify-Elements_ with a local __VMContext__:
+Beyond unit testing, you can completely replace the server-side view model with a local one by defining the object inside the `window` variable, and setting the connect options with __{mode: "local"}__.
+For example, the following code show show to provide _dotNetify-Elements_ with a local view model context:
 
 ```jsx
 window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
 window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
 
-const localVM = {
-  mode: 'local',
+window.LocalVM = {
   initialState: {
     RoutingState: {
       Templates: [
@@ -33,7 +33,7 @@ const localVM = {
   }
 };
 
-<VMContext vm="localVM" options={localVM}>
+<VMContext vm="LocalVM" options={{mode: "local"}}>
   <Panel horizontal>
     <Panel flex="30%">
       <NavMenu id="NavMenu" target="localTarget" />
