@@ -1,12 +1,8 @@
 using System;
-using System.Windows.Input;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
-using DotNetify;
 using DotNetify.Elements;
-using Newtonsoft.Json;
 
 namespace DotNetify.DevApp
 {
@@ -32,9 +28,10 @@ namespace DotNetify.DevApp
         }
     }
 
-    public class SimpleListVM : BaseVM
+    public class SimpleListVM : MulticastVM
     {
         private readonly IEmployeeRepository _repository;
+        private readonly IConnectionContext _connectionContext;
 
         public class EmployeeInfo
         {
@@ -77,6 +74,13 @@ namespace DotNetify.DevApp
                 employee.FirstName = employeeInfo.FirstName ?? employee.FirstName;
                 employee.LastName = employeeInfo.LastName ?? employee.LastName;
                 _repository.Update(employee);
+
+                this.UpdateList(nameof(Employees), new EmployeeInfo 
+                { 
+                  Id = employee.Id, 
+                  FirstName = employee.FirstName, 
+                  LastName = employee.LastName 
+                });
             }
         };
 
@@ -88,9 +92,13 @@ namespace DotNetify.DevApp
             this.RemoveList(nameof(Employees), id);
         };
 
-        public SimpleListVM(IEmployeeRepository repository)
+        // Clients from the same IP address will share the same VM instance.
+        public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();
+
+        public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
         {
             _repository = repository;
+            _connectionContext = connectionContext;
         }
     }
 }

@@ -122,6 +122,11 @@ export default {
     update: function () {
       this.toggleEdit();
       this.$emit('update', this.input);
+    },
+    watch: {
+      value: function (newVal, oldVal) {
+        this.input = newVal;
+      }
     }
   }
 }

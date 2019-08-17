@@ -18,6 +18,10 @@ class InlineEdit extends React.Component {
     value: this.props.text
   };
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.text !== this.props.text) this.setState({ value: this.props.text });
+  }
+
   handleBlur = () => this.setState({ edit: false });
 
   handleClick = event => {
@@ -34,8 +38,6 @@ class InlineEdit extends React.Component {
   };
 
   render() {
-    const textStyle = { display: 'inline-block' };
-
     if (this.state.edit)
       return (
         <div>

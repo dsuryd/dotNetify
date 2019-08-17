@@ -96,6 +96,10 @@ class InlineEdit extends React.Component {
     value: this.props.text
   };
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.text !== this.props.text) this.setState({ value: this.props.text });
+  }  
+
   handleBlue = _ => {
     this.setState({ edit: false });
   };
@@ -191,9 +195,10 @@ export default TextBox;
 ##### SimpleListVM.cs
 
 ```csharp
-public class SimpleListVM : BaseVM
+public class SimpleListVM : MulticastVM
 {
     private readonly IEmployeeRepository _repository;
+    private readonly IConnectionContext _connectionContext;
 
     public class EmployeeInfo
     {
@@ -236,6 +241,13 @@ public class SimpleListVM : BaseVM
             employee.FirstName = employeeInfo.FirstName ?? employee.FirstName;
             employee.LastName = employeeInfo.LastName ?? employee.LastName;
             _repository.Update(employee);
+
+            this.UpdateList(nameof(Employees), new EmployeeInfo 
+            { 
+              Id = employee.Id, 
+              FirstName = employee.FirstName, 
+              LastName = employee.LastName 
+            });            
         }
     };
 
@@ -247,9 +259,13 @@ public class SimpleListVM : BaseVM
         this.RemoveList(nameof(Employees), id);
     };
 
-    public SimpleListVM(IEmployeeRepository repository)
+    // Clients from the same IP address will share the same VM instance.
+    public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();    
+
+    public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
     {
         _repository = repository;
+        _connectionContext = connectionContext;
     }
 }
 ```
