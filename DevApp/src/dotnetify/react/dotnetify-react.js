@@ -32,31 +32,29 @@ dotnetify.react = {
   _connectionFailedSubs: null,
 
   // Initializes connection to SignalR server hub.
-  init: function(iVMId, iVMArg) {
+  init: function(iHub) {
     const self = dotnetify.react;
-    const hub = dotnetify.selectHub(iVMId, iVMArg);
 
     if (!self._responseSubs) {
-      self._responseSubs = hub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
+      self._responseSubs = iHub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
     }
 
     if (!self._connectedSubs) {
-      self._connectedSubs = hub.connectedEvent.subscribe(() =>
+      self._connectedSubs = iHub.connectedEvent.subscribe(() =>
         Object.keys(self.viewModels).forEach(vmId => !self.viewModels[vmId].$requested && self.viewModels[vmId].$request())
       );
     }
 
     const start = function() {
-      if (!hub.isHubStarted) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
-      dotnetify.startHub(hub);
-      return hub;
+      if (!iHub.isHubStarted) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
+      dotnetify.startHub(iHub);
     };
 
     if (!self._reconnectedSubs) {
-      self._reconnectedSubs = hub.reconnectedEvent.subscribe(start);
+      self._reconnectedSubs = iHub.reconnectedEvent.subscribe(start);
     }
 
-    return start();
+    start();
   },
 
   // Connects to a server view model.
@@ -92,8 +90,9 @@ dotnetify.react = {
       }
     };
 
-    const hub = !localMode ? self.init(iVMId, vmArg) : null;
+    const hub = !localMode ? dotnetify.selectHub(iVMId, vmArg) : null;
     self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
+    self.init(hub);
 
     return self.viewModels[iVMId];
   },
