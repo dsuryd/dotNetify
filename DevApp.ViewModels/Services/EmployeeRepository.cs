@@ -1,14 +1,9 @@
-﻿using Bogus;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using Bogus;
 
 namespace DotNetify.DevApp
 {
-   using StringDictionary = Dictionary<string, string>;
-
    public class Employee
    {
       public int Id { get; set; }
@@ -43,7 +38,7 @@ namespace DotNetify.DevApp
       {
          var employee = new Employee
          {
-            Id = _mockData.Max(x => x.Id) + 1,
+            Id = _mockData.Count > 0 ? _mockData.Max(x => x.Id) + 1 : 1,
             FirstName = model.FirstName,
             LastName = model.LastName,
             ReportTo = model.ReportTo,
