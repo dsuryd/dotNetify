@@ -282,7 +282,7 @@ export default class dotnetifyVMRouter {
     }
 
     // Check if the route has valid target.
-    if (iTemplate.Target === null) {
+    if (iTemplate.Target == null) {
       console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
       return;
     }
