@@ -26,32 +26,31 @@ dotnetify.vue = {
   controller: dotnetify,
 
   // Internal variables.
-  _responseSubs: null,
-  _reconnectedSubs: null,
-  _connectedSubs: null,
-  _connectionFailedSubs: null,
+  _hubs: [],
 
   // Initializes connection to SignalR server hub.
   init: function(iHub) {
     const self = dotnetify.vue;
-
-    if (!self._responseSubs) {
-      self._responseSubs = iHub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
-    }
-
-    if (!self._connectedSubs) {
-      self._connectedSubs = iHub.connectedEvent.subscribe(() =>
-        Object.keys(self.viewModels).forEach(vmId => !self.viewModels[vmId].$requested && self.viewModels[vmId].$request())
-      );
-    }
+    const hubInitialized = self._hubs.some(hub => hub === iHub);
 
     const start = function() {
-      if (!iHub.isHubStarted) Object.keys(self.viewModels).forEach(vmId => (self.viewModels[vmId].$requested = false));
+      if (!iHub.isHubStarted)
+        Object.keys(self.viewModels)
+          .filter(vmId => self.viewModels[vmId].$hub === iHub)
+          .forEach(vmId => (self.viewModels[vmId].$requested = false));
+
       dotnetify.startHub(iHub);
     };
 
-    if (!self._reconnectedSubs) {
-      self._reconnectedSubs = iHub.reconnectedEvent.subscribe(start);
+    if (!hubInitialized) {
+      iHub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
+      iHub.connectedEvent.subscribe(() =>
+        Object.keys(self.viewModels)
+          .filter(vmId => self.viewModels[vmId].$hub === iHub && !self.viewModels[vmId].$requested)
+          .forEach(vmId => self.viewModels[vmId].$request())
+      );
+      iHub.reconnectedEvent.subscribe(start);
+      self._hubs.push(iHub);
     }
 
     start();
@@ -102,7 +101,7 @@ dotnetify.vue = {
 
     const hub = !localMode ? dotnetify.selectHub(iVMId, vmArg) : null;
     self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
-    self.init(hub);
+    hub && self.init(hub);
 
     if (iOptions) {
       const vm = self.viewModels[iVMId];
