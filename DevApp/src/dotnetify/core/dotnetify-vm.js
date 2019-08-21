@@ -46,8 +46,6 @@ export default class dotnetifyVM {
     this.$dotnetify = iDotNetify;
     this.$hub = iHub;
 
-    if (iOptions) iOptions.update = iVMData => this.$update(typeof iVMData === 'object' ? JSON.stringify(iVMData) : iVMData);
-
     let getState = iOptions && iOptions['getState'];
     let setState = iOptions && iOptions['setState'];
     getState = typeof getState === 'function' ? getState : () => iComponent.state;
@@ -65,7 +63,11 @@ export default class dotnetifyVM {
         this.$options.initialState = this.$options.initialState || window[localVMId].initialState;
         this.$options.onDispatch = this.$options.onDispatch || window[localVMId].onDispatch;
       }
-      window[localVMId] = Object.assign(window[localVMId] || {}, { update: iOptions.update });
+
+      const update = iVMData => this.$update(typeof iVMData === 'object' ? JSON.stringify(iVMData) : iVMData);
+      window[localVMId] = Object.assign(window[localVMId] || {}, { $update: update });
+      if (iOptions) iOptions.$update = update;
+
       setTimeout(() => this.$request());
     }
 

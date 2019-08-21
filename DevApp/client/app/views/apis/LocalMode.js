@@ -1,6 +1,6 @@
 import React from 'react';
 import { Markdown, withTheme } from 'dotnetify-elements';
-import { Alert, Frame, NavMenu, Panel, VMContext } from 'dotnetify-elements';
+import { Alert, NavMenu, Panel, VMContext } from 'dotnetify-elements';
 import Article from '../../components/Article';
 import Expander from '../../components/Expander';
 import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
@@ -48,7 +48,7 @@ const mockHelloWorld = {
   mode: 'local',
   initialState: { Greetings: 'Hello World' },
   onDispatch: function(data) {
-    this.update({ Greetings: 'Hello ' + data.Submit.Name });
+    this.$update({ Greetings: 'Hello ' + data.Submit.Name });
   }
 };
 
@@ -76,7 +76,7 @@ const localHelloWorld = {
   mode: 'local',
   initialState: { Greetings: 'Hello World' },
   onDispatch: function(data) {
-    this.update({ Greetings: 'Hello ' + data.Submit.Name });
+    this.$update({ Greetings: 'Hello ' + data.Submit.Name });
   }
 };
 
@@ -118,7 +118,7 @@ const localModeHelloWorldVueCode = () =>
     mode: 'local',
     initialState: { Greetings: 'Hello World' },
     onDispatch: function(data) {
-      this.update({ Greetings: 'Hello ' + data.Name });
+      this.$update({ Greetings: 'Hello ' + data.Name });
     }
   };
 
@@ -134,7 +134,7 @@ const localHelloWorldVue = {
   mode: 'local',
   initialState: { Greetings: 'Hello World' },
   onDispatch: function(data) {
-    this.update({ Greetings: 'Hello ' + data.Name });
+    this.$update({ Greetings: 'Hello ' + data.Name });
   }
 };
 
