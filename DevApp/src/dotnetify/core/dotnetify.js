@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import dotnetifyHub, { dotnetifyHubFactory } from './dotnetify-hub';
+import { dotNetifyHubLocal } from './dotnetify-hub-local';
 
 export class dotnetifyFactory {
   static create() {
@@ -40,9 +41,9 @@ export class dotnetifyFactory {
       // (state, exception, hub) => void
       connectionStateHandler: null,
 
-      // Use this to assign a hub to which a view model will connect.
-      // (vmId, vmArg) => hub
-      hubHandler: null,
+      // Use this intercept a view model prior to establishing connection,
+      // with the option to provide any connect parameters.
+      connectHandler: null,
 
       // Support changing hub server URL after first init.
       get hubServerUrl() {
@@ -81,11 +82,14 @@ export class dotnetifyFactory {
         return hub;
       },
 
-      // Used by a view to select a hub.
-      selectHub(iVMId, iVMArg) {
-        // Allow switching to another hub by providing hubHandler function that returns a signalR hub object.
-        const hub = typeof this.hubHandler == 'function' && this.hubHandler(iVMId, iVMArg);
-        return hub || this.initHub();
+      // Used by a view to select a hub, and provides the opportunity to override any connect info.
+      selectHub(vmConnectArgs) {
+        let override = (typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs)) || {};
+        if (!override.hub) {
+          if (vmConnectArgs.options.mode === 'local') override.hub = new dotNetifyHubLocal(vmConnectArgs);
+          else override.hub = this.initHub();
+        }
+        return Object.assign(vmConnectArgs, override);
       },
 
       // Starts hub connection to SignalR hub server.
@@ -109,8 +113,7 @@ export class dotnetifyFactory {
 
           if (typeof iExceptionHandler === 'function') {
             return iExceptionHandler(exception);
-          }
-          else {
+          } else {
             console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
             throw exception;
           }

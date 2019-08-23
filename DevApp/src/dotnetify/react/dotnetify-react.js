@@ -61,7 +61,6 @@ dotnetify.react = {
     if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
 
     const vmArg = iOptions && iOptions['vmArg'];
-    const localMode = iOptions && iOptions['mode'] === 'local';
 
     if (dotnetify.ssr && dotnetify.react.ssrConnect) {
       return dotnetify.react.ssrConnect(iVMId, iReact, vmArg);
@@ -89,9 +88,11 @@ dotnetify.react = {
       }
     };
 
-    const hub = !localMode ? dotnetify.selectHub(iVMId, vmArg) : null;
-    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
-    hub && self.init(hub);
+    const connectInfo = { vmId: iVMId, options: iOptions, hub: null };
+    connectInfo = dotnetify.selectHub(connectInfo);
+
+    self.viewModels[iVMId] = new dotnetifyVM(connectInfo.vmId, component, connectInfo.options, self, connectInfo.hub);
+    if (connectInfo.hub) self.init(connectInfo.hub);
 
     return self.viewModels[iVMId];
   },

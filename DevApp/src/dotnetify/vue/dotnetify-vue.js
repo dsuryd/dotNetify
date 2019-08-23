@@ -87,8 +87,7 @@ dotnetify.vue = {
           if (vm && vm.$useState) {
             if (iVue.state.hasOwnProperty(key)) iVue.state[key] = value;
             else if (value) iVue.$set(iVue.state, key, value);
-          }
-          else {
+          } else {
             if (iVue.hasOwnProperty(key)) iVue[key] = value;
             else if (value) console.error(`'${key}' is received, but the Vue instance doesn't declare the property.`);
           }
@@ -96,12 +95,11 @@ dotnetify.vue = {
       }
     };
 
-    const vmArg = iOptions && iOptions['vmArg'];
-    const localMode = iOptions && iOptions['mode'] === 'local';
+    let connectInfo = { vmId: iVMId, options: iOptions, hub: null };
+    connectInfo = dotnetify.selectHub(connectInfo);
 
-    const hub = !localMode ? dotnetify.selectHub(iVMId, vmArg) : null;
-    self.viewModels[iVMId] = new dotnetifyVM(iVMId, component, iOptions, self, hub);
-    hub && self.init(hub);
+    self.viewModels[iVMId] = new dotnetifyVM(connectInfo.vmId, component, connectInfo.options, self, connectInfo.hub);
+    if (connectInfo.hub) self.init(connectInfo.hub);
 
     if (iOptions) {
       const vm = self.viewModels[iVMId];

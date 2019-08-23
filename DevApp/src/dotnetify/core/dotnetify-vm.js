@@ -27,7 +27,7 @@ export default class dotnetifyVM {
   //    vmArg: view model arguments.
   //    headers: request headers, for things like authentication token.
   //    exceptionHandler: called when receiving server-side exception.
-  //    mode: 'local' (localMode).
+  //    mode: 'local'.
   //    initialState: provides initial state, mainly for local mode.
   //    onDispatch: intercepts dispatch calls.
   // iDotNetify - framework-specific dotNetify library.
@@ -39,7 +39,6 @@ export default class dotnetifyVM {
     this.$vmArg = iOptions && iOptions['vmArg'];
     this.$headers = iOptions && iOptions['headers'];
     this.$exceptionHandler = iOptions && iOptions['exceptionHandler'];
-    this.$localMode = iOptions && iOptions['mode'] === 'local';
     this.$requested = false;
     this.$loaded = false;
     this.$itemKey = {};
@@ -57,19 +56,8 @@ export default class dotnetifyVM {
     const vmArg = this.Props('vmArg');
     if (vmArg) this.$vmArg = $.extend(this.$vmArg, vmArg);
 
-    if (this.$localMode) {
-      const localVMId = iVMId.replace(/\./g, '_');
-      if (typeof window[localVMId] === 'object') {
-        this.$options.initialState = this.$options.initialState || window[localVMId].initialState;
-        this.$options.onDispatch = this.$options.onDispatch || window[localVMId].onDispatch;
-      }
-
-      const update = iVMData => this.$update(typeof iVMData === 'object' ? JSON.stringify(iVMData) : iVMData);
-      window[localVMId] = Object.assign(window[localVMId] || {}, { $update: update });
-      if (iOptions) iOptions.$update = update;
-
-      setTimeout(() => this.$request());
-    }
+    if (iOptions && typeof iOptions.onDispatch == 'function')
+      iOptions.$update = iVMData => this.$update(typeof iVMData === 'object' ? JSON.stringify(iVMData) : iVMData);
 
     // Inject plugin functions into this view model.
     this.$getPlugins().map(plugin => (typeof plugin['$inject'] == 'function' ? plugin.$inject(this) : null));
@@ -80,7 +68,7 @@ export default class dotnetifyVM {
     // Call any plugin's $destroy function if provided.
     this.$getPlugins().map(plugin => (typeof plugin['$destroy'] == 'function' ? plugin.$destroy.apply(this) : null));
 
-    if (!this.$localMode && this.$hub.isConnected) {
+    if (this.$hub.isConnected) {
       try {
         this.$hub.disposeVM(this.$vmId);
       } catch (ex) {
@@ -96,7 +84,7 @@ export default class dotnetifyVM {
   $dispatch(iValue) {
     if (typeof this.$options.onDispatch == 'function') this.$options.onDispatch(iValue);
 
-    if (!this.$localMode && this.$hub.isConnected) {
+    if (this.$hub.isConnected) {
       const controller = this.$dotnetify.controller;
       try {
         this.$hub.updateVM(this.$vmId, iValue);
@@ -119,7 +107,9 @@ export default class dotnetifyVM {
     for (var listName in iValue) {
       const key = this.$itemKey[listName];
       if (!key) {
-        console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
+        console.error(
+          `[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`
+        );
         return;
       }
       var item = iValue[listName];
@@ -182,9 +172,11 @@ export default class dotnetifyVM {
             vm.$removeList(listName, function(i) {
               return i[key] == iVMUpdate[prop];
             });
-          else console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
-        }
-        else console.error(`[${this.$vmId}] '${listName}' is not found or not an array.`);
+          else
+            console.error(
+              `[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`
+            );
+        } else console.error(`[${this.$vmId}] '${listName}' is not found or not an array.`);
         delete iVMUpdate[prop];
         continue;
       }
@@ -210,7 +202,7 @@ export default class dotnetifyVM {
       this.$update(typeof state === 'object' ? JSON.stringify(state) : state);
     }
 
-    if (!this.$localMode && this.$hub.isConnected) this.$hub.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
+    if (this.$hub.isConnected) this.$hub.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
     this.$requested = true;
   }
 
@@ -297,7 +289,9 @@ export default class dotnetifyVM {
         return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i;
       });
       this.State(state);
-    }
-    else console.error(`[${this.$vmId}] missing item key for '${iListName}'; add '${iListName}_itemKey' property to the view model.`);
+    } else
+      console.error(
+        `[${this.$vmId}] missing item key for '${iListName}'; add '${iListName}_itemKey' property to the view model.`
+      );
   }
 }
