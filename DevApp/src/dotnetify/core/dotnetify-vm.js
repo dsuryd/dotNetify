@@ -28,8 +28,8 @@ export default class dotnetifyVM {
   //    headers: request headers, for things like authentication token.
   //    exceptionHandler: called when receiving server-side exception.
   //    mode: 'local'.
-  //    initialState: provides initial state, mainly for local mode.
-  //    onDispatch: intercepts dispatch calls.
+  //    initialState: provides initial state (local mode).
+  //    onDispatch: intercepts dispatch calls (local mode).
   // iDotNetify - framework-specific dotNetify library.
   // iHub - hub connection.
   constructor(iVMId, iComponent, iOptions, iDotNetify, iHub) {
@@ -80,10 +80,8 @@ export default class dotnetifyVM {
   }
 
   // Dispatches a value to the server view model.
-  // iValue - Vvalue to dispatch.
+  // iValue - Value to dispatch.
   $dispatch(iValue) {
-    if (typeof this.$options.onDispatch == 'function') this.$options.onDispatch(iValue);
-
     if (this.$hub.isConnected) {
       const controller = this.$dotnetify.controller;
       try {
@@ -107,9 +105,7 @@ export default class dotnetifyVM {
     for (var listName in iValue) {
       const key = this.$itemKey[listName];
       if (!key) {
-        console.error(
-          `[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`
-        );
+        console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
         return;
       }
       var item = iValue[listName];
@@ -172,11 +168,9 @@ export default class dotnetifyVM {
             vm.$removeList(listName, function(i) {
               return i[key] == iVMUpdate[prop];
             });
-          else
-            console.error(
-              `[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`
-            );
-        } else console.error(`[${this.$vmId}] '${listName}' is not found or not an array.`);
+          else console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
+        }
+        else console.error(`[${this.$vmId}] '${listName}' is not found or not an array.`);
         delete iVMUpdate[prop];
         continue;
       }
@@ -197,11 +191,6 @@ export default class dotnetifyVM {
 
   // Requests state from the server view model.
   $request() {
-    if (this.$options.initialState) {
-      const state = this.$options.initialState;
-      this.$update(typeof state === 'object' ? JSON.stringify(state) : state);
-    }
-
     if (this.$hub.isConnected) this.$hub.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
     this.$requested = true;
   }
@@ -289,9 +278,7 @@ export default class dotnetifyVM {
         return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i;
       });
       this.State(state);
-    } else
-      console.error(
-        `[${this.$vmId}] missing item key for '${iListName}'; add '${iListName}_itemKey' property to the view model.`
-      );
+    }
+    else console.error(`[${this.$vmId}] missing item key for '${iListName}'; add '${iListName}_itemKey' property to the view model.`);
   }
 }

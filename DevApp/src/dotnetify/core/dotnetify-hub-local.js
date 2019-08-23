@@ -1,4 +1,5 @@
 /* 
+import { dotnetify } from 'dotnetify/dist/dotnetify-ko';
 Copyright 2019 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,47 +14,50 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+import { createEventEmitter } from '../libs/utils';
 
 export class dotNetifyHubLocal {
-  // iDotNetify - framework-specific dotNetify library.
-  // vmConnectArgs - View model connect arguments.
-  constructor(iDotNetify, vmConnectArgs) {
-    super();
+  mode = 'local';
+  isConnected = false;
+  isHubStarted = false;
 
-    this.dotNetify = iDotNetify;
-    this.vmId = vmConnectArgs.vmId.replace(/\./g, '_');
-    this.initialState = vmConnectArgs.options.initialState;
-    this.onDispatch = vmConnectArgs.options.onDispatch;
+  responseEvent = createEventEmitter();
+  reconnectedEvent = createEventEmitter();
+  connectedEvent = createEventEmitter();
+  connectionFailedEvent = createEventEmitter();
 
+  constructor(iDotnetify, iVMConnectArgs) {
+    this.dotnetify = iDotnetify;
+    this.vmId = iVMConnectArgs.vmId.replace(/\./g, '_');
+    this.initialState = iVMConnectArgs.options.initialState;
+    this.onDispatch = val => iVMConnectArgs.options.onDispatch(val);
+  }
+
+  startHub() {
+    this.isConnected = true;
+    this.isHubStarted = true;
+    this.connectedEvent.emit();
+  }
+
+  requestVM(iVMId) {
+    const update = vmData => {
+      const vm = dotNetify.getViewModels().find(x => x.$vmId === iVMId);
+      vm && vm.$update(typeof vmData === 'object' ? JSON.stringify(vmData) : vmData);
+    };
+
+    // Local view model.
     if (typeof window[this.vmId] === 'object') {
       this.initialState = this.initialState || window[this.vmId].initialState;
       this.onDispatch = this.onDispatch || window[this.vmId].onDispatch;
+      window[this.vmId].$update = update;
     }
-  }
 
-  get mode() {
-    return 'local';
-  }
-
-  get isConnected() {
-    return true;
-  }
-
-  get isHubStarted() {
-    return true;
-  }
-
-  requestVM(iVMId, iArgs) {
-    const update = vmData =>
-      this.dotNetify.viewModels[iVMId].$update(typeof vmData === 'object' ? JSON.stringify(vmData) : vmData);
-
-    window[this.vmId].$update = update;
     setTimeout(() => update(this.initialState));
   }
 
   updateVM(iVMId, iValue) {
-    this.onDispatch(iVMId, iValue);
+    this.onDispatch(iValue);
   }
 
-  disposeVM(iVMId) {}
+  disposeVM() {}
 }

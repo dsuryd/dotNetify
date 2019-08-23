@@ -43,6 +43,7 @@ export class dotnetifyFactory {
 
       // Use this intercept a view model prior to establishing connection,
       // with the option to provide any connect parameters.
+      // ({vmId, options}) => {vmId, options, hub}
       connectHandler: null,
 
       // Support changing hub server URL after first init.
@@ -84,10 +85,11 @@ export class dotnetifyFactory {
 
       // Used by a view to select a hub, and provides the opportunity to override any connect info.
       selectHub(vmConnectArgs) {
+        vmConnectArgs = vmConnectArgs || { options: {} };
         let override = (typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs)) || {};
         if (!override.hub) {
-          if (vmConnectArgs.options.mode === 'local') override.hub = new dotNetifyHubLocal(vmConnectArgs);
-          else override.hub = this.initHub();
+          const localMode = vmConnectArgs.options && vmConnectArgs.options.mode === 'local';
+          override.hub = localMode ? new dotNetifyHubLocal(this, vmConnectArgs) : this.initHub();
         }
         return Object.assign(vmConnectArgs, override);
       },
@@ -113,7 +115,8 @@ export class dotnetifyFactory {
 
           if (typeof iExceptionHandler === 'function') {
             return iExceptionHandler(exception);
-          } else {
+          }
+          else {
             console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
             throw exception;
           }

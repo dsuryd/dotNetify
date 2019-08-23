@@ -50,7 +50,8 @@ dotnetify.react = {
           .forEach(vmId => self.viewModels[vmId].$request())
       );
       iHub.reconnectedEvent.subscribe(start);
-      self._hubs.push(iHub);
+
+      if (iHub.mode !== 'local') self._hubs.push(iHub);
     }
 
     start();
@@ -88,9 +89,7 @@ dotnetify.react = {
       }
     };
 
-    const connectInfo = { vmId: iVMId, options: iOptions, hub: null };
-    connectInfo = dotnetify.selectHub(connectInfo);
-
+    const connectInfo = dotnetify.selectHub({ vmId: iVMId, options: iOptions, hub: null });
     self.viewModels[iVMId] = new dotnetifyVM(connectInfo.vmId, component, connectInfo.options, self, connectInfo.hub);
     if (connectInfo.hub) self.init(connectInfo.hub);
 
