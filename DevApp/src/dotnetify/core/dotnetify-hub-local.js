@@ -27,7 +27,7 @@ export class dotNetifyHubLocal {
   connectionFailedEvent = createEventEmitter();
 
   constructor(iDotnetify, iVMConnectArgs) {
-    this.dotnetify = iDotnetify;
+    this.dotNetify = iDotnetify;
     this.vmId = iVMConnectArgs.vmId.replace(/\./g, '_');
     this.initialState = iVMConnectArgs.options.initialState;
     this.onDispatch = val => iVMConnectArgs.options.onDispatch(val);
@@ -41,7 +41,7 @@ export class dotNetifyHubLocal {
 
   requestVM(iVMId) {
     const update = vmData => {
-      const vm = dotNetify.getViewModels().find(x => x.$vmId === iVMId);
+      const vm = this.dotNetify.getViewModels().find(x => x.$vmId === iVMId);
       vm && vm.$update(typeof vmData === 'object' ? JSON.stringify(vmData) : vmData);
     };
 
@@ -49,10 +49,11 @@ export class dotNetifyHubLocal {
     if (typeof window[this.vmId] === 'object') {
       this.initialState = this.initialState || window[this.vmId].initialState;
       this.onDispatch = this.onDispatch || window[this.vmId].onDispatch;
-      window[this.vmId].$update = update;
     }
+    else window[this.vmId] = {};
 
-    setTimeout(() => update(this.initialState));
+    window[this.vmId].$update = update;
+    if (this.initialState) setTimeout(() => update(this.initialState));
   }
 
   updateVM(iVMId, iValue) {
