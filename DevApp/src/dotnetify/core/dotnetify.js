@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import dotnetifyHub, { dotnetifyHubFactory } from './dotnetify-hub';
-import { dotNetifyHubLocal } from './dotnetify-hub-local';
+import localHub, { hasLocalVM } from './dotnetify-hub-local';
 
 export class dotnetifyFactory {
   static create() {
@@ -88,8 +88,8 @@ export class dotnetifyFactory {
         vmConnectArgs = vmConnectArgs || { options: {} };
         let override = (typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs)) || {};
         if (!override.hub) {
-          const localMode = vmConnectArgs.options && vmConnectArgs.options.mode === 'local';
-          override.hub = localMode ? new dotNetifyHubLocal(this, vmConnectArgs) : this.initHub();
+          override.hub = hasLocalVM(vmConnectArgs.vmId) ? localHub : this.initHub();
+          override.hub.debug = this.debug;
         }
         return Object.assign(vmConnectArgs, override);
       },

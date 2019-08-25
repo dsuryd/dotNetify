@@ -16,8 +16,18 @@ limitations under the License.
  */
 import { createEventEmitter } from '../libs/utils';
 
+const window = window || global || {};
+
+const normalize = iVMId => iVMId && iVMId.replace(/\./g, '_');
+const hasLocalVM = iVMId => {
+  const vmId = normalize(iVMId);
+  const vm = window[vmId];
+  return typeof vm == 'object' && typeof vm.onConnect == 'function';
+};
+
 export class dotNetifyHubLocal {
   mode = 'local';
+  debug = false;
   isConnected = false;
   isHubStarted = false;
 
@@ -26,39 +36,46 @@ export class dotNetifyHubLocal {
   connectedEvent = createEventEmitter();
   connectionFailedEvent = createEventEmitter();
 
-  constructor(iDotnetify, iVMConnectArgs) {
-    this.dotNetify = iDotnetify;
-    this.vmId = iVMConnectArgs.vmId.replace(/\./g, '_');
-    this.initialState = iVMConnectArgs.options.initialState;
-    this.onDispatch = val => iVMConnectArgs.options.onDispatch(val);
-  }
-
   startHub() {
     this.isConnected = true;
     this.isHubStarted = true;
     this.connectedEvent.emit();
   }
 
-  requestVM(iVMId) {
-    const update = vmData => {
-      const vm = this.dotNetify.getViewModels().find(x => x.$vmId === iVMId);
-      vm && vm.$update(typeof vmData === 'object' ? JSON.stringify(vmData) : vmData);
-    };
+  requestVM(iVMId, iVMArgs) {
+    const vmId = normalize(iVMId);
+    const vm = window[vmId];
 
-    // Local view model.
-    if (typeof window[this.vmId] === 'object') {
-      this.initialState = this.initialState || window[this.vmId].initialState;
-      this.onDispatch = this.onDispatch || window[this.vmId].onDispatch;
+    if (typeof vm === 'object' && typeof vm.onConnect == 'function') {
+      if (this.debug) console.log(`[${iVMId}] *** local mode ***`);
+      let initialState = vm.onConnect(iVMArgs) || {};
+      if (typeof initialState == 'object') initialState = JSON.stringify(initialState);
+      setTimeout(() => this.responseEvent.emit(iVMId, initialState));
     }
-    else window[this.vmId] = {};
-
-    window[this.vmId].$update = update;
-    if (this.initialState) setTimeout(() => update(this.initialState));
   }
 
   updateVM(iVMId, iValue) {
-    this.onDispatch(iValue);
+    const vmId = normalize(iVMId);
+    const vm = window[vmId];
+
+    if (typeof vm === 'object' && typeof vm.onDispatch == 'function') {
+      let state = vm.onDispatch(iValue);
+      if (state) {
+        if (typeof state == 'object') state = JSON.stringify(state);
+        setTimeout(() => this.responseEvent.emit(iVMId, state));
+      }
+    }
   }
 
-  disposeVM() {}
+  disposeVM(iVMId) {
+    const vmId = normalize(iVMId);
+    const vm = window[vmId];
+
+    if (typeof vm === 'object' && typeof vm.onDispose == 'function') {
+      vm.Dispose(iVMId);
+    }
+  }
 }
+
+export default new dotNetifyHubLocal();
+export { hasLocalVM };

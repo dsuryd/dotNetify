@@ -27,9 +27,6 @@ export default class dotnetifyVM {
   //    vmArg: view model arguments.
   //    headers: request headers, for things like authentication token.
   //    exceptionHandler: called when receiving server-side exception.
-  //    mode: 'local'.
-  //    initialState: provides initial state (local mode).
-  //    onDispatch: intercepts dispatch calls (local mode).
   // iDotNetify - framework-specific dotNetify library.
   // iHub - hub connection.
   constructor(iVMId, iComponent, iOptions, iDotNetify, iHub) {
@@ -55,9 +52,6 @@ export default class dotnetifyVM {
 
     const vmArg = this.Props('vmArg');
     if (vmArg) this.$vmArg = $.extend(this.$vmArg, vmArg);
-
-    if (iOptions && typeof iOptions.onDispatch == 'function')
-      iOptions.$update = iVMData => this.$update(typeof iVMData === 'object' ? JSON.stringify(iVMData) : iVMData);
 
     // Inject plugin functions into this view model.
     this.$getPlugins().map(plugin => (typeof plugin['$inject'] == 'function' ? plugin.$inject(this) : null));

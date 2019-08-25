@@ -44,18 +44,19 @@ const SeeItLive = _ => <b>See It Live!</b>;
 const localModeHelloWorldReactCode = () =>
   `
 \`\`\`jsx
-const mockHelloWorld = {
-  mode: 'local',
-  initialState: { Greetings: 'Hello World' },
-  onDispatch: function(data) {
-    this.$update({ Greetings: 'Hello ' + data.Submit.Name });
+window.LocalHelloWorld = {
+  onConnect() {
+    return { Greetings: 'Hello World' };
+  },
+  onDispatch(data) {
+    return { Greetings: 'Hello ' + data.Submit.Name };
   }
 };
 
 class MyApp extends React.Component {
   constructor(props) {
     super(props);
-    this.vm = dotnetify.react.connect('HelloWorld', this, mockHelloWorld);
+    this.vm = dotnetify.react.connect('LocalHelloWorld', this);
     this.state = { Greetings: '', name: '' };
   }
   render() {
@@ -72,18 +73,10 @@ class MyApp extends React.Component {
 }
 \`\`\``;
 
-const localHelloWorld = {
-  mode: 'local',
-  initialState: { Greetings: 'Hello World' },
-  onDispatch: function(data) {
-    this.$update({ Greetings: 'Hello ' + data.Submit.Name });
-  }
-};
-
 class LocalModeHelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    this.vm = dotnetify.react.connect('LocalModeHelloWorld', this, localHelloWorld);
+    this.vm = dotnetify.react.connect('LocalHelloWorld', this);
     this.state = { Greetings: '', name: '' };
   }
   componentWillUnmount() {
@@ -102,6 +95,15 @@ class LocalModeHelloWorld extends React.Component {
   }
 }
 
+window.LocalHelloWorld = {
+  onConnect() {
+    return { Greetings: 'Hello World' };
+  },
+  onDispatch(data) {
+    return { Greetings: 'Hello ' + data.Submit.Name };
+  }
+};
+
 const localModeHelloWorldVueCode = () =>
   `
 \`\`\`jsx
@@ -114,27 +116,26 @@ const localModeHelloWorldVueCode = () =>
 <script>
   import dotnetify from 'dotnetify/vue';
 
-  const localHelloWorld = {
-    mode: 'local',
-    initialState: { Greetings: 'Hello World' },
+  window.LocalHelloWorld = {
+    onConnect: function() {
+      return { Greetings: 'Hello World' };
+    },
     onDispatch: function(data) {
-      this.$update({ Greetings: 'Hello ' + data.Name });
+      return { Greetings: 'Hello ' + data.Name };
     }
   };
 
-  export default dotnetify.vue.component('MyApp', 'HelloWorld', { 
-    watch: [ 'Name' ], 
-    ...localHelloWorld 
-  });
+  export default dotnetify.vue.component('MyApp', 'LocalHelloWorld', { watch: [ 'Name' ] });
 </script>
 
 \`\`\``;
 
-const localHelloWorldVue = {
-  mode: 'local',
-  initialState: { Greetings: 'Hello World' },
-  onDispatch: function(data) {
-    this.$update({ Greetings: 'Hello ' + data.Name });
+window.LocalHelloWorldVue = {
+  onConnect() {
+    return { Greetings: 'Hello World' };
+  },
+  onDispatch(data) {
+    return { Greetings: 'Hello ' + data.Name };
   }
 };
 
@@ -143,7 +144,7 @@ class LocalModeHelloWorldVue extends React.Component {
     this.app = new Vue(
       dotnetify.vue.component(
         {
-          name: 'LocalModeHelloWorld',
+          name: 'LocalHelloWorldVue',
           template: `
           <div>
             <div>{{state.Greetings}}</div>
@@ -151,8 +152,8 @@ class LocalModeHelloWorldVue extends React.Component {
           </div>
         `
         },
-        'LocalModeHelloWorld',
-        { watch: [ 'Name' ], ...localHelloWorldVue }
+        'LocalHelloWorldVue',
+        { watch: [ 'Name' ] }
       )
     );
     this.app.$mount('#LocalModeHelloWorldVue');
@@ -167,8 +168,8 @@ class LocalModeHelloWorldVue extends React.Component {
 window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
 window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
 
-window.LocalMode_LocalVM = {
-  initialState: {
+window.LocalMode_LocalVM = new class {
+  initialState = {
     RoutingState: {
       Templates: [
         {
@@ -202,11 +203,15 @@ window.LocalMode_LocalVM = {
         Label: 'Page 2'
       }
     ]
+  };
+
+  onConnect() {
+    return this.initialState;
   }
-};
+}();
 
 const LocalModeApp = _ => (
-  <VMContext vm="LocalVM" options={{ mode: 'local' }}>
+  <VMContext vm="LocalVM">
     <Panel horizontal>
       <Panel flex="30%">
         <NavMenu id="NavMenu" target="localTarget" />

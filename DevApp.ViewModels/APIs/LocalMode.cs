@@ -10,6 +10,6 @@ namespace DotNetify.DevApp
 
    public class LocalModeVue : BaseVM
    {
-      public string Content => new Markdown("DotNetify.DevApp.Docs.APIs.LocalMode.md").GetSection(null, "Local View Model");
+      public string Content => new Markdown("DotNetify.DevApp.Docs.APIs.LocalMode.md").GetSection(null, "Local VMContext");
    }
 }

@@ -1,24 +1,27 @@
 ## Local Mode
 
-When writing client-side unit tests, there's often a need to mock your component's connection so it won't talk to the real server.  DotNetify facilitates this by supporting "local" mode connection option.   You would do this by passing an object as the __connect__ API's _options_ parameter with the following properties:
-- __mode__: "local".
-- __initialState__: initial state for your component.
-- __onDispatch__: optional callback for when the component is dispatching something. You can respond by calling __this.$update__ with the data you want to pass back to the component.
+When writing client-side unit tests, there's often a need to mock your component's connection so it won't talk to the real server.  DotNetify facilitates this by supporting "local" view model mode, where you can override the server-side view model with a client-side Javascript object.  
+
+You would do this by adding an object with the same name as the view model ID to the `window` variable, and with the following properties:
+
+- __onConnect__(_vmArgs_): initial connection callback; expects initial state to be returned.
+- __onDispatch__(_state_): dispatch callback; you can optionally return the data you want to pass back to the component.
 
 [inset]
 [inset]
 
-#### Local View Model
 
-Beyond unit testing, you can completely replace the server-side view model with a local one by defining the object inside the `window` variable, and setting the connect options with __{mode: "local"}__.
-For example, the following code show show to provide _dotNetify-Elements_ with a local view model context:
+#### Local VMContext
+
+Beyond unit testing, the local mode provides you with the option to hydrate some of your presentational components purely from client-side. For example, the following code shows how to provide components from _dotNetify-Elements_ with a _VMContext_ element that gets its data from an ES6 class instance:
 
 ```jsx
+// Route components.
 window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
 window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
 
-window.LocalVM = {
-  initialState: {
+window.LocalVM = new class {
+  initialState = {
     RoutingState: {
       Templates: [
         { Id: 'Page1', Root: '', UrlPattern: 'page1', ViewUrl: 'LocalPage1' },
@@ -30,10 +33,14 @@ window.LocalVM = {
       { Route: { TemplateId: 'Page1', Path: 'page1' }, Label: 'Page 1' },
       { Route: { TemplateId: 'Page2', Path: 'page2' }, Label: 'Page 2' }
     ]
-  }
-};
+  };
 
-<VMContext vm="LocalVM" options={{mode: "local"}}>
+  onConnect() {
+    return this.initialState;
+  }
+}();
+
+<VMContext vm="LocalVM">
   <Panel horizontal>
     <Panel flex="30%">
       <NavMenu id="NavMenu" target="localTarget" />
@@ -46,3 +53,4 @@ window.LocalVM = {
 ```
 [inset]
 
+Note that if the _VMContext_ is nested under a parent _VMContext_, the local view model name must be in the form a path of the view model IDs, delimited with underscore.  For example: ```window.ParentVM_ChildVM = { /*...*/ }```.
