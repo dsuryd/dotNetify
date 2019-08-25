@@ -199,22 +199,26 @@ export default class dotnetifyVM {
 
       controller.debugFn && controller.debugFn(this.$vmId, 'received', JSON.parse(iVMData));
     }
-    var vmData = JSON.parse(iVMData);
+    let vmData = JSON.parse(iVMData);
     this.$preProcess(vmData);
 
-    var state = this.State();
+    let state = this.State();
     state = $.extend({}, state, vmData);
     this.State(state);
 
     if (!this.$loaded) this.$onLoad();
+    else this.$onUpdate(vmData);
   }
 
   // Handles initial view model load event.
   $onLoad() {
-    // Call any plugin's $ready function if provided to give a chance to do
-    // things when the view model is ready.
     this.$getPlugins().map(plugin => (typeof plugin['$ready'] == 'function' ? plugin.$ready.apply(this) : null));
     this.$loaded = true;
+  }
+
+  // Handles view model update event.
+  $onUpdate(vmData) {
+    this.$getPlugins().map(plugin => (typeof plugin['$update'] == 'function' ? plugin.$update.apply(this, [ vmData ]) : null));
   }
 
   // *** CRUD Functions ***

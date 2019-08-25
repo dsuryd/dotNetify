@@ -89,4 +89,9 @@ export default class dotnetifyRouter {
   $ready() {
     this.$router.initRouting();
   }
+
+  // Called by dotNetify when a view model receives update.
+  $update(vmData) {
+    if (vmData && vmData.RoutingState) this.$router.initRouting();
+  }
 }
