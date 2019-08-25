@@ -71,8 +71,8 @@ export class dotNetifyHubLocal {
     const vmId = normalize(iVMId);
     const vm = window[vmId];
 
-    if (typeof vm === 'object' && typeof vm.onDispose == 'function') {
-      vm.Dispose(iVMId);
+    if (typeof vm === 'object' && typeof vm.onDestroy == 'function') {
+      vm.onDestroy(iVMId);
     }
   }
 }

@@ -6,6 +6,7 @@ You would do this by adding an object with the same name as the view model ID to
 
 - __onConnect__(_vmArgs_): initial connection callback; expects initial state to be returned.
 - __onDispatch__(_state_): dispatch callback; you can optionally return the data you want to pass back to the component.
+- __onDestroy__(): optional destroy callback.
 
 [inset]
 [inset]
