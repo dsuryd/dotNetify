@@ -8,9 +8,10 @@ You would do this by adding an object with the same name as the view model ID to
 - __onDispatch__(_state_): dispatch callback; you can optionally return the data you want to pass back to the component.
 - __onDestroy__(): optional destroy callback.
 
-[inset]
-[inset]
+After the initial connection, the object will be provided __$pushUpdate__(_state_) function for when you need to simulate server push updates.
 
+[inset]
+[inset]
 
 #### Local VMContext
 

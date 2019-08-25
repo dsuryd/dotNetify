@@ -48,9 +48,12 @@ export class dotNetifyHubLocal {
 
     if (typeof vm === 'object' && typeof vm.onConnect == 'function') {
       if (this.debug) console.log(`[${iVMId}] *** local mode ***`);
+
+      vm.$pushUpdate = update => setTimeout(() => this.responseEvent.emit(iVMId, update));
+
       let initialState = vm.onConnect(iVMArgs) || {};
       if (typeof initialState == 'object') initialState = JSON.stringify(initialState);
-      setTimeout(() => this.responseEvent.emit(iVMId, initialState));
+      vm.$pushUpdate(initialState);
     }
   }
 
