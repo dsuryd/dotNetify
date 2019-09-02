@@ -1,6 +1,6 @@
-import dotnetify, { Scope, RouteLink } from './react';
+import dotnetify, { Scope, RouteLink, useConnect } from './react';
 
-export { Scope, RouteLink };
+export { Scope, RouteLink, useConnect };
 export default dotnetify;
 
 if (window) {

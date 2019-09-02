@@ -10,21 +10,7 @@ Whether in a brand-new ASP.NET Core project that runs on Windows, Linux, and Mac
 
 In the most basic form, you can just use dotNetify to quickly set up a back-end data store to get the initial state of your React component. Simply add the __connect__ API inside the constructor (or getInitialState if using ES5), specify the name of the C# class that will provide the state, and pass the component itself.
 
-```jsx
-import React from 'react';
-import dotnetify from 'dotnetify';
-
-class MyApp extends React.Component {
-   constructor(props) {
-      super(props);
-      dotnetify.react.connect("HelloWorld", this);
-      this.state = { Greetings: "" };
-   }
-   render() {
-      return <div>{this.state.Greetings}</div>
-   }
-}
-```
+[inset]
 ```csharp
 public class HelloWorld : BaseVM
 {
@@ -39,23 +25,7 @@ Write a C# class that inherits from __BaseVM__ in your ASP.NET project, and add 
 
 With very little effort, you can make your app gets real-time data update from the back-end:
 
-```jsx
-class MyApp extends React.Component {
-   constructor(props) {
-      super(props);
-      dotnetify.react.connect("HelloWorld", this);
-      this.state = { Greetings: "", ServerTime: "" };
-   }
-   render() {
-      return (
-         <div>
-            <p>{this.state.Greetings}</p>
-            <p>Server time is: {this.state.ServerTime}</p>
-         </div>
-      );
-   }
-}
-```
+[inset]
 ```csharp
 public class HelloWorld : BaseVM
 {
@@ -81,32 +51,7 @@ We added two new back-end APIs, __Changed__ that accepts the name of the propert
 
 At some point in your app, you probably want to send data back to the server to be persisted. Let's add to this example something to submit:
 
-```jsx
-class MyApp extends React.Component {
-   constructor(props) {
-      super(props);
-      this.vm = dotnetify.react.connect("HelloWorld", this);
-      this.state = { Greetings: "", firstName: "", lastName: "" };
-   }
-   render() {
-      const handleFirstName = e => this.setState({firstName: e.target.value});
-      const handleLastName = e => this.setState({lastName: e.target.value});
-      const handleSubmit = () => {
-        this.vm.$dispatch({
-          Submit: { FirstName: this.state.firstName, LastName: this.state.lastName }
-        });
-      }
-      return (
-         <div>
-            <div>{this.state.Greetings}</div>
-            <input type="text" value={this.state.firstName} onChange={handleFirstName} />
-            <input type="text" value={this.state.lastName} onChange={handleLastName} />
-            <button onClick={handleSubmit}>Submit</button>
-         </div>
-      );
-   }
-}
-```
+[inset]
 ```csharp
 public class HelloWorld : BaseVM
 {
@@ -138,14 +83,15 @@ You probably think of those back-end classes as models, but in dotNetify's schem
 
 View-models gets their model data from the back-end service layer and shape them to meet the needs of the views. This enforces separation of concerns, where you can keep the views dealing only with UI presentation and leave all data-driven operations to the view models. It's great for testing too, because you can test your use case independent of any UI concerns.
 
-View model objects stay alive on the back-end until the browser page is closed, reloaded, navigated away, or the session times out. On a single-page app, when a component can be mounted and dismounted repeatedly, it is important that you manually destroy the view model when your React component dismounts by calling the __$destroy__ API.
+View model objects stay alive on the back-end until the browser page is closed, reloaded, navigated away, or the session times out. On a single-page app, when a component can be mounted and dismounted repeatedly, it is important that you manually destroy the view model when your React component dismounts by calling the __$destroy__ API.  
+> Note: if you're using __useConnect__ hook, this is already built-in.
 
 ```jsx
 componentWillUnmount() {
    this.vm.$destroy();
 }
 ```
-> When the browser is closing or reloading, SignalR will normally send a disconnection event to the server, which signals dotNetify to dispose the view models associated with the connection.  However, this event won't occur when the SignalR transport falls back to HTTP long polling.  Orphan view models will eventually be cleared, but for best practice, use the window's `beforeUnload` event as fallback to invoke `this.vm.$destroy()`.  
+When the browser is closing or reloading, SignalR will normally send a disconnection event to the server, which signals dotNetify to dispose the view models associated with the connection.  However, this event won't occur when the SignalR transport falls back to HTTP long polling.  Orphan view models will eventually be cleared, but for best practice, use the window's `beforeUnload` event as fallback to invoke `this.vm.$destroy()`.  
 
 #### API Essentials
 
@@ -153,6 +99,7 @@ componentWillUnmount() {
 To get started, you only need these essential APIs to add to your React component:
 
 - _vm_ = __dotnetify.react.connect__(_vmName, component, options_)<br/>
+- `Custom hook:` { _vm, state_ } = __useConnect__(_vmName, state | { state, props }, options_)
 
    The options argument is an object with one or more of the following properties:
    - __getState__: function, provide your own component's state accessor.
@@ -166,12 +113,12 @@ To get started, you only need these essential APIs to add to your React componen
    - __headers__: object, pass request headers, e.g. for authentication purpose.
    - __exceptionHandler__: function, handler for server exceptions.
 
-
 - _vm_.__$dispatch__(_state_)
 - _vm_.__$destroy__()
 
-To output debug logs to the browser's Console tab, add `dotnetify.debug = true`.
-
+- To output debug logs to the browser's Console tab, add __dotnetify.debug__= _true_.
+<br/><br/>
+   
 ##### Server APIs
 On the back-end, inherit from __BaseVM__ and use:
 - __Changed__(_propName_)
