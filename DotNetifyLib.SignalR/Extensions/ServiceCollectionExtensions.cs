@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2017-2018 Dicky Suryadi
+Copyright 2017-2019 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using DotNetify.Client;
 using DotNetify.Security;
+using DotNetify.WebApi;
 
 namespace DotNetify
 {
@@ -27,6 +29,8 @@ namespace DotNetify
       public static IServiceCollection AddDotNetify(this IServiceCollection services)
       {
          // Add memory cache.
+         if (!services.Any(x => x.ServiceType == typeof(Microsoft.Extensions.Caching.Memory.IMemoryCache)))
+            services.AddMemoryCache();
          services.AddSingleton<IMemoryCache, MemoryCacheAdapter>();
 
          // Add view model controller factory, to be injected to dotNetify's signalR hub.
@@ -53,6 +57,8 @@ namespace DotNetify
          // Add middleware and filter factories.
          services.AddSingleton<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>(p => new List<Tuple<Type, Func<IMiddlewarePipeline>>>());
          services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
+
+         services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
 
          return services;
       }

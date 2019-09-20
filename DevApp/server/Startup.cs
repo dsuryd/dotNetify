@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using DotNetify;
 using DotNetify.Security;
 
 namespace DotNetify.DevApp
@@ -21,9 +20,9 @@ namespace DotNetify.DevApp
          // Add OpenID Connect server to produce JWT access tokens.
          services.AddAuthenticationServer();
 
-         services.AddMemoryCache();
          services.AddSignalR();
          services.AddDotNetify();
+         services.AddMvc();
 
          services.AddScoped<IEmployeeRepository, EmployeeRepository>();
          services.AddSingleton<IMovieService, MovieService>();
@@ -75,6 +74,7 @@ namespace DotNetify.DevApp
          }
 
          app.UseStaticFiles();
+         app.UseMvc();
 
          app.Run(async (context) =>
          {

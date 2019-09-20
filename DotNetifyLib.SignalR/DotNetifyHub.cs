@@ -19,10 +19,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using DotNetify.Security;
-using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
