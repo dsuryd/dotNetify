@@ -19,7 +19,8 @@ namespace SPA
       public List<Link> Links => new List<Link>
       {
          new Link { Route = this.GetRoute("SimpleList"), Caption = "Simple List" },
-         new Link { Route = this.GetRoute("LiveChart"), Caption = "Live Chart" }
+         new Link { Route = this.GetRoute("LiveChart"), Caption = "Live Chart" },
+         new Link { Route = this.GetRoute("CompositeView"), Caption = "Composite View" },
       };
 
       public App()
@@ -28,7 +29,8 @@ namespace SPA
          {
             new RouteTemplate("Home") { UrlPattern = "", ViewUrl = "SimpleList" },
             new RouteTemplate("SimpleList"),
-            new RouteTemplate("LiveChart")
+            new RouteTemplate("LiveChart"),
+            new RouteTemplate("CompositeView")
          });
       }
    }
