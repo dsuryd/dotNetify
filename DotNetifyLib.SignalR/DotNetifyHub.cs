@@ -326,7 +326,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="ex">Exception to serialize.</param>
       /// <returns>Serialized exception.</returns>
-      private string SerializeException(Exception ex) => JsonConvert.SerializeObject(new { ExceptionType = ex.GetType().Name, Message = ex.Message });
+      internal static string SerializeException(Exception ex) => JsonConvert.SerializeObject(new { ExceptionType = ex.GetType().Name, ex.Message });
 
       /// <summary>
       /// Sets the hub principal and connection context to the ambient accessor object.

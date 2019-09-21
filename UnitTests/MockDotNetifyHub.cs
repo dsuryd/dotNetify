@@ -38,7 +38,7 @@ namespace UnitTests
 
          public bool TryGetValue<T>(string key, out T cachedValue) where T : class
          {
-            cachedValue = (T)Get(key);
+            cachedValue = (T) Get(key);
             return cachedValue != null;
          }
       }
@@ -89,7 +89,7 @@ namespace UnitTests
 
          public Task SendCoreAsync(string method, object[] args)
          {
-            Hub.GetType().GetMethod(method).Invoke(Hub, (object[])args[0]);
+            Hub.GetType().GetMethod(method).Invoke(Hub, (object[]) args[0]);
             return Task.CompletedTask;
          }
 
@@ -154,16 +154,18 @@ namespace UnitTests
          return this;
       }
 
+      public IHubPipeline CreateHubPipeline() => new HubPipeline(_middlewareFactories, _vmFilterFactories);
+
       public MockDotNetifyHub UseMiddleware<T>(params object[] args) where T : IMiddlewarePipeline
       {
          _middlewareFactories.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(typeof(T),
-            () => (IMiddlewarePipeline)_factoryMethod(typeof(T), args)));
+            () => (IMiddlewarePipeline) _factoryMethod(typeof(T), args)));
          return this;
       }
 
       public MockDotNetifyHub UseFilter<T>(params object[] args) where T : IVMFilter
       {
-         _vmFilterFactories.Add(typeof(T), () => (IVMFilter)_factoryMethod(typeof(T), args));
+         _vmFilterFactories.Add(typeof(T), () => (IVMFilter) _factoryMethod(typeof(T), args));
          return this;
       }
 

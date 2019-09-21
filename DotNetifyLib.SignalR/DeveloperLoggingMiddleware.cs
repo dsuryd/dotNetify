@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,9 +35,9 @@ namespace DotNetify
 
       public Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
-         var log = $@"[dotNetify] connId={hubContext.CallerContext.ConnectionId} 
-            type={hubContext.CallType} 
-            vmId={hubContext.VMId} 
+         var log = $@"[dotNetify] connId={hubContext.CallerContext?.ConnectionId}
+            type={hubContext.CallType}
+            vmId={hubContext.VMId}
             data={JsonConvert.SerializeObject(hubContext.Data ?? string.Empty)}";
 
          if (hubContext.Headers != null)

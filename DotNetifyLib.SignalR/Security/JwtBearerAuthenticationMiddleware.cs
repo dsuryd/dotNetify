@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +63,7 @@ namespace DotNetify.Security
             Trace.WriteLine(ex.Message);
          }
 
-         hubContext.Principal = principal ?? hubContext.CallerContext.User;
+         hubContext.Principal = principal ?? hubContext.CallerContext?.User ?? hubContext.Principal;
          return next(hubContext);
       }
 
