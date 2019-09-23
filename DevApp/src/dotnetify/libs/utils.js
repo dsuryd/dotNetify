@@ -72,4 +72,24 @@ export const createEventEmitter = _ => {
   };
 };
 
+export const fetch = (iMethod, iUrl, iData, iOptions) => {
+  return new Promise((resolve, reject) => {
+    let request = new window.XMLHttpRequest();
+    request.open(iMethod, iUrl, true);
+    if (typeof iOptions == 'function') iOptions(request);
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        var response = request.responseText;
+        resolve(response);
+      }
+      else reject(request);
+    };
+    request.onerror = function() {
+      reject(request);
+    };
+    request.send(iData);
+  });
+};
+
 export default new utils();
