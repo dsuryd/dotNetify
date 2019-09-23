@@ -47,6 +47,10 @@ namespace DotNetify.Security
       /// <param name="next">Next middleware delegate.</param>
       public Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
+         // Skip if context already has headers (in the case of Web API mode).
+         if (context.Headers != null)
+            return next(context);
+
          // Set initial headers from previously cached headers.
          if (context.CallerContext != null)
             context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
