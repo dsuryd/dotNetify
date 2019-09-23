@@ -7,7 +7,7 @@
 		exports["dotnetify"] = factory(require("react"), require("@aspnet/signalr"), require("react-dom"));
 	else
 		root["dotnetify"] = factory(root["React"], root["signalR"], root["ReactDOM"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__2__, __WEBPACK_EXTERNAL_MODULE__6__, __WEBPACK_EXTERNAL_MODULE__22__) {
+})(window, function(__WEBPACK_EXTERNAL_MODULE__4__, __WEBPACK_EXTERNAL_MODULE__7__, __WEBPACK_EXTERNAL_MODULE__23__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,11 +91,37 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1, eval)("this");
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -105,7 +131,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _dotnetify2 = __webpack_require__(13);
+var _dotnetify2 = __webpack_require__(14);
 
 var _dotnetify3 = _interopRequireDefault(_dotnetify2);
 
@@ -130,51 +156,51 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-if (typeof window == 'undefined') window = global;
+var window = window || global || {};
 var dotnetify = window.dotnetify || _dotnetify3.default;
 
 dotnetify.react = {
-  version: '2.0.0',
+  version: '3.0.0',
   viewModels: {},
   plugins: {},
   controller: dotnetify,
 
   // Internal variables.
-  _responseSubs: null,
-  _reconnectedSubs: null,
-  _connectedSubs: null,
-  _connectionFailedSubs: null,
+  _hubs: [],
 
   // Initializes connection to SignalR server hub.
-  init: function init() {
+  init: function init(iHub) {
     var self = dotnetify.react;
-
-    if (!self._responseSubs) {
-      self._responseSubs = dotnetify.responseEvent.subscribe(function (iVMId, iVMData) {
-        return self._responseVM(iVMId, iVMData);
-      });
-    }
-
-    if (!self._connectedSubs) {
-      self._connectedSubs = dotnetify.connectedEvent.subscribe(function () {
-        return Object.keys(self.viewModels).forEach(function (vmId) {
-          return !self.viewModels[vmId].$requested && self.viewModels[vmId].$request();
-        });
-      });
-    }
+    var hubInitialized = self._hubs.some(function (hub) {
+      return hub === iHub;
+    });
 
     var start = function start() {
-      if (!dotnetify.isHubStarted) Object.keys(self.viewModels).forEach(function (vmId) {
+      if (!iHub.isHubStarted) Object.keys(self.viewModels).filter(function (vmId) {
+        return self.viewModels[vmId].$hub === iHub;
+      }).forEach(function (vmId) {
         return self.viewModels[vmId].$requested = false;
       });
-      dotnetify.startHub();
+
+      dotnetify.startHub(iHub);
     };
 
-    if (!self._reconnectedSubs) {
-      self._reconnectedSubs = dotnetify.reconnectedEvent.subscribe(start);
+    if (!hubInitialized) {
+      iHub.responseEvent.subscribe(function (iVMId, iVMData) {
+        return self._responseVM(iVMId, iVMData);
+      });
+      iHub.connectedEvent.subscribe(function () {
+        return Object.keys(self.viewModels).filter(function (vmId) {
+          return self.viewModels[vmId].$hub === iHub && !self.viewModels[vmId].$requested;
+        }).forEach(function (vmId) {
+          return self.viewModels[vmId].$request();
+        });
+      });
+      iHub.reconnectedEvent.subscribe(start);
+
+      if (iHub.mode !== 'local') self._hubs.push(iHub);
     }
 
-    dotnetify.initHub();
     start();
   },
 
@@ -182,8 +208,9 @@ dotnetify.react = {
   connect: function connect(iVMId, iReact, iOptions) {
     if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
 
+    var vmArg = iOptions && iOptions['vmArg'];
+
     if (dotnetify.ssr && dotnetify.react.ssrConnect) {
-      var vmArg = iOptions && iOptions['vmArg'];
       return dotnetify.react.ssrConnect(iVMId, iReact, vmArg);
     }
 
@@ -207,9 +234,11 @@ dotnetify.react = {
         iReact.setState(state);
       }
     };
-    self.viewModels[iVMId] = new _dotnetifyVm2.default(iVMId, component, iOptions, dotnetify.react);
 
-    self.init();
+    var connectInfo = dotnetify.selectHub({ vmId: iVMId, options: iOptions, hub: null });
+    self.viewModels[iVMId] = new _dotnetifyVm2.default(connectInfo.vmId, component, connectInfo.options, self, connectInfo.hub);
+    if (connectInfo.hub) self.init(connectInfo.hub);
+
     return self.viewModels[iVMId];
   },
 
@@ -234,15 +263,17 @@ dotnetify.react = {
   }
 };
 
+dotnetify.addVMAccessor(dotnetify.react.getViewModels);
+
 exports.default = dotnetify;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
+/* WEBPACK VAR INJECTION */(function(global, module) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -262,151 +293,149 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var jQueryDeferred = __webpack_require__(10);
+var window = window || global || {};
+
+var jQueryDeferred = __webpack_require__(11);
 var jQueryShim = jQueryDeferred.extend(function (selector) {
+  if (selector === window || selector.document) return {
+    0: selector,
+    on: function on(iEvent, iHandler) {
+      window.addEventListener(iEvent, iHandler);
+    },
+    bind: function bind(iEvent, iHandler) {
+      window.addEventListener(iEvent, iHandler, false);
+    },
+    unbind: function unbind(iEvent, iHandler) {
+      window.removeEventListener(iEvent, iHandler, false);
+    }
+  };
 
-   if (selector === window || selector.document) return {
-      0: selector,
-      on: function on(iEvent, iHandler) {
-         window.addEventListener(iEvent, iHandler);
-      },
-      bind: function bind(iEvent, iHandler) {
-         window.addEventListener(iEvent, iHandler, false);
-      },
-      unbind: function unbind(iEvent, iHandler) {
-         window.removeEventListener(iEvent, iHandler, false);
-      }
-   };
+  if (typeof selector !== 'string') selector.events = selector.events || {};
 
-   if (typeof selector !== "string") selector.events = selector.events || {};
+  return {
+    0: selector,
 
-   return {
-      0: selector,
+    bind: function bind(iEvent, iHandler) {
+      var event = selector.events[iEvent] || [];
+      event.push(iHandler);
+      selector.events[iEvent] = event;
+    },
 
-      bind: function bind(iEvent, iHandler) {
-         var event = selector.events[iEvent] || [];
-         event.push(iHandler);
-         selector.events[iEvent] = event;
-      },
+    unbind: function unbind(iEvent, iHandler) {
+      var handlers = selector.events[iEvent] || [];
+      if (iHandler) {
+        var idx = handlers.indexOf(iHandler);
+        if (idx !== -1) handlers.splice(idx, 1);
+      } else handlers = [];
+      selector.events[iEvent] = handlers;
+    },
 
-      unbind: function unbind(iEvent, iHandler) {
-         var handlers = selector.events[iEvent] || [];
-         if (iHandler) {
-            var idx = handlers.indexOf(iHandler);
-            if (idx !== -1) handlers.splice(idx, 1);
-         } else handlers = [];
-         selector.events[iEvent] = handlers;
-      },
+    triggerHandler: function triggerHandler(iEvent, iArgs) {
+      var handlers = selector.events[iEvent] || [];
+      var args = [{ type: iEvent }];
+      if (Array.isArray(iArgs)) iArgs.forEach(function (arg) {
+        args.push(arg);
+      });else if (iArgs) args.push(iArgs);
+      handlers.forEach(function (handler) {
+        handler.apply(this, args);
+      });
+    },
 
-      triggerHandler: function triggerHandler(iEvent, iArgs) {
-         var handlers = selector.events[iEvent] || [];
-         var args = [{ type: iEvent }];
-         if (Array.isArray(iArgs)) iArgs.forEach(function (arg) {
-            args.push(arg);
-         });else if (iArgs) args.push(iArgs);
-         handlers.forEach(function (handler) {
-            handler.apply(this, args);
-         });
-      },
-
-      load: function load(iUrl, iArgs, iHandler) {
-         var request = new window.XMLHttpRequest();
-         request.open('GET', iUrl, true);
-         request.onload = function () {
-            if (request.status >= 200 && request.status < 400) {
-               var response = request.responseText;
-               document.querySelector(selector).innerHTML = response;
-               iHandler.call(document.querySelector(selector));
-            }
-         };
-         request.send();
-         return { abort: function abort(reason) {
-               return request.abort(reason);
-            } };
-      }
-   };
-}, jQueryDeferred, {
-   support: { cors: true },
-
-   trim: function trim(iStr) {
-      return typeof iStr === "string" ? iStr.trim() : iStr;
-   },
-
-   inArray: function inArray(iArray, iItem) {
-      return iArray.indexOf(iItem) !== -1;
-   },
-
-   makeArray: function makeArray(iArray) {
-      return [].slice.call(iArray, 0);
-   },
-
-   merge: function merge(iArray1, iArray2) {
-      Array.prototype.push.apply(iArray1, iArray2);return iArray1;
-   },
-
-   isEmptyObject: function isEmptyObject(iObj) {
-      return !iObj || Object.keys(iObj).length === 0;
-   },
-
-   ajax: function ajax(iOptions) {
+    load: function load(iUrl, iArgs, iHandler) {
       var request = new window.XMLHttpRequest();
-      request.onreadystatechange = function () {
-         if (request.readyState !== 4) return;
-         if (request.status === 200 && !request._hasError) {
-            try {
-               iOptions.success && iOptions.success(JSON.parse(request.responseText));
-            } catch (error) {
-               iOptions.success && iOptions.success(request.responseText);
-            }
-         } else iOptions.error && iOptions.error(request);
+      request.open('GET', iUrl, true);
+      request.onload = function () {
+        if (request.status >= 200 && request.status < 400) {
+          var response = request.responseText;
+          document.querySelector(selector).innerHTML = response;
+          iHandler.call(document.querySelector(selector));
+        }
       };
-      request.open(iOptions.type, iOptions.url);
-      request.setRequestHeader("content-type", iOptions.contentType);
-      request.send(iOptions.data.data && "data=" + iOptions.data.data);
+      request.send();
       return {
-         abort: function abort(reason) {
-            return request.abort(reason);
-         }
+        abort: function abort(reason) {
+          return request.abort(reason);
+        }
       };
-   },
+    }
+  };
+}, jQueryDeferred, {
+  support: { cors: true },
 
-   getScript: function getScript(iUrl, iSuccess) {
-      var done = false;
-      var promise = jQueryDeferred.Deferred();
-      var head = document.getElementsByTagName("head")[0];
-      var script = document.createElement("script");
-      script.src = iUrl;
-      script.onload = script.onreadystatechange = function () {
-         if (!done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete")) {
-            done = true;
-            script.onload = script.onreadystatechange = null;
-            head.removeChild(script);
-            if (typeof iSuccess === "function") iSuccess();
-            promise.resolve();
-         }
-      };
-      head.appendChild(script);
-      return promise;
-   }
+  trim: function trim(iStr) {
+    return typeof iStr === 'string' ? iStr.trim() : iStr;
+  },
+
+  inArray: function inArray(iArray, iItem) {
+    return iArray.indexOf(iItem) !== -1;
+  },
+
+  makeArray: function makeArray(iArray) {
+    return [].slice.call(iArray, 0);
+  },
+
+  merge: function merge(iArray1, iArray2) {
+    Array.prototype.push.apply(iArray1, iArray2);
+    return iArray1;
+  },
+
+  isEmptyObject: function isEmptyObject(iObj) {
+    return !iObj || Object.keys(iObj).length === 0;
+  },
+
+  ajax: function ajax(iOptions) {
+    var request = new window.XMLHttpRequest();
+    request.onreadystatechange = function () {
+      if (request.readyState !== 4) return;
+      if (request.status === 200 && !request._hasError) {
+        try {
+          iOptions.success && iOptions.success(JSON.parse(request.responseText));
+        } catch (error) {
+          iOptions.success && iOptions.success(request.responseText);
+        }
+      } else iOptions.error && iOptions.error(request);
+    };
+    request.open(iOptions.type, iOptions.url);
+    request.setRequestHeader('content-type', iOptions.contentType);
+    request.send(iOptions.data.data && 'data=' + iOptions.data.data);
+    return {
+      abort: function abort(reason) {
+        return request.abort(reason);
+      }
+    };
+  },
+
+  getScript: function getScript(iUrl, iSuccess) {
+    var done = false;
+    var promise = jQueryDeferred.Deferred();
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.src = iUrl;
+    script.onload = script.onreadystatechange = function () {
+      if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
+        done = true;
+        script.onload = script.onreadystatechange = null;
+        head.removeChild(script);
+        if (typeof iSuccess === 'function') iSuccess();
+        promise.resolve();
+      }
+    };
+    head.appendChild(script);
+    return promise;
+  }
 });
 
-if (typeof window !== "undefined") window.jQuery = window.jQuery || jQueryShim;
+if (typeof window !== 'undefined') window.jQuery = window.jQuery || jQueryShim;
 
-if (( false ? undefined : _typeof(exports)) === "object" && ( false ? undefined : _typeof(module)) === "object") module.exports = jQueryShim;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(11)(module)))
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__2__;
+if (( false ? undefined : _typeof(exports)) === 'object' && ( false ? undefined : _typeof(module)) === 'object') module.exports = jQueryShim;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(12)(module)))
 
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -433,6 +462,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+var window = window || global || {};
 
 var utils = function () {
   function utils() {
@@ -521,39 +551,20 @@ var createEventEmitter = exports.createEventEmitter = function createEventEmitte
 };
 
 exports.default = new utils();
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 4 */
 /***/ (function(module, exports) {
 
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1, eval)("this");
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
+module.exports = __WEBPACK_EXTERNAL_MODULE__4__;
 
 /***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -578,7 +589,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _jqueryShim = __webpack_require__(1);
+var _jqueryShim = __webpack_require__(2);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
@@ -586,7 +597,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var window = window || global || {};
+
 // Client-side view model that acts as a proxy of the server view model.
+
 var dotnetifyVM = function () {
   // iVMId - identifies the view model.
   // iComponent - component object.
@@ -595,14 +609,17 @@ var dotnetifyVM = function () {
   //    setState: state mutator.
   //    vmArg: view model arguments.
   //    headers: request headers, for things like authentication token.
+  //    exceptionHandler: called when receiving server-side exception.
   // iDotNetify - framework-specific dotNetify library.
-  function dotnetifyVM(iVMId, iComponent, iOptions, iDotNetify) {
+  // iHub - hub connection.
+  function dotnetifyVM(iVMId, iComponent, iOptions, iDotNetify, iHub) {
     var _this = this;
 
     _classCallCheck(this, dotnetifyVM);
 
     this.$vmId = iVMId;
     this.$component = iComponent;
+    this.$options = iOptions || {};
     this.$vmArg = iOptions && iOptions['vmArg'];
     this.$headers = iOptions && iOptions['headers'];
     this.$exceptionHandler = iOptions && iOptions['exceptionHandler'];
@@ -610,6 +627,7 @@ var dotnetifyVM = function () {
     this.$loaded = false;
     this.$itemKey = {};
     this.$dotnetify = iDotNetify;
+    this.$hub = iHub;
 
     var getState = iOptions && iOptions['getState'];
     var setState = iOptions && iOptions['setState'];
@@ -649,12 +667,11 @@ var dotnetifyVM = function () {
         return typeof plugin['$destroy'] == 'function' ? plugin.$destroy.apply(_this2) : null;
       });
 
-      var controller = this.$dotnetify.controller;
-      if (controller.isConnected()) {
+      if (this.$hub.isConnected) {
         try {
-          controller.disposeVM(this.$vmId);
+          this.$hub.disposeVM(this.$vmId);
         } catch (ex) {
-          controller._triggerConnectionStateEvent('error', ex);
+          this.$dotnetify.controller.handleConnectionStateChanged('error', ex, this.$hub);
         }
       }
 
@@ -662,15 +679,15 @@ var dotnetifyVM = function () {
     }
 
     // Dispatches a value to the server view model.
-    // iValue - Vvalue to dispatch.
+    // iValue - Value to dispatch.
 
   }, {
     key: '$dispatch',
     value: function $dispatch(iValue) {
-      var controller = this.$dotnetify.controller;
-      if (controller.isConnected()) {
+      if (this.$hub.isConnected) {
+        var controller = this.$dotnetify.controller;
         try {
-          controller.updateVM(this.$vmId, iValue);
+          this.$hub.updateVM(this.$vmId, iValue);
 
           if (controller.debug) {
             console.log('[' + this.$vmId + '] sent> ');
@@ -679,7 +696,7 @@ var dotnetifyVM = function () {
             controller.debugFn && controller.debugFn(this.$vmId, 'sent', iValue);
           }
         } catch (ex) {
-          controller._triggerConnectionStateEvent('error', ex);
+          controller.handleConnectionStateChanged('error', ex, this.$hub);
         }
       }
     }
@@ -800,11 +817,8 @@ var dotnetifyVM = function () {
   }, {
     key: '$request',
     value: function $request() {
-      var controller = this.$dotnetify.controller;
-      if (controller.isConnected()) {
-        controller.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
-        this.$requested = true;
-      }
+      if (this.$hub.isConnected) this.$hub.requestVM(this.$vmId, { $vmArg: this.$vmArg, $headers: this.$headers });
+      this.$requested = true;
     }
 
     // Updates state from the server view model to the view.
@@ -827,7 +841,7 @@ var dotnetifyVM = function () {
       state = _jqueryShim2.default.extend({}, state, vmData);
       this.State(state);
 
-      if (!this.$loaded) this.$onLoad();
+      if (!this.$loaded) this.$onLoad();else this.$onUpdate(vmData);
     }
 
     // Handles initial view model load event.
@@ -837,12 +851,22 @@ var dotnetifyVM = function () {
     value: function $onLoad() {
       var _this5 = this;
 
-      // Call any plugin's $ready function if provided to give a chance to do
-      // things when the view model is ready.
       this.$getPlugins().map(function (plugin) {
         return typeof plugin['$ready'] == 'function' ? plugin.$ready.apply(_this5) : null;
       });
       this.$loaded = true;
+    }
+
+    // Handles view model update event.
+
+  }, {
+    key: '$onUpdate',
+    value: function $onUpdate(vmData) {
+      var _this6 = this;
+
+      this.$getPlugins().map(function (plugin) {
+        return typeof plugin['$update'] == 'function' ? plugin.$update.apply(_this6, [vmData]) : null;
+      });
     }
 
     // *** CRUD Functions ***
@@ -922,15 +946,142 @@ var dotnetifyVM = function () {
 }();
 
 exports.default = dotnetifyVM;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__6__;
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.hasLocalVM = exports.dotNetifyHubLocal = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* 
+                                                                                                                                                                                                                                                                              import { dotnetify } from 'dotnetify/dist/dotnetify-ko';
+                                                                                                                                                                                                                                                                              Copyright 2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                              Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                              you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                              You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                  http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                              Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                              distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                              See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                              limitations under the License.
+                                                                                                                                                                                                                                                                               */
+
+
+var _utils = __webpack_require__(3);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var window = window || global || {};
+
+var normalize = function normalize(iVMId) {
+  return iVMId && iVMId.replace(/\./g, '_');
+};
+var hasLocalVM = function hasLocalVM(iVMId) {
+  var vmId = normalize(iVMId);
+  var vm = window[vmId];
+  return (typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) == 'object' && typeof vm.onConnect == 'function';
+};
+
+var dotNetifyHubLocal = exports.dotNetifyHubLocal = function () {
+  function dotNetifyHubLocal() {
+    _classCallCheck(this, dotNetifyHubLocal);
+
+    this.mode = 'local';
+    this.debug = false;
+    this.isConnected = false;
+    this.isHubStarted = false;
+    this.responseEvent = (0, _utils.createEventEmitter)();
+    this.reconnectedEvent = (0, _utils.createEventEmitter)();
+    this.connectedEvent = (0, _utils.createEventEmitter)();
+    this.connectionFailedEvent = (0, _utils.createEventEmitter)();
+  }
+
+  _createClass(dotNetifyHubLocal, [{
+    key: 'startHub',
+    value: function startHub() {
+      this.isConnected = true;
+      this.isHubStarted = true;
+      this.connectedEvent.emit();
+    }
+  }, {
+    key: 'requestVM',
+    value: function requestVM(iVMId, iVMArgs) {
+      var _this = this;
+
+      var vmId = normalize(iVMId);
+      var vm = window[vmId];
+
+      if ((typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) === 'object' && typeof vm.onConnect == 'function') {
+        if (this.debug) console.log('[' + iVMId + '] *** local mode ***');
+
+        vm.$pushUpdate = function (update) {
+          if ((typeof update === 'undefined' ? 'undefined' : _typeof(update)) == 'object') update = JSON.stringify(update);
+          setTimeout(function () {
+            return _this.responseEvent.emit(iVMId, update);
+          });
+        };
+
+        vm.$pushUpdate(vm.onConnect(iVMArgs) || {});
+      }
+    }
+  }, {
+    key: 'updateVM',
+    value: function updateVM(iVMId, iValue) {
+      var _this2 = this;
+
+      var vmId = normalize(iVMId);
+      var vm = window[vmId];
+
+      if ((typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) === 'object' && typeof vm.onDispatch == 'function') {
+        var state = vm.onDispatch(iValue);
+        if (state) {
+          if ((typeof state === 'undefined' ? 'undefined' : _typeof(state)) == 'object') state = JSON.stringify(state);
+          setTimeout(function () {
+            return _this2.responseEvent.emit(iVMId, state);
+          });
+        }
+      }
+    }
+  }, {
+    key: 'disposeVM',
+    value: function disposeVM(iVMId) {
+      var vmId = normalize(iVMId);
+      var vm = window[vmId];
+
+      if ((typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) === 'object' && typeof vm.onDestroy == 'function') {
+        vm.onDestroy(iVMId);
+      }
+    }
+  }]);
+
+  return dotNetifyHubLocal;
+}();
+
+exports.default = new dotNetifyHubLocal();
+exports.hasLocalVM = hasLocalVM;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__7__;
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports) {
 
 /**
@@ -1091,10 +1242,10 @@ function extend() {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var jQuery = module.exports = __webpack_require__(7),
+var jQuery = module.exports = __webpack_require__(8),
 	core_rspace = /\s+/;
 /**
 * jQuery Callbacks
@@ -1303,7 +1454,7 @@ jQuery.Callbacks = function( options ) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1317,7 +1468,7 @@ jQuery.Callbacks = function( options ) {
 * Library version.
 */
 
-var jQuery = module.exports = __webpack_require__(8),
+var jQuery = module.exports = __webpack_require__(9),
 	core_slice = Array.prototype.slice;
 
 /**
@@ -1472,14 +1623,14 @@ jQuery.extend({
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(9);
+module.exports = __webpack_require__(10);
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -1507,7 +1658,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1516,542 +1667,452 @@ module.exports = function(module) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.dotnetifyHubFactory = undefined;
 
-var _jqueryShim = __webpack_require__(1);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Copyright 2017-2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _utils = __webpack_require__(3);
+
+var _jqueryShim = __webpack_require__(2);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var signalRNetCore = __webpack_require__(6); /* 
-                                                 Copyright 2017-2018 Dicky Suryadi
-                                                 
-                                                 Licensed under the Apache License, Version 2.0 (the "License");
-                                                 you may not use this file except in compliance with the License.
-                                                 You may obtain a copy of the License at
-                                                 
-                                                     http://www.apache.org/licenses/LICENSE-2.0
-                                                 
-                                                 Unless required by applicable law or agreed to in writing, software
-                                                 distributed under the License is distributed on an "AS IS" BASIS,
-                                                 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                 See the License for the specific language governing permissions and
-                                                 limitations under the License.
-                                                  */
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var signalRNetCore = __webpack_require__(7);
 var $ = _jqueryShim2.default;
 
-if (typeof window == 'undefined') window = global;
+var window = window || global || {};
 
-var dotnetifyHub = $.extend(dotnetifyHub, {
-  version: '1.2.0',
-  type: null,
-  _init: false
-});
+var dotnetifyHubFactory = exports.dotnetifyHubFactory = function () {
+  function dotnetifyHubFactory() {
+    _classCallCheck(this, dotnetifyHubFactory);
+  }
 
-dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
-  if (dotnetifyHub._init) return;
+  _createClass(dotnetifyHubFactory, null, [{
+    key: 'create',
+    value: function create() {
+      var dotnetifyHub = {
+        version: '2.0.0',
+        type: null,
 
-  dotnetifyHub._init = true;
-  signalR = signalR || window.signalR || signalRNetCore;
+        reconnectDelay: [2, 5, 10],
+        reconnectRetry: null,
 
-  // SignalR .NET Core.
-  if (signalR && signalR.HubConnection) {
-    dotnetifyHub.type = 'netcore';
+        _startInfo: null,
+        _init: false,
 
-    Object.defineProperty(dotnetifyHub, 'isConnected', {
-      get: function get() {
-        return dotnetifyHub._connection && dotnetifyHub._connection.connection.connectionState === 1;
-      }
-    });
-
-    dotnetifyHub = $.extend(dotnetifyHub, {
-      hubPath: iHubPath || '/dotnetify',
-      url: iServerUrl,
-      reconnectDelay: [2, 5, 10],
-      reconnectRetry: null,
-
-      // Internal variables. Do not modify!
-      _connection: null,
-      _reconnectCount: 0,
-      _startDoneHandler: null,
-      _startFailHandler: null,
-      _disconnectedHandler: function _disconnectedHandler() {},
-      _stateChangedHandler: function _stateChangedHandler(iNewState) {},
-
-      _onDisconnected: function _onDisconnected() {
-        dotnetifyHub._changeState(4);
-        dotnetifyHub._disconnectedHandler();
-      },
-
-      _changeState: function _changeState(iNewState) {
-        if (iNewState == 1) dotnetifyHub._reconnectCount = 0;
-
-        var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected', 99: 'terminated' };
-        dotnetifyHub._stateChangedHandler(stateText[iNewState]);
-      },
-
-      _startConnection: function _startConnection(iHubOptions, iTransportArray) {
-        var url = dotnetifyHub.url ? dotnetifyHub.url + dotnetifyHub.hubPath : dotnetifyHub.hubPath;
-        var hubOptions = {};
-        Object.keys(iHubOptions).forEach(function (key) {
-          hubOptions[key] = iHubOptions[key];
-        });
-        hubOptions.transport = iTransportArray.shift();
-
-        dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
-        dotnetifyHub._connection.on('response_vm', dotnetifyHub.client.response_VM);
-        dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
-
-        var promise = dotnetifyHub._connection.start().then(function () {
-          dotnetifyHub._changeState(1);
-        }).catch(function () {
-          // If failed to start, fallback to the next transport.
-          if (iTransportArray.length > 0) dotnetifyHub._startConnection(iHubOptions, iTransportArray);else dotnetifyHub._onDisconnected();
-        });
-
-        if (typeof dotnetifyHub._startDoneHandler === 'function') promise.then(dotnetifyHub._startDoneHandler).catch(dotnetifyHub._startFailHandler || function () {});
-        return promise;
-      },
-
-      start: function start(iHubOptions) {
-        dotnetifyHub._startDoneHandler = null;
-        dotnetifyHub._startFailHandler = null;
-
-        // Map the transport option.
-        var transport = [0];
-        var transportOptions = { webSockets: 0, serverSentEvents: 1, longPolling: 2 };
-        if (iHubOptions && Array.isArray(iHubOptions.transport)) transport = iHubOptions.transport.map(function (arg) {
-          return transportOptions[arg];
-        });
-
-        var promise = dotnetifyHub._startConnection(iHubOptions, transport);
-        return {
-          done: function done(iHandler) {
-            dotnetifyHub._startDoneHandler = iHandler;
-            promise.then(iHandler).catch(function (error) {
-              throw error;
-            });
-            return this;
-          },
-          fail: function fail(iHandler) {
-            dotnetifyHub._startFailHandler = iHandler;
-            promise.catch(iHandler);
-            return this;
-          }
-        };
-      },
-
-      disconnected: function disconnected(iHandler) {
-        if (typeof iHandler === 'function') dotnetifyHub._disconnectedHandler = iHandler;
-      },
-
-      stateChanged: function stateChanged(iHandler) {
-        if (typeof iHandler === 'function') dotnetifyHub._stateChangedHandler = iHandler;
-      },
-
-      reconnect: function reconnect(iStartHubFunc) {
-        if (typeof iStartHubFunc === 'function') {
-          // Only attempt reconnect if the specified retry hasn't been exceeded.
-          if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
-            // Determine reconnect delay from the specified configuration array.
-            var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
-
-            dotnetifyHub._reconnectCount++;
-
-            setTimeout(function () {
-              dotnetifyHub._changeState(2);
-              iStartHubFunc();
-            }, delay * 1000);
-          } else dotnetifyHub._changeState(99);
-        }
-      },
-
-      client: {},
-
-      server: {
-        dispose_VM: function dispose_VM(iVMId) {
-          dotnetifyHub._connection.invoke('Dispose_VM', iVMId);
+        // Hub server methods.
+        requestVM: function requestVM(iVMId, iOptions) {
+          return dotnetifyHub.server.request_VM(iVMId, iOptions);
         },
-        update_VM: function update_VM(iVMId, iValue) {
-          dotnetifyHub._connection.invoke('Update_VM', iVMId, iValue);
+        updateVM: function updateVM(iVMId, iValue) {
+          return dotnetifyHub.server.update_VM(iVMId, iValue);
         },
-        request_VM: function request_VM(iVMId, iArgs) {
-          dotnetifyHub._connection.invoke('Request_VM', iVMId, iArgs);
-        }
-      }
-    });
-  } else {
-    // SignalR .NET FX.
-    dotnetifyHub.type = 'netfx';
+        disposeVM: function disposeVM(iVMId) {
+          return dotnetifyHub.server.dispose_VM(iVMId);
+        },
 
-    if (window.jQuery) $ = window.jQuery;
+        // Connection events.
+        responseEvent: (0, _utils.createEventEmitter)(),
+        reconnectedEvent: (0, _utils.createEventEmitter)(),
+        connectedEvent: (0, _utils.createEventEmitter)(),
+        connectionFailedEvent: (0, _utils.createEventEmitter)(),
 
-    // SignalR hub auto-generated from /signalr/hubs.
-    /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
-    /// <reference path="jquery.signalR.js" />
-    (function ($, window, undefined) {
-      /// <param name="$" type="jQuery" />
-      'use strict';
+        get isHubStarted() {
+          return !!this._startInfo;
+        },
 
-      if (typeof $.signalR !== 'function') {
-        throw new Error('SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.');
-      }
+        // Starts connection with SignalR hub server.
+        startHub: function startHub(hubOptions, doneHandler, failHandler, forceRestart) {
+          var _this = this;
 
-      var signalR = $.signalR;
+          var _doneHandler = function _doneHandler() {
+            if (typeof doneHandler == 'function') doneHandler();
+            _this.connectedEvent.emit();
+          };
+          var _failHandler = function _failHandler(ex) {
+            if (typeof failHander == 'function') failHandler();
+            _this.connectionFailedEvent.emit();
+            throw ex;
+          };
 
-      function makeProxyCallback(hub, callback) {
-        return function () {
-          // Call the client hub method
-          callback.apply(hub, $.makeArray(arguments));
-        };
-      }
-
-      function registerHubProxies(instance, shouldSubscribe) {
-        var key, hub, memberKey, memberValue, subscriptionMethod;
-
-        for (key in instance) {
-          if (instance.hasOwnProperty(key)) {
-            hub = instance[key];
-
-            if (!hub.hubName) {
-              // Not a client hub
-              continue;
+          if (this._startInfo === null || forceRestart) {
+            try {
+              this._startInfo = this.start(hubOptions).done(_doneHandler).fail(_failHandler);
+            } catch (err) {
+              this._startInfo = null;
             }
-
-            if (shouldSubscribe) {
-              // We want to subscribe to the hub events
-              subscriptionMethod = hub.on;
-            } else {
-              // We want to unsubscribe from the hub events
-              subscriptionMethod = hub.off;
-            }
-
-            // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
-            for (memberKey in hub.client) {
-              if (hub.client.hasOwnProperty(memberKey)) {
-                memberValue = hub.client[memberKey];
-
-                if (!$.isFunction(memberValue)) {
-                  // Not a client hub function
-                  continue;
-                }
-
-                subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
-              }
+          } else {
+            try {
+              this._startInfo.done(_doneHandler);
+            } catch (err) {
+              this._startInfo = null;
+              return this.startHub(hubOptions, doneHandler, failHandler, forceRestart);
             }
           }
         }
-      }
-
-      $.hubConnection.prototype.createHubProxies = function () {
-        var proxies = {};
-        this.starting(function () {
-          // Register the hub proxies as subscribed
-          // (instance, shouldSubscribe)
-          registerHubProxies(proxies, true);
-
-          this._registerSubscribedHubs();
-        }).disconnected(function () {
-          // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
-          // (instance, shouldSubscribe)
-          registerHubProxies(proxies, false);
-        });
-
-        proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
-        proxies['dotNetifyHub'].client = {};
-        proxies['dotNetifyHub'].server = {
-          dispose_VM: function dispose_VM(vmId) {
-            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Dispose_VM'], $.makeArray(arguments)));
-          },
-
-          request_VM: function request_VM(vmId, vmArg) {
-            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Request_VM'], $.makeArray(arguments)));
-          },
-
-          update_VM: function update_VM(vmId, vmData) {
-            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Update_VM'], $.makeArray(arguments)));
-          }
-        };
-
-        return proxies;
       };
 
-      signalR.hub = $.hubConnection(dotnetifyHub.hubPath, { useDefaultPath: false });
-      $.extend(signalR, signalR.hub.createHubProxies());
-    })($, window);
+      // Configures connection to SignalR hub server.
+      dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
+        if (dotnetifyHub._init) return;
 
-    Object.defineProperty(dotnetifyHub, 'state', {
-      get: function get() {
-        return $.connection.hub.state;
-      },
-      set: function set(val) {
-        $.connection.hub.state = val;
-      }
-    });
+        dotnetifyHub._init = true;
+        signalR = signalR || window.signalR || signalRNetCore;
 
-    Object.defineProperty(dotnetifyHub, 'client', {
-      get: function get() {
-        return $.connection.dotNetifyHub.client;
-      }
-    });
+        // SignalR .NET Core.
+        if (signalR && signalR.HubConnection) {
+          dotnetifyHub.type = 'netcore';
 
-    Object.defineProperty(dotnetifyHub, 'server', {
-      get: function get() {
-        return $.connection.dotNetifyHub.server;
-      }
-    });
+          Object.defineProperty(dotnetifyHub, 'isConnected', {
+            get: function get() {
+              return dotnetifyHub._connection && dotnetifyHub._connection.connection.connectionState === 1;
+            }
+          });
 
-    Object.defineProperty(dotnetifyHub, 'isConnected', {
-      get: function get() {
-        return $.connection.hub.state == $.signalR.connectionState.connected;
-      }
-    });
+          dotnetifyHub = $.extend(dotnetifyHub, {
+            hubPath: iHubPath || '/dotnetify',
+            url: iServerUrl,
 
-    dotnetifyHub = $.extend(dotnetifyHub, {
-      hubPath: iHubPath || '/signalr',
-      url: iServerUrl,
-      reconnectDelay: [2, 5, 10],
-      reconnectRetry: null,
+            // Internal variables. Do not modify!
+            _connection: null,
+            _reconnectCount: 0,
+            _startDoneHandler: null,
+            _startFailHandler: null,
+            _disconnectedHandler: function _disconnectedHandler() {},
+            _stateChangedHandler: function _stateChangedHandler(iNewState) {},
 
-      _reconnectCount: 0,
-      _stateChangedHandler: function _stateChangedHandler(iNewState) {},
+            _onDisconnected: function _onDisconnected() {
+              dotnetifyHub._changeState(4);
+              dotnetifyHub._disconnectedHandler();
+            },
 
-      start: function start(iHubOptions) {
-        if (dotnetifyHub.url) $.connection.hub.url = dotnetifyHub.url;
+            _changeState: function _changeState(iNewState) {
+              if (iNewState == 1) dotnetifyHub._reconnectCount = 0;
 
-        var deferred;
-        if (iHubOptions) deferred = $.connection.hub.start(iHubOptions);else deferred = $.connection.hub.start();
-        deferred.fail(function (error) {
-          if (error.source && error.source.message === 'Error parsing negotiate response.') console.warn('This client may be attempting to connect to an incompatible SignalR .NET Core server.');
-        });
-        return deferred;
-      },
+              var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected', 99: 'terminated' };
+              dotnetifyHub._stateChangedHandler(stateText[iNewState]);
+            },
 
-      disconnected: function disconnected(iHandler) {
-        return $.connection.hub.disconnected(iHandler);
-      },
+            _startConnection: function _startConnection(iHubOptions, iTransportArray) {
+              var url = dotnetifyHub.url ? dotnetifyHub.url + dotnetifyHub.hubPath : dotnetifyHub.hubPath;
+              var hubOptions = {};
+              Object.keys(iHubOptions).forEach(function (key) {
+                hubOptions[key] = iHubOptions[key];
+              });
+              hubOptions.transport = iTransportArray.shift();
 
-      stateChanged: function stateChanged(iHandler) {
-        dotnetifyHub._stateChangedHandler = iHandler;
-        return $.connection.hub.stateChanged(function (state) {
-          if (state == 1) dotnetifyHub._reconnectCount = 0;
+              dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
+              dotnetifyHub._connection.on('response_vm', dotnetifyHub.client.response_VM);
+              dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
-          var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
-          iHandler(stateText[state.newState]);
-        });
-      },
+              var promise = dotnetifyHub._connection.start().then(function () {
+                dotnetifyHub._changeState(1);
+              }).catch(function () {
+                // If failed to start, fallback to the next transport.
+                if (iTransportArray.length > 0) dotnetifyHub._startConnection(iHubOptions, iTransportArray);else dotnetifyHub._onDisconnected();
+              });
 
-      reconnect: function reconnect(iStartHubFunc) {
-        if (typeof iStartHubFunc === 'function') {
-          // Only attempt reconnect if the specified retry hasn't been exceeded.
-          if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
-            // Determine reconnect delay from the specified configuration array.
-            var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+              if (typeof dotnetifyHub._startDoneHandler === 'function') promise.then(dotnetifyHub._startDoneHandler).catch(dotnetifyHub._startFailHandler || function () {});
+              return promise;
+            },
 
-            dotnetifyHub._reconnectCount++;
+            start: function start(iHubOptions) {
+              dotnetifyHub._startDoneHandler = null;
+              dotnetifyHub._startFailHandler = null;
 
-            setTimeout(function () {
-              dotnetifyHub._stateChangedHandler('reconnecting');
-              iStartHubFunc();
-            }, delay * 1000);
-          } else dotnetifyHub._stateChangedHandler('terminated');
+              // Map the transport option.
+              var transport = [0];
+              var transportOptions = { webSockets: 0, serverSentEvents: 1, longPolling: 2 };
+              if (iHubOptions && Array.isArray(iHubOptions.transport)) transport = iHubOptions.transport.map(function (arg) {
+                return transportOptions[arg];
+              });
+
+              var promise = dotnetifyHub._startConnection(iHubOptions, transport);
+              return {
+                done: function done(iHandler) {
+                  dotnetifyHub._startDoneHandler = iHandler;
+                  promise.then(iHandler).catch(function (error) {
+                    throw error;
+                  });
+                  return this;
+                },
+                fail: function fail(iHandler) {
+                  dotnetifyHub._startFailHandler = iHandler;
+                  promise.catch(iHandler);
+                  return this;
+                }
+              };
+            },
+
+            disconnected: function disconnected(iHandler) {
+              if (typeof iHandler === 'function') dotnetifyHub._disconnectedHandler = iHandler;
+            },
+
+            stateChanged: function stateChanged(iHandler) {
+              if (typeof iHandler === 'function') dotnetifyHub._stateChangedHandler = iHandler;
+            },
+
+            reconnect: function reconnect(iStartHubFunc) {
+              if (typeof iStartHubFunc === 'function') {
+                // Only attempt reconnect if the specified retry hasn't been exceeded.
+                if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
+                  // Determine reconnect delay from the specified configuration array.
+                  var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+
+                  dotnetifyHub._reconnectCount++;
+
+                  setTimeout(function () {
+                    dotnetifyHub._changeState(2);
+                    iStartHubFunc();
+                  }, delay * 1000);
+                } else dotnetifyHub._changeState(99);
+              }
+            },
+
+            client: {},
+
+            server: {
+              dispose_VM: function dispose_VM(iVMId) {
+                dotnetifyHub._connection.invoke('Dispose_VM', iVMId);
+              },
+              update_VM: function update_VM(iVMId, iValue) {
+                dotnetifyHub._connection.invoke('Update_VM', iVMId, iValue);
+              },
+              request_VM: function request_VM(iVMId, iArgs) {
+                dotnetifyHub._connection.invoke('Request_VM', iVMId, iArgs);
+              }
+            }
+          });
+        } else {
+          // SignalR .NET FX.
+          dotnetifyHub.type = 'netfx';
+
+          if (window.jQuery) $ = window.jQuery;
+
+          // SignalR hub auto-generated from /signalr/hubs.
+          /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
+          /// <reference path="jquery.signalR.js" />
+          (function ($, window, undefined) {
+            /// <param name="$" type="jQuery" />
+            'use strict';
+
+            if (typeof $.signalR !== 'function') {
+              throw new Error('SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.');
+            }
+
+            var signalR = $.signalR;
+
+            function makeProxyCallback(hub, callback) {
+              return function () {
+                // Call the client hub method
+                callback.apply(hub, $.makeArray(arguments));
+              };
+            }
+
+            function registerHubProxies(instance, shouldSubscribe) {
+              var key, hub, memberKey, memberValue, subscriptionMethod;
+
+              for (key in instance) {
+                if (instance.hasOwnProperty(key)) {
+                  hub = instance[key];
+
+                  if (!hub.hubName) {
+                    // Not a client hub
+                    continue;
+                  }
+
+                  if (shouldSubscribe) {
+                    // We want to subscribe to the hub events
+                    subscriptionMethod = hub.on;
+                  } else {
+                    // We want to unsubscribe from the hub events
+                    subscriptionMethod = hub.off;
+                  }
+
+                  // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
+                  for (memberKey in hub.client) {
+                    if (hub.client.hasOwnProperty(memberKey)) {
+                      memberValue = hub.client[memberKey];
+
+                      if (!$.isFunction(memberValue)) {
+                        // Not a client hub function
+                        continue;
+                      }
+
+                      subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
+                    }
+                  }
+                }
+              }
+            }
+
+            $.hubConnection.prototype.createHubProxies = function () {
+              var proxies = {};
+              this.starting(function () {
+                // Register the hub proxies as subscribed
+                // (instance, shouldSubscribe)
+                registerHubProxies(proxies, true);
+
+                this._registerSubscribedHubs();
+              }).disconnected(function () {
+                // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
+                // (instance, shouldSubscribe)
+                registerHubProxies(proxies, false);
+              });
+
+              proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
+              proxies['dotNetifyHub'].client = {};
+              proxies['dotNetifyHub'].server = {
+                dispose_VM: function dispose_VM(vmId) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Dispose_VM'], $.makeArray(arguments)));
+                },
+
+                request_VM: function request_VM(vmId, vmArg) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Request_VM'], $.makeArray(arguments)));
+                },
+
+                update_VM: function update_VM(vmId, vmData) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Update_VM'], $.makeArray(arguments)));
+                }
+              };
+
+              return proxies;
+            };
+
+            signalR.hub = $.hubConnection(dotnetifyHub.hubPath, { useDefaultPath: false });
+            $.extend(signalR, signalR.hub.createHubProxies());
+          })($, window);
+
+          Object.defineProperty(dotnetifyHub, 'state', {
+            get: function get() {
+              return $.connection.hub.state;
+            },
+            set: function set(val) {
+              $.connection.hub.state = val;
+            }
+          });
+
+          Object.defineProperty(dotnetifyHub, 'client', {
+            get: function get() {
+              return $.connection.dotNetifyHub.client;
+            }
+          });
+
+          Object.defineProperty(dotnetifyHub, 'server', {
+            get: function get() {
+              return $.connection.dotNetifyHub.server;
+            }
+          });
+
+          Object.defineProperty(dotnetifyHub, 'isConnected', {
+            get: function get() {
+              return $.connection.hub.state == $.signalR.connectionState.connected;
+            }
+          });
+
+          dotnetifyHub = $.extend(dotnetifyHub, {
+            hubPath: iHubPath || '/signalr',
+            url: iServerUrl,
+
+            _reconnectCount: 0,
+            _stateChangedHandler: function _stateChangedHandler(iNewState) {},
+
+            start: function start(iHubOptions) {
+              if (dotnetifyHub.url) $.connection.hub.url = dotnetifyHub.url;
+
+              var deferred = void 0;
+              if (iHubOptions) deferred = $.connection.hub.start(iHubOptions);else deferred = $.connection.hub.start();
+              deferred.fail(function (error) {
+                if (error.source && error.source.message === 'Error parsing negotiate response.') console.warn('This client may be attempting to connect to an incompatible SignalR .NET Core server.');
+              });
+              return deferred;
+            },
+
+            disconnected: function disconnected(iHandler) {
+              return $.connection.hub.disconnected(iHandler);
+            },
+
+            stateChanged: function stateChanged(iHandler) {
+              dotnetifyHub._stateChangedHandler = iHandler;
+              return $.connection.hub.stateChanged(function (state) {
+                if (state == 1) dotnetifyHub._reconnectCount = 0;
+
+                var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
+                iHandler(stateText[state.newState]);
+              });
+            },
+
+            reconnect: function reconnect(iStartHubFunc) {
+              if (typeof iStartHubFunc === 'function') {
+                // Only attempt reconnect if the specified retry hasn't been exceeded.
+                if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
+                  // Determine reconnect delay from the specified configuration array.
+                  var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+
+                  dotnetifyHub._reconnectCount++;
+
+                  setTimeout(function () {
+                    dotnetifyHub._stateChangedHandler('reconnecting');
+                    iStartHubFunc();
+                  }, delay * 1000);
+                } else dotnetifyHub._stateChangedHandler('terminated');
+              }
+            }
+          });
         }
-      }
-    });
-  }
-};
 
-exports.default = dotnetifyHub;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
+        // Setup SignalR server method handler.
+        dotnetifyHub.client.response_VM = function (iVMId, iVMData) {
+          // SignalR .NET Core is sending an array of arguments.
+          if (Array.isArray(iVMId)) {
+            iVMData = iVMId[1];
+            iVMId = iVMId[0];
+          }
 
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
+          var handled = dotnetifyHub.responseEvent.emit(iVMId, iVMData);
 
-"use strict";
+          // If we get to this point, that means the server holds a view model instance
+          // whose view no longer existed.  So, tell the server to dispose the view model.
+          if (!handled) dotnetifyHub.server.dispose_VM(iVMId);
+        };
 
+        // On disconnected, keep attempting to start the connection.
+        dotnetifyHub.disconnected(function () {
+          dotnetifyHub._startInfo = null;
+          dotnetifyHub.reconnect(function () {
+            dotnetifyHub.reconnectedEvent.emit();
+          });
+        });
+      };
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _dotnetifyHub = __webpack_require__(12);
-
-var _dotnetifyHub2 = _interopRequireDefault(_dotnetifyHub);
-
-var _utils = __webpack_require__(3);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* 
-Copyright 2017-2018 Dicky Suryadi
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- */
-var dotnetify = {
-  // SignalR hub options.
-  hub: _dotnetifyHub2.default,
-  hubOptions: { transport: ['webSockets', 'longPolling'] },
-  hubPath: null,
-  hubServerUrl: null,
-
-  // Debug mode.
-  debug: false,
-  debugFn: null,
-
-  // Offline mode. (WIP)
-  offline: false,
-  isOffline: true,
-  offlineTimeout: 5000,
-  offlineCacheFn: null,
-
-  // Handler for connection state changed events.
-  connectionStateHandler: null,
-
-  // Connection events.
-  responseEvent: (0, _utils.createEventEmitter)(),
-  reconnectedEvent: (0, _utils.createEventEmitter)(),
-  connectedEvent: (0, _utils.createEventEmitter)(),
-  connectionFailedEvent: (0, _utils.createEventEmitter)(),
-
-  // Whether connected to SignalR hub server.
-  isConnected: function isConnected() {
-    return _dotnetifyHub2.default.isConnected;
-  },
-
-  // Whether SignalR hub is started.
-  isHubStarted: function isHubStarted() {
-    return !!dotnetify._hub;
-  },
-
-  // Generic connect function for non-React app.
-  connect: function connect(iVMId, iOptions) {
-    return dotnetify.react.connect(iVMId, null, iOptions);
-  },
-
-  initHub: function initHub() {
-    if (dotnetify._hub !== null) return;
-
-    _dotnetifyHub2.default.init(dotnetify.hubPath, dotnetify.hubServerUrl, dotnetify.hubLib);
-
-    // Setup SignalR server method handler.
-    _dotnetifyHub2.default.client.response_VM = function (iVMId, iVMData) {
-      // SignalR .NET Core is sending an array of arguments.
-      if (Array.isArray(iVMId)) {
-        iVMData = iVMId[1];
-        iVMId = iVMId[0];
-      }
-
-      var handled = dotnetify.responseEvent.emit(iVMId, iVMData);
-
-      // If we get to this point, that means the server holds a view model instance
-      // whose view no longer existed.  So, tell the server to dispose the view model.
-      if (!handled) _dotnetifyHub2.default.server.dispose_VM(iVMId);
-    };
-
-    // On disconnected, keep attempting to start the connection.
-    _dotnetifyHub2.default.disconnected(function () {
-      dotnetify._hub = null;
-      _dotnetifyHub2.default.reconnect(function () {
-        dotnetify.reconnectedEvent.emit();
-      });
-    });
-
-    // Use SignalR event to raise the connection state event.
-    _dotnetifyHub2.default.stateChanged(function (state) {
-      dotnetify._triggerConnectionStateEvent(state);
-    });
-  },
-
-
-  startHub: function startHub() {
-    var doneHandler = function doneHandler() {
-      dotnetify.connectedEvent.emit();
-    };
-    var failHandler = function failHandler(ex) {
-      dotnetify.connectionFailedEvent.emit();
-      dotnetify._triggerConnectionStateEvent('error', ex);
-      throw ex;
-    };
-
-    if (dotnetify._hub === null) {
-      try {
-        dotnetify._hub = _dotnetifyHub2.default.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
-      } catch (err) {
-        dotnetify._hub = null;
-      }
-    } else {
-      try {
-        dotnetify._hub.done(doneHandler);
-      } catch (err) {
-        dotnetify._hub = null;
-        return dotnetify.startHub();
-      }
+      return dotnetifyHub;
     }
-  },
+  }]);
 
-  checkServerSideException: function checkServerSideException(iVMId, iVMData, iExceptionHandler) {
-    var vmData = JSON.parse(iVMData);
-    if (vmData && vmData.hasOwnProperty('ExceptionType') && vmData.hasOwnProperty('Message')) {
-      var exception = { name: vmData.ExceptionType, message: vmData.Message };
+  return dotnetifyHubFactory;
+}();
 
-      if (typeof iExceptionHandler === 'function') {
-        return iExceptionHandler(exception);
-      } else {
-        console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
-        throw exception;
-      }
-    }
-  },
-
-  requestVM: function requestVM(iVMId, iOptions) {
-    _dotnetifyHub2.default.server.request_VM(iVMId, iOptions);
-  },
-  updateVM: function updateVM(iVMId, iValue) {
-    _dotnetifyHub2.default.server.update_VM(iVMId, iValue);
-  },
-  disposeVM: function disposeVM(iVMId) {
-    _dotnetifyHub2.default.server.dispose_VM(iVMId);
-  },
-
-
-  _triggerConnectionStateEvent: function _triggerConnectionStateEvent(iState, iException) {
-    if (dotnetify.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
-
-    if (typeof dotnetify.connectionStateHandler === 'function') dotnetify.connectionStateHandler(iState, iException);else if (iException) console.error(iException);
-  },
-
-  // Internal variables. Do not modify!
-  _hub: null
-};
-
-// Support changing hub server URL after first init.
-Object.defineProperty(dotnetify, 'hubServerUrl', {
-  get: function get() {
-    return dotnetify.hub.url;
-  },
-  set: function set(url) {
-    dotnetify.hub.url = url;
-    if (dotnetify.debug) console.log('SignalR: connecting to ' + dotnetify.hubServerUrl);
-    if (dotnetify._hub) {
-      dotnetify._hub = null;
-      dotnetify.startHub();
-    }
-  }
-});
-
-exports.default = dotnetify;
+exports.default = dotnetifyHubFactory.create();
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 14 */
@@ -2063,16 +2124,207 @@ exports.default = dotnetify;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.dotnetifyFactory = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Copyright 2017-2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _dotnetifyHub = __webpack_require__(13);
+
+var _dotnetifyHub2 = _interopRequireDefault(_dotnetifyHub);
+
+var _dotnetifyHubLocal = __webpack_require__(6);
+
+var _dotnetifyHubLocal2 = _interopRequireDefault(_dotnetifyHubLocal);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var dotnetifyFactory = exports.dotnetifyFactory = function () {
+  function dotnetifyFactory() {
+    _classCallCheck(this, dotnetifyFactory);
+  }
+
+  _createClass(dotnetifyFactory, null, [{
+    key: 'create',
+    value: function create() {
+      var dotnetify = {
+        // SignalR hub options.
+        hub: _dotnetifyHub2.default,
+        hubOptions: { transport: ['webSockets', 'longPolling'] },
+        hubPath: null,
+
+        // Debug mode.
+        debug: false,
+        debugFn: null,
+
+        // Offline mode. (WIP)
+        offline: false,
+        isOffline: true,
+        offlineTimeout: 5000,
+        offlineCacheFn: null,
+
+        // Internal variables.
+        _vmAccessors: [],
+
+        // Use this to get notified of connection state changed events.
+        // (state, exception, hub) => void
+        connectionStateHandler: null,
+
+        // Use this intercept a view model prior to establishing connection,
+        // with the option to provide any connect parameters.
+        // ({vmId, options}) => {vmId, options, hub}
+        connectHandler: null,
+
+        // Support changing hub server URL after first init.
+        get hubServerUrl() {
+          return this.hub.url;
+        },
+
+        set hubServerUrl(url) {
+          this.hub.url = url;
+          if (this.debug) console.log('SignalR: connecting to ' + this.hubServerUrl);
+          if (this.hub.isHubStarted) this.startHub(this.hub, true);
+        },
+
+        // Generic connect function for non-React app.
+        connect: function connect(iVMId, iOptions) {
+          dotnetify.react.connect(iVMId, null, iOptions);
+        },
+
+
+        // Creates a SignalR hub client.
+        createHub: function createHub(hubServerUrl, hubPath, hubLib) {
+          return this.initHub(_dotnetifyHub.dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
+        },
+
+
+        // Configures hub connection to SignalR hub server.
+        initHub: function initHub(hub, hubPath, hubServerUrl, hubLib) {
+          var _this = this;
+
+          hub = hub || this.hub;
+          hubPath = hubPath || this.hubPath;
+          hubServerUrl = hubServerUrl || this.hubServerUrl;
+          hubLib = hubLib || this.hubLib;
+
+          if (!hub.isHubStarted) {
+            hub.init(hubPath, hubServerUrl, hubLib);
+
+            // Use SignalR event to raise the connection state event.
+            hub.stateChanged(function (state) {
+              return _this.handleConnectionStateChanged(state, null, hub);
+            });
+          }
+          return hub;
+        },
+
+
+        // Used by a view to select a hub, and provides the opportunity to override any connect info.
+        selectHub: function selectHub(vmConnectArgs) {
+          vmConnectArgs = vmConnectArgs || { options: {} };
+          var override = typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs) || {};
+          if (!override.hub) {
+            override.hub = (0, _dotnetifyHubLocal.hasLocalVM)(vmConnectArgs.vmId) ? _dotnetifyHubLocal2.default : this.initHub();
+            override.hub.debug = this.debug;
+          }
+          return Object.assign(vmConnectArgs, override);
+        },
+
+
+        // Starts hub connection to SignalR hub server.
+        startHub: function startHub(hub, forceRestart) {
+          var _this2 = this;
+
+          hub = hub || this.hub;
+
+          var doneHandler = function doneHandler() {};
+          var failHandler = function failHandler(ex) {
+            return _this2.handleConnectionStateChanged('error', ex, hub);
+          };
+          hub.startHub(this.hubOptions, doneHandler, failHandler, forceRestart);
+        },
+
+
+        // Used by dotnetify-react and -vue to expose their view model accessors.
+        addVMAccessor: function addVMAccessor(vmAccessor) {
+          !this._vmAccessors.includes(vmAccessor) && this._vmAccessors.push(vmAccessor);
+        },
+        checkServerSideException: function checkServerSideException(iVMId, iVMData, iExceptionHandler) {
+          var vmData = JSON.parse(iVMData);
+          if (vmData && vmData.hasOwnProperty('ExceptionType') && vmData.hasOwnProperty('Message')) {
+            var exception = { name: vmData.ExceptionType, message: vmData.Message };
+
+            if (typeof iExceptionHandler === 'function') {
+              return iExceptionHandler(exception);
+            } else {
+              console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
+              throw exception;
+            }
+          }
+        },
+
+
+        // Get all view models.
+        getViewModels: function getViewModels() {
+          return this._vmAccessors.reduce(function (prev, current) {
+            return [].concat(_toConsumableArray(prev), _toConsumableArray(current()));
+          }, []).filter(function (val, idx, self) {
+            return self.indexOf(val) === idx;
+          }); // returns distinct items.
+        },
+        handleConnectionStateChanged: function handleConnectionStateChanged(iState, iException, iHub) {
+          if (this.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
+          if (typeof this.connectionStateHandler === 'function') this.connectionStateHandler(iState, iException, iHub);else if (iException) console.error(iException);
+        }
+      };
+
+      return dotnetify;
+    }
+  }]);
+
+  return dotnetifyFactory;
+}();
+
+exports.default = dotnetifyFactory.create();
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(2);
+var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
@@ -2100,7 +2352,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
+var window = window || global || {};
+
 // <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
+
 var RouteTarget = function (_React$Component) {
   _inherits(RouteTarget, _React$Component);
 
@@ -2146,25 +2401,26 @@ exports.default = RouteTarget;
 
 
 _dotnetifyReact2.default.react.router.RouteTarget = RouteTarget;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(2);
+var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
@@ -2192,41 +2448,41 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 // <RouteLink> is a helper component to set anchor tags for routes.
 var RouteLink = function (_React$Component) {
-	_inherits(RouteLink, _React$Component);
+  _inherits(RouteLink, _React$Component);
 
-	function RouteLink() {
-		_classCallCheck(this, RouteLink);
+  function RouteLink() {
+    _classCallCheck(this, RouteLink);
 
-		return _possibleConstructorReturn(this, (RouteLink.__proto__ || Object.getPrototypeOf(RouteLink)).apply(this, arguments));
-	}
+    return _possibleConstructorReturn(this, (RouteLink.__proto__ || Object.getPrototypeOf(RouteLink)).apply(this, arguments));
+  }
 
-	_createClass(RouteLink, [{
-		key: 'render',
-		value: function render() {
-			var props = this.props;
-			if (props.vm == null) console.error("RouteLink requires 'vm' property.");
+  _createClass(RouteLink, [{
+    key: 'render',
+    value: function render() {
+      var props = this.props;
+      if (props.vm == null) console.error("RouteLink requires 'vm' property.");
 
-			var handleClick = function handleClick(event) {
-				event.preventDefault();
-				if (props.route == null) {
-					console.error("RouteLink requires 'route' property.");
-					return;
-				}
-				if (typeof props.onClick === 'function') props.onClick(event);
-				return props.vm.$handleRoute(event);
-			};
+      var handleClick = function handleClick(event) {
+        event.preventDefault();
+        if (props.route == null) {
+          console.error("RouteLink requires 'route' property.");
+          return;
+        }
+        if (typeof props.onClick === 'function' && props.onClick(event) === false) return;
+        return props.vm.$handleRoute(event);
+      };
 
-			return _react2.default.createElement('a', {
-				style: props.style,
-				className: props.className,
-				href: props.route != null ? props.vm.$route(props.route) : '',
-				children: props.children,
-				onClick: handleClick
-			});
-		}
-	}]);
+      return _react2.default.createElement('a', {
+        style: props.style,
+        className: props.className,
+        href: props.route != null ? props.vm.$route(props.route) : '',
+        children: props.children,
+        onClick: handleClick
+      });
+    }
+  }]);
 
-	return RouteLink;
+  return RouteLink;
 }(_react2.default.Component);
 
 exports.default = RouteLink;
@@ -2235,7 +2491,7 @@ exports.default = RouteLink;
 _dotnetifyReact2.default.react.router.RouteLink = RouteLink;
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2254,7 +2510,7 @@ module.exports = ReactPropTypesSecret;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2267,7 +2523,7 @@ module.exports = ReactPropTypesSecret;
 
 
 
-var ReactPropTypesSecret = __webpack_require__(16);
+var ReactPropTypesSecret = __webpack_require__(17);
 
 function emptyFunction() {}
 
@@ -2320,7 +2576,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -2333,32 +2589,32 @@ module.exports = function() {
 if (false) { var throwOnDirectAccess, isValidElement, REACT_ELEMENT_TYPE; } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(17)();
+  module.exports = __webpack_require__(18)();
 }
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(2);
+var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(18);
+var _propTypes = __webpack_require__(19);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
@@ -2384,59 +2640,62 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
+var window = window || global || {};
+
 // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
 // of the parent component, so that when the child component connects to its back-end view model, the child view model
 // instance is created within the scope of the parent view model.
 //
 // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
 // injects properties and dispatch functions into the component.
+
 var Scope = function (_React$Component) {
-	_inherits(Scope, _React$Component);
+  _inherits(Scope, _React$Component);
 
-	function Scope() {
-		_classCallCheck(this, Scope);
+  function Scope() {
+    _classCallCheck(this, Scope);
 
-		return _possibleConstructorReturn(this, (Scope.__proto__ || Object.getPrototypeOf(Scope)).apply(this, arguments));
-	}
+    return _possibleConstructorReturn(this, (Scope.__proto__ || Object.getPrototypeOf(Scope)).apply(this, arguments));
+  }
 
-	_createClass(Scope, [{
-		key: 'scoped',
-		value: function scoped(vmId) {
-			var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
-			return scope ? scope + '.' + vmId : vmId;
-		}
-	}, {
-		key: 'getChildContext',
-		value: function getChildContext() {
-			var _this = this;
+  _createClass(Scope, [{
+    key: 'scoped',
+    value: function scoped(vmId) {
+      var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
+      return scope ? scope + '.' + vmId : vmId;
+    }
+  }, {
+    key: 'getChildContext',
+    value: function getChildContext() {
+      var _this = this;
 
-			return {
-				scoped: function scoped(vmId) {
-					return _this.scoped(vmId);
-				},
-				connect: function connect(vmId, component, options) {
-					component.vmId = _this.scoped(vmId);
-					component.vm = _dotnetifyReact2.default.react.connect(component.vmId, component, options);
-					component.dispatch = function (state) {
-						return component.vm.$dispatch(state);
-					};
+      return {
+        scoped: function scoped(vmId) {
+          return _this.scoped(vmId);
+        },
+        connect: function connect(vmId, component, options) {
+          component.vmId = _this.scoped(vmId);
+          component.vm = _dotnetifyReact2.default.react.connect(component.vmId, component, options);
+          component.dispatch = function (state) {
+            return component.vm.$dispatch(state);
+          };
 
-					component.dispatchState = function (state) {
-						component.vm.State(state);
-						component.vm.$dispatch(state);
-					};
-					return window.vmStates ? window.vmStates[component.vmId] : null;
-				}
-			};
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return this.props.children;
-		}
-	}]);
+          component.dispatchState = function (state) {
+            component.vm.State(state);
+            component.vm.$dispatch(state);
+          };
+          return window.vmStates ? window.vmStates[component.vmId] : null;
+        }
+      };
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return this.props.children;
+    }
+  }]);
 
-	return Scope;
+  return Scope;
 }(_react2.default.Component);
 
 Scope.displayName = 'Scope';
@@ -2444,22 +2703,23 @@ Scope.version = '1.2.0';
 Scope.propTypes = { vm: _propTypes2.default.string };
 Scope.contextTypes = { scoped: _propTypes2.default.func };
 Scope.childContextTypes = {
-	scoped: _propTypes2.default.func.isRequired,
-	connect: _propTypes2.default.func.isRequired
+  scoped: _propTypes2.default.func.isRequired,
+  connect: _propTypes2.default.func.isRequired
 };
 exports.default = Scope;
 
 
 _dotnetifyReact2.default.react.Scope = Scope;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
 
-
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
@@ -2467,13 +2727,30 @@ var _dotnetifyVm = __webpack_require__(5);
 
 var _dotnetifyVm2 = _interopRequireDefault(_dotnetifyVm);
 
-var _jqueryShim = __webpack_require__(1);
+var _jqueryShim = __webpack_require__(2);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var window = window || global || {};
+
 // Used by server-side rendering in lieu of connect method.
+/* 
+Copyright 2017-2018 Dicky Suryadi
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
 _dotnetifyReact2.default.react.ssrConnect = function (iVMId, iReact, iVMArg) {
   if (window.ssr == null || !window.ssr.hasOwnProperty(iVMId)) console.error("Server-side rendering requires initial state in 'window.ssr." + iVMId + "'.");
 
@@ -2490,7 +2767,7 @@ _dotnetifyReact2.default.react.ssrConnect = function (iVMId, iReact, iVMArg) {
     setState: setState,
     vmArg: iVMArg
   };
-  var vm = self.viewModels[iVMId] = new _dotnetifyVm2.default(iVMId, iReact, options, _dotnetifyReact2.default.react);
+  var vm = self.viewModels[iVMId] = new _dotnetifyVm2.default(iVMId, iReact, options, self);
 
   // Need to be asynch to allow initial state to be processed.
   setTimeout(function () {
@@ -2500,21 +2777,6 @@ _dotnetifyReact2.default.react.ssrConnect = function (iVMId, iReact, iVMArg) {
 };
 
 // Used by client-side React component to get server-side rendered initial state.
-/* 
-Copyright 2017-2018 Dicky Suryadi
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- */
 _dotnetifyReact2.default.react.router.ssrState = function (iVMId) {
   if (window.ssr && window.ssr[iVMId] && !window.ssr[iVMId].fetched) {
     window.ssr[iVMId].fetched = true;
@@ -2553,9 +2815,10 @@ _dotnetifyReact2.default.react.router.ssr = function (iPath, iInitialStates, iOv
   // Add initial states into the window scope for the server-renderd components.
   window.ssr = JSON.parse(iInitialStates);
 };
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2589,6 +2852,8 @@ var _utils = __webpack_require__(3);
 var _utils2 = _interopRequireDefault(_utils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2737,6 +3002,52 @@ var dotnetifyVMRouter = function () {
       return false;
     }
 
+    // Loads an HTML view.
+
+  }, {
+    key: 'loadHtmlView',
+    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn) {
+      var vm = this.vm;
+      this.unmountView(iTargetSelector);
+
+      // Load the HTML view.
+      $(iTargetSelector).load(iViewUrl, null, function () {
+        if (iJsModuleUrl != null) {
+          var getScripts = iJsModuleUrl.split(',').map(function (i) {
+            return $.getScript(i);
+          });
+          $.when.apply($, getScripts).done(function () {
+            return typeof callbackFn === 'function' && iCallbackFn.call(vm);
+          });
+        } else if (typeof callbackFn === 'function') iCallbackFn.call(vm);
+      });
+    }
+  }, {
+    key: 'loadHtmlElementView',
+    value: function loadHtmlElementView(iTargetSelector, iHtmlElement, iJsModuleUrl, iVmArg, iCallbackFn) {
+      var _this3 = this;
+
+      var vm = this.vm;
+      var mountViewFunc = function mountViewFunc() {
+        _this3.unmountView(iTargetSelector);
+
+        var target = document.querySelector(iTargetSelector);
+        while (target.firstChild) {
+          target.removeChild(target.firstChild);
+        }target.appendChild(iHtmlElement);
+
+        if (typeof callbackFn === 'function') iCallbackFn.call(vm);
+      };
+
+      if (iJsModuleUrl == null) mountViewFunc();else {
+        // Load all javascripts first. Multiple files can be specified with comma delimiter.
+        var getScripts = iJsModuleUrl.split(',').map(function (i) {
+          return $.getScript(i);
+        });
+        $.when.apply($, getScripts).done(mountViewFunc);
+      }
+    }
+
     // Loads a view into a target element.
 
   }, {
@@ -2783,7 +3094,7 @@ var dotnetifyVMRouter = function () {
       // No route to process. Return silently.
       if (iRoute == null) return;
 
-      if (!iRoute.hasOwnProperty('Path') || !iRoute.hasOwnProperty('TemplateId')) throw new Error('Not a valid route');
+      if (!iRoute.hasOwnProperty('Path') && !iRoute.hasOwnProperty('TemplateId')) throw new Error('Not a valid route');
 
       // Build the absolute root path.
       this.initRoot();
@@ -2792,7 +3103,7 @@ var dotnetifyVMRouter = function () {
       // This is so that we don't send the same data twice if both are equal.
       var path = iRoute.Path;
       var template = null;
-      if (this.hasRoutingState && this.RoutingState.Templates != null) {
+      if (this.hasRoutingState && this.RoutingState.Templates != null && iRoute.TemplateId != null) {
         var match = this.RoutingState.Templates.filter(function (iTemplate) {
           return iTemplate.Id == iRoute.TemplateId;
         });
@@ -2805,7 +3116,7 @@ var dotnetifyVMRouter = function () {
             path = template.UrlPattern != null ? template.UrlPattern : template.Id;
             iRoute.Path = path;
           }
-        } else if (iRoute.RedirectRoot == null) throw new Error("vmRoute cannot find route template '" + iRoute.TemplateId);
+        } else if (iRoute.RedirectRoot == null) throw new Error('vmRoute cannot find route template ' + iRoute.TemplateId);
       }
 
       // If the path has a redirect root, the path doesn't belong to the current root and needs to be
@@ -2827,8 +3138,12 @@ var dotnetifyVMRouter = function () {
             urlRedirect += absRootPath[i] + '/';
           }
         }
+
         urlRedirect += redirectRoot + '/' + path;
-        this.routes.push({ Path: path, Url: urlRedirect });
+        urlRedirect = urlRedirect.replace(/\/\/+/g, '/');
+        if (!this.routes.some(function (x) {
+          return x.Path === path;
+        })) this.routes.push({ Path: path, Url: urlRedirect });
         return urlRedirect;
       }
 
@@ -2843,7 +3158,9 @@ var dotnetifyVMRouter = function () {
       // the anchor click event and instead do push to HTML5 history state.
       var url = this.toUrl(path);
       url = url.length > 0 ? url : '/';
-      this.routes.push({ Path: path, Url: url });
+      if (!this.routes.some(function (x) {
+        return x.Path === path;
+      })) this.routes.push({ Path: path, Url: url });
       return url;
     }
 
@@ -2852,7 +3169,7 @@ var dotnetifyVMRouter = function () {
   }, {
     key: 'routeTo',
     value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn, isRedirect) {
-      var _this3 = this;
+      var _this4 = this;
 
       var vm = this.vm;
       var viewModels = vm.$dotnetify.getViewModels();
@@ -2875,7 +3192,7 @@ var dotnetifyVMRouter = function () {
       }
 
       // Check if the route has valid target.
-      if (iTemplate.Target === null) {
+      if (iTemplate.Target == null) {
         console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
         return;
       }
@@ -2887,14 +3204,14 @@ var dotnetifyVMRouter = function () {
           return;
         } else {
           if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-          return this.router.redirect(this.toUrl(iPath), viewModels);
+          return this.router.redirect(this.toUrl(iPath), [].concat(_toConsumableArray(viewModels), _toConsumableArray(vm.$dotnetify.controller.getViewModels())));
         }
       }
 
       // Load the view associated with the route asynchronously.
       this.loadView('#' + iTemplate.Target, iTemplate.ViewUrl, iTemplate.JSModuleUrl, { 'RoutingState.Origin': iPath }, function () {
         // If load is successful, update the active route.
-        _this3.dispatchActiveRoutingState(iPath);
+        _this4.dispatchActiveRoutingState(iPath);
 
         // Support exit interception.
         if (iDisableEvent != true && vm.hasOwnProperty('onRouteExit')) vm.onRouteExit(iPath, iTemplate);
@@ -2905,13 +3222,13 @@ var dotnetifyVMRouter = function () {
   }, {
     key: 'routeToRoute',
     value: function routeToRoute(iRoute) {
-      var _this4 = this;
+      var _this5 = this;
 
       var path = this.vm.$route(iRoute);
       if (path == null || path == '') throw new Error('The route passed to $routeTo is invalid.');
 
       setTimeout(function () {
-        return _this4.router.pushState({}, '', path);
+        return _this5.router.pushState({}, '', path);
       });
     }
 
@@ -2920,16 +3237,17 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeUrl',
-    value: function routeUrl(isRedirect) {
-      var _this5 = this;
+    value: function routeUrl(redirectUrlPath) {
+      var _this6 = this;
 
       if (!this.hasRoutingState) return false;
 
+      var isRedirect = !!redirectUrlPath;
       var root = this.RoutingState.Root;
       if (root == null) return false;
 
       // Get the URL path to route.
-      var urlPath = this.router.urlPath;
+      var urlPath = isRedirect ? redirectUrlPath : this.router.urlPath;
 
       if (this.debug) console.log('router> routing ' + urlPath);
 
@@ -2952,13 +3270,13 @@ var dotnetifyVMRouter = function () {
       root = root + '/';
       if (_utils2.default.startsWith(urlPath, root)) {
         var routeElem = null;
-        var match = _utils2.default.grep(this.routes, function (elem) {
+        var _match = _utils2.default.grep(this.routes, function (elem) {
           return _utils2.default.startsWith(urlPath + '/', elem.Url + '/');
         });
-        if (match.length > 0) {
+        if (_match.length > 0) {
           // If more than one match, find the best match.
-          for (var i = 0; i < match.length; i++) {
-            if (routeElem == null || routeElem.Url.length < match[i].Url.length) routeElem = match[i];
+          for (var i = 0; i < _match.length; i++) {
+            if (routeElem == null || routeElem.Url.length < _match[i].Url.length) routeElem = _match[i];
           }
         }
 
@@ -2972,7 +3290,7 @@ var dotnetifyVMRouter = function () {
             // If route's not already active, route to it.
             if (!_utils2.default.equal(this.RoutingState.Active, path)) {
               this.routeTo(path, template, false, function () {
-                return _this5.raiseRoutedEvent();
+                return _this6.raiseRoutedEvent();
               }, isRedirect);
             } else this.raiseRoutedEvent();
             return true;
@@ -2996,6 +3314,14 @@ var dotnetifyVMRouter = function () {
       if (path.charAt(0) != '(' && path != '') path = '/' + path;
       return this.hasRoutingState ? this.RoutingState.Root + path : iPath;
     }
+
+    // Unmount a view if there's one on the target selector.
+
+  }, {
+    key: 'unmountView',
+    value: function unmountView(iTargetSelector) {
+      throw new Error('Not implemented');
+    }
   }]);
 
   return dotnetifyVMRouter;
@@ -3004,17 +3330,17 @@ var dotnetifyVMRouter = function () {
 exports.default = dotnetifyVMRouter;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__22__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__23__;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -3024,19 +3350,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(2);
+var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(22);
+var _reactDom = __webpack_require__(23);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _dotnetifyVmRouter = __webpack_require__(21);
+var _dotnetifyVmRouter = __webpack_require__(22);
 
 var _dotnetifyVmRouter2 = _interopRequireDefault(_dotnetifyVmRouter);
 
-var _jqueryShim = __webpack_require__(1);
+var _jqueryShim = __webpack_require__(2);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
@@ -3051,7 +3377,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Copyright 2017-2018 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Copyright 2017-2019 Dicky Suryadi
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                Licensed under the Apache License, Version 2.0 (the "License");
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                you may not use this file except in compliance with the License.
@@ -3066,6 +3392,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
+
+var window = window || global || {};
 
 var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
   _inherits(dotnetifyReactVMRouter, _dotnetifyVMRouter);
@@ -3131,78 +3459,64 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
       iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
       iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);else this.loadReactView(iTargetSelector, iViewUrl, iJsModuleUrl, reactProps, iCallbackFn);
-    }
+      if (_utils2.default.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);else {
+        var component = iViewUrl;
+        if (typeof iViewUrl === 'string' && window.hasOwnProperty(iViewUrl)) component = window[iViewUrl];
 
-    // Loads an HTML view.
-
-  }, {
-    key: 'loadHtmlView',
-    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, callbackFn) {
-      var vm = this.vm;
-
-      try {
-        // Unmount any React component before replacing with a new DOM.
-        _reactDom2.default.unmountComponentAtNode(document.querySelector(iTargetSelector));
-      } catch (e) {
-        console.error(e);
+        if (component instanceof HTMLElement) this.loadHtmlElementView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);else this.loadReactView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
       }
-
-      // Load the HTML view.
-      (0, _jqueryShim2.default)(iTargetSelector).load(iViewUrl, null, function () {
-        if (iJsModuleUrl != null) {
-          _jqueryShim2.default.getScript(iJsModuleUrl, function () {
-            if (typeof callbackFn === 'function') callbackFn.call(vm);
-          });
-        } else if (typeof callbackFn === 'function') callbackFn.call(vm);
-      });
     }
 
     // Loads a React view.
 
   }, {
     key: 'loadReactView',
-    value: function loadReactView(iTargetSelector, iReactClassOrClassName, iJsModuleUrl, iReactProps, callbackFn) {
+    value: function loadReactView(iTargetSelector, iComponent, iJsModuleUrl, iReactProps, iCallbackFn) {
       var _this2 = this;
 
       return new Promise(function (resolve, reject) {
         var vm = _this2.vm;
         var vmId = _this2.vm ? _this2.vm.$vmId : '';
-        var createViewFunc = function createViewFunc() {
-          // Resolve the vue class from the argument, which can be the object itself, or a global window variable name.
-          var reactClass = null;
-          if (typeof iReactClassOrClassName === 'string' && window.hasOwnProperty(iReactClassOrClassName)) reactClass = window[iReactClassOrClassName];else if ((typeof iReactClassOrClassName === 'undefined' ? 'undefined' : _typeof(iReactClassOrClassName)) === 'object' && iReactClassOrClassName.name) reactClass = iReactClassOrClassName;
 
-          if (!reactClass) {
-            console.error('[' + vmId + '] failed to load view \'' + iReactClassOrClassName + '\' because it\'s not a React element.');
+        var mountViewFunc = function mountViewFunc() {
+          if (typeof iComponent !== 'function' && ((typeof iComponent === 'undefined' ? 'undefined' : _typeof(iComponent)) !== 'object' || iComponent.name == null)) {
+            console.error('[' + vmId + '] failed to load view \'' + iComponent + '\' because it\'s not a valid React element.');
             reject();
             return;
           }
 
-          try {
-            _reactDom2.default.unmountComponentAtNode(document.querySelector(iTargetSelector));
-          } catch (e) {
-            console.error(e);
-          }
+          _this2.unmountView(iTargetSelector);
 
           try {
-            var reactElement = _react2.default.createElement(reactClass, iReactProps);
+            var reactElement = _react2.default.createElement(iComponent, iReactProps);
             _reactDom2.default.render(reactElement, document.querySelector(iTargetSelector));
           } catch (e) {
             console.error(e);
           }
-          if (typeof callbackFn === 'function') callbackFn.call(vm, reactElement);
+          if (typeof callbackFn === 'function') iCallbackFn.call(vm, reactElement);
           resolve(reactElement);
         };
 
-        if (iJsModuleUrl == null || dotnetify.ssr === true) createViewFunc();else {
+        if (iJsModuleUrl == null || dotnetify.ssr === true) mountViewFunc();else {
           // Load all javascripts first. Multiple files can be specified with comma delimiter.
           var getScripts = iJsModuleUrl.split(',').map(function (i) {
             return _jqueryShim2.default.getScript(i);
           });
-          _jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(createViewFunc);
+          _jqueryShim2.default.when.apply(_jqueryShim2.default, getScripts).done(mountViewFunc);
         }
       });
+    }
+
+    // Unmount a React view if there's one on the target selector.
+
+  }, {
+    key: 'unmountView',
+    value: function unmountView(iTargetSelector) {
+      try {
+        _reactDom2.default.unmountComponentAtNode(document.querySelector(iTargetSelector));
+      } catch (e) {
+        console.warn(e);
+      }
     }
   }]);
 
@@ -3210,242 +3524,245 @@ var dotnetifyReactVMRouter = function (_dotnetifyVMRouter) {
 }(_dotnetifyVmRouter2.default);
 
 exports.default = dotnetifyReactVMRouter;
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-/*
-PathJS - Copyright (c) 2011 Mike Trpcic, released under the MIT license.
- */
-
-var Path = {
-	// Need this specific version, because latest version is causing issue.
-	version: '0.8.5',
-	map: function map(path) {
-		if (Path.routes.defined.hasOwnProperty(path)) {
-			return Path.routes.defined[path];
-		} else {
-			return new Path.core.route(path);
-		}
-	},
-	root: function root(path) {
-		Path.routes.root = path;
-	},
-	rescue: function rescue(fn) {
-		Path.routes.rescue = fn;
-	},
-	history: {
-		initial: {}, // Empty container for "Initial Popstate" checking variables.
-		pushState: function pushState(state, title, path) {
-			if (Path.history.supported) {
-				if (Path.dispatch(path)) {
-					history.pushState(state, title, path);
-				}
-			} else {
-				if (Path.history.fallback) {
-					window.location.hash = '#' + path;
-				}
-			}
-		},
-		popState: function popState(event) {
-			var initialPop = !Path.history.initial.popped && location.href == Path.history.initial.URL;
-			Path.history.initial.popped = true;
-			if (initialPop) return;
-			Path.dispatch(document.location.pathname === '/' ? '' : document.location.pathname);
-		},
-		listen: function listen(fallback) {
-			Path.history.supported = !!(window.history && window.history.pushState);
-			Path.history.fallback = fallback;
-
-			if (Path.history.supported) {
-				Path.history.initial.popped = 'state' in window.history, Path.history.initial.URL = location.href;
-				window.onpopstate = Path.history.popState;
-			} else {
-				if (Path.history.fallback) {
-					for (route in Path.routes.defined) {
-						if (route.charAt(0) != '#') {
-							Path.routes.defined['#' + route] = Path.routes.defined[route];
-							Path.routes.defined['#' + route].path = '#' + route;
-						}
-					}
-					Path.listen();
-				}
-			}
-		}
-	},
-	match: function match(path, parameterize) {
-		var params = {},
-		    route = null,
-		    possible_routes,
-		    slice,
-		    i,
-		    j,
-		    compare,
-		    result;
-		for (route in Path.routes.defined) {
-			if (route !== null && route !== undefined) {
-				route = Path.routes.defined[route];
-				possible_routes = route.partition();
-				for (j = 0; j < possible_routes.length; j++) {
-					slice = possible_routes[j];
-					compare = path;
-					if (slice.search(/:/) > 0) {
-						for (i = 0; i < slice.split('/').length; i++) {
-							if (i < compare.split('/').length && slice.split('/')[i].charAt(0) === ':') {
-								params[slice.split('/')[i].replace(/:/, '')] = compare.split('/')[i];
-								result = compare.split('/');
-								result[i] = slice.split('/')[i];
-								compare = result.join('/');
-							}
-						}
-					}
-					if (slice === compare) {
-						if (parameterize) {
-							route.params = params;
-						}
-						return route;
-					}
-				}
-			}
-		}
-		return null;
-	},
-	dispatch: function dispatch(passed_route) {
-		var previous_route, matched_route;
-		if (Path.routes.current !== passed_route) {
-			Path.routes.previous = Path.routes.current;
-			Path.routes.current = passed_route;
-			matched_route = Path.match(passed_route, true);
-
-			if (Path.routes.previous) {
-				previous_route = Path.match(Path.routes.previous);
-				if (previous_route !== null && previous_route.do_exit !== null) {
-					previous_route.do_exit();
-				}
-			}
-
-			if (matched_route !== null) {
-				matched_route.run();
-				return true;
-			} else {
-				if (Path.routes.rescue !== null) {
-					Path.routes.rescue();
-				}
-			}
-		}
-	},
-	listen: function listen() {
-		var fn = function fn() {
-			Path.dispatch(location.hash);
-		};
-
-		if (location.hash === '') {
-			if (Path.routes.root !== null) {
-				location.hash = Path.routes.root;
-			}
-		}
-
-		// The 'document.documentMode' checks below ensure that PathJS fires the right events
-		// even in IE "Quirks Mode".
-		if ('onhashchange' in window && (!document.documentMode || document.documentMode >= 8)) {
-			window.onhashchange = fn;
-		} else {
-			setInterval(fn, 50);
-		}
-
-		if (location.hash !== '') {
-			Path.dispatch(location.hash);
-		}
-	},
-	core: {
-		route: function route(path) {
-			this.path = path;
-			this.action = null;
-			this.do_enter = [];
-			this.do_exit = null;
-			this.params = {};
-			Path.routes.defined[path] = this;
-		}
-	},
-	routes: {
-		current: null,
-		root: null,
-		rescue: null,
-		previous: null,
-		defined: {}
-	}
-};
-
-Path.core.route.prototype = {
-	to: function to(fn) {
-		this.action = fn;
-		return this;
-	},
-	enter: function enter(fns) {
-		if (fns instanceof Array) {
-			this.do_enter = this.do_enter.concat(fns);
-		} else {
-			this.do_enter.push(fns);
-		}
-		return this;
-	},
-	exit: function exit(fn) {
-		this.do_exit = fn;
-		return this;
-	},
-	partition: function partition() {
-		var parts = [],
-		    options = [],
-		    re = /\(([^}]+?)\)/g,
-		    text,
-		    i;
-		while (text = re.exec(this.path)) {
-			parts.push(text[1]);
-		}
-		options.push(this.path.split('(')[0]);
-		for (i = 0; i < parts.length; i++) {
-			options.push(options[options.length - 1] + parts[i]);
-		}
-		return options;
-	},
-	run: function run() {
-		var halt_execution = false,
-		    i,
-		    result,
-		    previous;
-
-		if (Path.routes.defined[this.path].hasOwnProperty('do_enter')) {
-			if (Path.routes.defined[this.path].do_enter.length > 0) {
-				for (i = 0; i < Path.routes.defined[this.path].do_enter.length; i++) {
-					result = Path.routes.defined[this.path].do_enter[i].apply(this, null);
-					if (result === false) {
-						halt_execution = true;
-						break;
-					}
-				}
-			}
-		}
-		if (!halt_execution) {
-			Path.routes.defined[this.path].action();
-		}
-	}
-};
-
-exports.default = Path;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/*
+PathJS - Copyright (c) 2011 Mike Trpcic, released under the MIT license.
+ */
+var window = window || global || {};
+
+var Path = {
+  // Need this specific version, because latest version is causing issue.
+  version: '0.8.5',
+  map: function map(path) {
+    if (Path.routes.defined.hasOwnProperty(path)) {
+      return Path.routes.defined[path];
+    } else {
+      return new Path.core.route(path);
+    }
+  },
+  root: function root(path) {
+    Path.routes.root = path;
+  },
+  rescue: function rescue(fn) {
+    Path.routes.rescue = fn;
+  },
+  history: {
+    initial: {}, // Empty container for "Initial Popstate" checking variables.
+    pushState: function pushState(state, title, path) {
+      if (Path.history.supported) {
+        if (Path.dispatch(path)) {
+          history.pushState(state, title, path);
+        }
+      } else {
+        if (Path.history.fallback) {
+          window.location.hash = '#' + path;
+        }
+      }
+    },
+    popState: function popState(event) {
+      var initialPop = !Path.history.initial.popped && location.href == Path.history.initial.URL;
+      Path.history.initial.popped = true;
+      if (initialPop) return;
+      Path.dispatch(document.location.pathname === '/' ? '' : document.location.pathname);
+    },
+    listen: function listen(fallback) {
+      Path.history.supported = !!(window.history && window.history.pushState);
+      Path.history.fallback = fallback;
+
+      if (Path.history.supported) {
+        Path.history.initial.popped = 'state' in window.history, Path.history.initial.URL = location.href;
+        window.onpopstate = Path.history.popState;
+      } else {
+        if (Path.history.fallback) {
+          for (route in Path.routes.defined) {
+            if (route.charAt(0) != '#') {
+              Path.routes.defined['#' + route] = Path.routes.defined[route];
+              Path.routes.defined['#' + route].path = '#' + route;
+            }
+          }
+          Path.listen();
+        }
+      }
+    }
+  },
+  match: function match(path, parameterize) {
+    var params = {},
+        route = null,
+        possible_routes,
+        slice,
+        i,
+        j,
+        compare,
+        result;
+    for (route in Path.routes.defined) {
+      if (route !== null && route !== undefined) {
+        route = Path.routes.defined[route];
+        possible_routes = route.partition();
+        for (j = 0; j < possible_routes.length; j++) {
+          slice = possible_routes[j];
+          compare = path;
+          if (slice.search(/:/) > 0) {
+            for (i = 0; i < slice.split('/').length; i++) {
+              if (i < compare.split('/').length && slice.split('/')[i].charAt(0) === ':') {
+                params[slice.split('/')[i].replace(/:/, '')] = compare.split('/')[i];
+                result = compare.split('/');
+                result[i] = slice.split('/')[i];
+                compare = result.join('/');
+              }
+            }
+          }
+          if (slice === compare) {
+            if (parameterize) {
+              route.params = params;
+            }
+            return route;
+          }
+        }
+      }
+    }
+    return null;
+  },
+  dispatch: function dispatch(passed_route) {
+    var previous_route, matched_route;
+    if (Path.routes.current !== passed_route) {
+      Path.routes.previous = Path.routes.current;
+      Path.routes.current = passed_route;
+      matched_route = Path.match(passed_route, true);
+
+      if (Path.routes.previous) {
+        previous_route = Path.match(Path.routes.previous);
+        if (previous_route !== null && previous_route.do_exit !== null) {
+          previous_route.do_exit();
+        }
+      }
+
+      if (matched_route !== null) {
+        matched_route.run();
+        return true;
+      } else {
+        if (Path.routes.rescue !== null) {
+          Path.routes.rescue();
+        }
+      }
+    }
+  },
+  listen: function listen() {
+    var fn = function fn() {
+      Path.dispatch(location.hash);
+    };
+
+    if (location.hash === '') {
+      if (Path.routes.root !== null) {
+        location.hash = Path.routes.root;
+      }
+    }
+
+    // The 'document.documentMode' checks below ensure that PathJS fires the right events
+    // even in IE "Quirks Mode".
+    if ('onhashchange' in window && (!document.documentMode || document.documentMode >= 8)) {
+      window.onhashchange = fn;
+    } else {
+      setInterval(fn, 50);
+    }
+
+    if (location.hash !== '') {
+      Path.dispatch(location.hash);
+    }
+  },
+  core: {
+    route: function route(path) {
+      this.path = path;
+      this.action = null;
+      this.do_enter = [];
+      this.do_exit = null;
+      this.params = {};
+      Path.routes.defined[path] = this;
+    }
+  },
+  routes: {
+    current: null,
+    root: null,
+    rescue: null,
+    previous: null,
+    defined: {}
+  }
+};
+
+Path.core.route.prototype = {
+  to: function to(fn) {
+    this.action = fn;
+    return this;
+  },
+  enter: function enter(fns) {
+    if (fns instanceof Array) {
+      this.do_enter = this.do_enter.concat(fns);
+    } else {
+      this.do_enter.push(fns);
+    }
+    return this;
+  },
+  exit: function exit(fn) {
+    this.do_exit = fn;
+    return this;
+  },
+  partition: function partition() {
+    var parts = [],
+        options = [],
+        re = /\(([^}]+?)\)/g,
+        text,
+        i;
+    while (text = re.exec(this.path)) {
+      parts.push(text[1]);
+    }
+    options.push(this.path.split('(')[0]);
+    for (i = 0; i < parts.length; i++) {
+      options.push(options[options.length - 1] + parts[i]);
+    }
+    return options;
+  },
+  run: function run() {
+    var halt_execution = false,
+        i,
+        result,
+        previous;
+
+    if (Path.routes.defined[this.path].hasOwnProperty('do_enter')) {
+      if (Path.routes.defined[this.path].do_enter.length > 0) {
+        for (i = 0; i < Path.routes.defined[this.path].do_enter.length; i++) {
+          result = Path.routes.defined[this.path].do_enter[i].apply(this, null);
+          if (result === false) {
+            halt_execution = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!halt_execution) {
+      Path.routes.defined[this.path].action();
+    }
+  }
+};
+
+exports.default = Path;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -3468,13 +3785,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _path = __webpack_require__(24);
+var _path = __webpack_require__(25);
 
 var _path2 = _interopRequireDefault(_path);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var window = window || global || {};
 
 var dotnetifyRouter = function () {
   function dotnetifyRouter(debug) {
@@ -3556,7 +3875,7 @@ var dotnetifyRouter = function () {
       this.urlPath = iUrl;
       for (var i = 0; i < viewModels.length; i++) {
         var vm = viewModels[i];
-        if (vm.$router.routeUrl(true)) {
+        if (vm.$router.routeUrl(iUrl)) {
           if (this.debug) console.log('router> redirected');
           return;
         }
@@ -3571,29 +3890,38 @@ var dotnetifyRouter = function () {
     value: function $ready() {
       this.$router.initRouting();
     }
+
+    // Called by dotNetify when a view model receives update.
+
+  }, {
+    key: '$update',
+    value: function $update(vmData) {
+      if (vmData && vmData.RoutingState) this.$router.initRouting();
+    }
   }]);
 
   return dotnetifyRouter;
 }();
 
 exports.default = dotnetifyRouter;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
-var _dotnetifyRouter = __webpack_require__(25);
+var _dotnetifyRouter = __webpack_require__(26);
 
 var _dotnetifyRouter2 = _interopRequireDefault(_dotnetifyRouter);
 
-var _dotnetifyReact3 = __webpack_require__(23);
+var _dotnetifyReact3 = __webpack_require__(24);
 
 var _dotnetifyReact4 = _interopRequireDefault(_dotnetifyReact3);
 
@@ -3649,29 +3977,29 @@ _dotnetifyReact2.default.react.router.$mount = function (iTargetSelector, iCompo
 _dotnetifyReact2.default.react.plugins['router'] = _dotnetifyReact2.default.react.router;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _dotnetifyReact = __webpack_require__(0);
+var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
-__webpack_require__(26);
+__webpack_require__(27);
 
-__webpack_require__(20);
+__webpack_require__(21);
 
-var _Scope = __webpack_require__(19);
+var _Scope = __webpack_require__(20);
 
 var _Scope2 = _interopRequireDefault(_Scope);
 
-var _RouteLink = __webpack_require__(15);
+var _RouteLink = __webpack_require__(16);
 
 var _RouteLink2 = _interopRequireDefault(_RouteLink);
 
-var _RouteTarget = __webpack_require__(14);
+var _RouteTarget = __webpack_require__(15);
 
 var _RouteTarget2 = _interopRequireDefault(_RouteTarget);
 

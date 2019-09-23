@@ -7,7 +7,7 @@
 		exports["dotnetify"] = factory(require("knockout"), require("jquery"), require("@aspnet/signalr"));
 	else
 		root["dotnetify"] = factory(root["ko"], root["jQuery"], root["signalR"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__0__, __WEBPACK_EXTERNAL_MODULE__1__, __WEBPACK_EXTERNAL_MODULE__12__) {
+})(window, function(__WEBPACK_EXTERNAL_MODULE__1__, __WEBPACK_EXTERNAL_MODULE__2__, __WEBPACK_EXTERNAL_MODULE__14__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,14 +91,34 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 21);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1, eval)("this");
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
 
 /***/ }),
 /* 1 */
@@ -108,10 +128,16 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__1__;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__2__;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -138,6 +164,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+var window = window || global || {};
 
 var utils = function () {
   function utils() {
@@ -226,9 +253,10 @@ var createEventEmitter = exports.createEventEmitter = function createEventEmitte
 };
 
 exports.default = new utils();
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -256,14 +284,14 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* 
@@ -283,17 +311,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                                                                                                                                                                                                                                                                                */
 
 
-var _dotnetify2 = __webpack_require__(20);
+var _dotnetify2 = __webpack_require__(21);
 
 var _dotnetify3 = _interopRequireDefault(_dotnetify2);
 
-var _jquery = __webpack_require__(1);
+var _jquery = __webpack_require__(2);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
-var _knockout = __webpack_require__(0);
+var _knockout = __webpack_require__(1);
 
 var ko = _interopRequireWildcard(_knockout);
 
@@ -301,715 +329,717 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-ko.mapping = __webpack_require__(10);
+ko.mapping = __webpack_require__(11);
 
+var window = window || global || {};
 var dotnetify = window.dotnetify || _dotnetify3.default;
 
 dotnetify.ko = {
-	version: '2.0.0',
-	controller: dotnetify,
+  version: '2.0.0',
+  controller: dotnetify,
 
-	// Internal variables.
-	_responseSubs: null,
-	_connectedSubs: null,
+  // Internal variables.
+  _responseSubs: null,
+  _connectedSubs: null,
 
-	_responseVM: function _responseVM(iVMId, iVMData) {
-		// Construct a selector from iVMId to find the associated widget.
-		// First parse the instance Id out of the string, if present.
-		var vmType = iVMId;
-		var vmInstanceId = null;
-		if (vmType.indexOf('$') >= 0) {
-			var path = iVMId.split('$');
-			vmType = path[0];
-			vmInstanceId = path[1];
-		}
+  _responseVM: function _responseVM(iVMId, iVMData) {
+    // Construct a selector from iVMId to find the associated widget.
+    // First parse the instance Id out of the string, if present.
+    var vmType = iVMId;
+    var vmInstanceId = null;
+    if (vmType.indexOf('$') >= 0) {
+      var path = iVMId.split('$');
+      vmType = path[0];
+      vmInstanceId = path[1];
+    }
 
-		var selector = "[data-vm='" + vmType + "']";
+    var selector = "[data-vm='" + vmType + "']";
 
-		// If present, add the master view models to the selector.
-		var path = vmType.split('.');
-		if (path.length > 1) {
-			selector = '';
-			var i = 0;
-			for (i = 0; i < path.length - 1; i++) {
-				selector += "[data-master-vm='" + path[i] + "'] ";
-			}selector += "[data-vm='" + path[i] + "']";
-		}
+    // If present, add the master view models to the selector.
+    var path = vmType.split('.');
+    if (path.length > 1) {
+      selector = '';
+      var i = 0;
+      for (i = 0; i < path.length - 1; i++) {
+        selector += "[data-master-vm='" + path[i] + "'] ";
+      }selector += "[data-vm='" + path[i] + "']";
+    }
 
-		// If present, add the instance Id to the selector.
-		if (vmInstanceId != null) selector += "[data-vm-id='" + vmInstanceId + "']";
+    // If present, add the instance Id to the selector.
+    if (vmInstanceId != null) selector += "[data-vm-id='" + vmInstanceId + "']";
 
-		// Use the selector to locate the view model widget and pass the data.
-		var element = (0, _jquery2.default)(selector);
-		if (element.length > 0) {
-			dotnetify.checkServerSideException(iVMId, iVMData);
-			element.data('ko-dotnetify').UpdateVM(iVMData);
-			return true;
-		}
-		return false;
-	},
+    // Use the selector to locate the view model widget and pass the data.
+    var element = (0, _jquery2.default)(selector);
+    if (element.length > 0) {
+      dotnetify.checkServerSideException(iVMId, iVMData);
+      element.data('ko-dotnetify').UpdateVM(iVMData);
+      return true;
+    }
+    return false;
+  },
 
-	init: function init() {
-		var self = dotnetify.ko;
+  init: function init() {
+    var self = dotnetify.ko;
+    var hub = dotnetify.selectHub().hub;
 
-		var applyWidget = function applyWidget() {
-			_jquery2.default.each((0, _jquery2.default)('[data-vm]'), function () {
-				(0, _jquery2.default)(this).dotnetify();
-			});
-		};
+    var applyWidget = function applyWidget() {
+      _jquery2.default.each((0, _jquery2.default)('[data-vm]'), function () {
+        (0, _jquery2.default)(this).dotnetify();
+      });
+    };
 
-		if (!self._responseSubs) self._responseSubs = dotnetify.responseEvent.subscribe(self._responseVM);
+    if (!self._responseSubs) self._responseSubs = hub.responseEvent.subscribe(self._responseVM);
 
-		if (!self._connectedSubs) self._connectedSubs = dotnetify.connectedEvent.subscribe(function () {
-			applyWidget();
-		});
+    if (!self._connectedSubs) self._connectedSubs = hub.connectedEvent.subscribe(function () {
+      applyWidget();
+    });
 
-		// If offline mode is enabled, apply the widget anyway when there's no connection.
-		setTimeout(function () {
-			if (dotnetify.offline && !dotnetify.isConnected()) {
-				applyWidget();
-				dotnetify.isOffline = true;
-				(0, _jquery2.default)(document).trigger('offline', dotnetify.isOffline);
-			}
-		}, dotnetify.offlineTimeout);
+    // If offline mode is enabled, apply the widget anyway when there's no connection.
+    setTimeout(function () {
+      if (dotnetify.offline && !hub.isConnected) {
+        applyWidget();
+        dotnetify.isOffline = true;
+        (0, _jquery2.default)(document).trigger('offline', dotnetify.isOffline);
+      }
+    }, dotnetify.offlineTimeout);
 
-		dotnetify.initHub();
-		dotnetify.startHub();
+    dotnetify.startHub(hub);
 
-		// Use SignalR event to raise the offline event with true/false argument.
-		dotnetify.hub.stateChanged(function (state) {
-			if (dotnetify.debug) console.log('SignalR: ' + state);
+    // Use SignalR event to raise the offline event with true/false argument.
+    hub.stateChanged(function (state) {
+      if (dotnetify.debug) console.log('SignalR: ' + state);
 
-			var isOffline = state != 'connected';
-			if (dotnetify.isOffline != isOffline) {
-				dotnetify.isOffline = isOffline;
-				(0, _jquery2.default)(document).trigger('offline', dotnetify.isOffline);
-			}
-		});
+      var isOffline = state != 'connected';
+      if (dotnetify.isOffline != isOffline) {
+        dotnetify.isOffline = isOffline;
+        (0, _jquery2.default)(document).trigger('offline', dotnetify.isOffline);
+      }
+    });
 
-		if (dotnetify.offline) applyWidget();
-	},
+    if (dotnetify.offline) applyWidget();
+  },
 
-	destroy: function destroy(iParent) {
-		var elems = iParent ? (0, _jquery2.default)(iParent).find('[data-vm]').addBack(iParent) : (0, _jquery2.default)('[data-vm]');
-		elems.toArray().forEach(function (elem) {
-			var widget = dotnetify.ko.widget(elem);
-			if (widget) widget.destroy();
-		});
-	},
+  destroy: function destroy(iParent) {
+    var elems = iParent ? (0, _jquery2.default)(iParent).find('[data-vm]').addBack(iParent) : (0, _jquery2.default)('[data-vm]');
+    elems.toArray().forEach(function (elem) {
+      var widget = dotnetify.ko.widget(elem);
+      if (widget) widget.destroy();
+    });
+  },
 
-	// Get all view models.
-	getViewModels: function getViewModels() {
-		var self = dotnetify.ko;
-		var elems = (0, _jquery2.default)('[data-vm]').toArray();
-		return elems.map(function (elem) {
-			var widget = dotnetify.ko.widget(elem);
-			return widget ? widget.VM : null;
-		}).filter(function (x) {
-			return x;
-		});
-	},
+  // Get all view models.
+  getViewModels: function getViewModels() {
+    var self = dotnetify.ko;
+    var elems = (0, _jquery2.default)('[data-vm]').toArray();
+    return elems.map(function (elem) {
+      var widget = dotnetify.ko.widget(elem);
+      return widget ? widget.VM : null;
+    }).filter(function (x) {
+      return x;
+    });
+  },
 
-	widget: function widget(iElement) {
-		return (0, _jquery2.default)(iElement).data('ko-dotnetify');
-	},
+  widget: function widget(iElement) {
+    return (0, _jquery2.default)(iElement).data('ko-dotnetify');
+  },
 
-	plugins: {}
+  plugins: {}
 };
 
 (0, _jquery2.default)(function () {
-	dotnetify.ko.init();
+  dotnetify.ko.init();
 });
 
 _jquery2.default.widget('ko.dotnetify', {
-	// Widget constructor.
-	_create: function _create() {
-		var self = this;
-
-		self.VMType = self.element.attr('data-vm');
-		self.VMId = self.VMType;
-
-		// If an instance Id is specified, add it to VMId.
-		var instanceId = self.element.attr('data-vm-id');
-		if (instanceId != null) self.VMId += '$' + instanceId;
-
-		// If inside master view scope, combine the names into VMId.
-		_jquery2.default.each(self.element.parents('[data-master-vm]'), function () {
-			self.VMId = (0, _jquery2.default)(this).attr('data-master-vm') + '.' + self.VMId;
-		});
-
-		// Handle offline mode.
-		if (dotnetify.offline) self._ListenToOfflineEvent();
-
-		// Request the server VM.
-		if (self.VMId != null) {
-			if (dotnetify.isConnected()) self._RequestVM();else if (dotnetify.offline) self._GetOfflineVM();
-		} else console.error("ERROR: dotnetify - failed to find 'data-vm' attribute in the element where .dotnetify() was applied.");
-	},
-
-	// Widget destructor.
-	_destroy: function _destroy() {
-		try {
-			var self = this;
-
-			// Stop listening to offline event.
-			if (typeof self.OfflineFn === 'function') (0, _jquery2.default)(document).off('offline', self.OfflineFn);
-
-			// Call any plugin's $destroy function if provided.
-			_jquery2.default.each(dotnetify.plugins, function (pluginId, plugin) {
-				if (typeof plugin['$destroy'] === 'function') plugin.$destroy.apply(self.VM);
-			});
-
-			// Call view model's $destroy function if provided.
-			if (self.VM != null && self.VM.hasOwnProperty('$destroy')) self.VM.$destroy();
-		} catch (e) {
-			console.error(e.stack);
-		}
-
-		dotnetify.disposeVM(self.VMId);
-	},
-
-	// Convert the server VM into knockout VM.
-	UpdateVM: function UpdateVM(iVMData) {
-		var self = this;
-		try {
-			// If no view model yet, create one from the server data.
-			if (self.VM == null) {
-				self.VM = ko.mapping.fromJS(JSON.parse(iVMData));
-
-				// Set essential info to the view model.
-				self.VM.$vmId = self.VMId;
-				self.VM.$element = self.element;
-				self.VM.$dotnetify = dotnetify.ko;
-
-				// Add an observable to carry the offline state.
-				if (dotnetify.offline) self.VM.$vmOffline = ko.observable(self.IsOffline);
-
-				// Add built-in functions to the view model.
-				this._AddBuiltInFunctions();
-
-				// Call any plugin's $init function if provided to give a chance to do
-				// things before initial binding is applied.
-				_jquery2.default.each(dotnetify.ko.plugins, function (pluginId, plugin) {
-					if (typeof plugin['$init'] === 'function') plugin.$init.apply(self.VM);
-				});
-
-				// Call view model's init function if provided.
-				if (typeof self.VM['$init'] === 'function') self.VM.$init();
-
-				// Apply knockout view model to the HTML element.
-				try {
-					ko.applyBindings(self.VM, self.element[0]);
-				} catch (e) {
-					console.error(e.stack);
-				}
-
-				// Enable server update so that every changed value goes to server.
-				self.VM.$serverUpdate = true;
-
-				// Raise the ready event after all knockout components are ready.
-				self._OnComponentReady(function () {
-					// Call any plugin's $ready function if provided to give a chance to do
-					// things when the view model is ready.
-					_jquery2.default.each(dotnetify.ko.plugins, function (pluginId, plugin) {
-						if (typeof plugin['$ready'] === 'function') plugin.$ready.apply(self.VM);
-					});
-
-					// Subscribe to change events to allow sending updates back to server.
-					self._SubscribeObservables(self.VM);
-
-					// Call view model's $ready function if provided.
-					if (typeof self.VM['$ready'] === 'function') self.VM.$ready();
-
-					// Send 'ready' event after a new view model was received.
-					self.element.trigger('ready', { VMId: self.VMId, VM: self.VM });
-				});
-
-				// Cache the VM data in case of offline mode.
-				if (dotnetify.offline && dotnetify.isConnected() && typeof dotnetify.offlineCacheFn === 'function') dotnetify.offlineCacheFn(self.VMId + self.element.attr('data-vm-arg'), iVMData);
-			} else {
-				// Disable server update because we're going to update the value in the knockout VM
-				// and that will trigger change event back to server if we don't stop it now.
-				self.VM.$serverUpdate = false;
-
-				var vmUpdate = JSON.parse(iVMData);
-				self._PreProcess(vmUpdate);
-
-				try {
-					ko.mapping.fromJS(vmUpdate, self.VM);
-				} catch (e) {
-					console.error(e.stack);
-				}
-
-				// Don't forget to re-enable sending changed values to server.
-				self.VM.$serverUpdate = true;
-
-				// Subscribe to change events to allow sending updates back to server,
-				// but do it after all the knockout components are ready.
-				self._OnComponentReady(function () {
-					self._SubscribeObservables(self.VM);
-				});
-			}
-		} catch (e) {
-			console.error(e.stack);
-		}
-
-		if (dotnetify.debug) {
-			console.log('[' + self.VMId + '] received> ');
-			console.log(JSON.parse(iVMData));
-
-			if (dotnetify.debugFn != null) dotnetify.debugFn(self.VMId, 'received', JSON.parse(iVMData));
-		}
-	},
-
-	// Adds built-in functions to the view model.
-	_AddBuiltInFunctions: function _AddBuiltInFunctions() {
-		var self = this;
-
-		// Executes the given function in a scope where server update is temporarily disabled.
-		self.VM.$preventBinding = function (fn) {
-			self.VM.$serverUpdate = false;
-			fn.apply(self.VM);
-			self.VM.$serverUpdate = true;
-		};
-
-		// Adds a new item to an observable array.
-		self.VM.$addList = function (iList, iNewItem) {
-			var newItem = Array.isArray(iNewItem) ? iNewItem : ko.mapping.fromJS(iNewItem);
-
-			// Check if the list already has an item with the same key. If so, replace it.
-			var key = iList()['$vmKey'];
-			if (key != null) {
-				var match = ko.utils.arrayFirst(iList(), function (i) {
-					return i[key]() == newItem[key]();
-				});
-				if (match != null) {
-					iList.replace(match, newItem);
-					return;
-				}
-			}
-			iList.push(newItem);
-		};
-
-		// Updates existing item to an observable array.
-		self.VM.$updateList = function (iList, iNewItem) {
-			var newItem = ko.mapping.fromJS(iNewItem);
-
-			// Check if the list already has an item with the same key. If so, update it.
-			var key = iList()['$vmKey'];
-			if (key != null) {
-				if (!newItem.hasOwnProperty(key)) {
-					console.error("ERROR: object requires property '" + key + "'");
-					return;
-				}
-				var match = ko.utils.arrayFirst(iList(), function (i) {
-					return i[key]() == newItem[key]();
-				});
-				if (match != null) {
-					Object.keys(newItem).forEach(function (prop) {
-						if (ko.isObservable(newItem[prop])) match[prop](newItem[prop]());
-					});
-
-					return;
-				}
-			}
-			iList.push(newItem);
-		};
-
-		// Removes an item from an observable array.
-		// Unlike the push operation, the ko remove operation will cause the list to trigger
-		// change event, therefore disable server update while we do this.
-		self.VM.$removeList = function (iList, iCriteria) {
-			self.VM.$preventBinding(function () {
-				iList.remove(iCriteria);
-			});
-		};
-
-		// Listens to a view model property change event.
-		self.VM.$on = function (iProperty, iCallback) {
-			iProperty.subscribe(function (iNewValue) {
-				iCallback(iNewValue);
-			});
-		};
-
-		// Listens to a view model property change event once.
-		self.VM.$once = function (iProperty, iCallback) {
-			var subscription = iProperty.subscribe(function (iNewValue) {
-				subscription.dispose();
-				iCallback(iNewValue);
-			});
-		};
-
-		// Loads a view into a target element.
-		// Method parameters: TargetSelector, ViewUrl, [iJsModuleUrl], [iVmArg], iCallbackFn
-		self.VM.$loadView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
-			if ((typeof iJsModuleUrl === 'undefined' ? 'undefined' : _typeof(iJsModuleUrl)) === 'object' && iJsModuleUrl != null) {
-				iCallbackFn = iVmArg;
-				iVmArg = iJsModuleUrl;
-				iJsModuleUrl = null;
-			} else if (typeof iJsModuleUrl === 'function') {
-				iCallbackFn = iJsModuleUrl;
-				iJsModuleUrl = null;
-			} else if (typeof iVmArg === 'function') {
-				iCallbackFn = iVmArg;
-				iVmArg = null;
-			}
-
-			// If no view URL is given, empty the target DOM element.
-			if (iViewUrl == null || iViewUrl == '') {
-				(0, _jquery2.default)(iTargetSelector).empty();
-				return;
-			}
-
-			// Loads the view template to the target DOM element.
-			(0, _jquery2.default)(iTargetSelector).load(iViewUrl, null, function () {
-				// Adds view model arguments when provided.
-				if (iVmArg != null && !_jquery2.default.isEmptyObject(iVmArg)) (0, _jquery2.default)(this).attr('data-vm-arg', JSON.stringify(iVmArg));
-
-				// Call the callback function.
-				if (typeof iCallbackFn === 'function') iCallbackFn.apply(this);
-
-				// Load the Javascript module if specified.
-				if (iJsModuleUrl != null) {
-					_jquery2.default.getScript(iJsModuleUrl, function () {
-						dotnetify.ko.init();
-					});
-				} else dotnetify.ko.init();
-			});
-		};
-
-		// Injects a context with observables mapped from an object. Context can be an object or an observable array.
-		self.VM.$inject = function (iContext, iObject) {
-			if (ko.isObservable(iContext) && 'push' in iContext) _jquery2.default.each(iContext(), function (idx, item) {
-				self._Inject(item, iObject);
-			});else self._Inject(iContext, iObject);
-		};
-
-		// Map the module in global namespace whose name matches the view model type.
-		var jsModule = window[self.VMType];
-		if (jsModule != null) {
-			// If the module is a Typescript class, instantiate it.
-			if (typeof jsModule === 'function') {
-				var jsInstance = new jsModule(self.VM);
-				Object.assign(jsInstance, jsModule.prototype);
-				self._Inject(self.VM, jsInstance);
-			} else self._Inject(self.VM, jsModule);
-		}
-
-		// Add plugin functions.
-		_jquery2.default.each(dotnetify.ko.plugins, function (pluginId, plugin) {
-			if (plugin.hasOwnProperty('$inject')) plugin.$inject(self.VM);
-		});
-	},
-
-	// Gets offline view model data from the local cache.
-	_GetOfflineVM: function _GetOfflineVM() {
-		var self = this;
-
-		if (typeof dotnetify.offlineCacheFn === 'function') {
-			// SignalR connection isn't available; use cached VM data for offline mode.
-			var cachedData = dotnetify.offlineCacheFn(self.VMId + self.element.attr('data-vm-arg'));
-			if (cachedData == null) cachedData = dotnetify.offlineCacheFn(self.VMId);
-
-			if (cachedData != null) {
-				if (dotnetify.debug) console.warn('[' + self.VMId + '] using offline data');
-
-				self.IsOffline = true;
-				self.UpdateVM(cachedData);
-			}
-		}
-	},
-
-	// Initializes offline mode handling.
-	_ListenToOfflineEvent: function _ListenToOfflineEvent() {
-		var self = this;
-
-		self.IsOffline = false;
-		self.OfflineFn = function (event, isOffline) {
-			if (self.VM != null && self.VM.hasOwnProperty('$vmOffline')) self.VM.$vmOffline(isOffline);
-
-			self.IsOffline = isOffline;
-			if (!isOffline) self._RequestVM();else if (self.VM == null) self._GetOfflineVM();
-
-			(0, _jquery2.default)(document).one('offline', self.OfflineFn.bind(self));
-		};
-
-		(0, _jquery2.default)(document).one('offline', self.OfflineFn.bind(self));
-	},
-
-	// Inject the context with observables mapped from an object.
-	// Properties that start with underscore are mapped to observables.
-	// Functions that start with underscore are mapped to pure computed observables.
-	_Inject: function _Inject(iContext, iObject) {
-		Object.keys(iObject).forEach(function (prop) {
-			// Skip if the context already has a property with the same name.
-			if (iContext.hasOwnProperty(prop)) return;
-
-			if (typeof iObject[prop] === 'function') {
-				if (prop.indexOf('_') == 0) {
-					iContext[prop] = ko.pureComputed(iObject[prop], iContext);
-				} else iContext[prop] = iObject[prop];
-			} else if (prop.indexOf('_') == 0) {
-				iContext[prop] = ko.observable(iObject[prop]);
-
-				// Prevent it from being subscribed so it won't get sent to server.
-				iContext[prop].$subscribe = true;
-			} else iContext[prop] = iObject[prop];
-		});
-	},
-
-	// Calls the callback function only if all the knockout components are ready.
-	// This is a workaround until knockout issue #1533 is closed.
-	_OnComponentReady: function _OnComponentReady(iCallbackFn) {
-		var self = this;
-		var retry = 0;
-		var checkComponentReadyFn = function checkComponentReadyFn() {
-			var isReady = true;
-
-			// Assume the knockout components are those with 'params' attribute,
-			// and that it's ready if it has at least one child element.
-			var components = self.element.find('[params]');
-			if (components.length > 0) isReady = _jquery2.default.grep(components, function (i) {
-				return i.childElementCount == 0;
-			}).length == 0;
-
-			if (isReady || retry++ > 3) iCallbackFn();else setTimeout(checkComponentReadyFn, 250);
-		};
-
-		checkComponentReadyFn();
-	},
-
-	// On value changed from a knockout VM's observable, update the server VM.
-	_OnValueChanged: function _OnValueChanged(iVMPath, iNewValue) {
-		var update = {};
-		update[iVMPath] = iNewValue instanceof Object ? _jquery2.default.extend({}, iNewValue) : iNewValue;
-
-		if (dotnetify.isConnected()) {
-			try {
-				dotnetify.updateVM(this.VMId, update);
-
-				if (dotnetify.debug) {
-					console.log('[' + this.VMId + '] sent> ');
-					console.log(update);
-
-					if (dotnetify.debugFn != null) dotnetify.debugFn(this.VMId, 'sent', update);
-				}
-			} catch (e) {
-				console.error(e);
-			}
-		}
-	},
-
-	// Preprocess view model update from the server before we map it to knockout view model.
-	_PreProcess: function _PreProcess(iVMUpdate) {
-		var _this = this;
-
-		Object.keys(iVMUpdate).forEach(function (prop) {
-			// Look for property that end with '_add'. Interpret the value as a list item to be added
-			// to an existing list whose property name precedes that suffix.
-			var match = /(.*)_add/.exec(prop);
-			if (match != null) {
-				var list = _this.VM[match[1]];
-				if (list != null) _this.VM.$addList(list, iVMUpdate[prop]);else throw new Error('unable to resolve ' + prop);
-				delete iVMUpdate[prop];
-				return;
-			}
-
-			// Look for property that end with '_update'. Interpret the value as a list item to be updated
-			// to an existing list whose property name precedes that suffix.
-			var match = /(.*)_update/.exec(prop);
-			if (match != null) {
-				var list = _this.VM[match[1]];
-				if (list != null) _this.VM.$updateList(list, iVMUpdate[prop]);else throw new Error('unable to resolve ' + prop);
-				delete iVMUpdate[prop];
-				return;
-			}
-
-			// Look for property that end with '_remove'. Interpret the value as a list item key to remove
-			// from an existing list whose property name precedes that suffix.
-			var match = /(.*)_remove/.exec(prop);
-			if (match != null) {
-				var list = _this.VM[match[1]];
-				if (list != null) {
-					var key = list()['$vmKey'];
-					if (key != null) _this.VM.$removeList(_this.VM[match[1]], function (i) {
-						return i[key]() == iVMUpdate[prop];
-					});else throw new Error('unable to resolve ' + prop + ' due to missing vmItemKey attribute');
-				} else throw new Error('unable to resolve ' + prop);
-				delete iVMUpdate[prop];
-				return;
-			}
-		});
-	},
-
-	// Requests view model data from the server.
-	_RequestVM: function _RequestVM() {
-		var self = this;
-		var vmArg = self.element.attr('data-vm-arg');
-		vmArg = vmArg != null ? _jquery2.default.parseJSON(vmArg.replace(/'/g, '"')) : null;
-
-		if (dotnetify.isConnected()) {
-			try {
-				dotnetify.requestVM(self.VMId, vmArg);
-			} catch (e) {
-				console.error(e);
-			}
-		}
-	},
-
-	// Subscribe to value change events raised by knockout VM's observables.
-	_SubscribeObservables: function _SubscribeObservables(iParam, iVMPath) {
-		var _this2 = this;
-
-		var self = this;
-
-		if (iParam == null) return;else if (ko.isObservable(iParam)) {
-			if ('$subscribe' in iParam === false) {
-				iParam.subscribe(function (iNewValue) {
-					// Handle value change event from observables.
-					if (self.VM.$serverUpdate === true) self._OnValueChanged(iVMPath, iNewValue);
-				});
-				iParam['$subscribe'] = true;
-			}
-			this._SubscribeObservables(iParam(), iVMPath);
-		} else if ((typeof iParam === 'undefined' ? 'undefined' : _typeof(iParam)) == 'object') {
-			// The property with $vmKey means it's an enumerable and the $vmKey indicates the key to identify
-			// the item in that enumerable.  When we send value update to the server, we'll use the property
-			// path in this format: <enumerable property name>.$<key value>.<property name>.
-			// For example: ListContent.$3.FirstName.
-			var key = '$vmKey' in iParam ? iParam['$vmKey'] : null;
-
-			Object.keys(iParam).forEach(function (property) {
-				if (property.charAt(0) == '$' || property.charAt(0) == '_') return;
-				if (property.charAt(0) == property.charAt(0).toLowerCase()) return;
-				if (!isNaN(property.charAt(0))) return;
-				var path = key != null ? '$' + iParam[property][key]() : property;
-				_this2._SubscribeObservables(iParam[property], iVMPath == null ? path : iVMPath + '.' + path);
-			});
-		} else if (iParam instanceof Array) {
-			Object.keys(iParam).forEach(function (index) {
-				path = '$' + index;
-				_this2._SubscribeObservables(iParam[index], iVMPath == null ? path : iVMPath + '.' + path);
-			});
-		}
-	}
+  // Widget constructor.
+  _create: function _create() {
+    var self = this;
+
+    self.VMType = self.element.attr('data-vm');
+    self.VMId = self.VMType;
+
+    // If an instance Id is specified, add it to VMId.
+    var instanceId = self.element.attr('data-vm-id');
+    if (instanceId != null) self.VMId += '$' + instanceId;
+
+    // If inside master view scope, combine the names into VMId.
+    _jquery2.default.each(self.element.parents('[data-master-vm]'), function () {
+      self.VMId = (0, _jquery2.default)(this).attr('data-master-vm') + '.' + self.VMId;
+    });
+
+    // Handle offline mode.
+    if (dotnetify.offline) self._ListenToOfflineEvent();
+
+    // Request the server VM.
+    if (self.VMId != null) {
+      if (dotnetify.hub.isConnected) self._RequestVM();else if (dotnetify.offline) self._GetOfflineVM();
+    } else console.error("ERROR: dotnetify - failed to find 'data-vm' attribute in the element where .dotnetify() was applied.");
+  },
+
+  // Widget destructor.
+  _destroy: function _destroy() {
+    try {
+      var self = this;
+
+      // Stop listening to offline event.
+      if (typeof self.OfflineFn === 'function') (0, _jquery2.default)(document).off('offline', self.OfflineFn);
+
+      // Call any plugin's $destroy function if provided.
+      _jquery2.default.each(dotnetify.plugins, function (pluginId, plugin) {
+        if (typeof plugin['$destroy'] === 'function') plugin.$destroy.apply(self.VM);
+      });
+
+      // Call view model's $destroy function if provided.
+      if (self.VM != null && self.VM.hasOwnProperty('$destroy')) self.VM.$destroy();
+    } catch (e) {
+      console.error(e.stack);
+    }
+
+    dotnetify.hub.disposeVM(self.VMId);
+  },
+
+  // Convert the server VM into knockout VM.
+  UpdateVM: function UpdateVM(iVMData) {
+    var self = this;
+    try {
+      // If no view model yet, create one from the server data.
+      if (self.VM == null) {
+        self.VM = ko.mapping.fromJS(JSON.parse(iVMData));
+
+        // Set essential info to the view model.
+        self.VM.$vmId = self.VMId;
+        self.VM.$element = self.element;
+        self.VM.$dotnetify = dotnetify.ko;
+
+        // Add an observable to carry the offline state.
+        if (dotnetify.offline) self.VM.$vmOffline = ko.observable(self.IsOffline);
+
+        // Add built-in functions to the view model.
+        this._AddBuiltInFunctions();
+
+        // Call any plugin's $init function if provided to give a chance to do
+        // things before initial binding is applied.
+        _jquery2.default.each(dotnetify.ko.plugins, function (pluginId, plugin) {
+          if (typeof plugin['$init'] === 'function') plugin.$init.apply(self.VM);
+        });
+
+        // Call view model's init function if provided.
+        if (typeof self.VM['$init'] === 'function') self.VM.$init();
+
+        // Apply knockout view model to the HTML element.
+        try {
+          ko.applyBindings(self.VM, self.element[0]);
+        } catch (e) {
+          console.error(e.stack);
+        }
+
+        // Enable server update so that every changed value goes to server.
+        self.VM.$serverUpdate = true;
+
+        // Raise the ready event after all knockout components are ready.
+        self._OnComponentReady(function () {
+          // Call any plugin's $ready function if provided to give a chance to do
+          // things when the view model is ready.
+          _jquery2.default.each(dotnetify.ko.plugins, function (pluginId, plugin) {
+            if (typeof plugin['$ready'] === 'function') plugin.$ready.apply(self.VM);
+          });
+
+          // Subscribe to change events to allow sending updates back to server.
+          self._SubscribeObservables(self.VM);
+
+          // Call view model's $ready function if provided.
+          if (typeof self.VM['$ready'] === 'function') self.VM.$ready();
+
+          // Send 'ready' event after a new view model was received.
+          self.element.trigger('ready', { VMId: self.VMId, VM: self.VM });
+        });
+
+        // Cache the VM data in case of offline mode.
+        if (dotnetify.offline && dotnetify.hub.isConnected && typeof dotnetify.offlineCacheFn === 'function') dotnetify.offlineCacheFn(self.VMId + self.element.attr('data-vm-arg'), iVMData);
+      } else {
+        // Disable server update because we're going to update the value in the knockout VM
+        // and that will trigger change event back to server if we don't stop it now.
+        self.VM.$serverUpdate = false;
+
+        var vmUpdate = JSON.parse(iVMData);
+        self._PreProcess(vmUpdate);
+
+        try {
+          ko.mapping.fromJS(vmUpdate, self.VM);
+        } catch (e) {
+          console.error(e.stack);
+        }
+
+        // Don't forget to re-enable sending changed values to server.
+        self.VM.$serverUpdate = true;
+
+        // Subscribe to change events to allow sending updates back to server,
+        // but do it after all the knockout components are ready.
+        self._OnComponentReady(function () {
+          self._SubscribeObservables(self.VM);
+        });
+      }
+    } catch (e) {
+      console.error(e.stack);
+    }
+
+    if (dotnetify.debug) {
+      console.log('[' + self.VMId + '] received> ');
+      console.log(JSON.parse(iVMData));
+
+      if (dotnetify.debugFn != null) dotnetify.debugFn(self.VMId, 'received', JSON.parse(iVMData));
+    }
+  },
+
+  // Adds built-in functions to the view model.
+  _AddBuiltInFunctions: function _AddBuiltInFunctions() {
+    var self = this;
+
+    // Executes the given function in a scope where server update is temporarily disabled.
+    self.VM.$preventBinding = function (fn) {
+      self.VM.$serverUpdate = false;
+      fn.apply(self.VM);
+      self.VM.$serverUpdate = true;
+    };
+
+    // Adds a new item to an observable array.
+    self.VM.$addList = function (iList, iNewItem) {
+      var newItem = Array.isArray(iNewItem) ? iNewItem : ko.mapping.fromJS(iNewItem);
+
+      // Check if the list already has an item with the same key. If so, replace it.
+      var key = iList()['$vmKey'];
+      if (key != null) {
+        var match = ko.utils.arrayFirst(iList(), function (i) {
+          return i[key]() == newItem[key]();
+        });
+        if (match != null) {
+          iList.replace(match, newItem);
+          return;
+        }
+      }
+      iList.push(newItem);
+    };
+
+    // Updates existing item to an observable array.
+    self.VM.$updateList = function (iList, iNewItem) {
+      var newItem = ko.mapping.fromJS(iNewItem);
+
+      // Check if the list already has an item with the same key. If so, update it.
+      var key = iList()['$vmKey'];
+      if (key != null) {
+        if (!newItem.hasOwnProperty(key)) {
+          console.error("ERROR: object requires property '" + key + "'");
+          return;
+        }
+        var match = ko.utils.arrayFirst(iList(), function (i) {
+          return i[key]() == newItem[key]();
+        });
+        if (match != null) {
+          Object.keys(newItem).forEach(function (prop) {
+            if (ko.isObservable(newItem[prop])) match[prop](newItem[prop]());
+          });
+
+          return;
+        }
+      }
+      iList.push(newItem);
+    };
+
+    // Removes an item from an observable array.
+    // Unlike the push operation, the ko remove operation will cause the list to trigger
+    // change event, therefore disable server update while we do this.
+    self.VM.$removeList = function (iList, iCriteria) {
+      self.VM.$preventBinding(function () {
+        iList.remove(iCriteria);
+      });
+    };
+
+    // Listens to a view model property change event.
+    self.VM.$on = function (iProperty, iCallback) {
+      iProperty.subscribe(function (iNewValue) {
+        iCallback(iNewValue);
+      });
+    };
+
+    // Listens to a view model property change event once.
+    self.VM.$once = function (iProperty, iCallback) {
+      var subscription = iProperty.subscribe(function (iNewValue) {
+        subscription.dispose();
+        iCallback(iNewValue);
+      });
+    };
+
+    // Loads a view into a target element.
+    // Method parameters: TargetSelector, ViewUrl, [iJsModuleUrl], [iVmArg], iCallbackFn
+    self.VM.$loadView = function (iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
+      if ((typeof iJsModuleUrl === 'undefined' ? 'undefined' : _typeof(iJsModuleUrl)) === 'object' && iJsModuleUrl != null) {
+        iCallbackFn = iVmArg;
+        iVmArg = iJsModuleUrl;
+        iJsModuleUrl = null;
+      } else if (typeof iJsModuleUrl === 'function') {
+        iCallbackFn = iJsModuleUrl;
+        iJsModuleUrl = null;
+      } else if (typeof iVmArg === 'function') {
+        iCallbackFn = iVmArg;
+        iVmArg = null;
+      }
+
+      // If no view URL is given, empty the target DOM element.
+      if (iViewUrl == null || iViewUrl == '') {
+        (0, _jquery2.default)(iTargetSelector).empty();
+        return;
+      }
+
+      // Loads the view template to the target DOM element.
+      (0, _jquery2.default)(iTargetSelector).load(iViewUrl, null, function () {
+        // Adds view model arguments when provided.
+        if (iVmArg != null && !_jquery2.default.isEmptyObject(iVmArg)) (0, _jquery2.default)(this).attr('data-vm-arg', JSON.stringify(iVmArg));
+
+        // Call the callback function.
+        if (typeof iCallbackFn === 'function') iCallbackFn.apply(this);
+
+        // Load the Javascript module if specified.
+        if (iJsModuleUrl != null) {
+          _jquery2.default.getScript(iJsModuleUrl, function () {
+            dotnetify.ko.init();
+          });
+        } else dotnetify.ko.init();
+      });
+    };
+
+    // Injects a context with observables mapped from an object. Context can be an object or an observable array.
+    self.VM.$inject = function (iContext, iObject) {
+      if (ko.isObservable(iContext) && 'push' in iContext) _jquery2.default.each(iContext(), function (idx, item) {
+        self._Inject(item, iObject);
+      });else self._Inject(iContext, iObject);
+    };
+
+    // Map the module in global namespace whose name matches the view model type.
+    var jsModule = window[self.VMType];
+    if (jsModule != null) {
+      // If the module is a Typescript class, instantiate it.
+      if (typeof jsModule === 'function') {
+        var jsInstance = new jsModule(self.VM);
+        Object.assign(jsInstance, jsModule.prototype);
+        self._Inject(self.VM, jsInstance);
+      } else self._Inject(self.VM, jsModule);
+    }
+
+    // Add plugin functions.
+    _jquery2.default.each(dotnetify.ko.plugins, function (pluginId, plugin) {
+      if (plugin.hasOwnProperty('$inject')) plugin.$inject(self.VM);
+    });
+  },
+
+  // Gets offline view model data from the local cache.
+  _GetOfflineVM: function _GetOfflineVM() {
+    var self = this;
+
+    if (typeof dotnetify.offlineCacheFn === 'function') {
+      // SignalR connection isn't available; use cached VM data for offline mode.
+      var cachedData = dotnetify.offlineCacheFn(self.VMId + self.element.attr('data-vm-arg'));
+      if (cachedData == null) cachedData = dotnetify.offlineCacheFn(self.VMId);
+
+      if (cachedData != null) {
+        if (dotnetify.debug) console.warn('[' + self.VMId + '] using offline data');
+
+        self.IsOffline = true;
+        self.UpdateVM(cachedData);
+      }
+    }
+  },
+
+  // Initializes offline mode handling.
+  _ListenToOfflineEvent: function _ListenToOfflineEvent() {
+    var self = this;
+
+    self.IsOffline = false;
+    self.OfflineFn = function (event, isOffline) {
+      if (self.VM != null && self.VM.hasOwnProperty('$vmOffline')) self.VM.$vmOffline(isOffline);
+
+      self.IsOffline = isOffline;
+      if (!isOffline) self._RequestVM();else if (self.VM == null) self._GetOfflineVM();
+
+      (0, _jquery2.default)(document).one('offline', self.OfflineFn.bind(self));
+    };
+
+    (0, _jquery2.default)(document).one('offline', self.OfflineFn.bind(self));
+  },
+
+  // Inject the context with observables mapped from an object.
+  // Properties that start with underscore are mapped to observables.
+  // Functions that start with underscore are mapped to pure computed observables.
+  _Inject: function _Inject(iContext, iObject) {
+    Object.keys(iObject).forEach(function (prop) {
+      // Skip if the context already has a property with the same name.
+      if (iContext.hasOwnProperty(prop)) return;
+
+      if (typeof iObject[prop] === 'function') {
+        if (prop.indexOf('_') == 0) {
+          iContext[prop] = ko.pureComputed(iObject[prop], iContext);
+        } else iContext[prop] = iObject[prop];
+      } else if (prop.indexOf('_') == 0) {
+        iContext[prop] = ko.observable(iObject[prop]);
+
+        // Prevent it from being subscribed so it won't get sent to server.
+        iContext[prop].$subscribe = true;
+      } else iContext[prop] = iObject[prop];
+    });
+  },
+
+  // Calls the callback function only if all the knockout components are ready.
+  // This is a workaround until knockout issue #1533 is closed.
+  _OnComponentReady: function _OnComponentReady(iCallbackFn) {
+    var self = this;
+    var retry = 0;
+    var checkComponentReadyFn = function checkComponentReadyFn() {
+      var isReady = true;
+
+      // Assume the knockout components are those with 'params' attribute,
+      // and that it's ready if it has at least one child element.
+      var components = self.element.find('[params]');
+      if (components.length > 0) isReady = _jquery2.default.grep(components, function (i) {
+        return i.childElementCount == 0;
+      }).length == 0;
+
+      if (isReady || retry++ > 3) iCallbackFn();else setTimeout(checkComponentReadyFn, 250);
+    };
+
+    checkComponentReadyFn();
+  },
+
+  // On value changed from a knockout VM's observable, update the server VM.
+  _OnValueChanged: function _OnValueChanged(iVMPath, iNewValue) {
+    var update = {};
+    update[iVMPath] = iNewValue instanceof Object ? _jquery2.default.extend({}, iNewValue) : iNewValue;
+
+    if (dotnetify.hub.isConnected) {
+      try {
+        dotnetify.hub.updateVM(this.VMId, update);
+
+        if (dotnetify.debug) {
+          console.log('[' + this.VMId + '] sent> ');
+          console.log(update);
+
+          if (dotnetify.debugFn != null) dotnetify.debugFn(this.VMId, 'sent', update);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  },
+
+  // Preprocess view model update from the server before we map it to knockout view model.
+  _PreProcess: function _PreProcess(iVMUpdate) {
+    var _this = this;
+
+    Object.keys(iVMUpdate).forEach(function (prop) {
+      // Look for property that end with '_add'. Interpret the value as a list item to be added
+      // to an existing list whose property name precedes that suffix.
+      var match = /(.*)_add/.exec(prop);
+      if (match != null) {
+        var list = _this.VM[match[1]];
+        if (list != null) _this.VM.$addList(list, iVMUpdate[prop]);else throw new Error('unable to resolve ' + prop);
+        delete iVMUpdate[prop];
+        return;
+      }
+
+      // Look for property that end with '_update'. Interpret the value as a list item to be updated
+      // to an existing list whose property name precedes that suffix.
+      var match = /(.*)_update/.exec(prop);
+      if (match != null) {
+        var list = _this.VM[match[1]];
+        if (list != null) _this.VM.$updateList(list, iVMUpdate[prop]);else throw new Error('unable to resolve ' + prop);
+        delete iVMUpdate[prop];
+        return;
+      }
+
+      // Look for property that end with '_remove'. Interpret the value as a list item key to remove
+      // from an existing list whose property name precedes that suffix.
+      var match = /(.*)_remove/.exec(prop);
+      if (match != null) {
+        var list = _this.VM[match[1]];
+        if (list != null) {
+          var key = list()['$vmKey'];
+          if (key != null) _this.VM.$removeList(_this.VM[match[1]], function (i) {
+            return i[key]() == iVMUpdate[prop];
+          });else throw new Error('unable to resolve ' + prop + ' due to missing vmItemKey attribute');
+        } else throw new Error('unable to resolve ' + prop);
+        delete iVMUpdate[prop];
+        return;
+      }
+    });
+  },
+
+  // Requests view model data from the server.
+  _RequestVM: function _RequestVM() {
+    var self = this;
+    var vmArg = self.element.attr('data-vm-arg');
+    vmArg = vmArg != null ? _jquery2.default.parseJSON(vmArg.replace(/'/g, '"')) : null;
+
+    if (dotnetify.hub.isConnected) {
+      try {
+        dotnetify.hub.requestVM(self.VMId, vmArg);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  },
+
+  // Subscribe to value change events raised by knockout VM's observables.
+  _SubscribeObservables: function _SubscribeObservables(iParam, iVMPath) {
+    var _this2 = this;
+
+    var self = this;
+
+    if (iParam == null) return;else if (ko.isObservable(iParam)) {
+      if ('$subscribe' in iParam === false) {
+        iParam.subscribe(function (iNewValue) {
+          // Handle value change event from observables.
+          if (self.VM.$serverUpdate === true) self._OnValueChanged(iVMPath, iNewValue);
+        });
+        iParam['$subscribe'] = true;
+      }
+      this._SubscribeObservables(iParam(), iVMPath);
+    } else if ((typeof iParam === 'undefined' ? 'undefined' : _typeof(iParam)) == 'object') {
+      // The property with $vmKey means it's an enumerable and the $vmKey indicates the key to identify
+      // the item in that enumerable.  When we send value update to the server, we'll use the property
+      // path in this format: <enumerable property name>.$<key value>.<property name>.
+      // For example: ListContent.$3.FirstName.
+      var key = '$vmKey' in iParam ? iParam['$vmKey'] : null;
+
+      Object.keys(iParam).forEach(function (property) {
+        if (property.charAt(0) == '$' || property.charAt(0) == '_') return;
+        if (property.charAt(0) == property.charAt(0).toLowerCase()) return;
+        if (!isNaN(property.charAt(0))) return;
+        var path = key != null ? '$' + iParam[property][key]() : property;
+        _this2._SubscribeObservables(iParam[property], iVMPath == null ? path : iVMPath + '.' + path);
+      });
+    } else if (iParam instanceof Array) {
+      Object.keys(iParam).forEach(function (index) {
+        path = '$' + index;
+        _this2._SubscribeObservables(iParam[index], iVMPath == null ? path : iVMPath + '.' + path);
+      });
+    }
+  }
 });
 
 // Custom knockout binding to indicate the item key of an items collection property.
 ko.bindingHandlers.vmItemKey = {
-	preprocess: function preprocess(value) {
-		// Make sure the item key is enclosed with quotes.
-		return value.charAt(0) != "'" ? "'" + value + "'" : value;
-	},
-	update: function update(element, valueAccessor, allBindings, viewModel, bindingContext) {
-		var value = valueAccessor();
-		var items = allBindings.get('foreach');
+  preprocess: function preprocess(value) {
+    // Make sure the item key is enclosed with quotes.
+    return value.charAt(0) != "'" ? "'" + value + "'" : value;
+  },
+  update: function update(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var value = valueAccessor();
+    var items = allBindings.get('foreach');
 
-		// Test whether the foreach value is object literal where items is set to 'data' property.
-		if (!ko.isObservable(items) && items.hasOwnProperty('data')) items = items.data;
+    // Test whether the foreach value is object literal where items is set to 'data' property.
+    if (!ko.isObservable(items) && items.hasOwnProperty('data')) items = items.data;
 
-		// Store the item key in a special property '$vmKey' in the element's view model.
-		if (ko.isObservable(items) && items() != null && value != null) items()['$vmKey'] = value;
-	}
+    // Store the item key in a special property '$vmKey' in the element's view model.
+    if (ko.isObservable(items) && items() != null && value != null) items()['$vmKey'] = value;
+  }
 };
 
 // Custom knockout binding to bind the specified function the click event of the element.
 ko.bindingHandlers.vmCommand = {
-	init: function init(element, valueAccessor, allBindings, viewModel, bindingContext) {
-		var vm = bindingContext.$root;
-		var fnName = null;
-		var fnArg = null;
+  init: function init(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var vm = bindingContext.$root;
+    var fnName = null;
+    var fnArg = null;
 
-		// Parse the value. It supports either a function name or an object literal { funcName: argument }
-		// where argument can be either data or obsevables.
-		var matchFnNameArg = /return\s{(.*):(.*)}\s/.exec(valueAccessor.toString());
-		if (matchFnNameArg != null) {
-			fnName = matchFnNameArg[1].trim();
-			fnArg = matchFnNameArg[2].trim();
-		} else {
-			var matchFnName = /return\s(.*)\s/.exec(valueAccessor.toString());
-			if (matchFnName != null) fnName = matchFnName[1].trim();
-		}
+    // Parse the value. It supports either a function name or an object literal { funcName: argument }
+    // where argument can be either data or obsevables.
+    var matchFnNameArg = /return\s{(.*):(.*)}\s/.exec(valueAccessor.toString());
+    if (matchFnNameArg != null) {
+      fnName = matchFnNameArg[1].trim();
+      fnArg = matchFnNameArg[2].trim();
+    } else {
+      var matchFnName = /return\s(.*)\s/.exec(valueAccessor.toString());
+      if (matchFnName != null) fnName = matchFnName[1].trim();
+    }
 
-		if (fnName == null) throw new Error('invalid vmCommand value at ' + element.outerHTML);
+    if (fnName == null) throw new Error('invalid vmCommand value at ' + element.outerHTML);
 
-		// Support whether function is defined globally or inside a namespace that matches view model Id.
-		var getFn = function getFn() {
-			return vm[fnName] != null ? vm[fnName] : valueAccessor();
-		};
+    // Support whether function is defined globally or inside a namespace that matches view model Id.
+    var getFn = function getFn() {
+      return vm[fnName] != null ? vm[fnName] : valueAccessor();
+    };
 
-		// Trim the argument from enclosing quotes.  If it's an observable name, replace it with the value.
-		if (fnArg != null) {
-			if (fnArg.charAt(0) == "'") fnArg = fnArg.replace(/(^'|'$)/g, '');else if (ko.isObservable(viewModel[fnArg])) fnArg = ko.unwrap(viewModel[fnArg]);else if (fnArg == '$data') fnArg = viewModel;
-		} else fnArg = true;
+    // Trim the argument from enclosing quotes.  If it's an observable name, replace it with the value.
+    if (fnArg != null) {
+      if (fnArg.charAt(0) == "'") fnArg = fnArg.replace(/(^'|'$)/g, '');else if (ko.isObservable(viewModel[fnArg])) fnArg = ko.unwrap(viewModel[fnArg]);else if (fnArg == '$data') fnArg = viewModel;
+    } else fnArg = true;
 
-		var newValueAccessor = function newValueAccessor() {
-			return function () {
-				var fn = getFn();
+    var newValueAccessor = function newValueAccessor() {
+      return function () {
+        var fn = getFn();
 
-				// If function is an observable, which means it's a server view model property, then set its value to
-				// trigger the invocation of its setter property on the server side.  If it's not an observable, then it must
-				// be a client-side function, in which case just invoke it and pass all possible objects it may need.
-				if (ko.isObservable(fn)) {
-					// Reset the value locally first to ensure that setting the value will raise change events.
-					vm.$preventBinding(function () {
-						fn(fnArg === true ? false : null);
-					});
+        // If function is an observable, which means it's a server view model property, then set its value to
+        // trigger the invocation of its setter property on the server side.  If it's not an observable, then it must
+        // be a client-side function, in which case just invoke it and pass all possible objects it may need.
+        if (ko.isObservable(fn)) {
+          // Reset the value locally first to ensure that setting the value will raise change events.
+          vm.$preventBinding(function () {
+            fn(fnArg === true ? false : null);
+          });
 
-					fn(fnArg);
-				} else fn.apply(vm, [viewModel, element, bindingContext.$parent]);
-			};
-		};
-		ko.bindingHandlers.click.init(element, newValueAccessor, allBindings, viewModel, bindingContext);
-	}
+          fn(fnArg);
+        } else fn.apply(vm, [viewModel, element, bindingContext.$parent]);
+      };
+    };
+    ko.bindingHandlers.click.init(element, newValueAccessor, allBindings, viewModel, bindingContext);
+  }
 };
 
 // Custom knockout binding to call a function on initial property change event.
 ko.bindingHandlers.vmOnce = {
-	init: function init(element, valueAccessor, allBindings, viewModel, bindingContext) {
-		ko.bindingHandlers.vmOn.init(element, valueAccessor, allBindings, viewModel, bindingContext, true);
-	}
+  init: function init(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    ko.bindingHandlers.vmOn.init(element, valueAccessor, allBindings, viewModel, bindingContext, true);
+  }
 };
 
 // Custom knockout binding to call a function on a property change event.
 ko.bindingHandlers.vmOn = {
-	init: function init(element, valueAccessor, allBindings, viewModel, bindingContext, once) {
-		var vm = bindingContext.$root;
-		var property = null;
-		var fnName = null;
-		var value = valueAccessor.toString();
+  init: function init(element, valueAccessor, allBindings, viewModel, bindingContext, once) {
+    var vm = bindingContext.$root;
+    var property = null;
+    var fnName = null;
+    var value = valueAccessor.toString();
 
-		// Parse the value, which should be in object literal { property: fnName }.
-		var match = /return\s{(.*):(.*)}\s/.exec(value);
-		if (match != null) {
-			property = match[1].trim();
-			fnName = match[2].trim();
-		}
+    // Parse the value, which should be in object literal { property: fnName }.
+    var match = /return\s{(.*):(.*)}\s/.exec(value);
+    if (match != null) {
+      property = match[1].trim();
+      fnName = match[2].trim();
+    }
 
-		if (fnName == null) throw new Error('invalid vmOn function at ' + element.outerHTML);
+    if (fnName == null) throw new Error('invalid vmOn function at ' + element.outerHTML);
 
-		// Support whether function is defined globally or inside a namespace that matches view model Id.
-		var getFn = function getFn() {
-			return vm[fnName] != null ? vm[fnName] : valueAccessor()[property];
-		};
+    // Support whether function is defined globally or inside a namespace that matches view model Id.
+    var getFn = function getFn() {
+      return vm[fnName] != null ? vm[fnName] : valueAccessor()[property];
+    };
 
-		// Make sure the property is an observable.
-		if (property != null && !ko.isObservable(viewModel[property])) throw new Error('invalid vmOn data: ' + valueAccessor());
+    // Make sure the property is an observable.
+    if (property != null && !ko.isObservable(viewModel[property])) throw new Error('invalid vmOn data: ' + valueAccessor());
 
-		// Call the function with the initial data.
-		getFn().apply(vm, [viewModel, element, bindingContext.$parent]);
+    // Call the function with the initial data.
+    getFn().apply(vm, [viewModel, element, bindingContext.$parent]);
 
-		// Call the function on every data update.
-		if (once == null) viewModel[property].subscribe(function (iNewValue) {
-			getFn().apply(vm, [viewModel, element, bindingContext.$parent]);
-		});
-	}
+    // Call the function on every data update.
+    if (once == null) viewModel[property].subscribe(function (iNewValue) {
+      getFn().apply(vm, [viewModel, element, bindingContext.$parent]);
+    });
+  }
 };
 
 exports.default = dotnetify;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1038,11 +1068,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _utils = __webpack_require__(2);
+var _utils = __webpack_require__(3);
 
 var _utils2 = _interopRequireDefault(_utils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1191,6 +1223,52 @@ var dotnetifyVMRouter = function () {
       return false;
     }
 
+    // Loads an HTML view.
+
+  }, {
+    key: 'loadHtmlView',
+    value: function loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn) {
+      var vm = this.vm;
+      this.unmountView(iTargetSelector);
+
+      // Load the HTML view.
+      $(iTargetSelector).load(iViewUrl, null, function () {
+        if (iJsModuleUrl != null) {
+          var getScripts = iJsModuleUrl.split(',').map(function (i) {
+            return $.getScript(i);
+          });
+          $.when.apply($, getScripts).done(function () {
+            return typeof callbackFn === 'function' && iCallbackFn.call(vm);
+          });
+        } else if (typeof callbackFn === 'function') iCallbackFn.call(vm);
+      });
+    }
+  }, {
+    key: 'loadHtmlElementView',
+    value: function loadHtmlElementView(iTargetSelector, iHtmlElement, iJsModuleUrl, iVmArg, iCallbackFn) {
+      var _this3 = this;
+
+      var vm = this.vm;
+      var mountViewFunc = function mountViewFunc() {
+        _this3.unmountView(iTargetSelector);
+
+        var target = document.querySelector(iTargetSelector);
+        while (target.firstChild) {
+          target.removeChild(target.firstChild);
+        }target.appendChild(iHtmlElement);
+
+        if (typeof callbackFn === 'function') iCallbackFn.call(vm);
+      };
+
+      if (iJsModuleUrl == null) mountViewFunc();else {
+        // Load all javascripts first. Multiple files can be specified with comma delimiter.
+        var getScripts = iJsModuleUrl.split(',').map(function (i) {
+          return $.getScript(i);
+        });
+        $.when.apply($, getScripts).done(mountViewFunc);
+      }
+    }
+
     // Loads a view into a target element.
 
   }, {
@@ -1237,7 +1315,7 @@ var dotnetifyVMRouter = function () {
       // No route to process. Return silently.
       if (iRoute == null) return;
 
-      if (!iRoute.hasOwnProperty('Path') || !iRoute.hasOwnProperty('TemplateId')) throw new Error('Not a valid route');
+      if (!iRoute.hasOwnProperty('Path') && !iRoute.hasOwnProperty('TemplateId')) throw new Error('Not a valid route');
 
       // Build the absolute root path.
       this.initRoot();
@@ -1246,7 +1324,7 @@ var dotnetifyVMRouter = function () {
       // This is so that we don't send the same data twice if both are equal.
       var path = iRoute.Path;
       var template = null;
-      if (this.hasRoutingState && this.RoutingState.Templates != null) {
+      if (this.hasRoutingState && this.RoutingState.Templates != null && iRoute.TemplateId != null) {
         var match = this.RoutingState.Templates.filter(function (iTemplate) {
           return iTemplate.Id == iRoute.TemplateId;
         });
@@ -1259,7 +1337,7 @@ var dotnetifyVMRouter = function () {
             path = template.UrlPattern != null ? template.UrlPattern : template.Id;
             iRoute.Path = path;
           }
-        } else if (iRoute.RedirectRoot == null) throw new Error("vmRoute cannot find route template '" + iRoute.TemplateId);
+        } else if (iRoute.RedirectRoot == null) throw new Error('vmRoute cannot find route template ' + iRoute.TemplateId);
       }
 
       // If the path has a redirect root, the path doesn't belong to the current root and needs to be
@@ -1281,8 +1359,12 @@ var dotnetifyVMRouter = function () {
             urlRedirect += absRootPath[i] + '/';
           }
         }
+
         urlRedirect += redirectRoot + '/' + path;
-        this.routes.push({ Path: path, Url: urlRedirect });
+        urlRedirect = urlRedirect.replace(/\/\/+/g, '/');
+        if (!this.routes.some(function (x) {
+          return x.Path === path;
+        })) this.routes.push({ Path: path, Url: urlRedirect });
         return urlRedirect;
       }
 
@@ -1297,7 +1379,9 @@ var dotnetifyVMRouter = function () {
       // the anchor click event and instead do push to HTML5 history state.
       var url = this.toUrl(path);
       url = url.length > 0 ? url : '/';
-      this.routes.push({ Path: path, Url: url });
+      if (!this.routes.some(function (x) {
+        return x.Path === path;
+      })) this.routes.push({ Path: path, Url: url });
       return url;
     }
 
@@ -1306,7 +1390,7 @@ var dotnetifyVMRouter = function () {
   }, {
     key: 'routeTo',
     value: function routeTo(iPath, iTemplate, iDisableEvent, iCallbackFn, isRedirect) {
-      var _this3 = this;
+      var _this4 = this;
 
       var vm = this.vm;
       var viewModels = vm.$dotnetify.getViewModels();
@@ -1329,7 +1413,7 @@ var dotnetifyVMRouter = function () {
       }
 
       // Check if the route has valid target.
-      if (iTemplate.Target === null) {
+      if (iTemplate.Target == null) {
         console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
         return;
       }
@@ -1341,14 +1425,14 @@ var dotnetifyVMRouter = function () {
           return;
         } else {
           if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-          return this.router.redirect(this.toUrl(iPath), viewModels);
+          return this.router.redirect(this.toUrl(iPath), [].concat(_toConsumableArray(viewModels), _toConsumableArray(vm.$dotnetify.controller.getViewModels())));
         }
       }
 
       // Load the view associated with the route asynchronously.
       this.loadView('#' + iTemplate.Target, iTemplate.ViewUrl, iTemplate.JSModuleUrl, { 'RoutingState.Origin': iPath }, function () {
         // If load is successful, update the active route.
-        _this3.dispatchActiveRoutingState(iPath);
+        _this4.dispatchActiveRoutingState(iPath);
 
         // Support exit interception.
         if (iDisableEvent != true && vm.hasOwnProperty('onRouteExit')) vm.onRouteExit(iPath, iTemplate);
@@ -1359,13 +1443,13 @@ var dotnetifyVMRouter = function () {
   }, {
     key: 'routeToRoute',
     value: function routeToRoute(iRoute) {
-      var _this4 = this;
+      var _this5 = this;
 
       var path = this.vm.$route(iRoute);
       if (path == null || path == '') throw new Error('The route passed to $routeTo is invalid.');
 
       setTimeout(function () {
-        return _this4.router.pushState({}, '', path);
+        return _this5.router.pushState({}, '', path);
       });
     }
 
@@ -1374,16 +1458,17 @@ var dotnetifyVMRouter = function () {
 
   }, {
     key: 'routeUrl',
-    value: function routeUrl(isRedirect) {
-      var _this5 = this;
+    value: function routeUrl(redirectUrlPath) {
+      var _this6 = this;
 
       if (!this.hasRoutingState) return false;
 
+      var isRedirect = !!redirectUrlPath;
       var root = this.RoutingState.Root;
       if (root == null) return false;
 
       // Get the URL path to route.
-      var urlPath = this.router.urlPath;
+      var urlPath = isRedirect ? redirectUrlPath : this.router.urlPath;
 
       if (this.debug) console.log('router> routing ' + urlPath);
 
@@ -1406,13 +1491,13 @@ var dotnetifyVMRouter = function () {
       root = root + '/';
       if (_utils2.default.startsWith(urlPath, root)) {
         var routeElem = null;
-        var match = _utils2.default.grep(this.routes, function (elem) {
+        var _match = _utils2.default.grep(this.routes, function (elem) {
           return _utils2.default.startsWith(urlPath + '/', elem.Url + '/');
         });
-        if (match.length > 0) {
+        if (_match.length > 0) {
           // If more than one match, find the best match.
-          for (var i = 0; i < match.length; i++) {
-            if (routeElem == null || routeElem.Url.length < match[i].Url.length) routeElem = match[i];
+          for (var i = 0; i < _match.length; i++) {
+            if (routeElem == null || routeElem.Url.length < _match[i].Url.length) routeElem = _match[i];
           }
         }
 
@@ -1426,7 +1511,7 @@ var dotnetifyVMRouter = function () {
             // If route's not already active, route to it.
             if (!_utils2.default.equal(this.RoutingState.Active, path)) {
               this.routeTo(path, template, false, function () {
-                return _this5.raiseRoutedEvent();
+                return _this6.raiseRoutedEvent();
               }, isRedirect);
             } else this.raiseRoutedEvent();
             return true;
@@ -1450,6 +1535,14 @@ var dotnetifyVMRouter = function () {
       if (path.charAt(0) != '(' && path != '') path = '/' + path;
       return this.hasRoutingState ? this.RoutingState.Root + path : iPath;
     }
+
+    // Unmount a view if there's one on the target selector.
+
+  }, {
+    key: 'unmountView',
+    value: function unmountView(iTargetSelector) {
+      throw new Error('Not implemented');
+    }
   }]);
 
   return dotnetifyVMRouter;
@@ -1458,7 +1551,7 @@ var dotnetifyVMRouter = function () {
 exports.default = dotnetifyVMRouter;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1485,15 +1578,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _dotnetifyVmRouter = __webpack_require__(5);
+var _dotnetifyVmRouter = __webpack_require__(6);
 
 var _dotnetifyVmRouter2 = _interopRequireDefault(_dotnetifyVmRouter);
 
-var _jquery = __webpack_require__(1);
+var _jquery = __webpack_require__(2);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _utils = __webpack_require__(2);
+var _utils = __webpack_require__(3);
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -1719,240 +1812,242 @@ var dotnetifyKoVMRouter = function (_dotnetifyVMRouter) {
 exports.default = dotnetifyKoVMRouter;
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-/*
-PathJS - Copyright (c) 2011 Mike Trpcic, released under the MIT license.
- */
-
-var Path = {
-	// Need this specific version, because latest version is causing issue.
-	version: '0.8.5',
-	map: function map(path) {
-		if (Path.routes.defined.hasOwnProperty(path)) {
-			return Path.routes.defined[path];
-		} else {
-			return new Path.core.route(path);
-		}
-	},
-	root: function root(path) {
-		Path.routes.root = path;
-	},
-	rescue: function rescue(fn) {
-		Path.routes.rescue = fn;
-	},
-	history: {
-		initial: {}, // Empty container for "Initial Popstate" checking variables.
-		pushState: function pushState(state, title, path) {
-			if (Path.history.supported) {
-				if (Path.dispatch(path)) {
-					history.pushState(state, title, path);
-				}
-			} else {
-				if (Path.history.fallback) {
-					window.location.hash = '#' + path;
-				}
-			}
-		},
-		popState: function popState(event) {
-			var initialPop = !Path.history.initial.popped && location.href == Path.history.initial.URL;
-			Path.history.initial.popped = true;
-			if (initialPop) return;
-			Path.dispatch(document.location.pathname === '/' ? '' : document.location.pathname);
-		},
-		listen: function listen(fallback) {
-			Path.history.supported = !!(window.history && window.history.pushState);
-			Path.history.fallback = fallback;
-
-			if (Path.history.supported) {
-				Path.history.initial.popped = 'state' in window.history, Path.history.initial.URL = location.href;
-				window.onpopstate = Path.history.popState;
-			} else {
-				if (Path.history.fallback) {
-					for (route in Path.routes.defined) {
-						if (route.charAt(0) != '#') {
-							Path.routes.defined['#' + route] = Path.routes.defined[route];
-							Path.routes.defined['#' + route].path = '#' + route;
-						}
-					}
-					Path.listen();
-				}
-			}
-		}
-	},
-	match: function match(path, parameterize) {
-		var params = {},
-		    route = null,
-		    possible_routes,
-		    slice,
-		    i,
-		    j,
-		    compare,
-		    result;
-		for (route in Path.routes.defined) {
-			if (route !== null && route !== undefined) {
-				route = Path.routes.defined[route];
-				possible_routes = route.partition();
-				for (j = 0; j < possible_routes.length; j++) {
-					slice = possible_routes[j];
-					compare = path;
-					if (slice.search(/:/) > 0) {
-						for (i = 0; i < slice.split('/').length; i++) {
-							if (i < compare.split('/').length && slice.split('/')[i].charAt(0) === ':') {
-								params[slice.split('/')[i].replace(/:/, '')] = compare.split('/')[i];
-								result = compare.split('/');
-								result[i] = slice.split('/')[i];
-								compare = result.join('/');
-							}
-						}
-					}
-					if (slice === compare) {
-						if (parameterize) {
-							route.params = params;
-						}
-						return route;
-					}
-				}
-			}
-		}
-		return null;
-	},
-	dispatch: function dispatch(passed_route) {
-		var previous_route, matched_route;
-		if (Path.routes.current !== passed_route) {
-			Path.routes.previous = Path.routes.current;
-			Path.routes.current = passed_route;
-			matched_route = Path.match(passed_route, true);
-
-			if (Path.routes.previous) {
-				previous_route = Path.match(Path.routes.previous);
-				if (previous_route !== null && previous_route.do_exit !== null) {
-					previous_route.do_exit();
-				}
-			}
-
-			if (matched_route !== null) {
-				matched_route.run();
-				return true;
-			} else {
-				if (Path.routes.rescue !== null) {
-					Path.routes.rescue();
-				}
-			}
-		}
-	},
-	listen: function listen() {
-		var fn = function fn() {
-			Path.dispatch(location.hash);
-		};
-
-		if (location.hash === '') {
-			if (Path.routes.root !== null) {
-				location.hash = Path.routes.root;
-			}
-		}
-
-		// The 'document.documentMode' checks below ensure that PathJS fires the right events
-		// even in IE "Quirks Mode".
-		if ('onhashchange' in window && (!document.documentMode || document.documentMode >= 8)) {
-			window.onhashchange = fn;
-		} else {
-			setInterval(fn, 50);
-		}
-
-		if (location.hash !== '') {
-			Path.dispatch(location.hash);
-		}
-	},
-	core: {
-		route: function route(path) {
-			this.path = path;
-			this.action = null;
-			this.do_enter = [];
-			this.do_exit = null;
-			this.params = {};
-			Path.routes.defined[path] = this;
-		}
-	},
-	routes: {
-		current: null,
-		root: null,
-		rescue: null,
-		previous: null,
-		defined: {}
-	}
-};
-
-Path.core.route.prototype = {
-	to: function to(fn) {
-		this.action = fn;
-		return this;
-	},
-	enter: function enter(fns) {
-		if (fns instanceof Array) {
-			this.do_enter = this.do_enter.concat(fns);
-		} else {
-			this.do_enter.push(fns);
-		}
-		return this;
-	},
-	exit: function exit(fn) {
-		this.do_exit = fn;
-		return this;
-	},
-	partition: function partition() {
-		var parts = [],
-		    options = [],
-		    re = /\(([^}]+?)\)/g,
-		    text,
-		    i;
-		while (text = re.exec(this.path)) {
-			parts.push(text[1]);
-		}
-		options.push(this.path.split('(')[0]);
-		for (i = 0; i < parts.length; i++) {
-			options.push(options[options.length - 1] + parts[i]);
-		}
-		return options;
-	},
-	run: function run() {
-		var halt_execution = false,
-		    i,
-		    result,
-		    previous;
-
-		if (Path.routes.defined[this.path].hasOwnProperty('do_enter')) {
-			if (Path.routes.defined[this.path].do_enter.length > 0) {
-				for (i = 0; i < Path.routes.defined[this.path].do_enter.length; i++) {
-					result = Path.routes.defined[this.path].do_enter[i].apply(this, null);
-					if (result === false) {
-						halt_execution = true;
-						break;
-					}
-				}
-			}
-		}
-		if (!halt_execution) {
-			Path.routes.defined[this.path].action();
-		}
-	}
-};
-
-exports.default = Path;
-
-/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/*
+PathJS - Copyright (c) 2011 Mike Trpcic, released under the MIT license.
+ */
+var window = window || global || {};
+
+var Path = {
+  // Need this specific version, because latest version is causing issue.
+  version: '0.8.5',
+  map: function map(path) {
+    if (Path.routes.defined.hasOwnProperty(path)) {
+      return Path.routes.defined[path];
+    } else {
+      return new Path.core.route(path);
+    }
+  },
+  root: function root(path) {
+    Path.routes.root = path;
+  },
+  rescue: function rescue(fn) {
+    Path.routes.rescue = fn;
+  },
+  history: {
+    initial: {}, // Empty container for "Initial Popstate" checking variables.
+    pushState: function pushState(state, title, path) {
+      if (Path.history.supported) {
+        if (Path.dispatch(path)) {
+          history.pushState(state, title, path);
+        }
+      } else {
+        if (Path.history.fallback) {
+          window.location.hash = '#' + path;
+        }
+      }
+    },
+    popState: function popState(event) {
+      var initialPop = !Path.history.initial.popped && location.href == Path.history.initial.URL;
+      Path.history.initial.popped = true;
+      if (initialPop) return;
+      Path.dispatch(document.location.pathname === '/' ? '' : document.location.pathname);
+    },
+    listen: function listen(fallback) {
+      Path.history.supported = !!(window.history && window.history.pushState);
+      Path.history.fallback = fallback;
+
+      if (Path.history.supported) {
+        Path.history.initial.popped = 'state' in window.history, Path.history.initial.URL = location.href;
+        window.onpopstate = Path.history.popState;
+      } else {
+        if (Path.history.fallback) {
+          for (route in Path.routes.defined) {
+            if (route.charAt(0) != '#') {
+              Path.routes.defined['#' + route] = Path.routes.defined[route];
+              Path.routes.defined['#' + route].path = '#' + route;
+            }
+          }
+          Path.listen();
+        }
+      }
+    }
+  },
+  match: function match(path, parameterize) {
+    var params = {},
+        route = null,
+        possible_routes,
+        slice,
+        i,
+        j,
+        compare,
+        result;
+    for (route in Path.routes.defined) {
+      if (route !== null && route !== undefined) {
+        route = Path.routes.defined[route];
+        possible_routes = route.partition();
+        for (j = 0; j < possible_routes.length; j++) {
+          slice = possible_routes[j];
+          compare = path;
+          if (slice.search(/:/) > 0) {
+            for (i = 0; i < slice.split('/').length; i++) {
+              if (i < compare.split('/').length && slice.split('/')[i].charAt(0) === ':') {
+                params[slice.split('/')[i].replace(/:/, '')] = compare.split('/')[i];
+                result = compare.split('/');
+                result[i] = slice.split('/')[i];
+                compare = result.join('/');
+              }
+            }
+          }
+          if (slice === compare) {
+            if (parameterize) {
+              route.params = params;
+            }
+            return route;
+          }
+        }
+      }
+    }
+    return null;
+  },
+  dispatch: function dispatch(passed_route) {
+    var previous_route, matched_route;
+    if (Path.routes.current !== passed_route) {
+      Path.routes.previous = Path.routes.current;
+      Path.routes.current = passed_route;
+      matched_route = Path.match(passed_route, true);
+
+      if (Path.routes.previous) {
+        previous_route = Path.match(Path.routes.previous);
+        if (previous_route !== null && previous_route.do_exit !== null) {
+          previous_route.do_exit();
+        }
+      }
+
+      if (matched_route !== null) {
+        matched_route.run();
+        return true;
+      } else {
+        if (Path.routes.rescue !== null) {
+          Path.routes.rescue();
+        }
+      }
+    }
+  },
+  listen: function listen() {
+    var fn = function fn() {
+      Path.dispatch(location.hash);
+    };
+
+    if (location.hash === '') {
+      if (Path.routes.root !== null) {
+        location.hash = Path.routes.root;
+      }
+    }
+
+    // The 'document.documentMode' checks below ensure that PathJS fires the right events
+    // even in IE "Quirks Mode".
+    if ('onhashchange' in window && (!document.documentMode || document.documentMode >= 8)) {
+      window.onhashchange = fn;
+    } else {
+      setInterval(fn, 50);
+    }
+
+    if (location.hash !== '') {
+      Path.dispatch(location.hash);
+    }
+  },
+  core: {
+    route: function route(path) {
+      this.path = path;
+      this.action = null;
+      this.do_enter = [];
+      this.do_exit = null;
+      this.params = {};
+      Path.routes.defined[path] = this;
+    }
+  },
+  routes: {
+    current: null,
+    root: null,
+    rescue: null,
+    previous: null,
+    defined: {}
+  }
+};
+
+Path.core.route.prototype = {
+  to: function to(fn) {
+    this.action = fn;
+    return this;
+  },
+  enter: function enter(fns) {
+    if (fns instanceof Array) {
+      this.do_enter = this.do_enter.concat(fns);
+    } else {
+      this.do_enter.push(fns);
+    }
+    return this;
+  },
+  exit: function exit(fn) {
+    this.do_exit = fn;
+    return this;
+  },
+  partition: function partition() {
+    var parts = [],
+        options = [],
+        re = /\(([^}]+?)\)/g,
+        text,
+        i;
+    while (text = re.exec(this.path)) {
+      parts.push(text[1]);
+    }
+    options.push(this.path.split('(')[0]);
+    for (i = 0; i < parts.length; i++) {
+      options.push(options[options.length - 1] + parts[i]);
+    }
+    return options;
+  },
+  run: function run() {
+    var halt_execution = false,
+        i,
+        result,
+        previous;
+
+    if (Path.routes.defined[this.path].hasOwnProperty('do_enter')) {
+      if (Path.routes.defined[this.path].do_enter.length > 0) {
+        for (i = 0; i < Path.routes.defined[this.path].do_enter.length; i++) {
+          result = Path.routes.defined[this.path].do_enter[i].apply(this, null);
+          if (result === false) {
+            halt_execution = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!halt_execution) {
+      Path.routes.defined[this.path].action();
+    }
+  }
+};
+
+exports.default = Path;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1975,13 +2070,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _path = __webpack_require__(7);
+var _path = __webpack_require__(8);
 
 var _path2 = _interopRequireDefault(_path);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var window = window || global || {};
 
 var dotnetifyRouter = function () {
   function dotnetifyRouter(debug) {
@@ -2063,7 +2160,7 @@ var dotnetifyRouter = function () {
       this.urlPath = iUrl;
       for (var i = 0; i < viewModels.length; i++) {
         var vm = viewModels[i];
-        if (vm.$router.routeUrl(true)) {
+        if (vm.$router.routeUrl(iUrl)) {
           if (this.debug) console.log('router> redirected');
           return;
         }
@@ -2078,37 +2175,46 @@ var dotnetifyRouter = function () {
     value: function $ready() {
       this.$router.initRouting();
     }
+
+    // Called by dotNetify when a view model receives update.
+
+  }, {
+    key: '$update',
+    value: function $update(vmData) {
+      if (vmData && vmData.RoutingState) this.$router.initRouting();
+    }
   }]);
 
   return dotnetifyRouter;
 }();
 
 exports.default = dotnetifyRouter;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _dotnetifyKo = __webpack_require__(4);
+var _dotnetifyKo = __webpack_require__(5);
 
 var _dotnetifyKo2 = _interopRequireDefault(_dotnetifyKo);
 
-var _dotnetifyRouter = __webpack_require__(8);
+var _dotnetifyRouter = __webpack_require__(9);
 
 var _dotnetifyRouter2 = _interopRequireDefault(_dotnetifyRouter);
 
-var _dotnetifyKo3 = __webpack_require__(6);
+var _dotnetifyKo3 = __webpack_require__(7);
 
 var _dotnetifyKo4 = _interopRequireDefault(_dotnetifyKo3);
 
-var _jquery = __webpack_require__(1);
+var _jquery = __webpack_require__(2);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _knockout = __webpack_require__(0);
+var _knockout = __webpack_require__(1);
 
 var ko = _interopRequireWildcard(_knockout);
 
@@ -2218,7 +2324,7 @@ ko.bindingHandlers.vmRoute = {
 _dotnetifyKo2.default.ko.plugins['router'] = _dotnetifyKo2.default.ko.router;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2230,7 +2336,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 /// (c) 2013 Steven Sanderson, Roy Jacobs - http://knockoutjs.com/
 /// License: MIT (http://www.opensource.org/licenses/mit-license.php)
 (function (d) {
-  "function" === "function" && "object" === ( false ? undefined : _typeof(exports)) && "object" === ( false ? undefined : _typeof(module)) ? d(__webpack_require__(0), exports) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0), exports], __WEBPACK_AMD_DEFINE_FACTORY__ = (d),
+  "function" === "function" && "object" === ( false ? undefined : _typeof(exports)) && "object" === ( false ? undefined : _typeof(module)) ? d(__webpack_require__(1), exports) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), exports], __WEBPACK_AMD_DEFINE_FACTORY__ = (d),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : undefined;
@@ -2442,10 +2548,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     });return e;
   };
 });
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)(module)))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2457,7 +2563,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 * Copyright 2015 jQuery Foundation and other contributors; Licensed MIT */
 
 (function (e) {
-   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (e),
+   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2)], __WEBPACK_AMD_DEFINE_FACTORY__ = (e),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : undefined;
@@ -2587,13 +2693,139 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__12__;
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.hasLocalVM = exports.dotNetifyHubLocal = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* 
+                                                                                                                                                                                                                                                                              import { dotnetify } from 'dotnetify/dist/dotnetify-ko';
+                                                                                                                                                                                                                                                                              Copyright 2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                              Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                              you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                              You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                  http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                              Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                              distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                              See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                              limitations under the License.
+                                                                                                                                                                                                                                                                               */
+
+
+var _utils = __webpack_require__(3);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var window = window || global || {};
+
+var normalize = function normalize(iVMId) {
+  return iVMId && iVMId.replace(/\./g, '_');
+};
+var hasLocalVM = function hasLocalVM(iVMId) {
+  var vmId = normalize(iVMId);
+  var vm = window[vmId];
+  return (typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) == 'object' && typeof vm.onConnect == 'function';
+};
+
+var dotNetifyHubLocal = exports.dotNetifyHubLocal = function () {
+  function dotNetifyHubLocal() {
+    _classCallCheck(this, dotNetifyHubLocal);
+
+    this.mode = 'local';
+    this.debug = false;
+    this.isConnected = false;
+    this.isHubStarted = false;
+    this.responseEvent = (0, _utils.createEventEmitter)();
+    this.reconnectedEvent = (0, _utils.createEventEmitter)();
+    this.connectedEvent = (0, _utils.createEventEmitter)();
+    this.connectionFailedEvent = (0, _utils.createEventEmitter)();
+  }
+
+  _createClass(dotNetifyHubLocal, [{
+    key: 'startHub',
+    value: function startHub() {
+      this.isConnected = true;
+      this.isHubStarted = true;
+      this.connectedEvent.emit();
+    }
+  }, {
+    key: 'requestVM',
+    value: function requestVM(iVMId, iVMArgs) {
+      var _this = this;
+
+      var vmId = normalize(iVMId);
+      var vm = window[vmId];
+
+      if ((typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) === 'object' && typeof vm.onConnect == 'function') {
+        if (this.debug) console.log('[' + iVMId + '] *** local mode ***');
+
+        vm.$pushUpdate = function (update) {
+          if ((typeof update === 'undefined' ? 'undefined' : _typeof(update)) == 'object') update = JSON.stringify(update);
+          setTimeout(function () {
+            return _this.responseEvent.emit(iVMId, update);
+          });
+        };
+
+        vm.$pushUpdate(vm.onConnect(iVMArgs) || {});
+      }
+    }
+  }, {
+    key: 'updateVM',
+    value: function updateVM(iVMId, iValue) {
+      var _this2 = this;
+
+      var vmId = normalize(iVMId);
+      var vm = window[vmId];
+
+      if ((typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) === 'object' && typeof vm.onDispatch == 'function') {
+        var state = vm.onDispatch(iValue);
+        if (state) {
+          if ((typeof state === 'undefined' ? 'undefined' : _typeof(state)) == 'object') state = JSON.stringify(state);
+          setTimeout(function () {
+            return _this2.responseEvent.emit(iVMId, state);
+          });
+        }
+      }
+    }
+  }, {
+    key: 'disposeVM',
+    value: function disposeVM(iVMId) {
+      var vmId = normalize(iVMId);
+      var vm = window[vmId];
+
+      if ((typeof vm === 'undefined' ? 'undefined' : _typeof(vm)) === 'object' && typeof vm.onDestroy == 'function') {
+        vm.onDestroy(iVMId);
+      }
+    }
+  }]);
+
+  return dotNetifyHubLocal;
+}();
+
+exports.default = new dotNetifyHubLocal();
+exports.hasLocalVM = hasLocalVM;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 13 */
+/* 14 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__14__;
+
+/***/ }),
+/* 15 */
 /***/ (function(module, exports) {
 
 /**
@@ -2754,10 +2986,10 @@ function extend() {
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var jQuery = module.exports = __webpack_require__(13),
+var jQuery = module.exports = __webpack_require__(15),
 	core_rspace = /\s+/;
 /**
 * jQuery Callbacks
@@ -2966,7 +3198,7 @@ jQuery.Callbacks = function( options ) {
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2980,7 +3212,7 @@ jQuery.Callbacks = function( options ) {
 * Library version.
 */
 
-var jQuery = module.exports = __webpack_require__(14),
+var jQuery = module.exports = __webpack_require__(16),
 	core_slice = Array.prototype.slice;
 
 /**
@@ -3135,18 +3367,18 @@ jQuery.extend({
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(15);
+module.exports = __webpack_require__(17);
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
+/* WEBPACK VAR INJECTION */(function(global, module) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -3166,167 +3398,145 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var jQueryDeferred = __webpack_require__(16);
+var window = window || global || {};
+
+var jQueryDeferred = __webpack_require__(18);
 var jQueryShim = jQueryDeferred.extend(function (selector) {
+  if (selector === window || selector.document) return {
+    0: selector,
+    on: function on(iEvent, iHandler) {
+      window.addEventListener(iEvent, iHandler);
+    },
+    bind: function bind(iEvent, iHandler) {
+      window.addEventListener(iEvent, iHandler, false);
+    },
+    unbind: function unbind(iEvent, iHandler) {
+      window.removeEventListener(iEvent, iHandler, false);
+    }
+  };
 
-   if (selector === window || selector.document) return {
-      0: selector,
-      on: function on(iEvent, iHandler) {
-         window.addEventListener(iEvent, iHandler);
-      },
-      bind: function bind(iEvent, iHandler) {
-         window.addEventListener(iEvent, iHandler, false);
-      },
-      unbind: function unbind(iEvent, iHandler) {
-         window.removeEventListener(iEvent, iHandler, false);
-      }
-   };
+  if (typeof selector !== 'string') selector.events = selector.events || {};
 
-   if (typeof selector !== "string") selector.events = selector.events || {};
+  return {
+    0: selector,
 
-   return {
-      0: selector,
+    bind: function bind(iEvent, iHandler) {
+      var event = selector.events[iEvent] || [];
+      event.push(iHandler);
+      selector.events[iEvent] = event;
+    },
 
-      bind: function bind(iEvent, iHandler) {
-         var event = selector.events[iEvent] || [];
-         event.push(iHandler);
-         selector.events[iEvent] = event;
-      },
+    unbind: function unbind(iEvent, iHandler) {
+      var handlers = selector.events[iEvent] || [];
+      if (iHandler) {
+        var idx = handlers.indexOf(iHandler);
+        if (idx !== -1) handlers.splice(idx, 1);
+      } else handlers = [];
+      selector.events[iEvent] = handlers;
+    },
 
-      unbind: function unbind(iEvent, iHandler) {
-         var handlers = selector.events[iEvent] || [];
-         if (iHandler) {
-            var idx = handlers.indexOf(iHandler);
-            if (idx !== -1) handlers.splice(idx, 1);
-         } else handlers = [];
-         selector.events[iEvent] = handlers;
-      },
+    triggerHandler: function triggerHandler(iEvent, iArgs) {
+      var handlers = selector.events[iEvent] || [];
+      var args = [{ type: iEvent }];
+      if (Array.isArray(iArgs)) iArgs.forEach(function (arg) {
+        args.push(arg);
+      });else if (iArgs) args.push(iArgs);
+      handlers.forEach(function (handler) {
+        handler.apply(this, args);
+      });
+    },
 
-      triggerHandler: function triggerHandler(iEvent, iArgs) {
-         var handlers = selector.events[iEvent] || [];
-         var args = [{ type: iEvent }];
-         if (Array.isArray(iArgs)) iArgs.forEach(function (arg) {
-            args.push(arg);
-         });else if (iArgs) args.push(iArgs);
-         handlers.forEach(function (handler) {
-            handler.apply(this, args);
-         });
-      },
-
-      load: function load(iUrl, iArgs, iHandler) {
-         var request = new window.XMLHttpRequest();
-         request.open('GET', iUrl, true);
-         request.onload = function () {
-            if (request.status >= 200 && request.status < 400) {
-               var response = request.responseText;
-               document.querySelector(selector).innerHTML = response;
-               iHandler.call(document.querySelector(selector));
-            }
-         };
-         request.send();
-         return { abort: function abort(reason) {
-               return request.abort(reason);
-            } };
-      }
-   };
-}, jQueryDeferred, {
-   support: { cors: true },
-
-   trim: function trim(iStr) {
-      return typeof iStr === "string" ? iStr.trim() : iStr;
-   },
-
-   inArray: function inArray(iArray, iItem) {
-      return iArray.indexOf(iItem) !== -1;
-   },
-
-   makeArray: function makeArray(iArray) {
-      return [].slice.call(iArray, 0);
-   },
-
-   merge: function merge(iArray1, iArray2) {
-      Array.prototype.push.apply(iArray1, iArray2);return iArray1;
-   },
-
-   isEmptyObject: function isEmptyObject(iObj) {
-      return !iObj || Object.keys(iObj).length === 0;
-   },
-
-   ajax: function ajax(iOptions) {
+    load: function load(iUrl, iArgs, iHandler) {
       var request = new window.XMLHttpRequest();
-      request.onreadystatechange = function () {
-         if (request.readyState !== 4) return;
-         if (request.status === 200 && !request._hasError) {
-            try {
-               iOptions.success && iOptions.success(JSON.parse(request.responseText));
-            } catch (error) {
-               iOptions.success && iOptions.success(request.responseText);
-            }
-         } else iOptions.error && iOptions.error(request);
+      request.open('GET', iUrl, true);
+      request.onload = function () {
+        if (request.status >= 200 && request.status < 400) {
+          var response = request.responseText;
+          document.querySelector(selector).innerHTML = response;
+          iHandler.call(document.querySelector(selector));
+        }
       };
-      request.open(iOptions.type, iOptions.url);
-      request.setRequestHeader("content-type", iOptions.contentType);
-      request.send(iOptions.data.data && "data=" + iOptions.data.data);
+      request.send();
       return {
-         abort: function abort(reason) {
-            return request.abort(reason);
-         }
+        abort: function abort(reason) {
+          return request.abort(reason);
+        }
       };
-   },
+    }
+  };
+}, jQueryDeferred, {
+  support: { cors: true },
 
-   getScript: function getScript(iUrl, iSuccess) {
-      var done = false;
-      var promise = jQueryDeferred.Deferred();
-      var head = document.getElementsByTagName("head")[0];
-      var script = document.createElement("script");
-      script.src = iUrl;
-      script.onload = script.onreadystatechange = function () {
-         if (!done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete")) {
-            done = true;
-            script.onload = script.onreadystatechange = null;
-            head.removeChild(script);
-            if (typeof iSuccess === "function") iSuccess();
-            promise.resolve();
-         }
-      };
-      head.appendChild(script);
-      return promise;
-   }
+  trim: function trim(iStr) {
+    return typeof iStr === 'string' ? iStr.trim() : iStr;
+  },
+
+  inArray: function inArray(iArray, iItem) {
+    return iArray.indexOf(iItem) !== -1;
+  },
+
+  makeArray: function makeArray(iArray) {
+    return [].slice.call(iArray, 0);
+  },
+
+  merge: function merge(iArray1, iArray2) {
+    Array.prototype.push.apply(iArray1, iArray2);
+    return iArray1;
+  },
+
+  isEmptyObject: function isEmptyObject(iObj) {
+    return !iObj || Object.keys(iObj).length === 0;
+  },
+
+  ajax: function ajax(iOptions) {
+    var request = new window.XMLHttpRequest();
+    request.onreadystatechange = function () {
+      if (request.readyState !== 4) return;
+      if (request.status === 200 && !request._hasError) {
+        try {
+          iOptions.success && iOptions.success(JSON.parse(request.responseText));
+        } catch (error) {
+          iOptions.success && iOptions.success(request.responseText);
+        }
+      } else iOptions.error && iOptions.error(request);
+    };
+    request.open(iOptions.type, iOptions.url);
+    request.setRequestHeader('content-type', iOptions.contentType);
+    request.send(iOptions.data.data && 'data=' + iOptions.data.data);
+    return {
+      abort: function abort(reason) {
+        return request.abort(reason);
+      }
+    };
+  },
+
+  getScript: function getScript(iUrl, iSuccess) {
+    var done = false;
+    var promise = jQueryDeferred.Deferred();
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.src = iUrl;
+    script.onload = script.onreadystatechange = function () {
+      if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
+        done = true;
+        script.onload = script.onreadystatechange = null;
+        head.removeChild(script);
+        if (typeof iSuccess === 'function') iSuccess();
+        promise.resolve();
+      }
+    };
+    head.appendChild(script);
+    return promise;
+  }
 });
 
-if (typeof window !== "undefined") window.jQuery = window.jQuery || jQueryShim;
+if (typeof window !== 'undefined') window.jQuery = window.jQuery || jQueryShim;
 
-if (( false ? undefined : _typeof(exports)) === "object" && ( false ? undefined : _typeof(module)) === "object") module.exports = jQueryShim;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)(module)))
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1, eval)("this");
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
+if (( false ? undefined : _typeof(exports)) === 'object' && ( false ? undefined : _typeof(module)) === 'object') module.exports = jQueryShim;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(4)(module)))
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3335,542 +3545,452 @@ module.exports = g;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.dotnetifyHubFactory = undefined;
 
-var _jqueryShim = __webpack_require__(17);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Copyright 2017-2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _utils = __webpack_require__(3);
+
+var _jqueryShim = __webpack_require__(19);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var signalRNetCore = __webpack_require__(12); /* 
-                                                 Copyright 2017-2018 Dicky Suryadi
-                                                 
-                                                 Licensed under the Apache License, Version 2.0 (the "License");
-                                                 you may not use this file except in compliance with the License.
-                                                 You may obtain a copy of the License at
-                                                 
-                                                     http://www.apache.org/licenses/LICENSE-2.0
-                                                 
-                                                 Unless required by applicable law or agreed to in writing, software
-                                                 distributed under the License is distributed on an "AS IS" BASIS,
-                                                 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                 See the License for the specific language governing permissions and
-                                                 limitations under the License.
-                                                  */
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var signalRNetCore = __webpack_require__(14);
 var $ = _jqueryShim2.default;
 
-if (typeof window == 'undefined') window = global;
+var window = window || global || {};
 
-var dotnetifyHub = $.extend(dotnetifyHub, {
-  version: '1.2.0',
-  type: null,
-  _init: false
-});
+var dotnetifyHubFactory = exports.dotnetifyHubFactory = function () {
+  function dotnetifyHubFactory() {
+    _classCallCheck(this, dotnetifyHubFactory);
+  }
 
-dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
-  if (dotnetifyHub._init) return;
+  _createClass(dotnetifyHubFactory, null, [{
+    key: 'create',
+    value: function create() {
+      var dotnetifyHub = {
+        version: '2.0.0',
+        type: null,
 
-  dotnetifyHub._init = true;
-  signalR = signalR || window.signalR || signalRNetCore;
+        reconnectDelay: [2, 5, 10],
+        reconnectRetry: null,
 
-  // SignalR .NET Core.
-  if (signalR && signalR.HubConnection) {
-    dotnetifyHub.type = 'netcore';
+        _startInfo: null,
+        _init: false,
 
-    Object.defineProperty(dotnetifyHub, 'isConnected', {
-      get: function get() {
-        return dotnetifyHub._connection && dotnetifyHub._connection.connection.connectionState === 1;
-      }
-    });
-
-    dotnetifyHub = $.extend(dotnetifyHub, {
-      hubPath: iHubPath || '/dotnetify',
-      url: iServerUrl,
-      reconnectDelay: [2, 5, 10],
-      reconnectRetry: null,
-
-      // Internal variables. Do not modify!
-      _connection: null,
-      _reconnectCount: 0,
-      _startDoneHandler: null,
-      _startFailHandler: null,
-      _disconnectedHandler: function _disconnectedHandler() {},
-      _stateChangedHandler: function _stateChangedHandler(iNewState) {},
-
-      _onDisconnected: function _onDisconnected() {
-        dotnetifyHub._changeState(4);
-        dotnetifyHub._disconnectedHandler();
-      },
-
-      _changeState: function _changeState(iNewState) {
-        if (iNewState == 1) dotnetifyHub._reconnectCount = 0;
-
-        var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected', 99: 'terminated' };
-        dotnetifyHub._stateChangedHandler(stateText[iNewState]);
-      },
-
-      _startConnection: function _startConnection(iHubOptions, iTransportArray) {
-        var url = dotnetifyHub.url ? dotnetifyHub.url + dotnetifyHub.hubPath : dotnetifyHub.hubPath;
-        var hubOptions = {};
-        Object.keys(iHubOptions).forEach(function (key) {
-          hubOptions[key] = iHubOptions[key];
-        });
-        hubOptions.transport = iTransportArray.shift();
-
-        dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
-        dotnetifyHub._connection.on('response_vm', dotnetifyHub.client.response_VM);
-        dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
-
-        var promise = dotnetifyHub._connection.start().then(function () {
-          dotnetifyHub._changeState(1);
-        }).catch(function () {
-          // If failed to start, fallback to the next transport.
-          if (iTransportArray.length > 0) dotnetifyHub._startConnection(iHubOptions, iTransportArray);else dotnetifyHub._onDisconnected();
-        });
-
-        if (typeof dotnetifyHub._startDoneHandler === 'function') promise.then(dotnetifyHub._startDoneHandler).catch(dotnetifyHub._startFailHandler || function () {});
-        return promise;
-      },
-
-      start: function start(iHubOptions) {
-        dotnetifyHub._startDoneHandler = null;
-        dotnetifyHub._startFailHandler = null;
-
-        // Map the transport option.
-        var transport = [0];
-        var transportOptions = { webSockets: 0, serverSentEvents: 1, longPolling: 2 };
-        if (iHubOptions && Array.isArray(iHubOptions.transport)) transport = iHubOptions.transport.map(function (arg) {
-          return transportOptions[arg];
-        });
-
-        var promise = dotnetifyHub._startConnection(iHubOptions, transport);
-        return {
-          done: function done(iHandler) {
-            dotnetifyHub._startDoneHandler = iHandler;
-            promise.then(iHandler).catch(function (error) {
-              throw error;
-            });
-            return this;
-          },
-          fail: function fail(iHandler) {
-            dotnetifyHub._startFailHandler = iHandler;
-            promise.catch(iHandler);
-            return this;
-          }
-        };
-      },
-
-      disconnected: function disconnected(iHandler) {
-        if (typeof iHandler === 'function') dotnetifyHub._disconnectedHandler = iHandler;
-      },
-
-      stateChanged: function stateChanged(iHandler) {
-        if (typeof iHandler === 'function') dotnetifyHub._stateChangedHandler = iHandler;
-      },
-
-      reconnect: function reconnect(iStartHubFunc) {
-        if (typeof iStartHubFunc === 'function') {
-          // Only attempt reconnect if the specified retry hasn't been exceeded.
-          if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
-            // Determine reconnect delay from the specified configuration array.
-            var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
-
-            dotnetifyHub._reconnectCount++;
-
-            setTimeout(function () {
-              dotnetifyHub._changeState(2);
-              iStartHubFunc();
-            }, delay * 1000);
-          } else dotnetifyHub._changeState(99);
-        }
-      },
-
-      client: {},
-
-      server: {
-        dispose_VM: function dispose_VM(iVMId) {
-          dotnetifyHub._connection.invoke('Dispose_VM', iVMId);
+        // Hub server methods.
+        requestVM: function requestVM(iVMId, iOptions) {
+          return dotnetifyHub.server.request_VM(iVMId, iOptions);
         },
-        update_VM: function update_VM(iVMId, iValue) {
-          dotnetifyHub._connection.invoke('Update_VM', iVMId, iValue);
+        updateVM: function updateVM(iVMId, iValue) {
+          return dotnetifyHub.server.update_VM(iVMId, iValue);
         },
-        request_VM: function request_VM(iVMId, iArgs) {
-          dotnetifyHub._connection.invoke('Request_VM', iVMId, iArgs);
-        }
-      }
-    });
-  } else {
-    // SignalR .NET FX.
-    dotnetifyHub.type = 'netfx';
+        disposeVM: function disposeVM(iVMId) {
+          return dotnetifyHub.server.dispose_VM(iVMId);
+        },
 
-    if (window.jQuery) $ = window.jQuery;
+        // Connection events.
+        responseEvent: (0, _utils.createEventEmitter)(),
+        reconnectedEvent: (0, _utils.createEventEmitter)(),
+        connectedEvent: (0, _utils.createEventEmitter)(),
+        connectionFailedEvent: (0, _utils.createEventEmitter)(),
 
-    // SignalR hub auto-generated from /signalr/hubs.
-    /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
-    /// <reference path="jquery.signalR.js" />
-    (function ($, window, undefined) {
-      /// <param name="$" type="jQuery" />
-      'use strict';
+        get isHubStarted() {
+          return !!this._startInfo;
+        },
 
-      if (typeof $.signalR !== 'function') {
-        throw new Error('SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.');
-      }
+        // Starts connection with SignalR hub server.
+        startHub: function startHub(hubOptions, doneHandler, failHandler, forceRestart) {
+          var _this = this;
 
-      var signalR = $.signalR;
+          var _doneHandler = function _doneHandler() {
+            if (typeof doneHandler == 'function') doneHandler();
+            _this.connectedEvent.emit();
+          };
+          var _failHandler = function _failHandler(ex) {
+            if (typeof failHander == 'function') failHandler();
+            _this.connectionFailedEvent.emit();
+            throw ex;
+          };
 
-      function makeProxyCallback(hub, callback) {
-        return function () {
-          // Call the client hub method
-          callback.apply(hub, $.makeArray(arguments));
-        };
-      }
-
-      function registerHubProxies(instance, shouldSubscribe) {
-        var key, hub, memberKey, memberValue, subscriptionMethod;
-
-        for (key in instance) {
-          if (instance.hasOwnProperty(key)) {
-            hub = instance[key];
-
-            if (!hub.hubName) {
-              // Not a client hub
-              continue;
+          if (this._startInfo === null || forceRestart) {
+            try {
+              this._startInfo = this.start(hubOptions).done(_doneHandler).fail(_failHandler);
+            } catch (err) {
+              this._startInfo = null;
             }
-
-            if (shouldSubscribe) {
-              // We want to subscribe to the hub events
-              subscriptionMethod = hub.on;
-            } else {
-              // We want to unsubscribe from the hub events
-              subscriptionMethod = hub.off;
-            }
-
-            // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
-            for (memberKey in hub.client) {
-              if (hub.client.hasOwnProperty(memberKey)) {
-                memberValue = hub.client[memberKey];
-
-                if (!$.isFunction(memberValue)) {
-                  // Not a client hub function
-                  continue;
-                }
-
-                subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
-              }
+          } else {
+            try {
+              this._startInfo.done(_doneHandler);
+            } catch (err) {
+              this._startInfo = null;
+              return this.startHub(hubOptions, doneHandler, failHandler, forceRestart);
             }
           }
         }
-      }
-
-      $.hubConnection.prototype.createHubProxies = function () {
-        var proxies = {};
-        this.starting(function () {
-          // Register the hub proxies as subscribed
-          // (instance, shouldSubscribe)
-          registerHubProxies(proxies, true);
-
-          this._registerSubscribedHubs();
-        }).disconnected(function () {
-          // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
-          // (instance, shouldSubscribe)
-          registerHubProxies(proxies, false);
-        });
-
-        proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
-        proxies['dotNetifyHub'].client = {};
-        proxies['dotNetifyHub'].server = {
-          dispose_VM: function dispose_VM(vmId) {
-            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Dispose_VM'], $.makeArray(arguments)));
-          },
-
-          request_VM: function request_VM(vmId, vmArg) {
-            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Request_VM'], $.makeArray(arguments)));
-          },
-
-          update_VM: function update_VM(vmId, vmData) {
-            return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Update_VM'], $.makeArray(arguments)));
-          }
-        };
-
-        return proxies;
       };
 
-      signalR.hub = $.hubConnection(dotnetifyHub.hubPath, { useDefaultPath: false });
-      $.extend(signalR, signalR.hub.createHubProxies());
-    })($, window);
+      // Configures connection to SignalR hub server.
+      dotnetifyHub.init = function (iHubPath, iServerUrl, signalR) {
+        if (dotnetifyHub._init) return;
 
-    Object.defineProperty(dotnetifyHub, 'state', {
-      get: function get() {
-        return $.connection.hub.state;
-      },
-      set: function set(val) {
-        $.connection.hub.state = val;
-      }
-    });
+        dotnetifyHub._init = true;
+        signalR = signalR || window.signalR || signalRNetCore;
 
-    Object.defineProperty(dotnetifyHub, 'client', {
-      get: function get() {
-        return $.connection.dotNetifyHub.client;
-      }
-    });
+        // SignalR .NET Core.
+        if (signalR && signalR.HubConnection) {
+          dotnetifyHub.type = 'netcore';
 
-    Object.defineProperty(dotnetifyHub, 'server', {
-      get: function get() {
-        return $.connection.dotNetifyHub.server;
-      }
-    });
+          Object.defineProperty(dotnetifyHub, 'isConnected', {
+            get: function get() {
+              return dotnetifyHub._connection && dotnetifyHub._connection.connection.connectionState === 1;
+            }
+          });
 
-    Object.defineProperty(dotnetifyHub, 'isConnected', {
-      get: function get() {
-        return $.connection.hub.state == $.signalR.connectionState.connected;
-      }
-    });
+          dotnetifyHub = $.extend(dotnetifyHub, {
+            hubPath: iHubPath || '/dotnetify',
+            url: iServerUrl,
 
-    dotnetifyHub = $.extend(dotnetifyHub, {
-      hubPath: iHubPath || '/signalr',
-      url: iServerUrl,
-      reconnectDelay: [2, 5, 10],
-      reconnectRetry: null,
+            // Internal variables. Do not modify!
+            _connection: null,
+            _reconnectCount: 0,
+            _startDoneHandler: null,
+            _startFailHandler: null,
+            _disconnectedHandler: function _disconnectedHandler() {},
+            _stateChangedHandler: function _stateChangedHandler(iNewState) {},
 
-      _reconnectCount: 0,
-      _stateChangedHandler: function _stateChangedHandler(iNewState) {},
+            _onDisconnected: function _onDisconnected() {
+              dotnetifyHub._changeState(4);
+              dotnetifyHub._disconnectedHandler();
+            },
 
-      start: function start(iHubOptions) {
-        if (dotnetifyHub.url) $.connection.hub.url = dotnetifyHub.url;
+            _changeState: function _changeState(iNewState) {
+              if (iNewState == 1) dotnetifyHub._reconnectCount = 0;
 
-        var deferred;
-        if (iHubOptions) deferred = $.connection.hub.start(iHubOptions);else deferred = $.connection.hub.start();
-        deferred.fail(function (error) {
-          if (error.source && error.source.message === 'Error parsing negotiate response.') console.warn('This client may be attempting to connect to an incompatible SignalR .NET Core server.');
-        });
-        return deferred;
-      },
+              var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected', 99: 'terminated' };
+              dotnetifyHub._stateChangedHandler(stateText[iNewState]);
+            },
 
-      disconnected: function disconnected(iHandler) {
-        return $.connection.hub.disconnected(iHandler);
-      },
+            _startConnection: function _startConnection(iHubOptions, iTransportArray) {
+              var url = dotnetifyHub.url ? dotnetifyHub.url + dotnetifyHub.hubPath : dotnetifyHub.hubPath;
+              var hubOptions = {};
+              Object.keys(iHubOptions).forEach(function (key) {
+                hubOptions[key] = iHubOptions[key];
+              });
+              hubOptions.transport = iTransportArray.shift();
 
-      stateChanged: function stateChanged(iHandler) {
-        dotnetifyHub._stateChangedHandler = iHandler;
-        return $.connection.hub.stateChanged(function (state) {
-          if (state == 1) dotnetifyHub._reconnectCount = 0;
+              dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
+              dotnetifyHub._connection.on('response_vm', dotnetifyHub.client.response_VM);
+              dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
-          var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
-          iHandler(stateText[state.newState]);
-        });
-      },
+              var promise = dotnetifyHub._connection.start().then(function () {
+                dotnetifyHub._changeState(1);
+              }).catch(function () {
+                // If failed to start, fallback to the next transport.
+                if (iTransportArray.length > 0) dotnetifyHub._startConnection(iHubOptions, iTransportArray);else dotnetifyHub._onDisconnected();
+              });
 
-      reconnect: function reconnect(iStartHubFunc) {
-        if (typeof iStartHubFunc === 'function') {
-          // Only attempt reconnect if the specified retry hasn't been exceeded.
-          if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
-            // Determine reconnect delay from the specified configuration array.
-            var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+              if (typeof dotnetifyHub._startDoneHandler === 'function') promise.then(dotnetifyHub._startDoneHandler).catch(dotnetifyHub._startFailHandler || function () {});
+              return promise;
+            },
 
-            dotnetifyHub._reconnectCount++;
+            start: function start(iHubOptions) {
+              dotnetifyHub._startDoneHandler = null;
+              dotnetifyHub._startFailHandler = null;
 
-            setTimeout(function () {
-              dotnetifyHub._stateChangedHandler('reconnecting');
-              iStartHubFunc();
-            }, delay * 1000);
-          } else dotnetifyHub._stateChangedHandler('terminated');
+              // Map the transport option.
+              var transport = [0];
+              var transportOptions = { webSockets: 0, serverSentEvents: 1, longPolling: 2 };
+              if (iHubOptions && Array.isArray(iHubOptions.transport)) transport = iHubOptions.transport.map(function (arg) {
+                return transportOptions[arg];
+              });
+
+              var promise = dotnetifyHub._startConnection(iHubOptions, transport);
+              return {
+                done: function done(iHandler) {
+                  dotnetifyHub._startDoneHandler = iHandler;
+                  promise.then(iHandler).catch(function (error) {
+                    throw error;
+                  });
+                  return this;
+                },
+                fail: function fail(iHandler) {
+                  dotnetifyHub._startFailHandler = iHandler;
+                  promise.catch(iHandler);
+                  return this;
+                }
+              };
+            },
+
+            disconnected: function disconnected(iHandler) {
+              if (typeof iHandler === 'function') dotnetifyHub._disconnectedHandler = iHandler;
+            },
+
+            stateChanged: function stateChanged(iHandler) {
+              if (typeof iHandler === 'function') dotnetifyHub._stateChangedHandler = iHandler;
+            },
+
+            reconnect: function reconnect(iStartHubFunc) {
+              if (typeof iStartHubFunc === 'function') {
+                // Only attempt reconnect if the specified retry hasn't been exceeded.
+                if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
+                  // Determine reconnect delay from the specified configuration array.
+                  var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+
+                  dotnetifyHub._reconnectCount++;
+
+                  setTimeout(function () {
+                    dotnetifyHub._changeState(2);
+                    iStartHubFunc();
+                  }, delay * 1000);
+                } else dotnetifyHub._changeState(99);
+              }
+            },
+
+            client: {},
+
+            server: {
+              dispose_VM: function dispose_VM(iVMId) {
+                dotnetifyHub._connection.invoke('Dispose_VM', iVMId);
+              },
+              update_VM: function update_VM(iVMId, iValue) {
+                dotnetifyHub._connection.invoke('Update_VM', iVMId, iValue);
+              },
+              request_VM: function request_VM(iVMId, iArgs) {
+                dotnetifyHub._connection.invoke('Request_VM', iVMId, iArgs);
+              }
+            }
+          });
+        } else {
+          // SignalR .NET FX.
+          dotnetifyHub.type = 'netfx';
+
+          if (window.jQuery) $ = window.jQuery;
+
+          // SignalR hub auto-generated from /signalr/hubs.
+          /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
+          /// <reference path="jquery.signalR.js" />
+          (function ($, window, undefined) {
+            /// <param name="$" type="jQuery" />
+            'use strict';
+
+            if (typeof $.signalR !== 'function') {
+              throw new Error('SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.');
+            }
+
+            var signalR = $.signalR;
+
+            function makeProxyCallback(hub, callback) {
+              return function () {
+                // Call the client hub method
+                callback.apply(hub, $.makeArray(arguments));
+              };
+            }
+
+            function registerHubProxies(instance, shouldSubscribe) {
+              var key, hub, memberKey, memberValue, subscriptionMethod;
+
+              for (key in instance) {
+                if (instance.hasOwnProperty(key)) {
+                  hub = instance[key];
+
+                  if (!hub.hubName) {
+                    // Not a client hub
+                    continue;
+                  }
+
+                  if (shouldSubscribe) {
+                    // We want to subscribe to the hub events
+                    subscriptionMethod = hub.on;
+                  } else {
+                    // We want to unsubscribe from the hub events
+                    subscriptionMethod = hub.off;
+                  }
+
+                  // Loop through all members on the hub and find client hub functions to subscribe/unsubscribe
+                  for (memberKey in hub.client) {
+                    if (hub.client.hasOwnProperty(memberKey)) {
+                      memberValue = hub.client[memberKey];
+
+                      if (!$.isFunction(memberValue)) {
+                        // Not a client hub function
+                        continue;
+                      }
+
+                      subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
+                    }
+                  }
+                }
+              }
+            }
+
+            $.hubConnection.prototype.createHubProxies = function () {
+              var proxies = {};
+              this.starting(function () {
+                // Register the hub proxies as subscribed
+                // (instance, shouldSubscribe)
+                registerHubProxies(proxies, true);
+
+                this._registerSubscribedHubs();
+              }).disconnected(function () {
+                // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
+                // (instance, shouldSubscribe)
+                registerHubProxies(proxies, false);
+              });
+
+              proxies['dotNetifyHub'] = this.createHubProxy('dotNetifyHub');
+              proxies['dotNetifyHub'].client = {};
+              proxies['dotNetifyHub'].server = {
+                dispose_VM: function dispose_VM(vmId) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Dispose_VM'], $.makeArray(arguments)));
+                },
+
+                request_VM: function request_VM(vmId, vmArg) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Request_VM'], $.makeArray(arguments)));
+                },
+
+                update_VM: function update_VM(vmId, vmData) {
+                  return proxies['dotNetifyHub'].invoke.apply(proxies['dotNetifyHub'], $.merge(['Update_VM'], $.makeArray(arguments)));
+                }
+              };
+
+              return proxies;
+            };
+
+            signalR.hub = $.hubConnection(dotnetifyHub.hubPath, { useDefaultPath: false });
+            $.extend(signalR, signalR.hub.createHubProxies());
+          })($, window);
+
+          Object.defineProperty(dotnetifyHub, 'state', {
+            get: function get() {
+              return $.connection.hub.state;
+            },
+            set: function set(val) {
+              $.connection.hub.state = val;
+            }
+          });
+
+          Object.defineProperty(dotnetifyHub, 'client', {
+            get: function get() {
+              return $.connection.dotNetifyHub.client;
+            }
+          });
+
+          Object.defineProperty(dotnetifyHub, 'server', {
+            get: function get() {
+              return $.connection.dotNetifyHub.server;
+            }
+          });
+
+          Object.defineProperty(dotnetifyHub, 'isConnected', {
+            get: function get() {
+              return $.connection.hub.state == $.signalR.connectionState.connected;
+            }
+          });
+
+          dotnetifyHub = $.extend(dotnetifyHub, {
+            hubPath: iHubPath || '/signalr',
+            url: iServerUrl,
+
+            _reconnectCount: 0,
+            _stateChangedHandler: function _stateChangedHandler(iNewState) {},
+
+            start: function start(iHubOptions) {
+              if (dotnetifyHub.url) $.connection.hub.url = dotnetifyHub.url;
+
+              var deferred = void 0;
+              if (iHubOptions) deferred = $.connection.hub.start(iHubOptions);else deferred = $.connection.hub.start();
+              deferred.fail(function (error) {
+                if (error.source && error.source.message === 'Error parsing negotiate response.') console.warn('This client may be attempting to connect to an incompatible SignalR .NET Core server.');
+              });
+              return deferred;
+            },
+
+            disconnected: function disconnected(iHandler) {
+              return $.connection.hub.disconnected(iHandler);
+            },
+
+            stateChanged: function stateChanged(iHandler) {
+              dotnetifyHub._stateChangedHandler = iHandler;
+              return $.connection.hub.stateChanged(function (state) {
+                if (state == 1) dotnetifyHub._reconnectCount = 0;
+
+                var stateText = { 0: 'connecting', 1: 'connected', 2: 'reconnecting', 4: 'disconnected' };
+                iHandler(stateText[state.newState]);
+              });
+            },
+
+            reconnect: function reconnect(iStartHubFunc) {
+              if (typeof iStartHubFunc === 'function') {
+                // Only attempt reconnect if the specified retry hasn't been exceeded.
+                if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
+                  // Determine reconnect delay from the specified configuration array.
+                  var delay = dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount] : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
+
+                  dotnetifyHub._reconnectCount++;
+
+                  setTimeout(function () {
+                    dotnetifyHub._stateChangedHandler('reconnecting');
+                    iStartHubFunc();
+                  }, delay * 1000);
+                } else dotnetifyHub._stateChangedHandler('terminated');
+              }
+            }
+          });
         }
-      }
-    });
-  }
-};
 
-exports.default = dotnetifyHub;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(18)))
+        // Setup SignalR server method handler.
+        dotnetifyHub.client.response_VM = function (iVMId, iVMData) {
+          // SignalR .NET Core is sending an array of arguments.
+          if (Array.isArray(iVMId)) {
+            iVMData = iVMId[1];
+            iVMId = iVMId[0];
+          }
 
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
+          var handled = dotnetifyHub.responseEvent.emit(iVMId, iVMData);
 
-"use strict";
+          // If we get to this point, that means the server holds a view model instance
+          // whose view no longer existed.  So, tell the server to dispose the view model.
+          if (!handled) dotnetifyHub.server.dispose_VM(iVMId);
+        };
 
+        // On disconnected, keep attempting to start the connection.
+        dotnetifyHub.disconnected(function () {
+          dotnetifyHub._startInfo = null;
+          dotnetifyHub.reconnect(function () {
+            dotnetifyHub.reconnectedEvent.emit();
+          });
+        });
+      };
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _dotnetifyHub = __webpack_require__(19);
-
-var _dotnetifyHub2 = _interopRequireDefault(_dotnetifyHub);
-
-var _utils = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* 
-Copyright 2017-2018 Dicky Suryadi
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- */
-var dotnetify = {
-  // SignalR hub options.
-  hub: _dotnetifyHub2.default,
-  hubOptions: { transport: ['webSockets', 'longPolling'] },
-  hubPath: null,
-  hubServerUrl: null,
-
-  // Debug mode.
-  debug: false,
-  debugFn: null,
-
-  // Offline mode. (WIP)
-  offline: false,
-  isOffline: true,
-  offlineTimeout: 5000,
-  offlineCacheFn: null,
-
-  // Handler for connection state changed events.
-  connectionStateHandler: null,
-
-  // Connection events.
-  responseEvent: (0, _utils.createEventEmitter)(),
-  reconnectedEvent: (0, _utils.createEventEmitter)(),
-  connectedEvent: (0, _utils.createEventEmitter)(),
-  connectionFailedEvent: (0, _utils.createEventEmitter)(),
-
-  // Whether connected to SignalR hub server.
-  isConnected: function isConnected() {
-    return _dotnetifyHub2.default.isConnected;
-  },
-
-  // Whether SignalR hub is started.
-  isHubStarted: function isHubStarted() {
-    return !!dotnetify._hub;
-  },
-
-  // Generic connect function for non-React app.
-  connect: function connect(iVMId, iOptions) {
-    return dotnetify.react.connect(iVMId, null, iOptions);
-  },
-
-  initHub: function initHub() {
-    if (dotnetify._hub !== null) return;
-
-    _dotnetifyHub2.default.init(dotnetify.hubPath, dotnetify.hubServerUrl, dotnetify.hubLib);
-
-    // Setup SignalR server method handler.
-    _dotnetifyHub2.default.client.response_VM = function (iVMId, iVMData) {
-      // SignalR .NET Core is sending an array of arguments.
-      if (Array.isArray(iVMId)) {
-        iVMData = iVMId[1];
-        iVMId = iVMId[0];
-      }
-
-      var handled = dotnetify.responseEvent.emit(iVMId, iVMData);
-
-      // If we get to this point, that means the server holds a view model instance
-      // whose view no longer existed.  So, tell the server to dispose the view model.
-      if (!handled) _dotnetifyHub2.default.server.dispose_VM(iVMId);
-    };
-
-    // On disconnected, keep attempting to start the connection.
-    _dotnetifyHub2.default.disconnected(function () {
-      dotnetify._hub = null;
-      _dotnetifyHub2.default.reconnect(function () {
-        dotnetify.reconnectedEvent.emit();
-      });
-    });
-
-    // Use SignalR event to raise the connection state event.
-    _dotnetifyHub2.default.stateChanged(function (state) {
-      dotnetify._triggerConnectionStateEvent(state);
-    });
-  },
-
-
-  startHub: function startHub() {
-    var doneHandler = function doneHandler() {
-      dotnetify.connectedEvent.emit();
-    };
-    var failHandler = function failHandler(ex) {
-      dotnetify.connectionFailedEvent.emit();
-      dotnetify._triggerConnectionStateEvent('error', ex);
-      throw ex;
-    };
-
-    if (dotnetify._hub === null) {
-      try {
-        dotnetify._hub = _dotnetifyHub2.default.start(dotnetify.hubOptions).done(doneHandler).fail(failHandler);
-      } catch (err) {
-        dotnetify._hub = null;
-      }
-    } else {
-      try {
-        dotnetify._hub.done(doneHandler);
-      } catch (err) {
-        dotnetify._hub = null;
-        return dotnetify.startHub();
-      }
+      return dotnetifyHub;
     }
-  },
+  }]);
 
-  checkServerSideException: function checkServerSideException(iVMId, iVMData, iExceptionHandler) {
-    var vmData = JSON.parse(iVMData);
-    if (vmData && vmData.hasOwnProperty('ExceptionType') && vmData.hasOwnProperty('Message')) {
-      var exception = { name: vmData.ExceptionType, message: vmData.Message };
+  return dotnetifyHubFactory;
+}();
 
-      if (typeof iExceptionHandler === 'function') {
-        return iExceptionHandler(exception);
-      } else {
-        console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
-        throw exception;
-      }
-    }
-  },
-
-  requestVM: function requestVM(iVMId, iOptions) {
-    _dotnetifyHub2.default.server.request_VM(iVMId, iOptions);
-  },
-  updateVM: function updateVM(iVMId, iValue) {
-    _dotnetifyHub2.default.server.update_VM(iVMId, iValue);
-  },
-  disposeVM: function disposeVM(iVMId) {
-    _dotnetifyHub2.default.server.dispose_VM(iVMId);
-  },
-
-
-  _triggerConnectionStateEvent: function _triggerConnectionStateEvent(iState, iException) {
-    if (dotnetify.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
-
-    if (typeof dotnetify.connectionStateHandler === 'function') dotnetify.connectionStateHandler(iState, iException);else if (iException) console.error(iException);
-  },
-
-  // Internal variables. Do not modify!
-  _hub: null
-};
-
-// Support changing hub server URL after first init.
-Object.defineProperty(dotnetify, 'hubServerUrl', {
-  get: function get() {
-    return dotnetify.hub.url;
-  },
-  set: function set(url) {
-    dotnetify.hub.url = url;
-    if (dotnetify.debug) console.log('SignalR: connecting to ' + dotnetify.hubServerUrl);
-    if (dotnetify._hub) {
-      dotnetify._hub = null;
-      dotnetify.startHub();
-    }
-  }
-});
-
-exports.default = dotnetify;
+exports.default = dotnetifyHubFactory.create();
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 21 */
@@ -3879,11 +3999,202 @@ exports.default = dotnetify;
 "use strict";
 
 
-var _dotnetifyKo = __webpack_require__(4);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.dotnetifyFactory = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Copyright 2017-2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _dotnetifyHub = __webpack_require__(20);
+
+var _dotnetifyHub2 = _interopRequireDefault(_dotnetifyHub);
+
+var _dotnetifyHubLocal = __webpack_require__(13);
+
+var _dotnetifyHubLocal2 = _interopRequireDefault(_dotnetifyHubLocal);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var dotnetifyFactory = exports.dotnetifyFactory = function () {
+  function dotnetifyFactory() {
+    _classCallCheck(this, dotnetifyFactory);
+  }
+
+  _createClass(dotnetifyFactory, null, [{
+    key: 'create',
+    value: function create() {
+      var dotnetify = {
+        // SignalR hub options.
+        hub: _dotnetifyHub2.default,
+        hubOptions: { transport: ['webSockets', 'longPolling'] },
+        hubPath: null,
+
+        // Debug mode.
+        debug: false,
+        debugFn: null,
+
+        // Offline mode. (WIP)
+        offline: false,
+        isOffline: true,
+        offlineTimeout: 5000,
+        offlineCacheFn: null,
+
+        // Internal variables.
+        _vmAccessors: [],
+
+        // Use this to get notified of connection state changed events.
+        // (state, exception, hub) => void
+        connectionStateHandler: null,
+
+        // Use this intercept a view model prior to establishing connection,
+        // with the option to provide any connect parameters.
+        // ({vmId, options}) => {vmId, options, hub}
+        connectHandler: null,
+
+        // Support changing hub server URL after first init.
+        get hubServerUrl() {
+          return this.hub.url;
+        },
+
+        set hubServerUrl(url) {
+          this.hub.url = url;
+          if (this.debug) console.log('SignalR: connecting to ' + this.hubServerUrl);
+          if (this.hub.isHubStarted) this.startHub(this.hub, true);
+        },
+
+        // Generic connect function for non-React app.
+        connect: function connect(iVMId, iOptions) {
+          dotnetify.react.connect(iVMId, null, iOptions);
+        },
+
+
+        // Creates a SignalR hub client.
+        createHub: function createHub(hubServerUrl, hubPath, hubLib) {
+          return this.initHub(_dotnetifyHub.dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
+        },
+
+
+        // Configures hub connection to SignalR hub server.
+        initHub: function initHub(hub, hubPath, hubServerUrl, hubLib) {
+          var _this = this;
+
+          hub = hub || this.hub;
+          hubPath = hubPath || this.hubPath;
+          hubServerUrl = hubServerUrl || this.hubServerUrl;
+          hubLib = hubLib || this.hubLib;
+
+          if (!hub.isHubStarted) {
+            hub.init(hubPath, hubServerUrl, hubLib);
+
+            // Use SignalR event to raise the connection state event.
+            hub.stateChanged(function (state) {
+              return _this.handleConnectionStateChanged(state, null, hub);
+            });
+          }
+          return hub;
+        },
+
+
+        // Used by a view to select a hub, and provides the opportunity to override any connect info.
+        selectHub: function selectHub(vmConnectArgs) {
+          vmConnectArgs = vmConnectArgs || { options: {} };
+          var override = typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs) || {};
+          if (!override.hub) {
+            override.hub = (0, _dotnetifyHubLocal.hasLocalVM)(vmConnectArgs.vmId) ? _dotnetifyHubLocal2.default : this.initHub();
+            override.hub.debug = this.debug;
+          }
+          return Object.assign(vmConnectArgs, override);
+        },
+
+
+        // Starts hub connection to SignalR hub server.
+        startHub: function startHub(hub, forceRestart) {
+          var _this2 = this;
+
+          hub = hub || this.hub;
+
+          var doneHandler = function doneHandler() {};
+          var failHandler = function failHandler(ex) {
+            return _this2.handleConnectionStateChanged('error', ex, hub);
+          };
+          hub.startHub(this.hubOptions, doneHandler, failHandler, forceRestart);
+        },
+
+
+        // Used by dotnetify-react and -vue to expose their view model accessors.
+        addVMAccessor: function addVMAccessor(vmAccessor) {
+          !this._vmAccessors.includes(vmAccessor) && this._vmAccessors.push(vmAccessor);
+        },
+        checkServerSideException: function checkServerSideException(iVMId, iVMData, iExceptionHandler) {
+          var vmData = JSON.parse(iVMData);
+          if (vmData && vmData.hasOwnProperty('ExceptionType') && vmData.hasOwnProperty('Message')) {
+            var exception = { name: vmData.ExceptionType, message: vmData.Message };
+
+            if (typeof iExceptionHandler === 'function') {
+              return iExceptionHandler(exception);
+            } else {
+              console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
+              throw exception;
+            }
+          }
+        },
+
+
+        // Get all view models.
+        getViewModels: function getViewModels() {
+          return this._vmAccessors.reduce(function (prev, current) {
+            return [].concat(_toConsumableArray(prev), _toConsumableArray(current()));
+          }, []).filter(function (val, idx, self) {
+            return self.indexOf(val) === idx;
+          }); // returns distinct items.
+        },
+        handleConnectionStateChanged: function handleConnectionStateChanged(iState, iException, iHub) {
+          if (this.debug) console.log('SignalR: ' + (iException ? iException.message : iState));
+          if (typeof this.connectionStateHandler === 'function') this.connectionStateHandler(iState, iException, iHub);else if (iException) console.error(iException);
+        }
+      };
+
+      return dotnetify;
+    }
+  }]);
+
+  return dotnetifyFactory;
+}();
+
+exports.default = dotnetifyFactory.create();
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _dotnetifyKo = __webpack_require__(5);
 
 var _dotnetifyKo2 = _interopRequireDefault(_dotnetifyKo);
 
-__webpack_require__(9);
+__webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
