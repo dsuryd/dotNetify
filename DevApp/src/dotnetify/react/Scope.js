@@ -28,18 +28,30 @@ const window = window || global || {};
 // injects properties and dispatch functions into the component.
 export default class Scope extends React.Component {
   static displayName = 'Scope';
-  static version = '1.2.0';
+  static version = '1.3.0';
 
-  static propTypes = { vm: PropTypes.string };
-  static contextTypes = { scoped: PropTypes.func };
+  static propTypes = {
+    vm: PropTypes.string,
+    options: PropTypes.object
+  };
+  static contextTypes = {
+    scoped: PropTypes.func,
+    scopedOptions: PropTypes.func
+  };
   static childContextTypes = {
     scoped: PropTypes.func.isRequired,
+    scopedOptions: PropTypes.func.isRequired,
     connect: PropTypes.func.isRequired
   };
 
   scoped(vmId) {
-    var scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
+    let scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
     return scope ? scope + '.' + vmId : vmId;
+  }
+
+  scopedOptions(options) {
+    let scopedOptions = this.context.scoped ? this.context.scopedOptions(this.props.options) : this.props.options;
+    return scopedOptions ? { ...scopedOptions, ...options } : options;
   }
 
   getChildContext() {
@@ -47,9 +59,11 @@ export default class Scope extends React.Component {
 
     return {
       scoped: vmId => _this.scoped(vmId),
+      scopedOptions: options => _this.scopedOptions(options),
       connect: (vmId, component, options) => {
         component.vmId = _this.scoped(vmId);
-        component.vm = dotnetify.react.connect(component.vmId, component, options);
+        component.options = _this.scopedOptions(options);
+        component.vm = dotnetify.react.connect(component.vmId, component, component.options);
         component.dispatch = state => component.vm.$dispatch(state);
 
         component.dispatchState = state => {
