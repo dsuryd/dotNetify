@@ -182,11 +182,7 @@ export default class ControlTypes extends React.Component {
             <tr>
               <td>Button: </td>
               <td>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={_ => this.dispatchState({ ButtonClicked: true })}
-                >
+                <button type="button" className="btn btn-secondary" onClick={_ => this.dispatchState({ ButtonClicked: true })}>
                   Click Me
                 </button>
                 {this.state.ClickCount > 0 && (

@@ -16,7 +16,6 @@ export default class SecurePage extends React.Component {
   signIn(username, password) {
     fetch('/token', {
       method: 'post',
-      mode: 'no-cors',
       body: 'username=' + username + '&password=' + password + '&grant_type=password&client_id=dotnetifydemo',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
@@ -28,7 +27,7 @@ export default class SecurePage extends React.Component {
         window.sessionStorage.setItem('access_token', token.access_token);
         this.setState({ loginError: null, accessToken: token.access_token });
       })
-      .catch(error => this.setState({ loginError: 'Invalid user name or password' }));
+      .catch(_ => this.setState({ loginError: 'Invalid user name or password' }));
   }
 
   signOut() {
