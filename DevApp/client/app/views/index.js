@@ -1,6 +1,7 @@
 import Overview from './Overview';
 import DataFlow from './DataFlow';
 import Reactive from './Reactive';
+import MicroFrontend from './MicroFrontend';
 import GetStarted from './GetStarted';
 import FromScratchWebPack from './from-scratch/FromScratchWebPack';
 import FromScratchScriptTag from './from-scratch/FromScratchScriptTag';
@@ -19,11 +20,12 @@ import CRUD from './apis/CRUD';
 import DI from './apis/DI';
 import DotNetClient from './apis/DotNetClient';
 import Filter from './apis/Filter';
+import LocalMode from './apis/LocalMode';
 import Middleware from './apis/Middleware';
 import Multicast from './apis/Multicast';
 import Routing from './apis/Routing';
 import Security from './apis/Security';
-import LocalMode from './apis/LocalMode';
+import WebApiMode from './apis/WebApiMode';
 
 export {
   Overview,
@@ -33,6 +35,7 @@ export {
   FromScratchCLI,
   DataFlow,
   Reactive,
+  MicroFrontend,
   GetStarted,
   HelloWorld,
   ControlTypes,
@@ -47,9 +50,10 @@ export {
   DI,
   DotNetClient,
   Filter,
+  LocalMode,
   Middleware,
   Multicast,
   Routing,
   Security,
-  LocalMode
+  WebApiMode
 };

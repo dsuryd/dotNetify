@@ -80,9 +80,9 @@ Add NPM configuration file _package.json_ with the following content:
     ]
   },
   "dependencies": {
-    "dotnetify": "~3.3.0",
-    "react": "~16.5.0",
-    "react-dom": "~16.5.0"
+    "dotnetify": "~3.4.0",
+    "react": "~16.6.0",
+    "react-dom": "~16.6.0"
   },
   "devDependencies": {
     "aspnet-webpack": "^3.0.0",

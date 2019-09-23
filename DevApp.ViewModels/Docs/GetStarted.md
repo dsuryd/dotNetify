@@ -100,7 +100,7 @@ If using script tags, include _React_, _signalR_, and _dotNetify_ from their res
 <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
-<script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
+<script src="https://unpkg.com/dotnetify@latest/dist/dotnetify-react.min.js"></script>
 ```
 
 To use SignalR .NET Framework client instead of .NET Core, replace _signalR_ script above with:

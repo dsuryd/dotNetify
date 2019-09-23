@@ -79,7 +79,7 @@ Add a new file _wwwroot/index.html_ with the following content:
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
-    <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
+    <script src="https://unpkg.com/dotnetify@latest/dist/dotnetify-react.min.js"></script>
 
     <script src="HelloWorld.js" type="text/babel"></script>
   </body>

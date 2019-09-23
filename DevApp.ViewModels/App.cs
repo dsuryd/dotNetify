@@ -20,6 +20,7 @@ namespace DotNetify.DevApp
          FromScratchCLI,
          DataFlow,
          Reactive,
+         MicroFrontend,
          GetStarted,
          HelloWorld,
          ControlTypes,
@@ -39,6 +40,7 @@ namespace DotNetify.DevApp
          Multicast,
          Routing,
          Security,
+         WebApiMode
       }
 
       private NavMenuItem[] _navMenuItems;
@@ -53,6 +55,7 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.Overview))       { UrlPattern = "overview" },
                 new RouteTemplate(nameof(Route.DataFlow))       { UrlPattern = "dataflow" },
                 new RouteTemplate(nameof(Route.Reactive))       { UrlPattern = "reactive" },
+                new RouteTemplate(nameof(Route.MicroFrontend))  { UrlPattern = "mfe" },
                 new RouteTemplate(nameof(Route.GetStarted))     { UrlPattern = "getstarted" },
                 new RouteTemplate(nameof(Route.HelloWorld))     { UrlPattern = "examples/helloworld" },
                 new RouteTemplate(nameof(Route.ControlTypes))   { UrlPattern = "examples/controltypes" },
@@ -67,11 +70,12 @@ namespace DotNetify.DevApp
                 new RouteTemplate(nameof(Route.DI))             { UrlPattern = "api/di" },
                 new RouteTemplate(nameof(Route.DotNetClient))   { UrlPattern = "api/dotnetclient" },
                 new RouteTemplate(nameof(Route.Filter))         { UrlPattern = "api/filter" },
-                new RouteTemplate(nameof(Route.LocalMode))     { UrlPattern = "api/localmode" },
+                new RouteTemplate(nameof(Route.LocalMode))      { UrlPattern = "api/localmode" },
                 new RouteTemplate(nameof(Route.Middleware))     { UrlPattern = "api/middleware" },
                 new RouteTemplate(nameof(Route.Multicast))      { UrlPattern = "api/multicast" },
                 new RouteTemplate(nameof(Route.Routing))        { UrlPattern = "api/routing" },
                 new RouteTemplate(nameof(Route.Security))       { UrlPattern = "api/security" },
+                new RouteTemplate(nameof(Route.WebApiMode))     { UrlPattern = "api/webapimode" },
 
                 new RouteTemplate(nameof(Route.FromScratchWebPack))     { UrlPattern = "fromscratch-webpack" },
                 new RouteTemplate(nameof(Route.FromScratchScriptTag))   { UrlPattern = "fromscratch-scripttag" },
@@ -84,6 +88,7 @@ namespace DotNetify.DevApp
                 new NavRoute("Overview",               this.GetRoute(nameof(Route.Overview))),
                 new NavRoute("Data Flow Pattern",      this.GetRoute(nameof(Route.DataFlow))),
                 new NavRoute("Reactive Programming",   this.GetRoute(nameof(Route.Reactive))),
+                new NavRoute("Micro-Frontend",         this.GetRoute(nameof(Route.MicroFrontend))),
                 new NavRoute("Get Started",            this.GetRoute(nameof(Route.GetStarted))),
 
                 new NavGroup
@@ -125,6 +130,7 @@ namespace DotNetify.DevApp
                         new NavRoute("Multicast",              this.GetRoute(nameof(Route.Multicast))),
                         new NavRoute("Routing",                this.GetRoute(nameof(Route.Routing))),
                         new NavRoute("Security",               this.GetRoute(nameof(Route.Security))),
+                        new NavRoute("Web API Mode",           this.GetRoute(nameof(Route.WebApiMode))),
                     },
                     IsExpanded = false
                 }
@@ -137,7 +143,7 @@ namespace DotNetify.DevApp
       private NavMenu GetNavMenu(string framework)
       {
          var navMenuItems = new List<NavMenuItem>(_navMenuItems);
-         if(framework == "Knockout")
+         if (framework == "Knockout")
          {
             navMenuItems.RemoveAt(1);  // Remove "Data Flow Pattern".
             navMenuItems[4] = new NavGroup
