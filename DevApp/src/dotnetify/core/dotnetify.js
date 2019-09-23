@@ -15,6 +15,7 @@ limitations under the License.
  */
 import dotnetifyHub, { dotnetifyHubFactory } from './dotnetify-hub';
 import localHub, { hasLocalVM } from './dotnetify-hub-local';
+import webApiHub from './dotnetify-hub-webapi';
 
 export class dotnetifyFactory {
   static create() {
@@ -85,10 +86,11 @@ export class dotnetifyFactory {
 
       // Used by a view to select a hub, and provides the opportunity to override any connect info.
       selectHub(vmConnectArgs) {
-        vmConnectArgs = vmConnectArgs || { options: {} };
+        vmConnectArgs = vmConnectArgs || {};
+        vmConnectArgs.options = vmConnectArgs.options || {};
         let override = (typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs)) || {};
         if (!override.hub) {
-          override.hub = hasLocalVM(vmConnectArgs.vmId) ? localHub : this.initHub();
+          override.hub = hasLocalVM(vmConnectArgs.vmId) ? localHub : vmConnectArgs.options.webApi ? webApiHub : this.initHub();
           override.hub.debug = this.debug;
         }
         return Object.assign(vmConnectArgs, override);

@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DotNetify;
 using DotNetify.WebApi;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,6 +39,11 @@ namespace UnitTests
          public string FullName => $"{FirstName} {LastName}";
       }
 
+      private class ServiceScopeFactory : IVMServiceScopeFactory
+      {
+         public IVMServiceScope CreateScope() => null;
+      }
+
       private class CustomMiddleware : IMiddleware
       {
          public Task Invoke(DotNetifyHubContext context, NextDelegate next)
@@ -58,15 +64,16 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public async Task HelloWorldVM_Request()
+      public async Task WebApiHelloWorldVM_Request()
       {
          VMController.Register<HelloWorldVM>();
 
          var webApi = new DotNetifyWebApi();
          var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
          var hubPipeline = new MockDotNetifyHub().CreateHubPipeline();
+         var serviceScopeFactory = new ServiceScopeFactory();
 
-         var result = await webApi.Request_VM("HelloWorldVM", null, vmFactory, hubPipeline);
+         var result = await webApi.Request_VM("HelloWorldVM", null, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
 
          dynamic response = JsonConvert.DeserializeObject(result);
          Assert.AreEqual("Hello", (string) response.FirstName);
@@ -75,20 +82,21 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public async Task HelloWorldVM_Update()
+      public async Task WebApiHelloWorldVM_Update()
       {
          VMController.Register<HelloWorldVM>();
 
          var webApi = new DotNetifyWebApi();
          var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
          var hubPipeline = new MockDotNetifyHub().CreateHubPipeline();
+         var serviceScopeFactory = new ServiceScopeFactory();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, hubPipeline);
+         var result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
          dynamic response1 = JsonConvert.DeserializeObject(result);
 
          update = new Dictionary<string, object>() { { "FirstName", "John" }, { "LastName", "Doe" } };
-         result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, hubPipeline);
+         result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
          dynamic response2 = JsonConvert.DeserializeObject(result);
 
          Assert.AreEqual("John World", (string) response1.FullName);
@@ -96,17 +104,18 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public async Task HelloWorldVM_RequestMiddleware()
+      public async Task WebApiHelloWorldVM_RequestMiddleware()
       {
          VMController.Register<HelloWorldVM>();
 
          var webApi = new DotNetifyWebApi();
          var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
+         var serviceScopeFactory = new ServiceScopeFactory();
          var hubPipeline = new MockDotNetifyHub()
             .UseMiddleware<CustomMiddleware>()
             .CreateHubPipeline();
 
-         var result = await webApi.Request_VM("HelloWorldVM", null, vmFactory, hubPipeline);
+         var result = await webApi.Request_VM("HelloWorldVM", null, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
 
          dynamic response = JsonConvert.DeserializeObject(result);
          Assert.AreEqual("John", (string) response.FirstName);
@@ -115,18 +124,19 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public async Task HelloWorldVM_UpdateMiddleware()
+      public async Task WebApiHelloWorldVM_UpdateMiddleware()
       {
          VMController.Register<HelloWorldVM>();
 
          var webApi = new DotNetifyWebApi();
          var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
+         var serviceScopeFactory = new ServiceScopeFactory();
          var hubPipeline = new MockDotNetifyHub()
             .UseMiddleware<CustomMiddleware>()
             .CreateHubPipeline();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, hubPipeline);
+         var result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
          dynamic response = JsonConvert.DeserializeObject(result);
 
          Assert.AreEqual("JOHN World", (string) response.FullName);
