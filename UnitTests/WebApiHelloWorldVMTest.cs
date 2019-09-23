@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetify;
 using DotNetify.WebApi;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NSubstitute;
+using Mvc = Microsoft.AspNetCore.Http;
 
 namespace UnitTests
 {
@@ -73,6 +72,9 @@ namespace UnitTests
          var hubPipeline = new MockDotNetifyHub().CreateHubPipeline();
          var serviceScopeFactory = new ServiceScopeFactory();
 
+         var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+
          var result = await webApi.Request_VM("HelloWorldVM", null, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
 
          dynamic response = JsonConvert.DeserializeObject(result);
@@ -90,6 +92,9 @@ namespace UnitTests
          var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
          var hubPipeline = new MockDotNetifyHub().CreateHubPipeline();
          var serviceScopeFactory = new ServiceScopeFactory();
+
+         var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
          var result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
@@ -115,6 +120,9 @@ namespace UnitTests
             .UseMiddleware<CustomMiddleware>()
             .CreateHubPipeline();
 
+         var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+
          var result = await webApi.Request_VM("HelloWorldVM", null, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
 
          dynamic response = JsonConvert.DeserializeObject(result);
@@ -134,6 +142,9 @@ namespace UnitTests
          var hubPipeline = new MockDotNetifyHub()
             .UseMiddleware<CustomMiddleware>()
             .CreateHubPipeline();
+
+         var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
          var result = await webApi.Update_VM("HelloWorldVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
