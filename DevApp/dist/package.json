@@ -10,6 +10,7 @@
       "dist/typings",
       "ko/*.js",
       "vue/*.js",
+      "react/*.js",
       "react-native/*.js",
       "README.*",
       "LICENSE.*"
