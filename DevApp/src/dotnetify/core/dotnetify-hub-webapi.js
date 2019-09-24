@@ -28,6 +28,10 @@ export class dotNetifyHubWebApi {
 
   _vmArgs = {};
 
+  constructor(iBaseUrl) {
+    this.baseUrl = iBaseUrl || '';
+  }
+
   startHub() {
     this.isConnected = true;
     this.isHubStarted = true;
@@ -39,7 +43,7 @@ export class dotNetifyHubWebApi {
     const vmArgQuery = iVMArgs.$vmArg ? '?vmarg=' + JSON.stringify(iVMArgs.$vmArg) : '';
     const headers = iVMArgs.$headers || {};
 
-    fetch('GET', `/api/dotnetify/vm/${iVMId}${vmArgQuery}`, null, request => {
+    fetch('GET', this.baseUrl + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`, null, request => {
       Object.keys(headers).forEach(key => request.setRequestHeader(key, headers[key]));
     })
       .then(response => {
@@ -54,7 +58,7 @@ export class dotNetifyHubWebApi {
     const headers = iVMArgs.$headers || {};
     const payload = typeof iValue == 'object' ? JSON.stringify(iValue) : iValue;
 
-    fetch('POST', `/api/dotnetify/vm/${iVMId}${vmArgQuery}`, payload, request => {
+    fetch('POST', this.baseUrl + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`, payload, request => {
       request.setRequestHeader('Content-Type', 'application/json');
       Object.keys(headers).forEach(key => request.setRequestHeader(key, headers[key]));
     })
