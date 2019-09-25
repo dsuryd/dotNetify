@@ -30,14 +30,15 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
 
 It's important to understand that, other than the obvious fact that real-time functionality like _PushUpdates_ and _multicasting_ won't be working in this mode, every API request will create a new instance of the view model and dispose it on completion. Therefore, the correct way to implement a view model for this mode is to make it stateless.
 
-#### Custom Base URL
+The headers that you've configured in the _connect_ options will be set to the HTTP request headers. The middlewares and filters will continue to work, with the _DotNetifyHubContext_ argument using the information from _HTTPContext_.
 
-By default the API uses a relative path.  To give it a different base URL, create a web API hub client, initialized to the new base URL, then implement the __dotnetify.connectHandler__ handler in which you return the instance:
+#### Cross-Domain Support
+
+By default the API uses a relative path.  To direct it to a different domain, create a web API hub client with the new base URL, then implement the __dotnetify.connectHandler__ handler that will return the instance if the _webApi_ option is enabled:
 
 ```jsx
-import dotNetify, { webApiHub } from 'dotnetify';
-
-const webApiHubClient = new webApiHub("http://my-domain.com");
+const callback = (url, request /*XMLHttpRequest*/) => console.log("Requesting...", url, request)
+const webApiHubClient = dotNetify.createWebApiHub("http://my-domain.com", callback);
 
 dotNetify.connectHandler = vmConnectArgs => {
   if (vmConnectArgs.options && vmConnectArgs.options.webApi)

@@ -15,7 +15,7 @@ limitations under the License.
  */
 import dotnetifyHub, { dotnetifyHubFactory } from './dotnetify-hub';
 import localHub, { hasLocalVM } from './dotnetify-hub-local';
-import webApiHub from './dotnetify-hub-webapi';
+import webApiHub, { createWebApiHub } from './dotnetify-hub-webapi';
 
 export class dotnetifyFactory {
   static create() {
@@ -68,6 +68,11 @@ export class dotnetifyFactory {
         return this.initHub(dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
       },
 
+      // Creates a Web API hub client.
+      createWebApiHub(baseUrl, onRequestHandler) {
+        return createWebApiHub(baseUrl, onRequestHandler);
+      },
+
       // Configures hub connection to SignalR hub server.
       initHub(hub, hubPath, hubServerUrl, hubLib) {
         hub = hub || this.hub;
@@ -117,8 +122,7 @@ export class dotnetifyFactory {
 
           if (typeof iExceptionHandler === 'function') {
             return iExceptionHandler(exception);
-          }
-          else {
+          } else {
             console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
             throw exception;
           }

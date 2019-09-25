@@ -28,8 +28,13 @@ export class dotNetifyHubWebApi {
 
   _vmArgs = {};
 
-  constructor(iBaseUrl) {
+  constructor(iBaseUrl, iOnRequest) {
     this.baseUrl = iBaseUrl || '';
+    this.onRequest = iOnRequest;
+  }
+
+  static create(iBaseUrl, iOnRequest) {
+    return new dotNetifyHubWebApi(iBaseUrl, iOnRequest);
   }
 
   startHub() {
@@ -39,12 +44,16 @@ export class dotNetifyHubWebApi {
   }
 
   requestVM(iVMId, iVMArgs) {
-    this._vmArgs[iVMId] = iVMArgs || {};
-    const vmArgQuery = iVMArgs.$vmArg ? '?vmarg=' + JSON.stringify(iVMArgs.$vmArg) : '';
-    const headers = iVMArgs.$headers || {};
+    const vmArgs = iVMArgs || {};
+    const vmArgQuery = vmArgs.$vmArg ? '?vmarg=' + JSON.stringify(vmArgs.$vmArg) : '';
+    const headers = vmArgs.$headers || {};
 
-    fetch('GET', this.baseUrl + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`, null, request => {
+    this._vmArgs[iVMId] = vmArgs;
+    const url = this.baseUrl + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`;
+
+    fetch('GET', url, null, request => {
       Object.keys(headers).forEach(key => request.setRequestHeader(key, headers[key]));
+      if (typeof this.onRequest == 'function') this.onRequest(url, request);
     })
       .then(response => {
         this.responseEvent.emit(iVMId, response);
@@ -55,12 +64,15 @@ export class dotNetifyHubWebApi {
   updateVM(iVMId, iValue) {
     const vmArgs = this._vmArgs[iVMId] || {};
     const vmArgQuery = vmArgs.$vmArg ? '?vmarg=' + JSON.stringify(vmArgs.$vmArg) : '';
-    const headers = iVMArgs.$headers || {};
+    const headers = vmArgs.$headers || {};
     const payload = typeof iValue == 'object' ? JSON.stringify(iValue) : iValue;
 
-    fetch('POST', this.baseUrl + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`, payload, request => {
+    const url = this.baseUrl + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`;
+
+    fetch('POST', url, payload, request => {
       request.setRequestHeader('Content-Type', 'application/json');
       Object.keys(headers).forEach(key => request.setRequestHeader(key, headers[key]));
+      if (typeof this.onRequest == 'function') this.onRequest(url, request, payload);
     })
       .then(response => {
         this.responseEvent.emit(iVMId, response);
@@ -73,4 +85,7 @@ export class dotNetifyHubWebApi {
   }
 }
 
-export default new dotNetifyHubWebApi();
+const createWebApiHub = dotNetifyHubWebApi.create;
+
+export { createWebApiHub };
+export default dotNetifyHubWebApi.create();

@@ -3,6 +3,7 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -46,5 +47,9 @@ module.exports = {
     'styled-components': 'styled',
     vue: 'Vue'
   },
-  plugins: [ new VueLoaderPlugin(), new MiniCssExtractPlugin() ]
+  plugins: [
+    new VueLoaderPlugin(),
+    new MiniCssExtractPlugin(),
+    new CopyPlugin([ { from: 'node_modules/dotnetify-elements/lib/dotnetify-elements.bundle.js' } ])
+  ]
 };
