@@ -34,11 +34,42 @@ dotnetify.connectionStateHandler = (state) => { /* handle state changed event */
 ```
 The state's possible values are: _"connecting", "connected", "reconnecting", "disconnected"_ and _"terminated"_.
 
-#### Cross-Domain Support
+#### Cross-Origin Support
+
 If you want to host the SignalR server on a different domain, use __dotnetify.hubServerUrl__ to specify its location; for example:
 
 ```jsx
-dotnetify.hubServerUrl = "http://dotnetify.net"; // If ASP.NET Framework, add "/signalR" at the end
+// ASP.NET Core:
+dotnetify.hubServerUrl = "http://my-other-domain.net"; 
+
+// ASP.NET Framework:
+dotnetify.hubServerUrl = "http://my-other-domain.net/signalr"; 
 ```
 
-The server must be configured to allow CORS.
+> The server must be configured to allow CORS.
+
+The above setup applies to all connection, but if you need a more fine-grained control over more than one hub servers, use __dotnetify.connectHandler__ to intercept every _connect_ call and replace the default hub proxy with one that you created with __donetify.createHub__ and initialized to a different origin:
+
+```jsx
+const hub1 = dotnetify.createHub("http://my-domain-1.net");
+const hub2 = dotnetify.createHub("http://my-domain-2.net");
+
+dotnetify.connectHandler = vmConnectArgs => {
+  if (vmConnectArgs.vmId === 'MyVM_1') return { ...vmConnectArgs, hub: hub1 };
+  else if (vmConnectArgs.vmId === 'MyVM_2') return { ...vmConnectArgs, hub: hub2 };
+};
+```
+
+The argument __vmConnectArgs__ is an object with the following properties which you can override: `vmId`, `options`, and `hub`.  One good use case to override the `options` is to add authentication header as in this example:
+
+```jsx
+dotnetify.connectHandler = vmConnectArgs => {
+  return { 
+    ...vmConnectArgs, 
+    options: { 
+      ...vmConnectArgs.options, 
+      headers: { Authorization: 'Bearer ' + auth.getAccessToken() } 
+    }
+   };
+};
+```
