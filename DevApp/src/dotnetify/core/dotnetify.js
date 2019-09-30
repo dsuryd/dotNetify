@@ -60,7 +60,7 @@ export class dotnetifyFactory {
 
       // Generic connect function for non-React app.
       connect(iVMId, iOptions) {
-        dotnetify.react.connect(iVMId, {}, iOptions);
+        return dotnetify.react.connect(iVMId, {}, iOptions);
       },
 
       // Creates a SignalR hub client.
@@ -122,7 +122,8 @@ export class dotnetifyFactory {
 
           if (typeof iExceptionHandler === 'function') {
             return iExceptionHandler(exception);
-          } else {
+          }
+          else {
             console.error('[' + iVMId + '] ' + exception.name + ': ' + exception.message);
             throw exception;
           }
