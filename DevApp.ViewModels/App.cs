@@ -88,7 +88,7 @@ namespace DotNetify.DevApp
                 new NavRoute("Overview",               this.GetRoute(nameof(Route.Overview))),
                 new NavRoute("Data Flow Pattern",      this.GetRoute(nameof(Route.DataFlow))),
                 new NavRoute("Reactive Programming",   this.GetRoute(nameof(Route.Reactive))),
-                new NavRoute("Micro-Frontend",         this.GetRoute(nameof(Route.MicroFrontend))),
+                //new NavRoute("Micro-Frontend",         this.GetRoute(nameof(Route.MicroFrontend))),
                 new NavRoute("Get Started",            this.GetRoute(nameof(Route.GetStarted))),
 
                 new NavGroup

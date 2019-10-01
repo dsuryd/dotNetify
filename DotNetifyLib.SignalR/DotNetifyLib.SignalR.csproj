@@ -9,18 +9,18 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>3.4.0</Version>
+    <Version>3.5.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Dicky Suryadi</Authors>
     <Description>Simple, lightweight, yet powerful way to build reactive, real-time web apps. SignalR hub for ASP.NET Core.</Description>
     <Copyright>Copyright 2015-2019</Copyright>
     <PackageLicenseUrl>https://github.com/dsuryd/dotNetify/blob/master/LICENSE.md</PackageLicenseUrl>
-    <PackageProjectUrl>http://dotnetify.net/</PackageProjectUrl>
+    <PackageProjectUrl>https://dotnetify.net/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageTags>netcore reactive realtime signalr mobile web websocket</PackageTags>
-    <PackageIconUrl>http://dotnetify.net/content/images/dotnetify.png</PackageIconUrl>
-    <AssemblyVersion>3.4.0.0</AssemblyVersion>
-    <FileVersion>3.4.0.0</FileVersion>
+    <PackageIconUrl>https://dotnetify.net/content/images/dotnetify.png</PackageIconUrl>
+    <AssemblyVersion>3.5.0.0</AssemblyVersion>
+    <FileVersion>3.5.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -7,7 +7,7 @@
 		exports["dotnetify"] = factory(require("vue"), require("@aspnet/signalr"));
 	else
 		root["dotnetify"] = factory(root["Vue"], root["signalR"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__4__, __WEBPACK_EXTERNAL_MODULE__14__) {
+})(window, function(__WEBPACK_EXTERNAL_MODULE__4__, __WEBPACK_EXTERNAL_MODULE__15__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ 	return __webpack_require__(__webpack_require__.s = 23);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -240,6 +240,25 @@ var createEventEmitter = exports.createEventEmitter = function createEventEmitte
   };
 };
 
+var fetch = exports.fetch = function fetch(iMethod, iUrl, iData, iOptions) {
+  return new Promise(function (resolve, reject) {
+    var request = new window.XMLHttpRequest();
+    request.open(iMethod, iUrl, true);
+    if (typeof iOptions == 'function') iOptions(request);
+
+    request.onload = function () {
+      if (request.status >= 200 && request.status < 400) {
+        var response = request.responseText;
+        resolve(response);
+      } else reject(request);
+    };
+    request.onerror = function () {
+      reject(request);
+    };
+    request.send(iData);
+  });
+};
+
 exports.default = new utils();
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
@@ -270,7 +289,7 @@ limitations under the License.
 
 var window = window || global || {};
 
-var jQueryDeferred = __webpack_require__(18);
+var jQueryDeferred = __webpack_require__(19);
 var jQueryShim = jQueryDeferred.extend(function (selector) {
   if (selector === window || selector.document) return {
     0: selector,
@@ -403,7 +422,7 @@ var jQueryShim = jQueryDeferred.extend(function (selector) {
 if (typeof window !== 'undefined') window.jQuery = window.jQuery || jQueryShim;
 
 if (( false ? undefined : _typeof(exports)) === 'object' && ( false ? undefined : _typeof(module)) === 'object') module.exports = jQueryShim;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(19)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(20)(module)))
 
 /***/ }),
 /* 3 */
@@ -433,7 +452,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
                                                                                                                                                                                                                                                                    */
 
 
-var _dotnetify2 = __webpack_require__(21);
+var _dotnetify2 = __webpack_require__(22);
 
 var _dotnetify3 = _interopRequireDefault(_dotnetify2);
 
@@ -2313,6 +2332,133 @@ exports.default = dotnetifyVM;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createWebApiHub = exports.dotNetifyHubWebApi = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Copyright 2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _utils = __webpack_require__(1);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var dotNetifyHubWebApi = exports.dotNetifyHubWebApi = function () {
+  function dotNetifyHubWebApi(iBaseUrl, iOnRequest) {
+    _classCallCheck(this, dotNetifyHubWebApi);
+
+    this.mode = 'webapi';
+    this.debug = false;
+    this.isConnected = false;
+    this.isHubStarted = false;
+    this.responseEvent = (0, _utils.createEventEmitter)();
+    this.reconnectedEvent = (0, _utils.createEventEmitter)();
+    this.connectedEvent = (0, _utils.createEventEmitter)();
+    this.connectionFailedEvent = (0, _utils.createEventEmitter)();
+    this._vmArgs = {};
+
+    this.baseUrl = iBaseUrl || '';
+    this.onRequest = iOnRequest;
+  }
+
+  _createClass(dotNetifyHubWebApi, [{
+    key: 'startHub',
+    value: function startHub() {
+      this.isConnected = true;
+      this.isHubStarted = true;
+      this.connectedEvent.emit();
+    }
+  }, {
+    key: 'requestVM',
+    value: function requestVM(iVMId, iVMArgs) {
+      var _this = this;
+
+      var vmArgs = iVMArgs || {};
+      var vmArgQuery = vmArgs.$vmArg ? '?vmarg=' + JSON.stringify(vmArgs.$vmArg) : '';
+      var headers = vmArgs.$headers || {};
+
+      this._vmArgs[iVMId] = vmArgs;
+      var url = this.baseUrl + ('/api/dotnetify/vm/' + iVMId + vmArgQuery);
+
+      (0, _utils.fetch)('GET', url, null, function (request) {
+        Object.keys(headers).forEach(function (key) {
+          return request.setRequestHeader(key, headers[key]);
+        });
+        if (typeof _this.onRequest == 'function') _this.onRequest(url, request);
+      }).then(function (response) {
+        _this.responseEvent.emit(iVMId, response);
+      }).catch(function (request) {
+        return console.error('[' + iVMId + '] Request failed', request);
+      });
+    }
+  }, {
+    key: 'updateVM',
+    value: function updateVM(iVMId, iValue) {
+      var _this2 = this;
+
+      var vmArgs = this._vmArgs[iVMId] || {};
+      var vmArgQuery = vmArgs.$vmArg ? '?vmarg=' + JSON.stringify(vmArgs.$vmArg) : '';
+      var headers = vmArgs.$headers || {};
+      var payload = (typeof iValue === 'undefined' ? 'undefined' : _typeof(iValue)) == 'object' ? JSON.stringify(iValue) : iValue;
+
+      var url = this.baseUrl + ('/api/dotnetify/vm/' + iVMId + vmArgQuery);
+
+      (0, _utils.fetch)('POST', url, payload, function (request) {
+        request.setRequestHeader('Content-Type', 'application/json');
+        Object.keys(headers).forEach(function (key) {
+          return request.setRequestHeader(key, headers[key]);
+        });
+        if (typeof _this2.onRequest == 'function') _this2.onRequest(url, request, payload);
+      }).then(function (response) {
+        _this2.responseEvent.emit(iVMId, response);
+      }).catch(function (request) {
+        return console.error('[' + iVMId + '] Update failed', request);
+      });
+    }
+  }, {
+    key: 'disposeVM',
+    value: function disposeVM(iVMId) {
+      delete this._vmArgs[iVMId];
+    }
+  }], [{
+    key: 'create',
+    value: function create(iBaseUrl, iOnRequest) {
+      return new dotNetifyHubWebApi(iBaseUrl, iOnRequest);
+    }
+  }]);
+
+  return dotNetifyHubWebApi;
+}();
+
+var createWebApiHub = dotNetifyHubWebApi.create;
+
+exports.createWebApiHub = createWebApiHub;
+exports.default = dotNetifyHubWebApi.create();
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
@@ -2323,7 +2469,6 @@ exports.hasLocalVM = exports.dotNetifyHubLocal = undefined;
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* 
-                                                                                                                                                                                                                                                                              import { dotnetify } from 'dotnetify/dist/dotnetify-ko';
                                                                                                                                                                                                                                                                               Copyright 2019 Dicky Suryadi
                                                                                                                                                                                                                                                                               
                                                                                                                                                                                                                                                                               Licensed under the Apache License, Version 2.0 (the "License");
@@ -2435,13 +2580,13 @@ exports.hasLocalVM = hasLocalVM;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__14__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__15__;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /**
@@ -2602,10 +2747,10 @@ function extend() {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var jQuery = module.exports = __webpack_require__(15),
+var jQuery = module.exports = __webpack_require__(16),
 	core_rspace = /\s+/;
 /**
 * jQuery Callbacks
@@ -2814,7 +2959,7 @@ jQuery.Callbacks = function( options ) {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2828,7 +2973,7 @@ jQuery.Callbacks = function( options ) {
 * Library version.
 */
 
-var jQuery = module.exports = __webpack_require__(16),
+var jQuery = module.exports = __webpack_require__(17),
 	core_slice = Array.prototype.slice;
 
 /**
@@ -2983,14 +3128,14 @@ jQuery.extend({
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(17);
+module.exports = __webpack_require__(18);
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -3018,7 +3163,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3056,7 +3201,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var signalRNetCore = __webpack_require__(14);
+var signalRNetCore = __webpack_require__(15);
 var $ = _jqueryShim2.default;
 
 var window = window || global || {};
@@ -3475,7 +3620,7 @@ exports.default = dotnetifyHubFactory.create();
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3503,13 +3648,17 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _dotnetifyHub = __webpack_require__(20);
+var _dotnetifyHub = __webpack_require__(21);
 
 var _dotnetifyHub2 = _interopRequireDefault(_dotnetifyHub);
 
-var _dotnetifyHubLocal = __webpack_require__(13);
+var _dotnetifyHubLocal = __webpack_require__(14);
 
 var _dotnetifyHubLocal2 = _interopRequireDefault(_dotnetifyHubLocal);
+
+var _dotnetifyHubWebapi = __webpack_require__(13);
+
+var _dotnetifyHubWebapi2 = _interopRequireDefault(_dotnetifyHubWebapi);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3566,13 +3715,19 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
 
         // Generic connect function for non-React app.
         connect: function connect(iVMId, iOptions) {
-          dotnetify.react.connect(iVMId, null, iOptions);
+          return dotnetify.react.connect(iVMId, {}, iOptions);
         },
 
 
         // Creates a SignalR hub client.
         createHub: function createHub(hubServerUrl, hubPath, hubLib) {
           return this.initHub(_dotnetifyHub.dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
+        },
+
+
+        // Creates a Web API hub client.
+        createWebApiHub: function createWebApiHub(baseUrl, onRequestHandler) {
+          return (0, _dotnetifyHubWebapi.createWebApiHub)(baseUrl, onRequestHandler);
         },
 
 
@@ -3599,10 +3754,11 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
 
         // Used by a view to select a hub, and provides the opportunity to override any connect info.
         selectHub: function selectHub(vmConnectArgs) {
-          vmConnectArgs = vmConnectArgs || { options: {} };
+          vmConnectArgs = vmConnectArgs || {};
+          vmConnectArgs.options = vmConnectArgs.options || {};
           var override = typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs) || {};
           if (!override.hub) {
-            override.hub = (0, _dotnetifyHubLocal.hasLocalVM)(vmConnectArgs.vmId) ? _dotnetifyHubLocal2.default : this.initHub();
+            override.hub = (0, _dotnetifyHubLocal.hasLocalVM)(vmConnectArgs.vmId) ? _dotnetifyHubLocal2.default : vmConnectArgs.options.webApi ? _dotnetifyHubWebapi2.default : this.initHub();
             override.hub.debug = this.debug;
           }
           return Object.assign(vmConnectArgs, override);
@@ -3666,7 +3822,7 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
 exports.default = dotnetifyFactory.create();
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

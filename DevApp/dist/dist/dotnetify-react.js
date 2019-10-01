@@ -7,7 +7,7 @@
 		exports["dotnetify"] = factory(require("react"), require("@aspnet/signalr"), require("react-dom"));
 	else
 		root["dotnetify"] = factory(root["React"], root["signalR"], root["ReactDOM"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__4__, __WEBPACK_EXTERNAL_MODULE__7__, __WEBPACK_EXTERNAL_MODULE__23__) {
+})(window, function(__WEBPACK_EXTERNAL_MODULE__4__, __WEBPACK_EXTERNAL_MODULE__8__, __WEBPACK_EXTERNAL_MODULE__25__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 30);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -131,7 +131,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _dotnetify2 = __webpack_require__(14);
+var _dotnetify2 = __webpack_require__(15);
 
 var _dotnetify3 = _interopRequireDefault(_dotnetify2);
 
@@ -273,6 +273,148 @@ exports.default = dotnetify;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* 
+Copyright 2018 Dicky Suryadi
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+var window = window || global || {};
+
+var utils = function () {
+  function utils() {
+    _classCallCheck(this, utils);
+  }
+
+  _createClass(utils, [{
+    key: 'trim',
+
+    // Trim slashes from start and end of string.
+    value: function trim(iStr) {
+      if (typeof iStr !== 'string') return '';
+
+      while (iStr.indexOf('/', iStr.length - 1) >= 0) {
+        iStr = iStr.substr(0, iStr.length - 1);
+      }while (iStr.indexOf('/') == 0) {
+        iStr = iStr.substr(1, iStr.length - 1);
+      }return iStr;
+    }
+
+    // Match two strings case-insensitive.
+
+  }, {
+    key: 'equal',
+    value: function equal(iStr1, iStr2) {
+      return iStr1 != null && iStr2 != null && iStr1.toLowerCase() == iStr2.toLowerCase();
+    }
+
+    // Whether the string starts or ends with a value.
+
+  }, {
+    key: 'startsWith',
+    value: function startsWith(iStr, iValue) {
+      return iStr.toLowerCase().slice(0, iValue.length) == iValue.toLowerCase();
+    }
+  }, {
+    key: 'endsWith',
+    value: function endsWith(iStr, iValue) {
+      return iValue == '' || iStr.toLowerCase().slice(-iValue.length) == iValue.toLowerCase();
+    }
+
+    // Dispatch event with IE polyfill.
+
+  }, {
+    key: 'dispatchEvent',
+    value: function dispatchEvent(iEvent) {
+      if (typeof Event === 'function') window.dispatchEvent(new Event(iEvent));else {
+        var event = document.createEvent('CustomEvent');
+        event.initEvent(iEvent, true, true);
+        window.dispatchEvent(event);
+      }
+    }
+  }, {
+    key: 'grep',
+    value: function grep(iArray, iFilter) {
+      return Array.isArray(iArray) ? iArray.filter(iFilter) : [];
+    }
+  }]);
+
+  return utils;
+}();
+
+var createEventEmitter = exports.createEventEmitter = function createEventEmitter(_) {
+  var subscribers = [];
+  return {
+    emit: function emit() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      var handled = false;
+      subscribers.forEach(function (subscriber) {
+        handled = subscriber.apply(undefined, _toConsumableArray(args)) || handled;
+      });
+      return handled;
+    },
+    subscribe: function subscribe(subscriber) {
+      !subscribers.includes(subscriber) && subscribers.push(subscriber);
+      return function () {
+        return subscribers = subscribers.filter(function (x) {
+          return x !== subscriber;
+        });
+      };
+    }
+  };
+};
+
+var fetch = exports.fetch = function fetch(iMethod, iUrl, iData, iOptions) {
+  return new Promise(function (resolve, reject) {
+    var request = new window.XMLHttpRequest();
+    request.open(iMethod, iUrl, true);
+    if (typeof iOptions == 'function') iOptions(request);
+
+    request.onload = function () {
+      if (request.status >= 200 && request.status < 400) {
+        var response = request.responseText;
+        resolve(response);
+      } else reject(request);
+    };
+    request.onerror = function () {
+      reject(request);
+    };
+    request.send(iData);
+  });
+};
+
+exports.default = new utils();
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(global, module) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -295,7 +437,7 @@ limitations under the License.
 
 var window = window || global || {};
 
-var jQueryDeferred = __webpack_require__(11);
+var jQueryDeferred = __webpack_require__(12);
 var jQueryShim = jQueryDeferred.extend(function (selector) {
   if (selector === window || selector.document) return {
     0: selector,
@@ -428,130 +570,7 @@ var jQueryShim = jQueryDeferred.extend(function (selector) {
 if (typeof window !== 'undefined') window.jQuery = window.jQuery || jQueryShim;
 
 if (( false ? undefined : _typeof(exports)) === 'object' && ( false ? undefined : _typeof(module)) === 'object') module.exports = jQueryShim;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(12)(module)))
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* 
-Copyright 2018 Dicky Suryadi
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- */
-var window = window || global || {};
-
-var utils = function () {
-  function utils() {
-    _classCallCheck(this, utils);
-  }
-
-  _createClass(utils, [{
-    key: 'trim',
-
-    // Trim slashes from start and end of string.
-    value: function trim(iStr) {
-      if (typeof iStr !== 'string') return '';
-
-      while (iStr.indexOf('/', iStr.length - 1) >= 0) {
-        iStr = iStr.substr(0, iStr.length - 1);
-      }while (iStr.indexOf('/') == 0) {
-        iStr = iStr.substr(1, iStr.length - 1);
-      }return iStr;
-    }
-
-    // Match two strings case-insensitive.
-
-  }, {
-    key: 'equal',
-    value: function equal(iStr1, iStr2) {
-      return iStr1 != null && iStr2 != null && iStr1.toLowerCase() == iStr2.toLowerCase();
-    }
-
-    // Whether the string starts or ends with a value.
-
-  }, {
-    key: 'startsWith',
-    value: function startsWith(iStr, iValue) {
-      return iStr.toLowerCase().slice(0, iValue.length) == iValue.toLowerCase();
-    }
-  }, {
-    key: 'endsWith',
-    value: function endsWith(iStr, iValue) {
-      return iValue == '' || iStr.toLowerCase().slice(-iValue.length) == iValue.toLowerCase();
-    }
-
-    // Dispatch event with IE polyfill.
-
-  }, {
-    key: 'dispatchEvent',
-    value: function dispatchEvent(iEvent) {
-      if (typeof Event === 'function') window.dispatchEvent(new Event(iEvent));else {
-        var event = document.createEvent('CustomEvent');
-        event.initEvent(iEvent, true, true);
-        window.dispatchEvent(event);
-      }
-    }
-  }, {
-    key: 'grep',
-    value: function grep(iArray, iFilter) {
-      return Array.isArray(iArray) ? iArray.filter(iFilter) : [];
-    }
-  }]);
-
-  return utils;
-}();
-
-var createEventEmitter = exports.createEventEmitter = function createEventEmitter(_) {
-  var subscribers = [];
-  return {
-    emit: function emit() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      var handled = false;
-      subscribers.forEach(function (subscriber) {
-        handled = subscriber.apply(undefined, _toConsumableArray(args)) || handled;
-      });
-      return handled;
-    },
-    subscribe: function subscribe(subscriber) {
-      !subscribers.includes(subscriber) && subscribers.push(subscriber);
-      return function () {
-        return subscribers = subscribers.filter(function (x) {
-          return x !== subscriber;
-        });
-      };
-    }
-  };
-};
-
-exports.default = new utils();
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(13)(module)))
 
 /***/ }),
 /* 4 */
@@ -589,7 +608,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _jqueryShim = __webpack_require__(2);
+var _jqueryShim = __webpack_require__(3);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
@@ -953,6 +972,133 @@ exports.default = dotnetifyVM;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createWebApiHub = exports.dotNetifyHubWebApi = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Copyright 2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _utils = __webpack_require__(2);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var dotNetifyHubWebApi = exports.dotNetifyHubWebApi = function () {
+  function dotNetifyHubWebApi(iBaseUrl, iOnRequest) {
+    _classCallCheck(this, dotNetifyHubWebApi);
+
+    this.mode = 'webapi';
+    this.debug = false;
+    this.isConnected = false;
+    this.isHubStarted = false;
+    this.responseEvent = (0, _utils.createEventEmitter)();
+    this.reconnectedEvent = (0, _utils.createEventEmitter)();
+    this.connectedEvent = (0, _utils.createEventEmitter)();
+    this.connectionFailedEvent = (0, _utils.createEventEmitter)();
+    this._vmArgs = {};
+
+    this.baseUrl = iBaseUrl || '';
+    this.onRequest = iOnRequest;
+  }
+
+  _createClass(dotNetifyHubWebApi, [{
+    key: 'startHub',
+    value: function startHub() {
+      this.isConnected = true;
+      this.isHubStarted = true;
+      this.connectedEvent.emit();
+    }
+  }, {
+    key: 'requestVM',
+    value: function requestVM(iVMId, iVMArgs) {
+      var _this = this;
+
+      var vmArgs = iVMArgs || {};
+      var vmArgQuery = vmArgs.$vmArg ? '?vmarg=' + JSON.stringify(vmArgs.$vmArg) : '';
+      var headers = vmArgs.$headers || {};
+
+      this._vmArgs[iVMId] = vmArgs;
+      var url = this.baseUrl + ('/api/dotnetify/vm/' + iVMId + vmArgQuery);
+
+      (0, _utils.fetch)('GET', url, null, function (request) {
+        Object.keys(headers).forEach(function (key) {
+          return request.setRequestHeader(key, headers[key]);
+        });
+        if (typeof _this.onRequest == 'function') _this.onRequest(url, request);
+      }).then(function (response) {
+        _this.responseEvent.emit(iVMId, response);
+      }).catch(function (request) {
+        return console.error('[' + iVMId + '] Request failed', request);
+      });
+    }
+  }, {
+    key: 'updateVM',
+    value: function updateVM(iVMId, iValue) {
+      var _this2 = this;
+
+      var vmArgs = this._vmArgs[iVMId] || {};
+      var vmArgQuery = vmArgs.$vmArg ? '?vmarg=' + JSON.stringify(vmArgs.$vmArg) : '';
+      var headers = vmArgs.$headers || {};
+      var payload = (typeof iValue === 'undefined' ? 'undefined' : _typeof(iValue)) == 'object' ? JSON.stringify(iValue) : iValue;
+
+      var url = this.baseUrl + ('/api/dotnetify/vm/' + iVMId + vmArgQuery);
+
+      (0, _utils.fetch)('POST', url, payload, function (request) {
+        request.setRequestHeader('Content-Type', 'application/json');
+        Object.keys(headers).forEach(function (key) {
+          return request.setRequestHeader(key, headers[key]);
+        });
+        if (typeof _this2.onRequest == 'function') _this2.onRequest(url, request, payload);
+      }).then(function (response) {
+        _this2.responseEvent.emit(iVMId, response);
+      }).catch(function (request) {
+        return console.error('[' + iVMId + '] Update failed', request);
+      });
+    }
+  }, {
+    key: 'disposeVM',
+    value: function disposeVM(iVMId) {
+      delete this._vmArgs[iVMId];
+    }
+  }], [{
+    key: 'create',
+    value: function create(iBaseUrl, iOnRequest) {
+      return new dotNetifyHubWebApi(iBaseUrl, iOnRequest);
+    }
+  }]);
+
+  return dotNetifyHubWebApi;
+}();
+
+var createWebApiHub = dotNetifyHubWebApi.create;
+
+exports.createWebApiHub = createWebApiHub;
+exports.default = dotNetifyHubWebApi.create();
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
@@ -963,7 +1109,6 @@ exports.hasLocalVM = exports.dotNetifyHubLocal = undefined;
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* 
-                                                                                                                                                                                                                                                                              import { dotnetify } from 'dotnetify/dist/dotnetify-ko';
                                                                                                                                                                                                                                                                               Copyright 2019 Dicky Suryadi
                                                                                                                                                                                                                                                                               
                                                                                                                                                                                                                                                                               Licensed under the Apache License, Version 2.0 (the "License");
@@ -980,7 +1125,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                                                                                                                                                                                                                                                                                */
 
 
-var _utils = __webpack_require__(3);
+var _utils = __webpack_require__(2);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1075,13 +1220,13 @@ exports.hasLocalVM = hasLocalVM;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__7__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__8__;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /**
@@ -1242,10 +1387,10 @@ function extend() {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var jQuery = module.exports = __webpack_require__(8),
+var jQuery = module.exports = __webpack_require__(9),
 	core_rspace = /\s+/;
 /**
 * jQuery Callbacks
@@ -1454,7 +1599,7 @@ jQuery.Callbacks = function( options ) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1468,7 +1613,7 @@ jQuery.Callbacks = function( options ) {
 * Library version.
 */
 
-var jQuery = module.exports = __webpack_require__(9),
+var jQuery = module.exports = __webpack_require__(10),
 	core_slice = Array.prototype.slice;
 
 /**
@@ -1623,14 +1768,14 @@ jQuery.extend({
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(10);
+module.exports = __webpack_require__(11);
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -1658,7 +1803,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1686,9 +1831,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _utils = __webpack_require__(3);
+var _utils = __webpack_require__(2);
 
-var _jqueryShim = __webpack_require__(2);
+var _jqueryShim = __webpack_require__(3);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
@@ -1696,7 +1841,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var signalRNetCore = __webpack_require__(7);
+var signalRNetCore = __webpack_require__(8);
 var $ = _jqueryShim2.default;
 
 var window = window || global || {};
@@ -2115,7 +2260,7 @@ exports.default = dotnetifyHubFactory.create();
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2143,13 +2288,17 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _dotnetifyHub = __webpack_require__(13);
+var _dotnetifyHub = __webpack_require__(14);
 
 var _dotnetifyHub2 = _interopRequireDefault(_dotnetifyHub);
 
-var _dotnetifyHubLocal = __webpack_require__(6);
+var _dotnetifyHubLocal = __webpack_require__(7);
 
 var _dotnetifyHubLocal2 = _interopRequireDefault(_dotnetifyHubLocal);
+
+var _dotnetifyHubWebapi = __webpack_require__(6);
+
+var _dotnetifyHubWebapi2 = _interopRequireDefault(_dotnetifyHubWebapi);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2206,13 +2355,19 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
 
         // Generic connect function for non-React app.
         connect: function connect(iVMId, iOptions) {
-          dotnetify.react.connect(iVMId, null, iOptions);
+          return dotnetify.react.connect(iVMId, {}, iOptions);
         },
 
 
         // Creates a SignalR hub client.
         createHub: function createHub(hubServerUrl, hubPath, hubLib) {
           return this.initHub(_dotnetifyHub.dotnetifyHubFactory.create(), hubPath, hubServerUrl, hubLib);
+        },
+
+
+        // Creates a Web API hub client.
+        createWebApiHub: function createWebApiHub(baseUrl, onRequestHandler) {
+          return (0, _dotnetifyHubWebapi.createWebApiHub)(baseUrl, onRequestHandler);
         },
 
 
@@ -2239,10 +2394,11 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
 
         // Used by a view to select a hub, and provides the opportunity to override any connect info.
         selectHub: function selectHub(vmConnectArgs) {
-          vmConnectArgs = vmConnectArgs || { options: {} };
+          vmConnectArgs = vmConnectArgs || {};
+          vmConnectArgs.options = vmConnectArgs.options || {};
           var override = typeof this.connectHandler == 'function' && this.connectHandler(vmConnectArgs) || {};
           if (!override.hub) {
-            override.hub = (0, _dotnetifyHubLocal.hasLocalVM)(vmConnectArgs.vmId) ? _dotnetifyHubLocal2.default : this.initHub();
+            override.hub = (0, _dotnetifyHubLocal.hasLocalVM)(vmConnectArgs.vmId) ? _dotnetifyHubLocal2.default : vmConnectArgs.options.webApi ? _dotnetifyHubWebapi2.default : this.initHub();
             override.hub.debug = this.debug;
           }
           return Object.assign(vmConnectArgs, override);
@@ -2306,7 +2462,79 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
 exports.default = dotnetifyFactory.create();
 
 /***/ }),
-/* 15 */
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         Copyright 2019 Dicky Suryadi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          */
+
+exports.default = useConnect;
+
+var _react = __webpack_require__(4);
+
+var _dotnetifyReact = __webpack_require__(1);
+
+var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function useConnect(vmId, component, options) {
+  var state = component.state,
+      props = component.props;
+
+  if (state == null) state = component || {};
+
+  if (_react.useState == null || _react.useEffect == null) throw 'Error: using React hooks requires at least v16.8.';
+
+  var _useState = (0, _react.useState)(state),
+      _useState2 = _slicedToArray(_useState, 2),
+      _state = _useState2[0],
+      _setState = _useState2[1];
+
+  var vm = (0, _react.useRef)();
+  var vmData = (0, _react.useRef)(_state);
+
+  (0, _react.useEffect)(function () {
+    vm.current = _dotnetifyReact2.default.react.connect(vmId, {
+      props: props,
+      get state() {
+        return vmData.current;
+      },
+      setState: function setState(newState) {
+        vmData.current = newState;
+        _setState(vmData.current);
+      }
+    }, options);
+    return function () {
+      return vm.current.$destroy();
+    };
+  }, []);
+
+  return { vm: vm.current, state: _state };
+}
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2404,7 +2632,7 @@ _dotnetifyReact2.default.react.router.RouteTarget = RouteTarget;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2491,7 +2719,7 @@ exports.default = RouteLink;
 _dotnetifyReact2.default.react.router.RouteLink = RouteLink;
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2510,7 +2738,7 @@ module.exports = ReactPropTypesSecret;
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2523,7 +2751,7 @@ module.exports = ReactPropTypesSecret;
 
 
 
-var ReactPropTypesSecret = __webpack_require__(17);
+var ReactPropTypesSecret = __webpack_require__(19);
 
 function emptyFunction() {}
 
@@ -2576,7 +2804,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -2589,12 +2817,12 @@ module.exports = function() {
 if (false) { var throwOnDirectAccess, isValidElement, REACT_ELEMENT_TYPE; } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(18)();
+  module.exports = __webpack_require__(20)();
 }
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2604,13 +2832,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(19);
+var _propTypes = __webpack_require__(21);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -2665,6 +2895,12 @@ var Scope = function (_React$Component) {
       return scope ? scope + '.' + vmId : vmId;
     }
   }, {
+    key: 'scopedOptions',
+    value: function scopedOptions(options) {
+      var scopedOptions = this.context.scoped ? this.context.scopedOptions(this.props.options) : this.props.options;
+      return scopedOptions ? _extends({}, scopedOptions, options) : options;
+    }
+  }, {
     key: 'getChildContext',
     value: function getChildContext() {
       var _this = this;
@@ -2673,9 +2909,13 @@ var Scope = function (_React$Component) {
         scoped: function scoped(vmId) {
           return _this.scoped(vmId);
         },
+        scopedOptions: function scopedOptions(options) {
+          return _this.scopedOptions(options);
+        },
         connect: function connect(vmId, component, options) {
           component.vmId = _this.scoped(vmId);
-          component.vm = _dotnetifyReact2.default.react.connect(component.vmId, component, options);
+          component.options = _this.scopedOptions(options);
+          component.vm = _dotnetifyReact2.default.react.connect(component.vmId, component, component.options);
           component.dispatch = function (state) {
             return component.vm.$dispatch(state);
           };
@@ -2699,11 +2939,18 @@ var Scope = function (_React$Component) {
 }(_react2.default.Component);
 
 Scope.displayName = 'Scope';
-Scope.version = '1.2.0';
-Scope.propTypes = { vm: _propTypes2.default.string };
-Scope.contextTypes = { scoped: _propTypes2.default.func };
+Scope.version = '1.3.0';
+Scope.propTypes = {
+  vm: _propTypes2.default.string,
+  options: _propTypes2.default.object
+};
+Scope.contextTypes = {
+  scoped: _propTypes2.default.func,
+  scopedOptions: _propTypes2.default.func
+};
 Scope.childContextTypes = {
   scoped: _propTypes2.default.func.isRequired,
+  scopedOptions: _propTypes2.default.func.isRequired,
   connect: _propTypes2.default.func.isRequired
 };
 exports.default = Scope;
@@ -2713,7 +2960,7 @@ _dotnetifyReact2.default.react.Scope = Scope;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2727,7 +2974,7 @@ var _dotnetifyVm = __webpack_require__(5);
 
 var _dotnetifyVm2 = _interopRequireDefault(_dotnetifyVm);
 
-var _jqueryShim = __webpack_require__(2);
+var _jqueryShim = __webpack_require__(3);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
@@ -2818,7 +3065,7 @@ _dotnetifyReact2.default.react.router.ssr = function (iPath, iInitialStates, iOv
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2847,7 +3094,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _utils = __webpack_require__(3);
+var _utils = __webpack_require__(2);
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -3330,13 +3577,13 @@ var dotnetifyVMRouter = function () {
 exports.default = dotnetifyVMRouter;
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__23__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__25__;
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3354,19 +3601,19 @@ var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(23);
+var _reactDom = __webpack_require__(25);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _dotnetifyVmRouter = __webpack_require__(22);
+var _dotnetifyVmRouter = __webpack_require__(24);
 
 var _dotnetifyVmRouter2 = _interopRequireDefault(_dotnetifyVmRouter);
 
-var _jqueryShim = __webpack_require__(2);
+var _jqueryShim = __webpack_require__(3);
 
 var _jqueryShim2 = _interopRequireDefault(_jqueryShim);
 
-var _utils = __webpack_require__(3);
+var _utils = __webpack_require__(2);
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -3527,7 +3774,7 @@ exports.default = dotnetifyReactVMRouter;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3758,7 +4005,7 @@ exports.default = Path;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3785,7 +4032,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _path = __webpack_require__(25);
+var _path = __webpack_require__(27);
 
 var _path2 = _interopRequireDefault(_path);
 
@@ -3907,7 +4154,7 @@ exports.default = dotnetifyRouter;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3917,11 +4164,11 @@ var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
-var _dotnetifyRouter = __webpack_require__(26);
+var _dotnetifyRouter = __webpack_require__(28);
 
 var _dotnetifyRouter2 = _interopRequireDefault(_dotnetifyRouter);
 
-var _dotnetifyReact3 = __webpack_require__(24);
+var _dotnetifyReact3 = __webpack_require__(26);
 
 var _dotnetifyReact4 = _interopRequireDefault(_dotnetifyReact3);
 
@@ -3977,7 +4224,7 @@ _dotnetifyReact2.default.react.router.$mount = function (iTargetSelector, iCompo
 _dotnetifyReact2.default.react.plugins['router'] = _dotnetifyReact2.default.react.router;
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3987,25 +4234,29 @@ var _dotnetifyReact = __webpack_require__(1);
 
 var _dotnetifyReact2 = _interopRequireDefault(_dotnetifyReact);
 
-__webpack_require__(27);
+__webpack_require__(29);
 
-__webpack_require__(21);
+__webpack_require__(23);
 
-var _Scope = __webpack_require__(20);
+var _Scope = __webpack_require__(22);
 
 var _Scope2 = _interopRequireDefault(_Scope);
 
-var _RouteLink = __webpack_require__(16);
+var _RouteLink = __webpack_require__(18);
 
 var _RouteLink2 = _interopRequireDefault(_RouteLink);
 
-var _RouteTarget = __webpack_require__(15);
+var _RouteTarget = __webpack_require__(17);
 
 var _RouteTarget2 = _interopRequireDefault(_RouteTarget);
 
+var _useConnect = __webpack_require__(16);
+
+var _useConnect2 = _interopRequireDefault(_useConnect);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = Object.assign(_dotnetifyReact2.default, { Scope: _Scope2.default, RouteLink: _RouteLink2.default, RouteTarget: _RouteTarget2.default });
+module.exports = Object.assign(_dotnetifyReact2.default, { Scope: _Scope2.default, RouteLink: _RouteLink2.default, RouteTarget: _RouteTarget2.default, useConnect: _useConnect2.default });
 
 /***/ })
 /******/ ]);

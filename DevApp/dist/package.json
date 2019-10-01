@@ -1,6 +1,6 @@
 {
    "name": "dotnetify",
-   "version": "3.4.0",
+   "version": "3.5.0",
    "description": "Simple, lightweight, yet powerful way to build realtime .NET web apps.",
    "main": "index.js",
    "types": "dist/typings/dotnetify.d.ts",
@@ -34,7 +34,8 @@
       "mvvm",
       "web",
       "mobile",
-      "realtime"
+      "realtime",
+      "microfrontend"
    ],
    "author": "Dicky Suryadi",
    "license": "Apache 2.0",
