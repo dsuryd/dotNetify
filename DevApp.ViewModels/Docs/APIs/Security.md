@@ -84,3 +84,28 @@ public AddContactViewModel : BaseVM { /*...*/ }
 ```
 
 If you need more than this basic authorization, you can always write your own custom authorization attribute and filter.
+
+#### IdentityServer4 Integration
+
+If you use IdentityServer4 to generate the web token, build the JWT issuer signing keys by calling its API to get the security keys, and then convert the keys to the RSA format:
+```csharp
+using IdentityModel.Client;
+...
+public static async Task<IEnumerable<SecurityKey>> GetIssuerSigningKeysAsync(HttpClient client, string id4ApiUri)
+{
+   var disco = await client.GetDiscoveryDocumentAsync(id4ApiUri);
+   var keys = new List<SecurityKey>();
+   foreach(var webKey in disco.KeySet.Keys)
+   {
+      var key = new RsaSecurityKey(new RSAParameters
+      {
+         Exponent = Base64Url.Decode(webKey.E),
+         Modulus = Base64Url.Decode(webKey.N)
+      });
+
+      key.KeyId = webKey.Kid;
+      keys.Add(key);
+   }
+   return keys;
+}
+```

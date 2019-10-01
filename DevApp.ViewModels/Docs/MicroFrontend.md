@@ -4,52 +4,97 @@ Micro-frontend is a technique that decomposes an otherwise monolithic web applic
 
 While this technique does increase development complexity and brings its own challenges, many large organizations find merits to this approach, as it allows them to better scale their development and deployment process across autonomous, geographically-dispersed teams.
 
-There are many different ways in implementing micro-frontend. What dotNetify proposes is closely aligned to the microservices approach, where aspects of functionality is encapsulated within independent web services (dotNetify on ASP.NET Core applications), each with its own build process and deployment pipeline.  The domain-driven design approach can be employed here on deciding how to slice the problem domain into these distinct services.
+There are many different ways in implementing micro-frontend. What dotNetify proposes is closely aligned to the microservices approach, where aspects of functionality is encapsulated within independent web services (dotNetify on ASP.NET Core applications), each with its own build process and deployment pipeline.  The domain-driven design approach can be employed here on deciding how to slice the problem domain into these distinct services.  
 
-The entry to the application is provided by a portal service that performs the front-end orchestration.  That process involves discovering the services, then dynamically loading the static UI script bundles from the running web services, instantiating and composing their root UI components into a single-page application with client-side routing (can be provided by dotNetify), and redirecting the network traffic to appropriate service ports.  
-
-The portal service also takes care of the authentication and authorization for the services, i.e. communicate with an identity server to generate security tokens, then inject the tokens through request interception.  In production environment, we want to put these services behind an API gateway to secure them and expose just a single entry point into the system.
-
-Below is the diagram depicting the architecture:
+The diagram below depicts the proposed architecture:
 [inset]
 
-A simple reference implementation covering the application layer of this architecture is provided in the nuget:
-```
+The entry to the application is provided by what is referred to as a portal service.  This service is responsible for performing front-end orchestration, which involves:
+- discovering the app services,
+- loading the static UI script bundles dynamically, 
+- instantiating and composing their root UI components into a single-page application with client-side routing (can be done with dotNetify routing system), 
+- and redirecting the network traffic to the appropriate service address.  
+
+The portal service is also responsible for authentication/authorization.  It communicates with an identity provider to generate security tokens, and intercept outgoing service requests to injects the tokens into the auth header. In production environment, these services should be put behind an API gateway to secure them, and only expose a single entry point into the system.
+
+#### Reference Implementation
+
+A simple reference implementation covering the application layer of the above architecture is provided in the `DotNetify.React.Template` nuget:
+
+```js
 dotnet new -i dotnetify.react.template
 
 dotnet new dotnetify-mfe -o MyApp
-
 // To run the app, follow the instructions in README.md
 ```
+<br/>
 
-### App Services
+##### App Services
 
-Each app service is built from ASP.NET Core application that's been configured to build the UI scripts with Webpack on compile time (dev build on `dotnet run`, prod build on `dotnet publish`).  The main script that serves as the Webpack's entry point is designed to expose the root UI component as a native Web Component, instead of the normal mounting to a DOM tag.   This will allow the portal service later on to create the application's root component at will as a framework-agnostic HTML element and mount it anywhere it likes.
+Each app service is an ASP.NET Core web application that's been configured to build the UI scripts using Webpack when the application is compiled (dev build on _dotnet run_, prod build on _dotnet publish_).  The main UI script that serves as the Webpack's entry point is made to provide a function that will return the root UI component as a native Web Component. This will allow the portal service that will load the app's UI script bundle to create and mount the app's root component in a framework-agnostic manner.
 
-Here is a sample implementation of the main script.  For React, you can use the function provided by dotNetify-Elements to wrap your React component in a HTML Web Component:
+The following is a sample implementation of the main script.  The _createWebComponent_ function is provided by `dotNetify-Elements` to wrap the React component inside a standard HTML custom element:
 
-```
+```jsx
 import { createWebComponent } from 'dotnetify-elements/web-components/core';
 import MyApp from './components/MyApp';
 
-const elementName = 'my-app';
+const elementName = 'app1-element';
 createWebComponent(TodoList, elementName);
 
-export default document.createElement(elementName);
+export default () => document.createElement(elementName);
+```
+<br/>
+
+##### Portal Service
+
+The portal service is also an ASP.NET Core web application combined with Webpack.  The UI script contains a function called `loader` that will be executed as soon as the portal starts.  This function is given a list containing information on all the app services, including their addresses.  For demo purpose, this list is hardcoded.   
+
+```jsx
+loader(
+  [
+    {
+      id: 'app1',
+      label: 'App 1',
+      routePath: 'app1',
+      baseUrl: '//localhost:8080/app1',
+      moduleUrl: '/dist/app.js'
+    },
+    ...
+  ],
+  // External dependencies required by the apps.
+  [ 'dotnetify', 'dotNetifyElements' ]
+);
 ```
 
-You can still run the app independently without the portal by having the custom element tag in the index.html.  
+The `loader` function will ping each app service addresses, and on getting a response, use `SystemJS` module loader to load the app, and pass the module function that creates the app's root component to an object that manages and displays these components.
 
-### Portal 
+```jsx
+function importApp(app) {
+  const appUrl = app.baseUrl + app.moduleUrl;
+  return SystemJS.import(appUrl)
+    .then(module => module.default && updatePortal({ ...app, rootComponent: module.default }));
+}
+```
 
-The portal service is similar to an app service, but has special logic to discover running app services, load the root UI components from them, and assemble them as an ordinary single-page application.  The demo simplifies the discovery process (for demonstration purpose) by having the service URLs hardcoded and periodically pinged.  When ther is a response, the portal uses SystemJS module loader to load the app's UI script bundle and execute the instantiation of its root UI component.
+When the app's root component is mounted, it will communicate to its own hub server.  Since the address is relative, the portal needs to intercept every connect request and redirect it to the correct address.  The portal can do this by implementing __dotnetify.connectHandler__ and use the special identifier that each app will need to provide when its component makes the _connect_ call to forward the request appropriately:
 
-As each app's UI will be communicating with their own backend service, the portal will be responsible for making sure that the dotNetify connection in every app will go to the correct hub server.  This is done by having the portal intercept every dotNetify connect call by implementing the connectHandler function, and override the app's default hub proxy with a new one initialized to the known service address.
+```jsx
+dotnetify.connectHandler = vmConnectArgs => {
+  const appId = vmConnectArgs.options && vmConnectArgs.options.appId;
+  const app = apps.find(x => x.id === appId);
+  if (app) {
+    app.hub = app.hub || dotnetify.createHub(app.baseUrl);
+    return {
+      ...vmConnectArgs,
+      hub: app.hub,
+      options: { ...vmConnectArgs.options, headers: { Authorization: 'Bearer ' + getAccessToken() } }
+    };
+  }
+};
+```
 
-#### Dynamic Routing
+Along with the hub change, it too injects the access token to the _connect_ request.  The service's back-end is set up to get the JWT signing keys from the identity provider (`IdentityServer4`) to authenticate the token. 
 
-The demo portal employs dotNetify-Elements Nav component and a local view model to dynamically build and apply the client-side routing.  Apps that use dotNetify routing system will be able to integrate and nest their routes within the portal's root path.
+Finally, the portal uses the Nav component from `dotNetify-Elements` to dynamically build and run the client-side routing.  Any app that use dotNetify routing system will be able to integrate and nest their routes within the portal's root path.
 
-### Authentication
-
-Authenticating users are the responsibility of the portal.  The demo portal provides a login page, and uses IdentityServer4 library to generate a security token on successful login.  Since the portal overrides the hub proxies of all apps, it can inject the token into every dotNetify connect call.  The app's back-end authenticates the token by calling the IdentityServer4 AP
