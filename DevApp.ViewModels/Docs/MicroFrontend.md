@@ -98,3 +98,8 @@ Along with the hub change, it too injects the access token to the _connect_ requ
 
 Finally, the portal uses the Nav component from `dotNetify-Elements` to dynamically build and run the client-side routing.  Any app that use dotNetify routing system will be able to integrate and nest their routes within the portal's root path.
 
+##### Shared UI Component Library
+
+With each micro-frontend app being developed and deployed independently, naturally there are concerns over visual inconsistencies, and ballooning size due to duplicated dependencies.  This can be mitigated by agreeing to use a shared set of core UI components as basic building blocks for the app's more domain-specific components.  This UI library will then be declared external when bundling the apps, and to load the module during the portal's initialization so it can be made available to all apps.
+
+The reference implementation uses `dotNetify-Elements` for this common library.  While it's built with React, it exposes the same components as HTML custom elements, making them reusable in other non-React frameworks.
