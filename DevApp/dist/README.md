@@ -5,40 +5,38 @@
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 [![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/) 
 
-DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org), or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket. 
+DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org) or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket (SignalR). 
 
 ## What's New
 
-* v3.4: [**release notes**](https://github.com/dsuryd/dotNetify/releases/tag/v3.4).
-* v3.3: .NET client.
-* v3.2: integrates with Vue.
-* v3.1: multicast - [**release notes**](https://github.com/dsuryd/dotNetify/releases/tag/nuget_v.3.1).
-<br/><br/>
+* v3.5: **Multi-hub support, web API + local modes - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.5).**
+* v3.4: [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.4).
+* v3.3: .NET client support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.3.1).
+
+<div/>
+
 * **DotNetify-Elements** is out! <a href="http://dotnetify.net/elements">See documentation and live demo.</a> 
-* React SPA template for ASP.NET Core 2.1 - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
+* React SPA template for ASP.NET Core 2.x - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
 
 ## Features
 
-* Simple and lightweight - no heavy JS client-side framework, and no REST APIs.
-* Reactive back-end MVVM architecture on both .NET Core and .NET Framework.
+* Simple and lightweight - no heavy client-side framework, no REST APIs.
+* Reactive back-end MVVM architecture on either .NET Core or .NET Framework.
 * Built-in real-time across WebSocket with SignalR.
+* Support local (client-side only) and Web API modes.
 * Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
-* Powerful back-end infrastructure, including dependency injection, WebSocket request/response pipelines, and modern tooling like VS2017 and Webpack.
+* Powerful back-end infrastructure, including dependency injection, WebSocket request/response pipelines, and modern tooling.
 
 ## Documentation
 
-Documentation and live demo can be found at [http://dotnetify.net](http://dotnetify.net).
+Documentation and live demo can be found at [https://dotnetify.net](http://dotnetify.net).
 
-## React/React Native Code Example   
+## Code Examples
 
-* Real-time "Hello World" with Visual Studio 2017 + WebPack: [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).   
-* Real-time "Hello World" with create-react-app + Node.js + .NET Core: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).  Includes example using ***Electron*** to build cross-platform desktop app.
+* React example: [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).   
 * React Native example: [dotnetify-react-native-demo](https://github.com/dsuryd/dotnetify-react-native-demo).
+* Other examples: [demo github repo]([https://github.com/dsuryd/dotNetify/tree/master/Demo]).
 
-## Knockout Code Example
-
-* Live chart: [Live Chart Example](https://github.com/dsuryd/dotnetify-knockout-demo/tree/master/LiveChart).    
-* Mobile app example: [Web/Mobile App Template](https://github.com/dsuryd/dotnetify-knockout-demo/tree/master/MobileApp).
 
 ## Installation
 
@@ -46,13 +44,15 @@ Documentation and live demo can be found at [http://dotnetify.net](http://dotnet
 
 ASP.NET Core:
 
-*dotnet add package DotNetify.SignalR*  
+*PM> Install-Package DotNetify.Core*  
+*PM> Install-Package DotNetify.SignalR*  
 
 ASP.NET Framework:
 
+*PM> Install-Package DotNetify.Core*  
 *PM> Install-Package DotNetify.SignalR.Owin*  
 
-Read the website on how to configure your project ([React](http://dotnetify.net/react/Installation) | [Knockout](http://dotnetify.net/index/Installing)).
+Read the website on how to configure your project.
 
 ## License
 Licensed under the Apache License, Version 2.0.
