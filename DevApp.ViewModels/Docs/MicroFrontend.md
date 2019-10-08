@@ -24,7 +24,7 @@ A simple reference implementation covering the application layer of the above ar
 ```js
 dotnet new -i dotnetify.react.template
 
-dotnet new dotnetify-mfe -o MyApp
+dotnet new mfe -o MyApp
 // To run the app, follow the instructions in README.md
 ```
 <br/>
