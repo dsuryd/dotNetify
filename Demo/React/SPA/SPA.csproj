@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetify.SignalR" Version="3.0.1" />
+    <PackageReference Include="DotNetify.SignalR" Version="3.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Bogus" Version="22.1.3" />
   </ItemGroup>
