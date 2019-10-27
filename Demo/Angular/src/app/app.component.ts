@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import dotnetify from 'dotnetify/dist/dotnetify';
 
-dotnetify.hubServerUrl = 'http://localhost:5000';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,14 +11,10 @@ export class AppComponent {
   vm: any;
 
   ngOnInit() {
-    this.vm = dotnetify.react.connect(
-      'HelloWorld',
-      {},
-      {
-        getState: () => this.state,
-        setState: (state: any) => Object.assign(this.state, state)
-      }
-    );
+    this.vm = dotnetify.connect('HelloWorld', {
+      getState: () => this.state,
+      setState: (state: any) => Object.assign(this.state, state)
+    });
   }
 
   ngOnDestroy() {

@@ -1,8 +1,8 @@
 ﻿using System.IO;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.DependencyInjection;
 using DotNetify;
 
@@ -13,22 +13,32 @@ namespace helloworld
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddCors();
-        services.AddMemoryCache();
         services.AddSignalR();
         services.AddDotNetify();          
+
+        services.AddSpaStaticFiles(c => c.RootPath = "./dist");
     }
 
-    public void Configure(IApplicationBuilder app)
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
       app.UseCors(builder => builder
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .WithOrigins("http://localhost:4200")
+        .AllowAnyOrigin()
         .AllowCredentials());
 
       app.UseWebSockets();
       app.UseSignalR(routes => routes.MapDotNetifyHub());
       app.UseDotNetify();  
+
+      app.UseStaticFiles();
+      app.UseSpaStaticFiles();
+      app.UseSpa(spa =>
+      {
+        spa.Options.SourcePath = ".";
+        if (env.IsDevelopment())
+          spa.UseAngularCliServer(npmScript: "start");
+      });
 
       app.Run(async (context) =>
       {
