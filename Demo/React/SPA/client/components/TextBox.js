@@ -1,51 +1,41 @@
-import React, { createRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-class TextBox extends React.Component {
-  constructor(props) {
-    super(props);
-    this.textInput = createRef();
-    this.state = { changed: false };
-  }
+export default ({ label, type, errorText, placeholder, value, onBlur, onChange, onUpdate }) => {
+  const textInput = useRef();
+  const [ changed, setChanged ] = useState(false);
 
-  focus() {
-    this.textInput.current.focus();
-  }
+  useEffect(() => {
+    textInput.current.focus();
+  }, []);
 
-  handleChange = event => {
-    this.setState({ changed: true });
-    this.props.onChange(event.target.value);
+  const handleChange = event => {
+    setChanged(true);
+    onChange(event.target.value);
   };
 
-  handleBlur = event => {
-    if (this.state.changed && this.props.onUpdate) {
-      this.props.onUpdate(this.props.value);
-    }
-    this.setState({ changed: false });
-    this.props.onBlur && this.props.onBlur(event);
+  const handleBlur = event => {
+    if (changed && onUpdate) onUpdate(value);
+
+    setChanged(false);
+    onBlur && onBlur(event);
   };
 
-  handleKeydown = event => {
-    if (event.keyCode == 13) this.handleBlur(event);
-  };
+  const handleKeydown = event => event.keyCode == 13 && handleBlur(event);
 
-  render() {
-    return (
-      <div>
-        <label>{this.props.label}</label>
-        <input
-          type={this.props.type || 'text'}
-          className="form-control"
-          value={this.props.value}
-          placeholder={this.props.placeholder}
-          onChange={this.handleChange}
-          onBlur={this.handleBlur}
-          onKeyDown={this.handleKeydown}
-          ref={this.textInput}
-        />
-        {this.props.errorText && <b>{this.props.errorText}</b>}
-      </div>
-    );
-  }
-}
-
-export default TextBox;
+  return (
+    <div>
+      {label && <label>{label}</label>}
+      <input
+        type={type || 'text'}
+        className="form-control"
+        value={value}
+        placeholder={placeholder}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        onKeyDown={handleKeydown}
+        ref={textInput}
+      />
+      {errorText && <b>{errorText}</b>}
+    </div>
+  );
+};
