@@ -7,7 +7,7 @@
     "chart.js": "^2.7.2",
     "dotnetify": "file:dotnetify-3.0.3.tgz",
     "jquery": "~3.3.1",
-    "knockout": "~3.4.2"
+    "knockout": "~3.5.0"
   },
   "devDependencies": {
     "@types/knockout": "~3.4.59",
