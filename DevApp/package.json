@@ -23,7 +23,7 @@
     "chartjs-plugin-streaming": "~1.7.1",
     "dotnetify-elements": "^1.1.0",
     "jquery": "~3.4.0",
-    "knockout": "~3.4.2",
+    "knockout": "~3.5.0",
     "react": "^16.9.0",
     "react-chartjs-2": "~2.7.4",
     "react-dom": "^16.9.0",
