@@ -87,7 +87,7 @@ namespace DotNetify
          foreach (Type vmType in vmAssembly.GetExportedTypes().Where(i => typeof(T).GetTypeInfo().IsAssignableFrom(i)))
          {
             hasVMTypes = true;
-            if (!_vmTypes.Any(i => i == vmType))
+            if (!_vmTypes.Any(i => (Type) i == vmType))
                _vmTypes.Add(vmType);
             else
                exceptions.Add(new Exception($"ERROR: View model '{vmType.Name}' was already registered by another assembly!"));
@@ -106,7 +106,7 @@ namespace DotNetify
       public static void Register<T>() where T : INotifyPropertyChanged
       {
          Type vmType = typeof(T);
-         if (!_vmTypes.Any(i => i == vmType))
+         if (!_vmTypes.Any(i => (Type) i == vmType))
             _vmTypes.Add(vmType);
       }
 
