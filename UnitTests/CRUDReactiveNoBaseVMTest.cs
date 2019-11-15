@@ -2,16 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using DotNetify;
+using System.ComponentModel;
 
 namespace UnitTests
 {
    [TestClass]
-   public class SimpleListVMTest
+   public class CrudReactiveNoBaseVMTest
    {
       private Response _response = new Response();
       private EmployeeService _employeeService = new EmployeeService();
-      private SimpleListVM _simpleListVM;
+      private CrudVMNoBaseVM _CrudVMVM;
 
       private class EmployeeRecord
       {
@@ -47,12 +49,11 @@ namespace UnitTests
          }
 
          public void Update(EmployeeRecord record) => _employeeRecords[record.Id] = record;
+
          public void Delete(int id) => _employeeRecords.Remove(id);
+      }
 
-         public void DeleteMany(List<int> ids) => ids.ForEach(id => _employeeRecords.Remove(id));
-        }
-
-      private class SimpleListVM : BaseVM
+      private class CrudVMNoBaseVM : INotifyPropertyChanged, IReactiveProperties, IBaseVMAccessor
       {
          private readonly EmployeeService _employeeService;
 
@@ -63,93 +64,88 @@ namespace UnitTests
             public string LastName { get; set; }
          }
 
-         public IEnumerable<EmployeeInfo> Employees => _employeeService.GetAll().Select(i => new EmployeeInfo
-         {
-            Id = i.Id,
-            FirstName = i.FirstName,
-            LastName = i.LastName
-         });
+         public Action<BaseVM> OnInitialized { get; }
+         public IList<IReactiveProperty> RuntimeProperties { get; } = new List<IReactiveProperty>();
 
-         public string Employees_itemKey => nameof(EmployeeInfo.Id);
+         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-         public Action<string> Add => fullName =>
-         {
-            var names = fullName.Split(new char[] { ' ' }, 2);
-            var newRecord = new EmployeeRecord
-            {
-               FirstName = names.First(),
-               LastName = names.Length > 1 ? names.Last() : ""
-            };
+         private Action<string, object> AddList { get; set; }
+         private Action<string, object> UpdateList { get; set; }
+         private Action<string, object> RemoveList { get; set; }
 
-            this.AddList(nameof(Employees), new EmployeeInfo
-            {
-               Id = _employeeService.Add(newRecord),
-               FirstName = newRecord.FirstName,
-               LastName = newRecord.LastName
-            });
-         };
-
-         public Action<EmployeeInfo> Update => changes =>
-         {
-            var record = _employeeService.GetById(changes.Id);
-            if (record != null)
-            {
-               record.FirstName = changes.FirstName ?? record.FirstName;
-               record.LastName = changes.LastName ?? record.LastName;
-               _employeeService.Update(record);
-}
-         };
-
-         public Action<int> Remove => id =>
-         {
-            _employeeService.Delete(id);
-            this.RemoveList(nameof(Employees), id);
-            ShowNotification = true;
-         };
-
-
-         public Action<int[]> RemoveMany => ids =>
-          {
-            _employeeService.DeleteMany(ids.ToList());
-            foreach(var id in ids)
-            {
-                this.RemoveList(nameof(Employees), id);
-            }
-              ShowNotification = true;
-          };
-
-            private bool _showNotification;
-         public bool ShowNotification
-         {
-            get
-            {
-               var value = _showNotification;
-               _showNotification = false;
-               return value;
-            }
-            set
-            {
-               _showNotification = value;
-               Changed(nameof(ShowNotification));
-            }
-         }
-
-         public SimpleListVM(EmployeeService employeeService)
+         public CrudVMNoBaseVM(EmployeeService employeeService)
          {
             _employeeService = employeeService;
+
+            OnInitialized = baseVM =>
+            {
+               AddList = (propName, value) => baseVM.AddList(propName, value);
+               UpdateList = (propName, value) => baseVM.UpdateList(propName, value);
+               RemoveList = (propName, value) => baseVM.RemoveList(propName, value);
+            };
+
+            this.AddProperty<IEnumerable<EmployeeInfo>>("Employees").SubscribeTo(
+               Observable.Return(_employeeService
+                  .GetAll()
+                  .Select(i => new EmployeeInfo
+                  {
+                     Id = i.Id,
+                     FirstName = i.FirstName,
+                     LastName = i.LastName
+                  }))
+            );
+
+            this.AddProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
+
+            this.AddProperty<string>("Add").Subscribe(fullName =>
+            {
+               var names = fullName.Split(new char[] { ' ' }, 2);
+               var newRecord = new EmployeeRecord
+               {
+                  FirstName = names.First(),
+                  LastName = names.Length > 1 ? names.Last() : ""
+               };
+
+               AddList("Employees", new EmployeeInfo
+               {
+                  Id = _employeeService.Add(newRecord),
+                  FirstName = newRecord.FirstName,
+                  LastName = newRecord.LastName
+               });
+            });
+
+            this.AddProperty<EmployeeInfo>("Update").Subscribe(changes =>
+            {
+               var record = _employeeService.GetById(changes.Id);
+               if (record != null)
+               {
+                  record.FirstName = changes.FirstName ?? record.FirstName;
+                  record.LastName = changes.LastName ?? record.LastName;
+                  _employeeService.Update(record);
+               }
+            });
+
+            var removeCommand = this.AddProperty<int>("Remove");
+            removeCommand.Subscribe(id =>
+            {
+               _employeeService.Delete(id);
+               RemoveList("Employees", id);
+            });
+
+            this.AddProperty<bool>("ShowNotification").SubscribeTo(removeCommand.Select(_ => true));
          }
       }
 
       [TestInitialize]
       public void Initialize()
       {
-         _simpleListVM = new SimpleListVM(_employeeService);
+         _CrudVMVM = new CrudVMNoBaseVM(_employeeService);
       }
 
       [TestMethod]
-      public void SimpleListVM_Create()
+      public void CrudVMNoBaseVM_Create()
       {
-         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
          vmController.RequestVM();
 
          vmController.UpdateVM(new Dictionary<string, object>() { { "Add", "Peter Chen" } });
@@ -160,9 +156,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void SimpleListVM_Read()
+      public void CrudVMNoBaseVM_Read()
       {
-         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
          var vmEmployees = vmController
             .RequestVM()
             .GetVMProperty<List<EmployeeRecord>>("Employees");
@@ -178,9 +174,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void SimpleListVM_Update()
+      public void CrudVMNoBaseVM_Update()
       {
-         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
          var vmEmployees = vmController.RequestVM();
 
          vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, FirstName: 'Teddy' }" } });
@@ -199,44 +195,26 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void SimpleListVM_Delete()
+      public void CrudVMNoBaseVM_Delete()
       {
-         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
          var vmEmployees = vmController.RequestVM();
 
          var employees = _employeeService.GetAll();
          Assert.AreEqual(3, employees.Count);
          Assert.IsTrue(employees.Exists(i => i.Id == 2));
 
-         vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
+         var response = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
 
          employees = _employeeService.GetAll();
          Assert.AreEqual(2, employees.Count);
          Assert.IsFalse(employees.Exists(i => i.Id == 2));
       }
 
-        [TestMethod]
-        public void SimpleListVM_DeleteMany()
-        {
-            var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
-            var vmEmployees = vmController.RequestVM();
-
-            var employees = _employeeService.GetAll();
-            Assert.AreEqual(3, employees.Count);
-            Assert.IsTrue(employees.Exists(i => i.Id == 2));
-
-            vmController.UpdateVM(new Dictionary<string, object>() { { "RemoveMany", "[1,2]" } });
-
-            employees = _employeeService.GetAll();
-            Assert.AreEqual(1, employees.Count);
-            Assert.IsFalse(employees.Exists(i => i.Id == 2));
-            Assert.IsFalse(employees.Exists(i => i.Id == 1));
-        }
-
-        [TestMethod]
-      public void SimpleListVM_ShowNotification()
+      [TestMethod]
+      public void CrudVMNoBaseVM_ShowNotification()
       {
-         var vmController = new MockVMController<SimpleListVM>(_simpleListVM);
+         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
          var vmEmployees = vmController.RequestVM();
 
          var employees = _employeeService.GetAll();

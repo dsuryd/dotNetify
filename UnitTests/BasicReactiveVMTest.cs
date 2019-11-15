@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 namespace UnitTests
 {
    [TestClass]
-   public class HelloWorldReactiveVMTest
+   public class BasicReactiveVMTest
    {
       private static DateTime now = DateTime.Now;
 
-      private class HelloWorldReactiveVM : BaseVM
+      private class BasicReactiveVM : BaseVM
       {
          public ReactiveProperty<string> FirstName { get; set; } = "Hello";
          public ReactiveProperty<string> LastName { get; set; } = "World";
 
-         public HelloWorldReactiveVM()
+         public BasicReactiveVM()
          {
             AddProperty<string>("FullName")
                .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
@@ -31,7 +31,7 @@ namespace UnitTests
             AddInternalProperty("Internal2", 0);
          }
 
-         public HelloWorldReactiveVM(bool live) : this()
+         public BasicReactiveVM(bool live) : this()
          {
             AddProperty("ServerTime", DateTime.MinValue)
                .SubscribeTo(Observable.Interval(TimeSpan.FromMilliseconds(200)).Select(_ => DateTime.Now).StartWith(now))
@@ -41,12 +41,12 @@ namespace UnitTests
          private string FullNameDelegate(string firstName, string lastName) => $"{firstName} {lastName}";
       }
 
-      private class HelloWorldReactiveVMAsync : BaseVM
+      private class BasicReactiveVMAsync : BaseVM
       {
          public ReactiveProperty<string> FirstName { get; set; } = "Hello";
          public ReactiveProperty<string> LastName { get; set; } = "World";
 
-         public HelloWorldReactiveVMAsync()
+         public BasicReactiveVMAsync()
          {
             AddProperty<string>("FullName")
                .SubscribeTo(Observable.CombineLatest(FirstName, LastName, FullNameDelegate))
@@ -65,9 +65,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveVM_Request()
+      public void BasicReactiveVM_Request()
       {
-         var vmController = new MockVMController<HelloWorldReactiveVM>();
+         var vmController = new MockVMController<BasicReactiveVM>();
          var response = vmController.RequestVM();
 
          Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
@@ -76,9 +76,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveVM_Update()
+      public void BasicReactiveVM_Update()
       {
-         var vmController = new MockVMController<HelloWorldReactiveVM>();
+         var vmController = new MockVMController<BasicReactiveVM>();
          vmController.RequestVM();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
@@ -95,9 +95,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public async Task HelloWorldReactiveVM_UpdateAsync()
+      public async Task BasicReactiveVM_UpdateAsync()
       {
-         var vmController = new MockVMController<HelloWorldReactiveVMAsync>();
+         var vmController = new MockVMController<BasicReactiveVMAsync>();
          vmController.RequestVM();
 
          dynamic data1 = null;
@@ -123,13 +123,13 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveVM_Dispose()
+      public void BasicReactiveVM_Dispose()
       {
          bool dispose = false;
-         var vm = new HelloWorldReactiveVM();
+         var vm = new BasicReactiveVM();
          vm.Disposed += (sender, e) => dispose = true;
 
-         var vmController = new MockVMController<HelloWorldReactiveVM>(vm);
+         var vmController = new MockVMController<BasicReactiveVM>(vm);
          vmController.RequestVM();
 
          vmController.DisposeVM();
@@ -141,7 +141,7 @@ namespace UnitTests
       {
          int updateCounter = 0;
 
-         var vmController = new MockVMController<HelloWorldReactiveVM>(new HelloWorldReactiveVM(true));
+         var vmController = new MockVMController<BasicReactiveVM>(new BasicReactiveVM(true));
          vmController.OnResponse += (sender, e) => updateCounter++;
          vmController.RequestVM();
 
@@ -150,9 +150,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveVM_Internal()
+      public void BasicReactiveVM_Internal()
       {
-         var vmController = new MockVMController<HelloWorldReactiveVM>();
+         var vmController = new MockVMController<BasicReactiveVM>();
          var response = vmController.RequestVM();
 
          // Internal properties should not be sent to the client.

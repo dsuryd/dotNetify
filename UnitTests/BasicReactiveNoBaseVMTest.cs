@@ -8,18 +8,19 @@ using System.Reactive.Linq;
 namespace UnitTests
 {
    [TestClass]
-   public class HelloWorldReactiveNoBaseVMTest
+   public class BasicReactiveNoBaseVMTest
    {
       private static DateTime now = DateTime.Now;
 
-      private class HelloWorldReactiveNoBaseVM : INotifyPropertyChanged, IPushUpdates, IReactiveProperties
+      private class BasicReactiveNoBaseVM : INotifyPropertyChanged, IPushUpdates, IReactiveProperties
       {
          public event EventHandler RequestPushUpdates = delegate { };
+
          public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
          public IList<IReactiveProperty> RuntimeProperties { get; } = new List<IReactiveProperty>();
 
-         public HelloWorldReactiveNoBaseVM()
+         public BasicReactiveNoBaseVM()
          {
             var firstName = this.AddProperty("FirstName", "Hello");
             var lastName = this.AddProperty("LastName", "World");
@@ -28,7 +29,7 @@ namespace UnitTests
                .SubscribeTo(Observable.CombineLatest(firstName, lastName, FullNameDelegate));
          }
 
-         public HelloWorldReactiveNoBaseVM(bool live) : this()
+         public BasicReactiveNoBaseVM(bool live) : this()
          {
             this.AddProperty("ServerTime", DateTime.MinValue)
                .SubscribeTo(Observable.Interval(TimeSpan.FromMilliseconds(200)).Select(_ => DateTime.Now).StartWith(now))
@@ -39,9 +40,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveNoBaseVM_Request()
+      public void BasicReactiveNoBaseVM_Request()
       {
-         var vmController = new MockVMController<HelloWorldReactiveNoBaseVM>();
+         var vmController = new MockVMController<BasicReactiveNoBaseVM>();
          var response = vmController.RequestVM();
 
          Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
@@ -50,9 +51,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveNoBaseVM_Update()
+      public void BasicReactiveNoBaseVM_Update()
       {
-         var vmController = new MockVMController<HelloWorldReactiveNoBaseVM>();
+         var vmController = new MockVMController<BasicReactiveNoBaseVM>();
          vmController.RequestVM();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
@@ -66,11 +67,11 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldReactiveNoBaseVM_PushUpdates()
+      public void BasicReactiveNoBaseVM_PushUpdates()
       {
          int updateCounter = 0;
 
-         var vmController = new MockVMController<HelloWorldReactiveNoBaseVM>(new HelloWorldReactiveNoBaseVM(true));
+         var vmController = new MockVMController<BasicReactiveNoBaseVM>(new BasicReactiveNoBaseVM(true));
          vmController.OnResponse += (sender, e) => updateCounter++;
          vmController.RequestVM();
 

@@ -9,9 +9,9 @@ using Rx = System.Reactive.Linq;
 namespace UnitTests
 {
    [TestClass]
-   public class HelloWorldVMTest
+   public class BasicVMTest
    {
-      private class HelloWorldVM : BaseVM
+      private class BasicVM : BaseVM
       {
          public string FirstName
          {
@@ -41,10 +41,10 @@ namespace UnitTests
 
          public string FullName => $"{FirstName} {LastName}";
 
-         public HelloWorldVM()
+         public BasicVM()
          { }
 
-         public HelloWorldVM(bool live) : this()
+         public BasicVM(bool live) : this()
          {
             Rx.Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(value =>
             {
@@ -55,9 +55,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldVM_Request()
+      public void BasicVM_Request()
       {
-         var vmController = new MockVMController<HelloWorldVM>();
+         var vmController = new MockVMController<BasicVM>();
          var response = vmController.RequestVM();
 
          Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
@@ -66,9 +66,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldVM_Update()
+      public void BasicVM_Update()
       {
-         var vmController = new MockVMController<HelloWorldVM>();
+         var vmController = new MockVMController<BasicVM>();
          vmController.RequestVM();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
@@ -85,13 +85,13 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldVM_Dispose()
+      public void BasicVM_Dispose()
       {
          bool dispose = false;
-         var vm = new HelloWorldVM();
+         var vm = new BasicVM();
          vm.Disposed += (sender, e) => dispose = true;
 
-         var vmController = new MockVMController<HelloWorldVM>(vm);
+         var vmController = new MockVMController<BasicVM>(vm);
          vmController.RequestVM();
 
          vmController.DisposeVM();
@@ -99,11 +99,11 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldVM_PushUpdates()
+      public void BasicVM_PushUpdates()
       {
          int updateCounter = 0;
 
-         var vmController = new MockVMController<HelloWorldVM>(new HelloWorldVM(true));
+         var vmController = new MockVMController<BasicVM>(new BasicVM(true));
          vmController.OnResponse += (sender, e) => updateCounter++;
          vmController.RequestVM();
 

@@ -4,20 +4,23 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Linq;
+
 using Rx = System.Reactive.Linq;
 
 namespace UnitTests
 {
    [TestClass]
-   public class HelloWorldNoBaseVMTest
+   public class BasicNoBaseVMTest
    {
-      private class HelloWorldNoBaseVM : INotifyPropertyChanged, IPushUpdates, IDisposable
+      private class BasicNoBaseVM : INotifyPropertyChanged, IPushUpdates, IDisposable
       {
          private string _firstName;
          private string _lastName;
 
          public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
          public event EventHandler RequestPushUpdates = delegate { };
+
          public event EventHandler Disposed;
 
          public string FirstName
@@ -44,10 +47,10 @@ namespace UnitTests
 
          public string FullName => $"{FirstName} {LastName}";
 
-         public HelloWorldNoBaseVM()
+         public BasicNoBaseVM()
          { }
 
-         public HelloWorldNoBaseVM(bool live) : this()
+         public BasicNoBaseVM(bool live) : this()
          {
             Rx.Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(value =>
             {
@@ -61,9 +64,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldNoBaseVM_Request()
+      public void BasicNoBaseVM_Request()
       {
-         var vmController = new MockVMController<HelloWorldNoBaseVM>();
+         var vmController = new MockVMController<BasicNoBaseVM>();
          var response = vmController.RequestVM();
 
          Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
@@ -72,9 +75,9 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldNoBaseVM_Update()
+      public void BasicNoBaseVM_Update()
       {
-         var vmController = new MockVMController<HelloWorldNoBaseVM>();
+         var vmController = new MockVMController<BasicNoBaseVM>();
          vmController.RequestVM();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
@@ -88,13 +91,13 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldNoBaseVM_Dispose()
+      public void BasicNoBaseVM_Dispose()
       {
          bool dispose = false;
-         var vm = new HelloWorldNoBaseVM();
+         var vm = new BasicNoBaseVM();
          vm.Disposed += (sender, e) => dispose = true;
 
-         var vmController = new MockVMController<HelloWorldNoBaseVM>(vm);
+         var vmController = new MockVMController<BasicNoBaseVM>(vm);
          vmController.RequestVM();
 
          vmController.DisposeVM();
@@ -102,11 +105,11 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void HelloWorldNoBaseVM_PushUpdates()
+      public void BasicNoBaseVM_PushUpdates()
       {
          int updateCounter = 0;
 
-         var vmController = new MockVMController<HelloWorldNoBaseVM>(new HelloWorldNoBaseVM(true));
+         var vmController = new MockVMController<BasicNoBaseVM>(new BasicNoBaseVM(true));
          vmController.OnResponse += (sender, e) => updateCounter++;
          vmController.RequestVM();
 
