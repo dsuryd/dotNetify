@@ -115,4 +115,6 @@ declare module "dotnetify" {
    }
 
    export class RouteTarget extends React.PureComponent<IRouteTargetProps, any>{ }
+    
+   export function useConnect<T>(iVMId: String, initialState: T, iOptions?: IConnectOptions): { vm: dotnetifyVM, state: T };
  }
