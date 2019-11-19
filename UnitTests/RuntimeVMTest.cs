@@ -1,4 +1,5 @@
 using DotNetify;
+using DotNetify.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -9,6 +10,8 @@ namespace UnitTests
    [TestClass]
    public class RuntimeVMTest
    {
+      private HubEmulator _hubEmulator;
+
       [TestInitialize]
       public void Initialize()
       {
@@ -29,44 +32,54 @@ namespace UnitTests
             vm.AddProperty<string>("FullName").SubscribeTo(Observable.CombineLatest(firstName, lastName, (fn, ln) => $"{fn} {ln}"));
             return vm;
          });
+
+         var hubEmulatorBuilder = new HubEmulatorBuilder();
+
+         foreach (var typeHelper in VMController.VMTypes)
+            hubEmulatorBuilder.Register(typeHelper.FullName, typeHelper.CreateInstance());
+
+         _hubEmulator = hubEmulatorBuilder.Build();
       }
 
       [TestMethod]
       public void RuntimeVM_Request()
       {
-         var vmController = new MockVMController<BaseVM>();
-         var response = vmController.RequestVM("HelloWorldRuntimeVM");
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect("HelloWorldRuntimeVM").As<dynamic>();
 
-         Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
-         Assert.AreEqual("World", response.GetVMProperty<string>("LastName"));
-         Assert.AreEqual("Hello World", response.GetVMProperty<string>("FullName"));
+         Assert.AreEqual("Hello", (string) response.FirstName);
+         Assert.AreEqual("World", (string) response.LastName);
+         Assert.AreEqual("Hello World", (string) response.FullName);
       }
 
       [TestMethod]
       public void RuntimeVM_Update()
       {
-         var vmController = new MockVMController<BaseVM>();
-         vmController.RequestVM("HelloWorldRuntimeVM");
+         var client = _hubEmulator.CreateClient();
+         client.Connect("HelloWorldRuntimeVM");
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var response1 = vmController.UpdateVM(update, "HelloWorldRuntimeVM");
+         var response1 = client.Dispatch(update).As<dynamic>();
 
          update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         var response2 = vmController.UpdateVM(update, "HelloWorldRuntimeVM");
+         var response2 = client.Dispatch(update).As<dynamic>();
 
-         Assert.AreEqual("John World", response1["FullName"]);
-         Assert.AreEqual("John Doe", response2["FullName"]);
+         Assert.AreEqual("John World", (string) response1.FullName);
+         Assert.AreEqual("John Doe", (string) response2.FullName);
       }
 
       [TestMethod]
       public void RuntimeVM_RequestWithNamespace()
       {
-         var vmController = new MockVMController<BaseVM>();
-         var response = vmController.RequestVM("HelloWorldRuntimeVM", JObject.Parse("{ namespace: 'MyNamespace' }"));
+         var options = new VMConnectOptions();
+         options.VMArg.Set("namespace", "MyNamespace");
 
-         Assert.AreEqual("John", response.GetVMProperty<string>("FirstName"));
-         Assert.AreEqual("Hancock", response.GetVMProperty<string>("LastName"));
-         Assert.AreEqual("John Hancock", response.GetVMProperty<string>("FullName"));
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect("HelloWorldRuntimeVM", options).As<dynamic>();
+
+         Assert.AreEqual("John", (string) response.FirstName);
+         Assert.AreEqual("Hancock", (string) response.LastName);
+         Assert.AreEqual("John Hancock", (string) response.FullName);
       }
    }
 }

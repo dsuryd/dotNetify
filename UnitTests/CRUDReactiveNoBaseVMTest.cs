@@ -1,25 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using DotNetify;
-using System.ComponentModel;
+using DotNetify.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
 {
    [TestClass]
    public class CrudReactiveNoBaseVMTest
    {
-      private Response _response = new Response();
       private EmployeeService _employeeService = new EmployeeService();
-      private CrudVMNoBaseVM _CrudVMVM;
 
       private class EmployeeRecord
       {
          public int Id { get; set; }
          public string FirstName { get; set; }
          public string LastName { get; set; }
+      }
+
+      private class ClientState
+      {
+         public List<CrudVMNoBaseVM.EmployeeInfo> Employees { get; set; }
       }
 
       private class EmployeeService
@@ -136,19 +141,24 @@ namespace UnitTests
          }
       }
 
+      private HubEmulator _hubEmulator;
+
       [TestInitialize]
       public void Initialize()
       {
-         _CrudVMVM = new CrudVMNoBaseVM(_employeeService);
+         _hubEmulator = new HubEmulatorBuilder()
+            .AddServices(services => services.AddTransient(_ => _employeeService))
+            .Register<CrudVMNoBaseVM>()
+            .Build();
       }
 
       [TestMethod]
       public void CrudVMNoBaseVM_Create()
       {
-         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
-         vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(CrudVMNoBaseVM));
 
-         vmController.UpdateVM(new Dictionary<string, object>() { { "Add", "Peter Chen" } });
+         client.Dispatch(new Dictionary<string, object>() { { "Add", "Peter Chen" } });
 
          var employee = _employeeService.GetAll().Last();
          Assert.AreEqual("Peter", employee.FirstName);
@@ -158,10 +168,9 @@ namespace UnitTests
       [TestMethod]
       public void CrudVMNoBaseVM_Read()
       {
-         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
-         var vmEmployees = vmController
-            .RequestVM()
-            .GetVMProperty<List<EmployeeRecord>>("Employees");
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(CrudVMNoBaseVM)).As<ClientState>();
+         var vmEmployees = response.Employees;
 
          Assert.IsNotNull(vmEmployees);
          Assert.AreEqual(3, vmEmployees.Count);
@@ -176,14 +185,14 @@ namespace UnitTests
       [TestMethod]
       public void CrudVMNoBaseVM_Update()
       {
-         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
-         var vmEmployees = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(CrudVMNoBaseVM));
 
-         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, FirstName: 'Teddy' }" } });
-         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
+         client.Dispatch(new Dictionary<string, object>() { { "Update", "{ Id: 1, FirstName: 'Teddy' }" } });
+         client.Dispatch(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
 
-         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 3, FirstName: 'Beth' }" } });
-         vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 3, LastName: 'Larson' }" } });
+         client.Dispatch(new Dictionary<string, object>() { { "Update", "{ Id: 3, FirstName: 'Beth' }" } });
+         client.Dispatch(new Dictionary<string, object>() { { "Update", "{ Id: 3, LastName: 'Larson' }" } });
 
          var employee = _employeeService.GetById(1);
          Assert.AreEqual("Teddy", employee.FirstName);
@@ -197,14 +206,14 @@ namespace UnitTests
       [TestMethod]
       public void CrudVMNoBaseVM_Delete()
       {
-         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
-         var vmEmployees = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(CrudVMNoBaseVM));
 
          var employees = _employeeService.GetAll();
          Assert.AreEqual(3, employees.Count);
          Assert.IsTrue(employees.Exists(i => i.Id == 2));
 
-         var response = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
+         var response = client.Dispatch(new Dictionary<string, object>() { { "Remove", "2" } });
 
          employees = _employeeService.GetAll();
          Assert.AreEqual(2, employees.Count);
@@ -214,20 +223,20 @@ namespace UnitTests
       [TestMethod]
       public void CrudVMNoBaseVM_ShowNotification()
       {
-         var vmController = new MockVMController<CrudVMNoBaseVM>(_CrudVMVM);
-         var vmEmployees = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(CrudVMNoBaseVM));
 
          var employees = _employeeService.GetAll();
          Assert.AreEqual(3, employees.Count);
 
-         var response = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "2" } });
-         Assert.AreEqual(true, response["ShowNotification"]);
+         var response = client.Dispatch(new Dictionary<string, object>() { { "Remove", "2" } }).As<dynamic>();
+         Assert.AreEqual(true, (bool) response.ShowNotification);
 
-         var response2 = vmController.UpdateVM(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
-         Assert.AreEqual(null, response2);
+         var response2 = client.Dispatch(new Dictionary<string, object>() { { "Update", "{ Id: 1, LastName: 'Lee' }" } });
+         Assert.AreEqual(0, response2.Count);
 
-         var response3 = vmController.UpdateVM(new Dictionary<string, object>() { { "Remove", "1" } });
-         Assert.AreEqual(true, response3["ShowNotification"]);
+         var response3 = client.Dispatch(new Dictionary<string, object>() { { "Remove", "1" } }).As<dynamic>();
+         Assert.AreEqual(true, (bool) response3.ShowNotification);
       }
    }
 }

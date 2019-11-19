@@ -11,7 +11,7 @@ namespace UnitTests
       public ExampleControlTypesTest()
       {
          _hubEmulator = new HubEmulatorBuilder()
-            .Register<ControlTypesVM>(nameof(ControlTypesVM))
+            .Register<ControlTypesVM>()
             .Build();
       }
 

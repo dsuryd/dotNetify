@@ -47,7 +47,7 @@ namespace UnitTests
 
          _hubEmulator = new HubEmulatorBuilder()
             .AddServices(services => services.AddTransient(x => employeeRepositoryStub))
-            .Register<SimpleListVM>(nameof(SimpleListVM))
+            .Register<SimpleListVM>()
             .Build();
       }
 

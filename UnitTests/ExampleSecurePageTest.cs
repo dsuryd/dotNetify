@@ -78,7 +78,7 @@ namespace UnitTests
          };
 
          _hubEmulator = new HubEmulatorBuilder()
-            .Register<SecurePageVM>(nameof(SecurePageVM))
+            .Register<SecurePageVM>()
             .UseMiddleware<JwtBearerAuthenticationMiddleware>(tokenValidationParams)
             .UseMiddleware<ExtractAccessTokenMiddleware>(tokenValidationParams)
             .UseFilter<SetAccessTokenFilter>()
@@ -104,10 +104,8 @@ namespace UnitTests
 
          var client = _hubEmulator.CreateClient();
 
-         var options = new VMConnectOptions
-         {
-            Headers = JObject.FromObject(new { Authorization = "Bearer " + CreateBearerToken("john", "guest", expireSeconds) })
-         };
+         var options = new VMConnectOptions();
+         options.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
 
          client.Connect(nameof(SecurePageVM), options);
 

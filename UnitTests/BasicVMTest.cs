@@ -1,10 +1,9 @@
 using DotNetify;
+using DotNetify.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-
-using Rx = System.Reactive.Linq;
 
 namespace UnitTests
 {
@@ -43,10 +42,13 @@ namespace UnitTests
 
          public BasicVM()
          { }
+      }
 
-         public BasicVM(bool live) : this()
+      private class BasicVMLive : BasicVM
+      {
+         public BasicVMLive() : base()
          {
-            Rx.Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(value =>
+            Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(value =>
             {
                Data = value;
                PushUpdates();
@@ -54,31 +56,42 @@ namespace UnitTests
          }
       }
 
+      private HubEmulator _hubEmulator;
+
+      [TestInitialize]
+      public void Initialize()
+      {
+         _hubEmulator = new HubEmulatorBuilder()
+            .Register<BasicVM>()
+            .Register<BasicVMLive>()
+            .Build();
+      }
+
       [TestMethod]
       public void BasicVM_Request()
       {
-         var vmController = new MockVMController<BasicVM>();
-         var response = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(BasicVM)).As<dynamic>();
 
-         Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
-         Assert.AreEqual("World", response.GetVMProperty<string>("LastName"));
-         Assert.AreEqual("Hello World", response.GetVMProperty<string>("FullName"));
+         Assert.AreEqual("Hello", (string) response.FirstName);
+         Assert.AreEqual("World", (string) response.LastName);
+         Assert.AreEqual("Hello World", (string) response.FullName);
       }
 
       [TestMethod]
       public void BasicVM_Update()
       {
-         var vmController = new MockVMController<BasicVM>();
-         vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicVM)).As<dynamic>();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var response1 = vmController.UpdateVM(update);
+         var response1 = client.Dispatch(update).As<dynamic>();
 
          update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         var response2 = vmController.UpdateVM(update);
+         var response2 = client.Dispatch(update).As<dynamic>();
 
-         Assert.AreEqual("John World", response1["FullName"]);
-         Assert.AreEqual("John Doe", response2["FullName"]);
+         Assert.AreEqual("John World", (string) response1.FullName);
+         Assert.AreEqual("John Doe", (string) response2.FullName);
 
          Assert.IsFalse(response1.ContainsKey("FirstName"));
          Assert.IsFalse(response2.ContainsKey("LastName"));
@@ -87,28 +100,26 @@ namespace UnitTests
       [TestMethod]
       public void BasicVM_Dispose()
       {
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicVM)).As<dynamic>();
+
          bool dispose = false;
-         var vm = new BasicVM();
+
+         var vm = _hubEmulator.CreatedVMs.Find(x => x is BasicVM) as BasicVM;
          vm.Disposed += (sender, e) => dispose = true;
 
-         var vmController = new MockVMController<BasicVM>(vm);
-         vmController.RequestVM();
-
-         vmController.DisposeVM();
+         client.Destroy();
          Assert.IsTrue(dispose);
       }
 
       [TestMethod]
       public void BasicVM_PushUpdates()
       {
-         int updateCounter = 0;
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicVMLive)).As<dynamic>();
 
-         var vmController = new MockVMController<BasicVM>(new BasicVM(true));
-         vmController.OnResponse += (sender, e) => updateCounter++;
-         vmController.RequestVM();
-
-         System.Threading.Thread.Sleep(1000);
-         Assert.IsTrue(updateCounter >= 5);
+         var responses = client.Listen(1000);
+         Assert.IsTrue(responses.Count >= 3, $"{responses.Count}");
       }
    }
 }

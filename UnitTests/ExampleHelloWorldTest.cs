@@ -19,7 +19,7 @@ namespace UnitTests
       public ExampleHelloWorldTest()
       {
          _hubEmulator = new HubEmulatorBuilder()
-            .Register<HelloWorldVM>(nameof(HelloWorldVM))
+            .Register<HelloWorldVM>()
             .Build();
       }
 

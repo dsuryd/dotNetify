@@ -34,7 +34,7 @@ namespace UnitTests
       public ExampleChatRoomTest()
       {
          _hubEmulator = new HubEmulatorBuilder()
-            .Register<ChatRoomVM>(nameof(ChatRoomVM))
+            .Register<ChatRoomVM>()
             .Build();
       }
 

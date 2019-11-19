@@ -1,4 +1,5 @@
 using DotNetify;
+using DotNetify.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System;
@@ -31,14 +32,17 @@ namespace UnitTests
             AddInternalProperty("Internal2", 0);
          }
 
-         public BasicReactiveVM(bool live) : this()
+         private string FullNameDelegate(string firstName, string lastName) => $"{firstName} {lastName}";
+      }
+
+      private class BasicReactiveVMLive : BasicReactiveVM
+      {
+         public BasicReactiveVMLive() : base()
          {
             AddProperty("ServerTime", DateTime.MinValue)
                .SubscribeTo(Observable.Interval(TimeSpan.FromMilliseconds(200)).Select(_ => DateTime.Now).StartWith(now))
                .Subscribe(_ => PushUpdates());
          }
-
-         private string FullNameDelegate(string firstName, string lastName) => $"{firstName} {lastName}";
       }
 
       private class BasicReactiveVMAsync : BaseVM
@@ -64,100 +68,98 @@ namespace UnitTests
          private string FullNameDelegate(string firstName, string lastName) => $"{firstName} {lastName}";
       }
 
+      private HubEmulator _hubEmulator;
+
+      [TestInitialize]
+      public void Initialize()
+      {
+         _hubEmulator = new HubEmulatorBuilder()
+            .Register<BasicReactiveVM>()
+            .Register<BasicReactiveVMLive>()
+            .Register<BasicReactiveVMAsync>()
+            .Build();
+      }
+
       [TestMethod]
       public void BasicReactiveVM_Request()
       {
-         var vmController = new MockVMController<BasicReactiveVM>();
-         var response = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(BasicReactiveVM)).As<dynamic>();
 
-         Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
-         Assert.AreEqual("World", response.GetVMProperty<string>("LastName"));
-         Assert.AreEqual("Hello World", response.GetVMProperty<string>("FullName"));
+         Assert.AreEqual("Hello", (string) response.FirstName);
+         Assert.AreEqual("World", (string) response.LastName);
+         Assert.AreEqual("Hello World", (string) response.FullName);
       }
 
       [TestMethod]
       public void BasicReactiveVM_Update()
       {
-         var vmController = new MockVMController<BasicReactiveVM>();
-         vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicReactiveVM));
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var response1 = vmController.UpdateVM(update);
+         var response1 = client.Dispatch(update).As<dynamic>();
 
          update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         var response2 = vmController.UpdateVM(update);
+         var response2 = client.Dispatch(update).As<dynamic>();
 
-         Assert.AreEqual("John World", response1["FullName"]);
-         Assert.AreEqual("John Doe", response2["FullName"]);
+         Assert.AreEqual("John World", (string) response1.FullName);
+         Assert.AreEqual("John Doe", (string) response2.FullName);
 
-         Assert.AreEqual(10, response1["NameLength"]);
-         Assert.AreEqual(8, response2["NameLength"]);
+         Assert.AreEqual(10, (int) response1.NameLength);
+         Assert.AreEqual(8, (int) response2.NameLength);
       }
 
       [TestMethod]
       public async Task BasicReactiveVM_UpdateAsync()
       {
-         var vmController = new MockVMController<BasicReactiveVMAsync>();
-         vmController.RequestVM();
-
-         dynamic data1 = null;
-         vmController.OnResponse += (sender, e) =>
-         {
-            dynamic data = JObject.Parse(e);
-            if (data.NameLengthAsync != null)
-            {
-               if (data1 == null)
-               {
-                  data1 = data;
-               }
-            }
-         };
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicReactiveVMAsync));
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var response1 = vmController.UpdateVM(update);
+         var response1 = client.Dispatch(update).As<dynamic>();
 
-         Assert.AreEqual("John World", response1["FullName"]);
+         Assert.AreEqual("John World", (string) response1.FullName);
 
-         await Task.Delay(2000);
-         Assert.AreEqual(10, data1.NameLengthAsync.Value);
+         var response2 = (await client.ListenAsync(2000)).As<dynamic>();
+
+         Assert.AreEqual(10, (int) response2.NameLengthAsync);
       }
 
       [TestMethod]
       public void BasicReactiveVM_Dispose()
       {
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicReactiveVM));
+
          bool dispose = false;
-         var vm = new BasicReactiveVM();
+         var vm = _hubEmulator.CreatedVMs.Find(x => x is BasicReactiveVM) as BasicReactiveVM;
          vm.Disposed += (sender, e) => dispose = true;
 
-         var vmController = new MockVMController<BasicReactiveVM>(vm);
-         vmController.RequestVM();
-
-         vmController.DisposeVM();
+         client.Destroy();
          Assert.IsTrue(dispose);
       }
 
       [TestMethod]
       public void ReactiveVM_PushUpdates()
       {
-         int updateCounter = 0;
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicReactiveVMLive));
 
-         var vmController = new MockVMController<BasicReactiveVM>(new BasicReactiveVM(true));
-         vmController.OnResponse += (sender, e) => updateCounter++;
-         vmController.RequestVM();
-
-         System.Threading.Thread.Sleep(1000);
-         Assert.IsTrue(updateCounter >= 4);
+         Thread.Sleep(1000);
+         var responses = client.Listen(1000);
+         Assert.IsTrue(responses.Count > 4);
       }
 
       [TestMethod]
       public void BasicReactiveVM_Internal()
       {
-         var vmController = new MockVMController<BasicReactiveVM>();
-         var response = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(BasicReactiveVM)).As<dynamic>();
 
          // Internal properties should not be sent to the client.
-         Assert.IsNull(response.VMData["Internal1"]);
-         Assert.IsNull(response.VMData["Internal2"]);
+         Assert.IsNull(response.Internal1);
+         Assert.IsNull(response.Internal2);
       }
    }
 }

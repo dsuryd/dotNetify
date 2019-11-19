@@ -1,6 +1,5 @@
-﻿using System;
+﻿using DotNetify;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DotNetify;
 
 namespace UnitTests
 {

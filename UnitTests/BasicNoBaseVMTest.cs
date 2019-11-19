@@ -1,9 +1,10 @@
-using DotNetify;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Linq;
+using DotNetify;
+using DotNetify.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Rx = System.Reactive.Linq;
 
@@ -50,7 +51,12 @@ namespace UnitTests
          public BasicNoBaseVM()
          { }
 
-         public BasicNoBaseVM(bool live) : this()
+         public void Dispose() => Disposed?.Invoke(this, EventArgs.Empty);
+      }
+
+      private class BasicNoBaseVMLive : BasicNoBaseVM
+      {
+         public BasicNoBaseVMLive() : base()
          {
             Rx.Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(value =>
             {
@@ -59,62 +65,68 @@ namespace UnitTests
                this.PushUpdates();
             });
          }
+      }
 
-         public void Dispose() => Disposed?.Invoke(this, EventArgs.Empty);
+      private HubEmulator _hubEmulator;
+
+      [TestInitialize]
+      public void Initialize()
+      {
+         _hubEmulator = new HubEmulatorBuilder()
+            .Register<BasicNoBaseVM>()
+            .Register<BasicNoBaseVMLive>()
+            .Build();
       }
 
       [TestMethod]
       public void BasicNoBaseVM_Request()
       {
-         var vmController = new MockVMController<BasicNoBaseVM>();
-         var response = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(BasicNoBaseVM)).As<dynamic>();
 
-         Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
-         Assert.AreEqual("World", response.GetVMProperty<string>("LastName"));
-         Assert.AreEqual("Hello World", response.GetVMProperty<string>("FullName"));
+         Assert.AreEqual("Hello", (string) response.FirstName);
+         Assert.AreEqual("World", (string) response.LastName);
+         Assert.AreEqual("Hello World", (string) response.FullName);
       }
 
       [TestMethod]
       public void BasicNoBaseVM_Update()
       {
-         var vmController = new MockVMController<BasicNoBaseVM>();
-         vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(BasicNoBaseVM)).As<dynamic>();
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var response1 = vmController.UpdateVM(update);
+         var response1 = client.Dispatch(update).As<dynamic>();
 
          update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         var response2 = vmController.UpdateVM(update);
+         var response2 = client.Dispatch(update).As<dynamic>();
 
-         Assert.AreEqual("John World", response1["FullName"]);
-         Assert.AreEqual("John Doe", response2["FullName"]);
+         Assert.AreEqual("John World", (string) response1.FullName);
+         Assert.AreEqual("John Doe", (string) response2.FullName);
       }
 
       [TestMethod]
       public void BasicNoBaseVM_Dispose()
       {
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicNoBaseVM));
+
          bool dispose = false;
-         var vm = new BasicNoBaseVM();
+         var vm = _hubEmulator.CreatedVMs.Find(x => x is BasicNoBaseVM) as BasicNoBaseVM;
          vm.Disposed += (sender, e) => dispose = true;
 
-         var vmController = new MockVMController<BasicNoBaseVM>(vm);
-         vmController.RequestVM();
-
-         vmController.DisposeVM();
+         client.Destroy();
          Assert.IsTrue(dispose);
       }
 
       [TestMethod]
       public void BasicNoBaseVM_PushUpdates()
       {
-         int updateCounter = 0;
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(BasicNoBaseVMLive)).As<dynamic>();
 
-         var vmController = new MockVMController<BasicNoBaseVM>(new BasicNoBaseVM(true));
-         vmController.OnResponse += (sender, e) => updateCounter++;
-         vmController.RequestVM();
-
-         System.Threading.Thread.Sleep(1000);
-         Assert.IsTrue(updateCounter >= 5);
+         var responses = client.Listen(1000);
+         Assert.IsTrue(responses.Count >= 3, $"{response.Count}");
       }
    }
 }

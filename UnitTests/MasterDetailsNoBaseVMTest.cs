@@ -1,8 +1,8 @@
-using DotNetify;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using DotNetify;
+using DotNetify.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
 {
@@ -16,13 +16,16 @@ namespace UnitTests
       {
          private DetailsNoBaseVM _DetailsVM = new DetailsNoBaseVM() { Value = int.MaxValue };
 
-         public event EventHandler SubVMCreated;
-         public event EventHandler SubVMDisposing;
+         public object CreatedSubVM { get; set; }
+         public object DisposedSubVM { get; set; }
+
          public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
          public INotifyPropertyChanged GetSubVM(string vmTypeName, string vmInstanceId = null) => vmTypeName == nameof(DetailsNoBaseVM) ? _DetailsVM : null;
-         public void OnSubVMCreated(object subVM) => SubVMCreated?.Invoke(subVM, EventArgs.Empty);
-         public void OnSubVMDisposing(object subVM) => SubVMDisposing?.Invoke(subVM, EventArgs.Empty);
+
+         public void OnSubVMCreated(object subVM) => CreatedSubVM = subVM;
+
+         public void OnSubVMDisposing(object subVM) => DisposedSubVM = subVM;
       }
 
       private class DetailsNoBaseVM : INotifyPropertyChanged
@@ -32,62 +35,62 @@ namespace UnitTests
          public int Value { get; set; }
       }
 
+      private HubEmulator _hubEmulator;
+
       [TestInitialize]
       public void Initialize()
       {
-         VMController.Register<MasterNoBaseVM>();
-         VMController.Register<DetailsNoBaseVM>();
+         _hubEmulator = new HubEmulatorBuilder()
+            .Register<MasterNoBaseVM>()
+            .Register<DetailsNoBaseVM>()
+            .Build();
       }
 
       [TestMethod]
       public void MasterDetailsNoBaseVM_Request()
       {
-         var vmController = new MockVMController<MasterNoBaseVM>(_masterVM);
-         var response = vmController.RequestVM(_detailsVMId);
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(_detailsVMId).As<dynamic>();
 
-         Assert.IsNotNull(response);
-         Assert.AreEqual(int.MaxValue, response.GetVMProperty<int>("Value"));
+         Assert.AreEqual(int.MaxValue, (int) response.Value);
       }
 
       [TestMethod]
       public void MasterDetailsNoBaseVM_Update()
       {
-         var vmController = new MockVMController<MasterNoBaseVM>(_masterVM);
-         vmController.RequestVM(_detailsVMId);
+         var client = _hubEmulator.CreateClient();
+         client.Connect(_detailsVMId);
 
          var update = new Dictionary<string, object>() { { "Value", "99" } };
-         vmController.UpdateVM(update, _detailsVMId);
+         client.Dispatch(update);
 
-         Assert.AreEqual(99, (_masterVM.GetSubVM(nameof(DetailsNoBaseVM)) as DetailsNoBaseVM).Value);
+         var masterVM = _hubEmulator.CreatedVMs.Find(x => x is MasterNoBaseVM) as MasterNoBaseVM;
+         Assert.AreEqual(99, (masterVM.GetSubVM(nameof(DetailsNoBaseVM)) as DetailsNoBaseVM).Value);
       }
 
       [TestMethod]
       public void MasterDetailsNoBaseVM_SubVMCreated()
       {
-         object subVM = null;
-         bool subVMCreated = false;
-         _masterVM.SubVMCreated += (sender, e) => { subVM = sender; subVMCreated = true; };
+         var client = _hubEmulator.CreateClient();
+         client.Connect(_detailsVMId).As<dynamic>();
 
-         var vmController = new MockVMController<MasterNoBaseVM>(_masterVM);
-         vmController.RequestVM(_detailsVMId);
+         var masterVM = _hubEmulator.CreatedVMs.Find(x => x is MasterNoBaseVM) as MasterNoBaseVM;
 
-         Assert.IsTrue(subVMCreated);
-         Assert.IsTrue(subVM is DetailsNoBaseVM);
+         Assert.IsNotNull(masterVM.CreatedSubVM);
+         Assert.IsTrue(masterVM.CreatedSubVM is DetailsNoBaseVM);
       }
 
       [TestMethod]
       public void MasterDetailsNoBaseVM_SubVMDisposing()
       {
-         object subVM = null;
-         bool subVMDisposing = false;
-         _masterVM.SubVMDisposing += (sender, e) => { subVM = sender; subVMDisposing = true; };
+         var client = _hubEmulator.CreateClient();
+         client.Connect(_detailsVMId).As<dynamic>();
+         client.Destroy();
 
-         var vmController = new MockVMController<MasterNoBaseVM>(_masterVM);
-         vmController.RequestVM(_detailsVMId);
+         var masterVM = _hubEmulator.CreatedVMs.Find(x => x is MasterNoBaseVM) as MasterNoBaseVM;
 
-         vmController.DisposeVM(_detailsVMId);
-         Assert.IsTrue(subVMDisposing);
-         Assert.IsTrue(subVM is DetailsNoBaseVM);
+         Assert.IsNotNull(masterVM.DisposedSubVM);
+         Assert.IsTrue(masterVM.DisposedSubVM is DetailsNoBaseVM);
       }
    }
 }

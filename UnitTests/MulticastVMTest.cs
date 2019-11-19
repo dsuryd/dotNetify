@@ -1,10 +1,9 @@
-﻿using DotNetify;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
+using DotNetify;
+using DotNetify.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
 {
@@ -13,11 +12,15 @@ namespace UnitTests
    {
       private class MulticastTestVM : MulticastVM
       {
+         internal List<bool> DisposeCalls { get; } = new List<bool>();
+
          public string Message
          {
             get => Get<string>() ?? "Hello";
             set => Set(value);
          }
+
+         public string Group => GroupName;
 
          public override string GroupName => GroupNameTest();
 
@@ -28,29 +31,40 @@ namespace UnitTests
          }
 
          internal static Func<string> GroupNameTest { get; set; }
+
+         protected override void Dispose(bool disposing)
+         {
+            DisposeCalls.Add(disposing);
+         }
       }
+
+      private HubEmulator _hubEmulator;
 
       [TestInitialize]
       public void Initialize()
       {
          MulticastTestVM.GroupNameTest = () => null;
+
+         _hubEmulator = new HubEmulatorBuilder()
+            .Register<MulticastTestVM>()
+            .Build();
       }
 
       [TestMethod]
       public void MulticastVM_ViewModelShared()
       {
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory);
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
 
-         var response = vmController1.RequestVM();
-         Assert.AreEqual("Hello", response.GetVMProperty<string>(nameof(MulticastTestVM.Message)));
+         var response = client1.Connect(nameof(MulticastTestVM)).As<dynamic>();
+
+         Assert.AreEqual("Hello", (string) response.Message);
 
          var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "World" } };
-         vmController1.UpdateVM(update);
+         client1.Dispatch(update);
 
-         response = vmController2.RequestVM();
-         Assert.AreEqual("World", response.GetVMProperty<string>(nameof(MulticastTestVM.Message)));
+         response = client2.Connect(nameof(MulticastTestVM)).As<dynamic>();
+         Assert.AreEqual("World", (string) response.Message);
       }
 
       [TestMethod]
@@ -59,113 +73,94 @@ namespace UnitTests
          var random = new Random();
          MulticastTestVM.GroupNameTest = () => random.Next().ToString();
 
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory);
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
 
-         var response = vmController1.RequestVM();
-         Assert.AreEqual("Hello", response.GetVMProperty<string>(nameof(MulticastTestVM.Message)));
+         var response = client1.Connect(nameof(MulticastTestVM)).As<dynamic>();
+         Assert.AreEqual("Hello", (string) response.Message);
 
          var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "World" } };
-         vmController1.UpdateVM(update);
+         client1.Dispatch(update);
 
-         response = vmController2.RequestVM();
-         Assert.AreEqual("Hello", response.GetVMProperty<string>(nameof(MulticastTestVM.Message)));
+         response = client2.Connect(nameof(MulticastTestVM)).As<dynamic>();
+         Assert.AreEqual("Hello", (string) response.Message);
       }
 
       [TestMethod]
       public void MulticastVM_ViewModelDisposed()
       {
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory);
-         var vmController3 = new MockVMController<MulticastTestVM>(vmFactory);
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
+         var client3 = _hubEmulator.CreateClient();
 
-         var response = vmController1.RequestVM();
-         Assert.AreEqual("Hello", response.GetVMProperty<string>(nameof(MulticastTestVM.Message)));
+         var response = client1.Connect(nameof(MulticastTestVM)).As<dynamic>();
+         Assert.AreEqual("Hello", (string) response.Message);
 
          var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "World" } };
-         vmController1.UpdateVM(update);
+         client1.Dispatch(update);
 
-         response = vmController2.RequestVM();
-         Assert.AreEqual("World", response.GetVMProperty<string>(nameof(MulticastTestVM.Message)));
+         response = client2.Connect(nameof(MulticastTestVM)).As<dynamic>();
+         Assert.AreEqual("World", (string) response.Message);
 
-         vmController1.DisposeVM();
-         vmController2.DisposeVM();
+         client1.Destroy();
+         client2.Destroy();
 
-         response = vmController3.RequestVM();
-         Assert.AreEqual("Hello", response.GetVMProperty<string>(nameof(MulticastTestVM.Message)));
+         response = client3.Connect(nameof(MulticastTestVM)).As<dynamic>();
+         Assert.AreEqual("Hello", (string) response.Message);
       }
 
       [TestMethod]
-      public void MulticastVM_PushUpdates()
+      public async Task MulticastVM_PushUpdates()
       {
-         dynamic responseData1 = null;
-         dynamic responseData2 = null;
-         Action<string, string> responseDelegate = (connId, data) =>
-         {
-            if (connId.EndsWith("GroupSend"))
-            {
-               var msg = JsonConvert.DeserializeObject<VMController.GroupSend>(data);
-               if (msg.ConnectionIds.Contains("conn1"))
-                  responseData1 = JObject.Parse(msg.Data);
-               if (msg.ConnectionIds.Contains("conn2"))
-                  responseData2 = JObject.Parse(msg.Data);
-            }
-         };
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
 
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory, "conn1", responseDelegate);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory, "conn2", responseDelegate);
+         client1.Connect(nameof(MulticastTestVM));
+         client2.Connect(nameof(MulticastTestVM));
 
-         vmController1.RequestVM();
-         vmController2.RequestVM();
+         var vm = _hubEmulator.CreatedVMs.Find(x => x is MulticastTestVM) as MulticastTestVM;
 
-         var vm = vmFactory.GetInstance(nameof(MulticastTestVM)) as MulticastTestVM;
+         var client1ResponsesTask = client1.ListenAsync();
+         var client2ResponsesTask = client2.ListenAsync();
+
          vm.PushMessage("Goodbye");
 
-         Assert.AreEqual("Goodbye", responseData1.Message.Value);
-         Assert.AreEqual("Goodbye", responseData2.Message.Value);
+         var client1Response = (await client1ResponsesTask).As<dynamic>();
+         var client2Response = (await client2ResponsesTask).As<dynamic>();
+
+         client1ResponsesTask = client1.ListenAsync();
+         client2ResponsesTask = client2.ListenAsync();
+
+         Assert.AreEqual("Goodbye", (string) client1Response.Message);
+         Assert.AreEqual("Goodbye", (string) client2Response.Message);
 
          vm.PushMessage("World");
 
-         Assert.AreEqual("World", responseData1.Message.Value);
-         Assert.AreEqual("World", responseData2.Message.Value);
+         client1Response = (await client1ResponsesTask).As<dynamic>();
+         client2Response = (await client2ResponsesTask).As<dynamic>();
+
+         Assert.AreEqual("World", (string) client1Response.Message);
+         Assert.AreEqual("World", (string) client2Response.Message);
       }
 
       [TestMethod]
       public void MulticastVM_ChangedDataMulticasted()
       {
-         dynamic responseData1 = null;
-         dynamic responseData2 = null;
-         Action<string, string> responseDelegate = (connId, data) =>
-         {
-            if (connId.EndsWith("GroupSend"))
-            {
-               var msg = JsonConvert.DeserializeObject<VMController.GroupSend>(data);
-               if (msg.ConnectionIds.Contains("conn1"))
-                  responseData1 = JObject.Parse(msg.Data);
-               if (msg.ConnectionIds.Contains("conn2"))
-                  responseData2 = JObject.Parse(msg.Data);
-            }
-         };
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
 
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory, "conn1", responseDelegate);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory, "conn2", responseDelegate);
-
-         vmController1.RequestVM();
-         vmController2.RequestVM();
+         client1.Connect(nameof(MulticastTestVM));
+         client2.Connect(nameof(MulticastTestVM));
 
          var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Goodbye" } };
-         vmController1.UpdateVM(update);
+         var client2Response = client2.Listen(() => client1.Dispatch(update)).As<dynamic>();
 
-         Assert.AreEqual("Goodbye", responseData2.Message.Value);
+         Assert.AreEqual("Goodbye", (string) client2Response.Message);
 
          update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Adios" } };
-         vmController2.UpdateVM(update);
+         var client1Response = client1.Listen(() => client2.Dispatch(update)).As<dynamic>();
 
-         Assert.AreEqual("Adios", responseData1.Message.Value);
+         Assert.AreEqual("Adios", (string) client1Response.Message);
       }
 
       [TestMethod]
@@ -173,53 +168,33 @@ namespace UnitTests
       {
          MulticastTestVM.GroupNameTest = () => "group1";
 
-         dynamic responseData1 = null;
-         dynamic responseData2 = null;
-         string removeGroup1 = null;
-         string removeGroup2 = null;
-         Action<string, string> responseDelegate = (connId, data) =>
-         {
-            if (connId.EndsWith(nameof(VMController.GroupSend)))
-            {
-               var message = JsonConvert.DeserializeObject<VMController.GroupSend>(data);
-               responseData1 = JObject.Parse(message.Data);
-               responseData2 = JObject.Parse(message.Data);
-            }
-            else if (connId.EndsWith(nameof(VMController.GroupRemove)))
-            {
-               var message = JsonConvert.DeserializeObject<VMController.GroupRemove>(data);
-               if (message.ConnectionId == "conn1")
-                  removeGroup1 = message.GroupName;
-               else if (message.ConnectionId == "conn2")
-                  removeGroup2 = message.GroupName;
-            }
-         };
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
 
-         var vmFactory = MockVMController<MulticastTestVM>.GetVMFactory();
-         var vmController1 = new MockVMController<MulticastTestVM>(vmFactory, "conn1", responseDelegate);
-         var vmController2 = new MockVMController<MulticastTestVM>(vmFactory, "conn2", responseDelegate);
+         var client1Response = client1.Connect(nameof(MulticastTestVM)).As<dynamic>();
+         var client2Response = client2.Connect(nameof(MulticastTestVM)).As<dynamic>();
 
-         vmController1.RequestVM(out string groupName1);
-         vmController2.RequestVM(out string groupName2);
-
-         Assert.AreEqual("group1", groupName1);
-         Assert.AreEqual("group1", groupName2);
+         Assert.AreEqual("group1", (string) client1Response.Group);
+         Assert.AreEqual("group1", (string) client2Response.Group);
 
          var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Goodbye" } };
-         vmController1.UpdateVM(update);
+         client2Response = client2.Listen(() => client1.Dispatch(update)).As<dynamic>();
 
-         Assert.AreEqual("Goodbye", responseData2.Message.Value);
+         Assert.AreEqual("Goodbye", (string) client2Response.Message);
 
          update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Adios" } };
-         vmController2.UpdateVM(update);
+         client1Response = client1.Listen(() => client2.Dispatch(update)).As<dynamic>();
 
-         Assert.AreEqual("Adios", responseData1.Message.Value);
+         Assert.AreEqual("Adios", (string) client1Response.Message);
 
-         vmController1.DisposeVM();
-         vmController2.DisposeVM();
+         client1.Destroy();
+         client2.Destroy();
 
-         Assert.AreEqual("group1", removeGroup1);
-         Assert.AreEqual("group1", removeGroup2);
+         var vm = _hubEmulator.CreatedVMs.Find(x => x is MulticastTestVM) as MulticastTestVM;
+
+         Assert.AreEqual(2, vm.DisposeCalls.Count);
+         Assert.IsFalse(vm.DisposeCalls[0]);
+         Assert.IsTrue(vm.DisposeCalls[1]);
       }
    }
 }

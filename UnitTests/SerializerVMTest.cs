@@ -1,4 +1,5 @@
 using DotNetify;
+using DotNetify.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
@@ -48,28 +49,38 @@ namespace UnitTests
          }
       }
 
+      private HubEmulator _hubEmulator;
+
+      [TestInitialize]
+      public void Initialize()
+      {
+         _hubEmulator = new HubEmulatorBuilder()
+            .Register<SerializerVM>()
+            .Build();
+      }
+
       [TestMethod]
       public void SerializerVM_Serialize()
       {
-         var vmController = new MockVMController<SerializerVM>();
-         var response = vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         var response = client.Connect(nameof(SerializerVM)).As<dynamic>();
 
-         Assert.AreEqual("Hello", response.GetVMProperty<string>("FirstName"));
-         Assert.AreEqual("World", response.GetVMProperty<string>("LastName"));
-         Assert.AreEqual("Hello World", response.GetVMProperty<string>("FullName"));
+         Assert.AreEqual("Hello", (string) response.FirstName);
+         Assert.AreEqual("World", (string) response.LastName);
+         Assert.AreEqual("Hello World", (string) response.FullName);
       }
 
       [TestMethod]
       public void SerializerVM_Deserialize()
       {
-         var vmController = new MockVMController<SerializerVM>();
-         vmController.RequestVM();
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(SerializerVM));
 
-         var response = vmController.UpdateVM(new Dictionary<string, object>() { { "FirstName", "John" } });
-         Assert.AreEqual("John World", response["FullName"]);
+         var response = client.Dispatch(new Dictionary<string, object>() { { "FirstName", "John" } }).As<dynamic>();
+         Assert.AreEqual("John World", (string) response.FullName);
 
-         response = vmController.UpdateVM(new Dictionary<string, object>() { { "LastName", "Hancock" } });
-         Assert.AreEqual("John Hancock", response["FullName"]);
+         response = client.Dispatch(new Dictionary<string, object>() { { "LastName", "Hancock" } }).As<dynamic>();
+         Assert.AreEqual("John Hancock", (string) response.FullName);
       }
    }
 }

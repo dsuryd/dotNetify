@@ -27,7 +27,7 @@ namespace UnitTests
       public ExampleLiveChartTest()
       {
          _hubEmulator = new HubEmulatorBuilder()
-            .Register<LiveChartVM>(nameof(LiveChartVM))
+            .Register<LiveChartVM>()
             .Build();
       }
 
