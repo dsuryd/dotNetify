@@ -18,10 +18,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Principal;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
@@ -121,10 +123,16 @@ namespace DotNetify
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
       public void Request_VM(string vmId, object vmArg)
       {
+         object data = vmArg;
+
+         // Convert System.Text.Json object to Newtonsoft.Json object to keep compatibility.
+         if (vmArg is JsonElement)
+            data = JObject.Parse(((JsonElement) vmArg).GetRawText());
+
          try
          {
             _callerContext = Context;
-            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Request_VM), vmId, vmArg, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Request_VM), vmId, data, null, Principal);
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
