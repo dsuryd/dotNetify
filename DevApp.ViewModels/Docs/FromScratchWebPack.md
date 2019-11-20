@@ -9,7 +9,7 @@ Prerequisites:
 
 ##### Create Project
 
-Create an empty ASP.NET Core Web Application (.NET Core 2.1) project and name it _HelloWorld_.  Then use the NuGet Package Manager Console to install the dotNetify package:
+Create an empty ASP.NET Core Web Application (.NET Core 3.x) project and name it _HelloWorld_.  Then use the NuGet Package Manager Console to install the dotNetify package:
 ```csharp
 install-package DotNetify.SignalR
 ```
@@ -34,7 +34,6 @@ namespace HelloWorld
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMemoryCache();
             services.AddSignalR();
             services.AddDotNetify();          
         }
@@ -42,7 +41,6 @@ namespace HelloWorld
         public void Configure(IApplicationBuilder app)
         {
             app.UseWebSockets();
-            app.UseSignalR(routes => routes.MapDotNetifyHub());
             app.UseDotNetify();
 
             // Optional: utilize webpack hot reload feature.
@@ -53,6 +51,9 @@ namespace HelloWorld
             });            
 
             app.UseStaticFiles();
+			app.UseRouting();
+	  	    app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
+
             app.Run(async (context) =>
             {
                 using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))

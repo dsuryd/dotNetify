@@ -5,7 +5,7 @@ The easiest way to get started is to use the basic SPA template that contains so
 
 Prerequisites:
 - Node.js
-- .NET Core SDK (v2.1 and up)
+- .NET Core SDK (2.x or 3.x)
 
 Download the template from nuget from the command line, then create your project:
 ```js
@@ -33,7 +33,6 @@ The following are required in the _Startup.cs_:
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-   services.AddMemoryCache();
    services.AddSignalR();
    services.AddDotNetify();
    ...
@@ -41,8 +40,15 @@ public void ConfigureServices(IServiceCollection services)
 public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 {
    app.UseWebSockets();
-   app.UseSignalR(routes => routes.MapDotNetifyHub());
    app.UseDotNetify();
+
+   // .NET Core 2.x:
+   app.UseSignalR(routes => routes.MapDotNetifyHub());	
+
+   // .NET Core 3.x:
+   app.UseRouting();
+   app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
+   
    ...
 }
 ```

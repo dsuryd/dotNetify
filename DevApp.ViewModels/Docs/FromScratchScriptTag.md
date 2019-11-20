@@ -4,7 +4,7 @@ The following steps will create a simple real-time Hello World ASP.NET Core app 
 
 Prerequisites:
 
-- .NET Core 2.1 SDK.
+- .NET Core 3.x SDK.
 <br/>
 
 ##### Create Project
@@ -35,7 +35,6 @@ namespace HelloWorld
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMemoryCache();
             services.AddSignalR();
             services.AddDotNetify();          
         }
@@ -43,10 +42,15 @@ namespace HelloWorld
         public void Configure(IApplicationBuilder app)
         {
             app.UseWebSockets();
-            app.UseSignalR(routes => routes.MapDotNetifyHub());
-            app.UseDotNetify();          
+			app.UseDotNetify();          
 
             app.UseStaticFiles();
+			app.UseRouting();
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapHub<DotNetifyHub>("/dotnetify");
+			});
+
             app.Run(async (context) =>
             {
                 using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
