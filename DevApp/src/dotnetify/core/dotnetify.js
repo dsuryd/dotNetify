@@ -22,7 +22,12 @@ export class dotnetifyFactory {
     const dotnetify = {
       // SignalR hub options.
       hub: dotnetifyHub,
-      hubOptions: { transport: [ 'webSockets', 'longPolling' ] },
+      hubOptions: {
+        transport: [ 'webSockets', 'longPolling' ],
+
+        // Use this to add customize HubConnectionBuilder.
+        connectionBuilder: builder => builder
+      },
       hubPath: null,
 
       // Debug mode.

@@ -126,7 +126,11 @@ export class dotnetifyHubFactory {
             });
             hubOptions.transport = iTransportArray.shift();
 
-            dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
+            let hubConnectionBuilder = new signalR.HubConnectionBuilder().withUrl(url, hubOptions);
+            if (typeof hubOptions.connectionBuilder == 'function')
+              hubConnectionBuilder = hubOptions.connectionBuilder(hubConnectionBuilder);
+
+            dotnetifyHub._connection = hubConnectionBuilder.build();
             dotnetifyHub._connection.on('response_vm', dotnetifyHub.client.response_VM);
             dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
