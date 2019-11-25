@@ -2169,9 +2169,15 @@ var dotnetifyVM = function () {
           var listName = match[1];
           if (Array.isArray(this.State()[listName])) {
             var key = this.$itemKey[listName];
-            if (key != null) vm.$removeList(listName, function (i) {
-              return i[key] == iVMUpdate[prop];
-            });else console.error('[' + this.$vmId + '] missing item key for \'' + listName + '\'; add ' + listName + '_itemKey property to the view model.');
+            if (key != null) {
+              if (Array.isArray(iVMUpdate[prop])) vm.$removeList(listName, function (i) {
+                return iVMUpdate[prop].some(function (x) {
+                  return i[key] == x;
+                });
+              });else vm.$removeList(listName, function (i) {
+                return i[key] == iVMUpdate[prop];
+              });
+            } else console.error('[' + this.$vmId + '] missing item key for \'' + listName + '\'; add ' + listName + '_itemKey property to the view model.');
           } else console.error('[' + this.$vmId + '] \'' + listName + '\' is not found or not an array.');
           delete iVMUpdate[prop];
           continue;
@@ -2264,6 +2270,15 @@ var dotnetifyVM = function () {
   }, {
     key: '$addList',
     value: function $addList(iListName, iNewItem) {
+      var _this7 = this;
+
+      if (Array.isArray(iNewItem)) {
+        iNewItem.forEach(function (item) {
+          return _this7.$addList(iListName, item);
+        });
+        return;
+      }
+
       // Check if the list already has an item with the same key. If so, replace it.
       var key = this.$itemKey[iListName];
       if (key != null) {
@@ -2305,6 +2320,15 @@ var dotnetifyVM = function () {
   }, {
     key: '$updateList',
     value: function $updateList(iListName, iNewItem) {
+      var _this8 = this;
+
+      if (Array.isArray(iNewItem)) {
+        iNewItem.forEach(function (item) {
+          return _this8.$updateList(iListName, item);
+        });
+        return;
+      }
+
       // Check if the list already has an item with the same key. If so, update it.
       var key = this.$itemKey[iListName];
       if (key != null) {
@@ -3325,7 +3349,10 @@ var dotnetifyHubFactory = exports.dotnetifyHubFactory = function () {
               });
               hubOptions.transport = iTransportArray.shift();
 
-              dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
+              var hubConnectionBuilder = new signalR.HubConnectionBuilder().withUrl(url, hubOptions);
+              if (typeof hubOptions.connectionBuilder == 'function') hubConnectionBuilder = hubOptions.connectionBuilder(hubConnectionBuilder);
+
+              dotnetifyHub._connection = hubConnectionBuilder.build();
               dotnetifyHub._connection.on('response_vm', dotnetifyHub.client.response_VM);
               dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
@@ -3677,7 +3704,14 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
       var dotnetify = {
         // SignalR hub options.
         hub: _dotnetifyHub2.default,
-        hubOptions: { transport: ['webSockets', 'longPolling'] },
+        hubOptions: {
+          transport: ['webSockets', 'longPolling'],
+
+          // Use this to add customize HubConnectionBuilder.
+          connectionBuilder: function connectionBuilder(builder) {
+            return builder;
+          }
+        },
         hubPath: null,
 
         // Debug mode.

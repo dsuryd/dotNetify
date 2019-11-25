@@ -3843,7 +3843,10 @@ var dotnetifyHubFactory = exports.dotnetifyHubFactory = function () {
               });
               hubOptions.transport = iTransportArray.shift();
 
-              dotnetifyHub._connection = new signalR.HubConnectionBuilder().withUrl(url, hubOptions).build();
+              var hubConnectionBuilder = new signalR.HubConnectionBuilder().withUrl(url, hubOptions);
+              if (typeof hubOptions.connectionBuilder == 'function') hubConnectionBuilder = hubOptions.connectionBuilder(hubConnectionBuilder);
+
+              dotnetifyHub._connection = hubConnectionBuilder.build();
               dotnetifyHub._connection.on('response_vm', dotnetifyHub.client.response_VM);
               dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
@@ -4195,7 +4198,14 @@ var dotnetifyFactory = exports.dotnetifyFactory = function () {
       var dotnetify = {
         // SignalR hub options.
         hub: _dotnetifyHub2.default,
-        hubOptions: { transport: ['webSockets', 'longPolling'] },
+        hubOptions: {
+          transport: ['webSockets', 'longPolling'],
+
+          // Use this to add customize HubConnectionBuilder.
+          connectionBuilder: function connectionBuilder(builder) {
+            return builder;
+          }
+        },
         hubPath: null,
 
         // Debug mode.
