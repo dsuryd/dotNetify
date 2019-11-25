@@ -11,9 +11,9 @@
     ]
   },
   "dependencies": {
-    "dotnetify": "^3.0.3",
-    "react": "~16.5.0",
-    "react-dom": "~16.5.0"
+    "dotnetify": "^3.6.0",
+    "react": "~16.11.0",
+    "react-dom": "~16.11.0"
   },
   "devDependencies": {
     "aspnet-webpack": "^3.0.0",

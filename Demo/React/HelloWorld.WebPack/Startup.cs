@@ -21,7 +21,6 @@ namespace HelloWorld.WebPack
         public void Configure(IApplicationBuilder app)
         {
             app.UseWebSockets();
-            app.UseSignalR(routes => routes.MapDotNetifyHub());
             app.UseDotNetify();
 
             app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
@@ -31,6 +30,9 @@ namespace HelloWorld.WebPack
             });            
 
             app.UseStaticFiles();
+            app.UseRouting();
+            app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
+
             app.Run(async (context) =>
             {
                 using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
