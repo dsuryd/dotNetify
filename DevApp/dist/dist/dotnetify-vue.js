@@ -2272,7 +2272,9 @@ var dotnetifyVM = function () {
     value: function $addList(iListName, iNewItem) {
       var _this7 = this;
 
-      if (Array.isArray(iNewItem)) {
+      var items = this.State()[iListName];
+
+      if (Array.isArray(iNewItem) && !Array.isArray(items[0] || [])) {
         iNewItem.forEach(function (item) {
           return _this7.$addList(iListName, item);
         });
@@ -2294,8 +2296,6 @@ var dotnetifyVM = function () {
           return;
         }
       }
-
-      var items = this.State()[iListName];
       items.push(iNewItem);
 
       var state = {};
@@ -2322,7 +2322,9 @@ var dotnetifyVM = function () {
     value: function $updateList(iListName, iNewItem) {
       var _this8 = this;
 
-      if (Array.isArray(iNewItem)) {
+      var items = this.State()[iListName];
+
+      if (Array.isArray(iNewItem) && !Array.isArray(items[0] || [])) {
         iNewItem.forEach(function (item) {
           return _this8.$updateList(iListName, item);
         });
@@ -2337,7 +2339,7 @@ var dotnetifyVM = function () {
           return;
         }
         var state = {};
-        state[iListName] = this.State()[iListName].map(function (i) {
+        state[iListName] = items.map(function (i) {
           return i[key] == iNewItem[key] ? _jqueryShim2.default.extend(i, iNewItem) : i;
         });
         this.State(state);

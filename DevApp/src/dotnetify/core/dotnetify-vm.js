@@ -231,7 +231,9 @@ export default class dotnetifyVM {
 
   //// Adds a new item to a state array.
   $addList(iListName, iNewItem) {
-    if (Array.isArray(iNewItem)) {
+    let items = this.State()[iListName];
+
+    if (Array.isArray(iNewItem) && !Array.isArray(items[0] || [])) {
       iNewItem.forEach(item => this.$addList(iListName, item));
       return;
     }
@@ -251,8 +253,6 @@ export default class dotnetifyVM {
         return;
       }
     }
-
-    let items = this.State()[iListName];
     items.push(iNewItem);
 
     let state = {};
@@ -269,7 +269,9 @@ export default class dotnetifyVM {
 
   //// Updates existing item to an observable array.
   $updateList(iListName, iNewItem) {
-    if (Array.isArray(iNewItem)) {
+    let items = this.State()[iListName];
+
+    if (Array.isArray(iNewItem) && !Array.isArray(items[0] || [])) {
       iNewItem.forEach(item => this.$updateList(iListName, item));
       return;
     }
@@ -282,7 +284,7 @@ export default class dotnetifyVM {
         return;
       }
       var state = {};
-      state[iListName] = this.State()[iListName].map(function(i) {
+      state[iListName] = items.map(function(i) {
         return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i;
       });
       this.State(state);
