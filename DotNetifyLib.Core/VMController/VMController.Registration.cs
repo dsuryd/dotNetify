@@ -51,8 +51,8 @@ namespace DotNetify
       {
          get
          {
-            // If no view model assembly has been registered, default to the entry assembly.
-            if (_registeredAssemblies.Count == 0)
+            // If no view model has been registered, default to the entry assembly.
+            if (_vmTypes.Count == 0)
                RegisterAssembly(Assembly.GetEntryAssembly());
 
             // If there's deferred exception on registering assemblies, throw it now.
