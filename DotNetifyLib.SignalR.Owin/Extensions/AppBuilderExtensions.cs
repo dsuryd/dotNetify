@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,10 +53,6 @@ namespace DotNetify
 
          config?.Invoke(dotNetifyConfig);
 
-         // If no view model assembly has been registered, default to the entry assembly.
-         if (!dotNetifyConfig.HasAssembly)
-            dotNetifyConfig.RegisterEntryAssembly();
-
          // Sets how long to keep a view model controller in memory after it hasn't been accessed for a while.
          if (dotNetifyConfig.VMControllerCacheExpiration.HasValue)
             vmControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
@@ -66,16 +62,17 @@ namespace DotNetify
 
          // Add middleware factories to the hub.
          var middlewareFactories = provider.GetService<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>();
-         _middlewareTypes.ForEach(t => middlewareFactories?.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(t.Item1, () => (IMiddlewarePipeline)factoryMethod(t.Item1, t.Item2))));
+         _middlewareTypes.ForEach(t => middlewareFactories?.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(t.Item1, () => (IMiddlewarePipeline) factoryMethod(t.Item1, t.Item2))));
 
          // Add filter factories to the hub.
          var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
-         _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter)factoryMethod(t.Item1, t.Item2)));
+         _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter) factoryMethod(t.Item1, t.Item2)));
 
          return appBuilder;
       }
 
       public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline => _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+
       public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter => _filterTypes.Add(Tuple.Create(typeof(T), args));
    }
 }
