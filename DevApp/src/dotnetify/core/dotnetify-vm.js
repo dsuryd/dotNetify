@@ -158,10 +158,10 @@ export default class dotnetifyVM {
         var listName = match[1];
         if (Array.isArray(this.State()[listName])) {
           var key = this.$itemKey[listName];
-          if (key != null)
-            vm.$removeList(listName, function(i) {
-              return i[key] == iVMUpdate[prop];
-            });
+          if (key != null) {
+            if (Array.isArray(iVMUpdate[prop])) vm.$removeList(listName, i => iVMUpdate[prop].some(x => i[key] == x));
+            else vm.$removeList(listName, i => i[key] == iVMUpdate[prop]);
+          }
           else console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
         }
         else console.error(`[${this.$vmId}] '${listName}' is not found or not an array.`);
@@ -231,6 +231,11 @@ export default class dotnetifyVM {
 
   //// Adds a new item to a state array.
   $addList(iListName, iNewItem) {
+    if (Array.isArray(iNewItem)) {
+      iNewItem.forEach(item => this.$addList(iListName, item));
+      return;
+    }
+
     // Check if the list already has an item with the same key. If so, replace it.
     var key = this.$itemKey[iListName];
     if (key != null) {
@@ -264,6 +269,11 @@ export default class dotnetifyVM {
 
   //// Updates existing item to an observable array.
   $updateList(iListName, iNewItem) {
+    if (Array.isArray(iNewItem)) {
+      iNewItem.forEach(item => this.$updateList(iListName, item));
+      return;
+    }
+
     // Check if the list already has an item with the same key. If so, update it.
     let key = this.$itemKey[iListName];
     if (key != null) {
