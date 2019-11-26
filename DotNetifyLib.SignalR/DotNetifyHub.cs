@@ -129,7 +129,7 @@ namespace DotNetify
          if (vmArg is JsonElement)
             data = JObject.Parse(((JsonElement)vmArg).GetRawText());
          // MessagePack protocol support.
-         else if (vmArg is JObject == false)
+         else if (vmArg != null && vmArg is JObject == false)
             data = JObject.FromObject(vmArg);
 
          try

@@ -121,7 +121,7 @@ namespace DotNetify
          JObject data = vmArg as JObject;
 
          // MessagePack protocol support.
-         if (vmArg is JObject == false)   
+         if (vmArg != null && vmArg is JObject == false)
             data = JObject.FromObject(vmArg);
 
          try
