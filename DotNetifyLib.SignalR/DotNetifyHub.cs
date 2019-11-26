@@ -123,11 +123,14 @@ namespace DotNetify
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
       public void Request_VM(string vmId, object vmArg)
       {
-         object data = vmArg;
+         JObject data = vmArg as JObject;
 
          // Convert System.Text.Json object to Newtonsoft.Json object to keep compatibility.
          if (vmArg is JsonElement)
-            data = JObject.Parse(((JsonElement) vmArg).GetRawText());
+            data = JObject.Parse(((JsonElement)vmArg).GetRawText());
+         // MessagePack protocol support.
+         else if (vmArg is JObject == false)
+            data = JObject.FromObject(vmArg);
 
          try
          {

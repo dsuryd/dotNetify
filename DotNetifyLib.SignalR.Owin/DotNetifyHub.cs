@@ -21,6 +21,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using DotNetify.Security;
 
 namespace DotNetify
@@ -117,9 +118,15 @@ namespace DotNetify
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
       public void Request_VM(string vmId, object vmArg)
       {
+         JObject data = vmArg as JObject;
+
+         // MessagePack protocol support.
+         if (vmArg is JObject == false)   
+            data = JObject.FromObject(vmArg);
+
          try
          {
-            _hubContext = new DotNetifyHubContext(Context, nameof(Request_VM), vmId, vmArg, null, Principal);
+            _hubContext = new DotNetifyHubContext(Context, nameof(Request_VM), vmId, data, null, Principal);
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
