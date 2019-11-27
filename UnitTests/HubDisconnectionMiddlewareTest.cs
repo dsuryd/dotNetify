@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
 using DotNetify;
+using DotNetify.Testing;
 
 namespace UnitTests
 {
@@ -16,7 +17,7 @@ namespace UnitTests
 
       private class CustomMiddleware : IDisconnectionMiddleware
       {
-         public event EventHandler<HubCallerContext> Invoked;
+         public static event EventHandler<HubCallerContext> Invoked;
 
          public Task OnDisconnected(HubCallerContext context)
          {
@@ -25,34 +26,21 @@ namespace UnitTests
          }
       }
 
-      private CustomMiddleware _middleware;
-
-      [TestInitialize]
-      public void Initialize()
-      {
-         _middleware = new CustomMiddleware();
-         VMController.CreateInstance = (type, args) =>  type == typeof(CustomMiddleware) ? _middleware : Activator.CreateInstance(type, args);
-      }
-
-      [TestCleanup]
-      public void Cleanup()
-      {
-         VMController.CreateInstance = (type, args) => Activator.CreateInstance(type, args);
-      }
-
       [TestMethod]
       public void DisconnectionMiddleware_DisconnectionIntercepted()
       {
-         VMController.Register<TestVM>();
-         var hub = new MockDotNetifyHub()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<TestVM>()
             .UseMiddleware<CustomMiddleware>()
-            .Create();
+            .Build();
 
          bool middlewareInvoked = false;
-         _middleware.Invoked += (sender, e) => middlewareInvoked = true;
+         CustomMiddleware.Invoked += (sender, e) => middlewareInvoked = true;
 
-         hub.RequestVM(nameof(TestVM));
-         hub.OnDisconnected();
+         var client = hubEmulator.CreateClient();
+         client.Connect(nameof(TestVM));
+
+         client.TerminateHubConnection();
          Assert.IsTrue(middlewareInvoked);
       }
    }

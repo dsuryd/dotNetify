@@ -1,14 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using DotNetify;
 using DotNetify.Security;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+using DotNetify.Testing;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace UnitTests
 {
@@ -28,9 +29,9 @@ namespace UnitTests
          public string ResponseProperty => "Triggered";
       }
 
-      private abstract class MiddlewareBase : IMiddleware
+      private class CustomMiddleware1 : IMiddleware
       {
-         public event EventHandler<DotNetifyHubContext> Invoked;
+         public static event EventHandler<DotNetifyHubContext> Invoked;
 
          public virtual Task Invoke(DotNetifyHubContext context, NextDelegate next)
          {
@@ -40,9 +41,17 @@ namespace UnitTests
          }
       }
 
-      private class CustomMiddleware1 : MiddlewareBase { }
+      private class CustomMiddleware2 : IMiddleware
+      {
+         public static event EventHandler<DotNetifyHubContext> Invoked;
 
-      private class CustomMiddleware2 : MiddlewareBase { }
+         public virtual Task Invoke(DotNetifyHubContext context, NextDelegate next)
+         {
+            Invoked?.Invoke(this, context);
+            context.PipelineData.Add(GetType().Name, null);
+            return next(context);
+         }
+      }
 
       private class CustomMiddleware3 : IMiddleware
       {
@@ -59,16 +68,14 @@ namespace UnitTests
          }
       }
 
-      private CustomMiddleware1 _middleware1;
-      private CustomMiddleware2 _middleware2;
-      private JObject _vmArg;
-      private IMemoryCache _headersCache = MockDotNetifyHub.CreateMemoryCache();
+      private TokenValidationParameters _tokenValidationParameters;
+      private VMConnectOptions _vmConnectOptions;
 
       [TestInitialize]
       public void Initialize()
       {
          string secretKey = "dotnetifydemo_secretkey_123!";
-         var tokenValidationParameters = new TokenValidationParameters
+         _tokenValidationParameters = new TokenValidationParameters
          {
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
             ValidAudience = "DotNetifyDemoApp",
@@ -80,55 +87,30 @@ namespace UnitTests
             ClockSkew = TimeSpan.FromSeconds(0)
          };
 
-         var types = new Dictionary<Type, object>
-         {
-            {typeof(CustomMiddleware1), (_middleware1 = new CustomMiddleware1()) },
-            {typeof(CustomMiddleware2), (_middleware2 = new CustomMiddleware2()) },
-            {typeof(ExtractHeadersMiddleware), new ExtractHeadersMiddleware(_headersCache) },
-            {typeof(JwtBearerAuthenticationMiddleware), new JwtBearerAuthenticationMiddleware(tokenValidationParameters) },
-         };
-
-         VMController.CreateInstance = (type, args) => types.ContainsKey(type) ? types[type] : Activator.CreateInstance(type, args);
-
-         _vmArg = JObject.Parse(@"{
-            Property: 'World',
-            $headers: {
-               Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjI0YTUwOGJlLWJlMTktNDFhZS1iZmI1LTc5OGU4YmNjNDI3ZCIsImlhdCI6MTUxNDUyODgxNiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6WyJhZG1pbiIsImFkbWluIl0sImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImFkbWluIiwibmJmIjoxNTE0NTI4ODE2LCJleHAiOjE4Mjk4ODg4MTYsImlzcyI6IkRvdE5ldGlmeURlbW9TZXJ2ZXIiLCJhdWQiOiJEb3ROZXRpZnlEZW1vQXBwIn0.q2wZyS13FskQ094O9xbz4FLlRPPHf1GfKOUOTHJyLbk'
-            }
-         }");
-      }
-
-      [TestCleanup]
-      public void Cleanup()
-      {
-         VMController.CreateInstance = (type, args) => Activator.CreateInstance(type, args);
+         _vmConnectOptions = new VMConnectOptions();
+         _vmConnectOptions.VMArg.Set("Property", "World");
+         _vmConnectOptions.Headers.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjI0YTUwOGJlLWJlMTktNDFhZS1iZmI1LTc5OGU4YmNjNDI3ZCIsImlhdCI6MTUxNDUyODgxNiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6WyJhZG1pbiIsImFkbWluIl0sImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImFkbWluIiwibmJmIjoxNTE0NTI4ODE2LCJleHAiOjE4Mjk4ODg4MTYsImlzcyI6IkRvdE5ldGlmeURlbW9TZXJ2ZXIiLCJhdWQiOiJEb3ROZXRpZnlEZW1vQXBwIn0.q2wZyS13FskQ094O9xbz4FLlRPPHf1GfKOUOTHJyLbk");
       }
 
       [TestMethod]
       public void Middleware_RequestIntercepted()
       {
-         VMController.Register<MiddlewareTestVM>();
-         var hub = new MockDotNetifyHub()
-            .UseMiddleware<ExtractHeadersMiddleware>()
-            .UseMiddleware<JwtBearerAuthenticationMiddleware>()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<MiddlewareTestVM>()
+            .UseMiddleware<JwtBearerAuthenticationMiddleware>(_tokenValidationParameters)
             .UseMiddleware<CustomMiddleware1>()
             .UseMiddleware<CustomMiddleware2>()
-            .Create();
+            .Build();
 
-         string vmName = null;
-         dynamic vmData = null;
-         hub.Response += (sender, e) =>
-         {
-            vmName = e.Item1;
-            vmData = JsonConvert.DeserializeObject<dynamic>(e.Item2);
-         };
+         var client = hubEmulator.CreateClient();
 
          Action middleware1Assertions = null;
-         _middleware1.Invoked += (sender, context) =>
+         CustomMiddleware1.Invoked += (sender, context) =>
          {
             if (middleware1Assertions != null)
                return;
 
+            var vmId = context.VMId;
             var callType = context.CallType;
             var connectionId = context.CallerContext.ConnectionId;
             var testVMPropValue = (context.Data as JObject)[nameof(MiddlewareTestVM.Property)];
@@ -138,8 +120,9 @@ namespace UnitTests
 
             middleware1Assertions = () =>
             {
+               Assert.AreEqual(nameof(MiddlewareTestVM), vmId);
                Assert.AreEqual("Request_VM", callType);
-               Assert.AreEqual(hub.ConnectionId, connectionId);
+               Assert.AreEqual(client.ConnectionId, connectionId);
                Assert.AreEqual("World", testVMPropValue);
                Assert.IsTrue(authToken.StartsWith("Bearer "));
                Assert.AreEqual("admin", principalName);
@@ -148,11 +131,12 @@ namespace UnitTests
          };
 
          Action middleware2Assertions = null;
-         _middleware2.Invoked += (sender, context) =>
+         CustomMiddleware2.Invoked += (sender, context) =>
          {
             if (middleware2Assertions != null)
                return;
 
+            var vmId = context.VMId;
             var callType = context.CallType;
             var connectionId = context.CallerContext.ConnectionId;
             var testVMPropValue = (context.Data as JObject)[nameof(MiddlewareTestVM.Property)];
@@ -162,8 +146,9 @@ namespace UnitTests
 
             middleware2Assertions = () =>
             {
+               Assert.AreEqual(nameof(MiddlewareTestVM), vmId);
                Assert.AreEqual("Request_VM", callType);
-               Assert.AreEqual(hub.ConnectionId, connectionId);
+               Assert.AreEqual(client.ConnectionId, connectionId);
                Assert.AreEqual("World", testVMPropValue);
                Assert.IsTrue(authToken.StartsWith("Bearer "));
                Assert.AreEqual("admin", principalName);
@@ -171,10 +156,9 @@ namespace UnitTests
             };
          };
 
-         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
+         var request = client.Connect(nameof(MiddlewareTestVM), _vmConnectOptions).As<dynamic>();
 
-         Assert.AreEqual(nameof(MiddlewareTestVM), vmName);
-         Assert.AreEqual("World", vmData.Property.ToString());
+         Assert.AreEqual("World", (string) request.Property);
          middleware1Assertions();
          middleware2Assertions();
       }
@@ -182,16 +166,17 @@ namespace UnitTests
       [TestMethod]
       public void Middleware_UpdateIntercepted()
       {
-         VMController.Register<MiddlewareTestVM>();
-         var hub = new MockDotNetifyHub()
-            .UseMiddleware<ExtractHeadersMiddleware>()
-            .UseMiddleware<JwtBearerAuthenticationMiddleware>()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<MiddlewareTestVM>()
+            .UseMiddleware<JwtBearerAuthenticationMiddleware>(_tokenValidationParameters)
             .UseMiddleware<CustomMiddleware1>()
             .UseMiddleware<CustomMiddleware2>()
-            .Create();
+            .Build();
+
+         var client = hubEmulator.CreateClient();
 
          Action middleware1Assertions = null;
-         _middleware1.Invoked += (sender, context) =>
+         CustomMiddleware1.Invoked += (sender, context) =>
          {
             if (context.CallType != "Update_VM")
                return;
@@ -204,7 +189,7 @@ namespace UnitTests
 
             middleware1Assertions = () =>
             {
-               Assert.AreEqual(hub.ConnectionId, connectionId);
+               Assert.AreEqual(client.ConnectionId, connectionId);
                Assert.AreEqual("Goodbye", testVMPropValue);
                Assert.IsTrue(authToken.StartsWith("Bearer "));
                Assert.AreEqual("admin", principalName);
@@ -213,7 +198,7 @@ namespace UnitTests
          };
 
          Action middleware2Assertions = null;
-         _middleware2.Invoked += (sender, context) =>
+         CustomMiddleware2.Invoked += (sender, context) =>
          {
             if (context.CallType != "Update_VM")
                return;
@@ -226,7 +211,7 @@ namespace UnitTests
 
             middleware2Assertions = () =>
             {
-               Assert.AreEqual(hub.ConnectionId, connectionId);
+               Assert.AreEqual(client.ConnectionId, connectionId);
                Assert.AreEqual("Goodbye", testVMPropValue);
                Assert.IsTrue(authToken.StartsWith("Bearer "));
                Assert.AreEqual("admin", principalName);
@@ -234,8 +219,8 @@ namespace UnitTests
             };
          };
 
-         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
-         hub.UpdateVM(nameof(MiddlewareTestVM), new Dictionary<string, object> { { "Property", "Goodbye" } });
+         client.Connect(nameof(MiddlewareTestVM), _vmConnectOptions);
+         client.Dispatch(new Dictionary<string, object> { { "Property", "Goodbye" } });
 
          middleware1Assertions();
          middleware2Assertions();
@@ -244,16 +229,17 @@ namespace UnitTests
       [TestMethod]
       public void Middleware_DisposeIntercepted()
       {
-         VMController.Register<MiddlewareTestVM>();
-         var hub = new MockDotNetifyHub()
-            .UseMiddleware<ExtractHeadersMiddleware>()
-            .UseMiddleware<JwtBearerAuthenticationMiddleware>()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<MiddlewareTestVM>()
+            .UseMiddleware<JwtBearerAuthenticationMiddleware>(_tokenValidationParameters)
             .UseMiddleware<CustomMiddleware1>()
             .UseMiddleware<CustomMiddleware2>()
-            .Create();
+            .Build();
+
+         var client = hubEmulator.CreateClient();
 
          Action middleware1Assertions = null;
-         _middleware1.Invoked += (sender, context) =>
+         CustomMiddleware1.Invoked += (sender, context) =>
          {
             if (context.CallType != "Dispose_VM")
                return;
@@ -265,7 +251,7 @@ namespace UnitTests
 
             middleware1Assertions = () =>
             {
-               Assert.AreEqual(hub.ConnectionId, connectionId);
+               Assert.AreEqual(client.ConnectionId, connectionId);
                Assert.IsTrue(authToken.StartsWith("Bearer "));
                Assert.AreEqual("admin", principalName);
                Assert.AreEqual(0, pipelineData.Count);
@@ -273,7 +259,7 @@ namespace UnitTests
          };
 
          Action middleware2Assertions = null;
-         _middleware2.Invoked += (sender, context) =>
+         CustomMiddleware2.Invoked += (sender, context) =>
          {
             if (context.CallType != "Dispose_VM")
                return;
@@ -285,15 +271,15 @@ namespace UnitTests
 
             middleware2Assertions = () =>
             {
-               Assert.AreEqual(hub.ConnectionId, connectionId);
+               Assert.AreEqual(client.ConnectionId, connectionId);
                Assert.IsTrue(authToken.StartsWith("Bearer "));
                Assert.AreEqual("admin", principalName);
                Assert.AreEqual(1, pipelineData.Count);
             };
          };
 
-         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
-         hub.DisposeVM(nameof(MiddlewareTestVM));
+         client.Connect(nameof(MiddlewareTestVM), _vmConnectOptions);
+         client.Destroy();
 
          middleware1Assertions();
          middleware2Assertions();
@@ -302,24 +288,17 @@ namespace UnitTests
       [TestMethod]
       public void Middleware_ResponseIntercepted()
       {
-         VMController.Register<MiddlewareTestVM>();
-         var hub = new MockDotNetifyHub()
-            .UseMiddleware<ExtractHeadersMiddleware>()
-            .UseMiddleware<JwtBearerAuthenticationMiddleware>()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<MiddlewareTestVM>()
+            .UseMiddleware<JwtBearerAuthenticationMiddleware>(_tokenValidationParameters)
             .UseMiddleware<CustomMiddleware3>()
-            .Create();
+            .Build();
 
-         hub.RequestVM(nameof(MiddlewareTestVM), _vmArg);
+         var client = hubEmulator.CreateClient();
+         client.Connect(nameof(MiddlewareTestVM), _vmConnectOptions);
 
-         string responsePropertyValue = null;
-         hub.Response += (sender, e) =>
-         {
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(e.Item2);
-            responsePropertyValue = data.ResponseProperty;
-         };
-
-         hub.UpdateVM(nameof(MiddlewareTestVM), new Dictionary<string, object> { { "TriggerProperty", true } });
-         Assert.AreEqual("TRIGGERED", responsePropertyValue);
+         var response = client.Dispatch(new Dictionary<string, object> { { "TriggerProperty", true } }).As<dynamic>();
+         Assert.AreEqual("TRIGGERED", (string) response.ResponseProperty);
       }
    }
 }

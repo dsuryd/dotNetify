@@ -1,10 +1,11 @@
-﻿using DotNetify;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using DotNetify;
+using DotNetify.Testing;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace UnitTests
 {
@@ -28,6 +29,7 @@ namespace UnitTests
       private class ExceptionOnDisposeVM : BaseVM
       {
          public string Property { get; set; }
+
          public override void Dispose() => throw new ArgumentOutOfRangeException();
       }
 
@@ -36,7 +38,7 @@ namespace UnitTests
          public Task<Exception> OnException(HubCallerContext context, Exception exception)
          {
             if (exception is JsonSerializationException)
-               return Task.FromResult((Exception)new ApplicationException());
+               return Task.FromResult((Exception) new ApplicationException());
             return Task.FromResult(exception);
          }
       }
@@ -46,7 +48,7 @@ namespace UnitTests
          public Task<Exception> OnException(HubCallerContext context, Exception exception)
          {
             if (exception is ArgumentNullException)
-               return Task.FromResult((Exception)new InvalidOperationException());
+               return Task.FromResult((Exception) new InvalidOperationException());
             return Task.FromResult(exception);
          }
       }
@@ -54,6 +56,7 @@ namespace UnitTests
       private class ExceptionOnDisposeMiddleware : IExceptionMiddleware
       {
          public static Exception Exception { get; set; }
+
          public Task<Exception> OnException(HubCallerContext context, Exception exception)
          {
             Exception = exception;
@@ -72,90 +75,70 @@ namespace UnitTests
       [TestMethod]
       public void ExceptionMiddleware_ExceptionOnRequest_NotIntercepted()
       {
-         VMController.Register<ExceptionOnRequestVM>();
-         var hub = new MockDotNetifyHub().Create();
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<ExceptionOnRequestVM>()
+            .Build();
 
-         string exceptionType = null;
-         hub.Response += (sender, e) =>
-         {
-            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
-            exceptionType = exception.ExceptionType;
-         };
-
-         hub.RequestVM(nameof(ExceptionOnRequestVM), null);
-         Assert.AreEqual(nameof(JsonSerializationException), exceptionType);
+         var client = hubEmulator.CreateClient();
+         var response = client.Connect(nameof(ExceptionOnRequestVM)).As<dynamic>();
+         Assert.AreEqual(nameof(JsonSerializationException), (string) response.ExceptionType);
       }
 
       [TestMethod]
       public void ExceptionMiddleware_ExceptionOnRequest_ExceptionIntercepted()
       {
-         VMController.Register<ExceptionOnRequestVM>();
-         var hub = new MockDotNetifyHub()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<ExceptionOnRequestVM>()
             .UseMiddleware<JsonSerializationExceptionMiddleware>()
             .UseMiddleware<ArgumentNullExceptionMiddleware>()
-            .Create();
+            .Build();
 
-         string exceptionType = null;
-         hub.Response += (sender, e) =>
-         {
-            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
-            exceptionType = exception.ExceptionType;
-         };
-
-         hub.RequestVM(nameof(ExceptionOnRequestVM));
-         Assert.AreEqual(nameof(ApplicationException), exceptionType);
+         var client = hubEmulator.CreateClient();
+         var response = client.Connect(nameof(ExceptionOnRequestVM)).As<dynamic>();
+         Assert.AreEqual(nameof(ApplicationException), (string) response.ExceptionType);
       }
 
       [TestMethod]
       public void ExceptionMiddleware_ExceptionOnUpdate_NotIntercepted()
       {
-         VMController.Register<ExceptionOnUpdateVM>();
-         var hub = new MockDotNetifyHub().Create();
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<ExceptionOnUpdateVM>()
+            .Build();
 
-         string exceptionType = null;
-         hub.Response += (sender, e) =>
-         {
-            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
-            exceptionType = exception.ExceptionType;
-         };
-
-         hub.RequestVM(nameof(ExceptionOnUpdateVM));
-         hub.UpdateVM(nameof(ExceptionOnUpdateVM), new Dictionary<string, object> { { "Property", "" } });
-         Assert.AreEqual(nameof(ArgumentNullException), exceptionType);
+         var client = hubEmulator.CreateClient();
+         client.Connect(nameof(ExceptionOnUpdateVM));
+         var response = client.Dispatch(new Dictionary<string, object> { { "Property", "" } }).As<dynamic>();
+         Assert.AreEqual(nameof(ArgumentNullException), (string) response.ExceptionType);
       }
 
       [TestMethod]
       public void ExceptionMiddleware_ExceptionOnUpdate_ExceptionIntercepted()
       {
-         VMController.Register<ExceptionOnUpdateVM>();
-         var hub = new MockDotNetifyHub()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<ExceptionOnUpdateVM>()
             .UseMiddleware<JsonSerializationExceptionMiddleware>()
             .UseMiddleware<ArgumentNullExceptionMiddleware>()
-            .Create();
+            .Build();
 
-         string exceptionType = null;
-         hub.Response += (sender, e) =>
-         {
-            dynamic exception = JsonConvert.DeserializeObject<dynamic>(e.Item2);
-            exceptionType = exception.ExceptionType;
-         };
+         var client = hubEmulator.CreateClient();
+         client.Connect(nameof(ExceptionOnUpdateVM));
+         var response = client.Dispatch(new Dictionary<string, object> { { "Property", "" } }).As<dynamic>();
 
-         hub.RequestVM(nameof(ExceptionOnUpdateVM));
-         hub.UpdateVM(nameof(ExceptionOnUpdateVM), new Dictionary<string, object> { { "Property", "" } });
-         Assert.AreEqual(nameof(InvalidOperationException), exceptionType);
+         Assert.AreEqual(nameof(InvalidOperationException), (string) response.ExceptionType);
       }
 
       [TestMethod]
       [ExpectedException(typeof(ArgumentOutOfRangeException))]
       public void ExceptionMiddleware_ExceptionOnDispose_ExceptionIntercepted()
       {
-         VMController.Register<ExceptionOnDisposeVM>();
-         var hub = new MockDotNetifyHub()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<ExceptionOnDisposeVM>()
             .UseMiddleware<ExceptionOnDisposeMiddleware>()
-            .Create();
+            .Build();
 
-         hub.RequestVM(nameof(ExceptionOnDisposeVM));
-         hub.DisposeVM(nameof(ExceptionOnDisposeVM));
+         var client = hubEmulator.CreateClient();
+         client.Connect(nameof(ExceptionOnDisposeVM));
+         client.Destroy();
 
          throw ExceptionOnDisposeMiddleware.Exception;
       }
@@ -163,16 +146,15 @@ namespace UnitTests
       [TestMethod]
       public void ExceptionMiddleware_OperationCancelled_NoResponse()
       {
-         VMController.Register<ExceptionOnDisposeVM>();
-         var hub = new MockDotNetifyHub()
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<ExceptionOnDisposeVM>()
             .UseMiddleware<OperationCancelledMiddleware>()
-            .Create();
+            .Build();
 
-         bool responseSent = false;
-         hub.Response += (sender, e) => responseSent = true;
+         var client = hubEmulator.CreateClient();
+         var request = client.Connect(nameof(ExceptionOnDisposeVM));
 
-         hub.RequestVM(nameof(ExceptionOnDisposeVM));
-         Assert.IsFalse(responseSent);
+         Assert.AreEqual(0, request.Count);
       }
    }
 }

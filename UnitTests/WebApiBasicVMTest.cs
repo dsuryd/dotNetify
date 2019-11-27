@@ -7,6 +7,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
 using Mvc = Microsoft.AspNetCore.Http;
+using ms = Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using System;
 
 namespace UnitTests
 {
@@ -62,14 +65,26 @@ namespace UnitTests
          }
       }
 
+      private IMemoryCache _memoryCache;
+      private List<Tuple<Type, Func<IMiddlewarePipeline>>> _middlewareFactories = new List<Tuple<Type, Func<IMiddlewarePipeline>>>();
+      private Dictionary<Type, Func<IVMFilter>> _vmFilterFactories = new Dictionary<Type, Func<IVMFilter>>();
+
+      [TestInitialize]
+      public void Initialize()
+      {
+         var options = Substitute.For<IOptions<ms.MemoryCacheOptions>>();
+         options.Value.Returns(new ms.MemoryCacheOptions());
+         _memoryCache = new MemoryCacheAdapter(new ms.MemoryCache(options));
+      }
+
       [TestMethod]
       public async Task WebApiBasicVM_Request()
       {
          VMController.Register<BasicVM>();
 
          var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
-         var hubPipeline = new MockDotNetifyHub().CreateHubPipeline();
+         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
+         var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
          var serviceScopeFactory = new ServiceScopeFactory();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -89,8 +104,8 @@ namespace UnitTests
          VMController.Register<BasicVM>();
 
          var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
-         var hubPipeline = new MockDotNetifyHub().CreateHubPipeline();
+         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
+         var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
          var serviceScopeFactory = new ServiceScopeFactory();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -113,12 +128,12 @@ namespace UnitTests
       {
          VMController.Register<BasicVM>();
 
+         _middlewareFactories.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(typeof(CustomMiddleware), () => new CustomMiddleware()));
+
          var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
+         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
          var serviceScopeFactory = new ServiceScopeFactory();
-         var hubPipeline = new MockDotNetifyHub()
-            .UseMiddleware<CustomMiddleware>()
-            .CreateHubPipeline();
+         var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
@@ -136,12 +151,12 @@ namespace UnitTests
       {
          VMController.Register<BasicVM>();
 
+         _middlewareFactories.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(typeof(CustomMiddleware), () => new CustomMiddleware()));
+
          var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(new MockDotNetifyHub.MemoryCache(), new VMTypesAccessor());
+         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
          var serviceScopeFactory = new ServiceScopeFactory();
-         var hubPipeline = new MockDotNetifyHub()
-            .UseMiddleware<CustomMiddleware>()
-            .CreateHubPipeline();
+         var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };

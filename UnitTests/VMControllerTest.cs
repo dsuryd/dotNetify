@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DotNetify;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using DotNetify;
-using static UnitTests.MockDotNetifyHub;
+using NSubstitute;
+using ms = Microsoft.Extensions.Caching.Memory;
 
 namespace UnitTests
 {
@@ -69,7 +70,11 @@ namespace UnitTests
       [TestInitialize]
       public void Initialize()
       {
-         _vmFactory = new VMFactory(new MemoryCache(), new VMTypesAccessor());
+         var options = Substitute.For<IOptions<ms.MemoryCacheOptions>>();
+         options.Value.Returns(new ms.MemoryCacheOptions());
+
+         var memoryCache = new MemoryCacheAdapter(new ms.MemoryCache(options));
+         _vmFactory = new VMFactory(memoryCache, new VMTypesAccessor());
       }
 
       [TestMethod]
@@ -100,13 +105,13 @@ namespace UnitTests
 
          Assert.AreEqual("conn1", _connectionId);
          Assert.AreEqual(typeof(UnitTestVM).Name, _vmId);
-         var vmData = (JObject)JsonConvert.DeserializeObject(_vmData);
+         var vmData = (JObject) JsonConvert.DeserializeObject(_vmData);
          Assert.AreEqual("John Doe", vmData["FullName"]);
 
          vmController.OnRequestVM("conn1", typeof(UnitTestVM).Name);
          Assert.AreEqual("conn1", _connectionId);
          Assert.AreEqual(typeof(UnitTestVM).Name, _vmId);
-         vmData = (JObject)JsonConvert.DeserializeObject(_vmData);
+         vmData = (JObject) JsonConvert.DeserializeObject(_vmData);
          Assert.AreEqual("Doe", vmData["LastName"]);
          Assert.AreEqual(42, vmData["Age"]);
 
