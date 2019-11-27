@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using DotNetify.Pulse;
+using DotNetify.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using DotNetify.Security;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotNetify.DevApp
 {
@@ -22,6 +24,7 @@ namespace DotNetify.DevApp
 
          services.AddSignalR();
          services.AddDotNetify();
+         services.AddDotNetifyPulse();
          services.AddMvc();
 
          services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -55,7 +58,13 @@ namespace DotNetify.DevApp
             config.UseFilter<AuthorizeFilter>();
 
             // Middleware to log incoming/outgoing message; default to Sytem.Diagnostic.Trace.
-            config.UseDeveloperLogging();
+            var logger = app.ApplicationServices.GetService<ILogger<VMController>>();
+            config.UseDeveloperLogging(log =>
+            {
+               if (!log.Contains("vmId=PulseVM"))
+                  logger.LogInformation(log);
+               System.Diagnostics.Trace.WriteLine(log);
+            });
 
             // Demonstration middleware that extracts auth token from incoming request headers.
             config.UseMiddleware<ExtractAccessTokenMiddleware>(tokenValidationParameters);
@@ -63,6 +72,7 @@ namespace DotNetify.DevApp
             // Demonstration filter that passes access token from the middleware to the ViewModels.SecurePageVM class instance.
             config.UseFilter<SetAccessTokenFilter>();
          });
+         app.UseDotNetifyPulse();
 
          if (env.IsDevelopment())
          {

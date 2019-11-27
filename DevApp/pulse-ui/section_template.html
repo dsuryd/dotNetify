@@ -1,0 +1,33 @@
+﻿<template id="scalar-display">
+    <d-panel nogap="true" class="card">
+        <label slot="label"></label>
+        <d-panel horizontal="true">
+            <h3 slot="value"></h3>
+            <label slot="unit"></label>
+        </d-panel>
+    </d-panel>
+</template>
+
+<d-frame>
+    <d-panel horizontal="true" flex="0 0 auto">
+        <d-panel flex="0 0 11rem">
+            <d-element id="TotalCpu" template="scalar-display"></d-element>
+            <d-element id="GCTotalMemory" template="scalar-display"></d-element>
+        </d-panel>
+        <d-panel horizontal="true" flex="1">
+            <d-panel class="card">
+                <d-line-chart id="TotalCpuTrend" height="100px" streaming="true" tooltip="true"></d-line-chart>
+            </d-panel>
+            <d-panel class="card">
+                <d-line-chart id="GCTotalMemoryTrend" height="100px" streaming="true" tooltip="true"></d-line-chart>
+            </d-panel>
+        </d-panel>
+    </d-panel>
+
+    <d-data-grid id="Logs">
+        <d-grid-column colkey="FormattedTime" width="12rem"></d-grid-column>
+        <d-grid-column colkey="Level" width="7rem"></d-grid-column>
+    </d-data-grid>
+
+    <!--section_ext-->
+</d-frame>

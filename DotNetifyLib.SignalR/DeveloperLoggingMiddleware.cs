@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
 
 namespace DotNetify
 {
@@ -35,10 +35,13 @@ namespace DotNetify
 
       public Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
+         string data = hubContext.Data == null ? string.Empty
+            : hubContext.Data is string ? (string)hubContext.Data : JsonConvert.SerializeObject(hubContext.Data, Formatting.None);
+
          var log = $@"[dotNetify] connId={hubContext.CallerContext?.ConnectionId}
             type={hubContext.CallType}
             vmId={hubContext.VMId}
-            data={JsonConvert.SerializeObject(hubContext.Data ?? string.Empty)}";
+            data={data.Replace("\r\n", "")}";
 
          if (hubContext.Headers != null)
             log += $@"
