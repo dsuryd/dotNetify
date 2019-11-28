@@ -11,7 +11,10 @@ using DotNetify.Security;
 using DotNetify.Testing;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Text.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections;
+using System.Linq;
 
 namespace UnitTests
 {
@@ -106,6 +109,49 @@ namespace UnitTests
 
          var options = new VMConnectOptions();
          options.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
+
+         client.Connect(nameof(SecurePageVM), options);
+
+         var responses = client.Listen(expireSeconds * 1000);
+
+         var state = client.GetState<ClientState>();
+         Assert.AreEqual("Authenticated user: \"john\"", state.SecureCaption);
+         Assert.IsTrue(state.SecureData.StartsWith("Access token will expire in"));
+      }
+
+      [TestMethod]
+      public void ExampleSecurePage_Connect_SystemTextJsonProtocol_ReturnsSecureData()
+      {
+         var expireSeconds = 3;
+
+         var client = _hubEmulator.CreateClient();
+
+         var vmConnectOptions = new VMConnectOptions();
+         vmConnectOptions.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
+
+         var serializedString = ((JObject) vmConnectOptions).ToString();
+         object options = JsonSerializer.Deserialize<object>(serializedString);
+
+         client.Connect(nameof(SecurePageVM), options);
+
+         var responses = client.Listen(expireSeconds * 1000);
+
+         var state = client.GetState<ClientState>();
+         Assert.AreEqual("Authenticated user: \"john\"", state.SecureCaption);
+         Assert.IsTrue(state.SecureData.StartsWith("Access token will expire in"));
+      }
+
+      [TestMethod]
+      public void ExampleSecurePage_Connect_MessagePackProtocol_ReturnsSecureData()
+      {
+         var expireSeconds = 3;
+
+         var client = _hubEmulator.CreateClient();
+
+         var vmConnectOptions = new VMConnectOptions();
+         vmConnectOptions.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
+
+         var options = ((JObject) vmConnectOptions).ToObject<Dictionary<object, object>>();
 
          client.Connect(nameof(SecurePageVM), options);
 
