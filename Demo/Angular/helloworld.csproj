@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetify.SignalR" Version="3.5.0" />
+    <PackageReference Include="DotNetify.SignalR" Version="3.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="2.1.1" />
   </ItemGroup>

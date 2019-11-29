@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.2",
-    "dotnetify": "file:dotnetify-3.0.3.tgz",
+    "dotnetify": "^3.6.0",
     "jquery": "~3.4.1",
     "knockout": "~3.5.0"
   },

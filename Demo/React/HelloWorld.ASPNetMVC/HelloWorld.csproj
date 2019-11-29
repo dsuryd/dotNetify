@@ -44,11 +44,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetifyLib.Core, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>.\packages\DotNetify.Core.3.0.1\lib\netstandard2.0\DotNetifyLib.Core.dll</HintPath>
+    <Reference Include="DotNetifyLib.Core, Version=3.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DotNetify.Core.3.6.0\lib\netstandard2.0\DotNetifyLib.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetifyLib.SignalR.Owin, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>.\packages\DotNetify.SignalR.Owin.3.0.1\lib\net461\DotNetifyLib.SignalR.Owin.dll</HintPath>
+    <Reference Include="DotNetifyLib.SignalR.Owin, Version=3.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DotNetify.SignalR.Owin.3.6.0\lib\net461\DotNetifyLib.SignalR.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>.\packages\Microsoft.AspNet.SignalR.Core.2.2.2\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>

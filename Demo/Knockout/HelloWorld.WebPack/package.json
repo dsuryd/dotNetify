@@ -5,7 +5,7 @@
     "build": "webpack"
   },
   "dependencies": {
-    "dotnetify": "^3.0.3",
+    "dotnetify": "^3.6.0",
     "jquery": "~3.4.1",
     "knockout": "~3.5.0"
   },
