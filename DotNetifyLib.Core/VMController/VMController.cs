@@ -220,7 +220,7 @@ namespace DotNetify
             var vmData = vmInstance.Serialize();
 
             // Send the view model data back to the browser client.
-            ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => _vmResponse(connectionId, vmId, (string)filteredData));
+            ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => _vmResponse(connectionId, vmId, (string) filteredData));
 
             // Reset the changed property states.
             vmInstance.AcceptChangedProperties();
@@ -356,11 +356,12 @@ namespace DotNetify
 
          // If the view model Id is in the form of a delimited path, it has a master view model.
          BaseVM masterVM = null;
+         string masterVMId = null;
          var path = vmId.Split('.');
          if (path.Length > 1)
          {
             // Get the master view model; create the instance if it doesn't exist.
-            var masterVMId = vmId.Remove(vmId.LastIndexOf('.'));
+            masterVMId = vmId.Remove(vmId.LastIndexOf('.'));
             lock (_activeVMs)
             {
                if (!_activeVMs.ContainsKey(masterVMId))
@@ -384,19 +385,31 @@ namespace DotNetify
             vmInstanceId = path[1];
          }
 
-         // Get the view model instance from the master view model, and if not, create it ourselves here.
-         var vmInstance = masterVM?.GetSubVM(vmTypeName, vmInstanceId)
-            ?? _vmFactory.GetInstance(vmTypeName, vmInstanceId, vmNamespace)
-            ?? throw new Exception($"[dotNetify] ERROR: '{vmId}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.");
+         BaseVM vmInstance = null;
+         void createVMAction(object data)
+         {
+            // Get the view model instance from the master view model, and if not, create it ourselves here.
+            vmInstance = masterVM?.GetSubVM(vmTypeName, vmInstanceId) ?? _vmFactory.GetInstance(vmTypeName, vmInstanceId, vmNamespace);
+            if (vmInstance != null)
+            {
+               // If there are view model arguments, set them into the instance.
+               if (data is JObject)
+                  foreach (var prop in (data as JObject).Properties())
+                     UpdateVM(vmInstance, prop.Name, prop.Value.ToString());
 
-         // If there are view model arguments, set them into the instance.
-         if (vmArg is JObject)
-            foreach (var prop in (vmArg as JObject).Properties())
-               UpdateVM(vmInstance, prop.Name, prop.Value.ToString());
+               // Pass the view model instance to the master view model.
+               masterVM?.OnSubVMCreated(vmInstance);
+            }
+         }
 
-         // Pass the view model instance to the master view model.
-         masterVM?.OnSubVMCreated(vmInstance);
+         // If there's a master view model, run it through the view model filter.
+         if (masterVM != null)
+            RequestVMFilter(masterVMId, masterVM, vmArg, createVMAction);
+         else
+            createVMAction(vmArg);
 
+         if (vmInstance == null)
+            throw new Exception($"[dotNetify] ERROR: '{vmId}' is not a known view model! Its assembly must be registered through VMController.RegisterAssembly.");
          return vmInstance;
       }
 
@@ -482,7 +495,7 @@ namespace DotNetify
 
          ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, vmData, filteredData =>
          {
-            _vmResponse(vmInfo.ConnectionId, vmInfo.Id, (string)filteredData);
+            _vmResponse(vmInfo.ConnectionId, vmInfo.Id, (string) filteredData);
          });
       }
 

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DotNetify;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -21,10 +21,10 @@ namespace UnitTests
          Assert.IsNotNull(resolver);
 
          var serializer = new VMSerializer();
-         var ignoredPropertyNames = new List<String> {"World"};
-         serializer.Serialize(new {Hello = "Hello", World = "World"}, ignoredPropertyNames);
+         var ignoredPropertyNames = new List<string> { "World" };
+         serializer.Serialize(new { Hello = "Hello", World = "World" }, ignoredPropertyNames);
 
-         Assert.AreSame(ignoredPropertyNames, resolver.IgnoredPropertyNames);
+         Assert.IsTrue(ignoredPropertyNames.All(name => resolver.IgnoredPropertyNames.Contains(name)));
       }
    }
 }
