@@ -46,6 +46,13 @@ namespace UnitTests
       {
          public static event EventHandler<Tuple<CustomFilter1Attribute, VMContext>> Invoked;
 
+         public static void Cleanup()
+         {
+            if (Invoked != null)
+               foreach (Delegate d in Invoked.GetInvocationList())
+                  Invoked -= (EventHandler<Tuple<CustomFilter1Attribute, VMContext>>) d;
+         }
+
          public Task Invoke(CustomFilter1Attribute attribute, VMContext context, NextFilterDelegate next)
          {
             Invoked?.Invoke(this, Tuple.Create(attribute, context));
@@ -56,6 +63,13 @@ namespace UnitTests
       private class CustomFilter2 : IVMFilter<CustomFilter2Attribute>
       {
          public static event EventHandler<Tuple<CustomFilter2Attribute, VMContext>> Invoked;
+
+         public static void Cleanup()
+         {
+            if (Invoked != null)
+               foreach (Delegate d in Invoked.GetInvocationList())
+                  Invoked -= (EventHandler<Tuple<CustomFilter2Attribute, VMContext>>) d;
+         }
 
          public Task Invoke(CustomFilter2Attribute attribute, VMContext context, NextFilterDelegate next)
          {
@@ -94,6 +108,13 @@ namespace UnitTests
          _vmConnectOptions = new VMConnectOptions();
          _vmConnectOptions.VMArg.Set("Property", "World");
          _vmConnectOptions.Headers.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjI0YTUwOGJlLWJlMTktNDFhZS1iZmI1LTc5OGU4YmNjNDI3ZCIsImlhdCI6MTUxNDUyODgxNiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6WyJhZG1pbiIsImFkbWluIl0sImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImFkbWluIiwibmJmIjoxNTE0NTI4ODE2LCJleHAiOjE4Mjk4ODg4MTYsImlzcyI6IkRvdE5ldGlmeURlbW9TZXJ2ZXIiLCJhdWQiOiJEb3ROZXRpZnlEZW1vQXBwIn0.q2wZyS13FskQ094O9xbz4FLlRPPHf1GfKOUOTHJyLbk");
+      }
+
+      [TestCleanup]
+      public void Cleanup()
+      {
+         CustomFilter1.Cleanup();
+         CustomFilter2.Cleanup();
       }
 
       [TestMethod]

@@ -33,6 +33,13 @@ namespace UnitTests
       {
          public static event EventHandler<DotNetifyHubContext> Invoked;
 
+         public static void Cleanup()
+         {
+            if (Invoked != null)
+               foreach (Delegate d in Invoked.GetInvocationList())
+                  Invoked -= (EventHandler<DotNetifyHubContext>) d;
+         }
+
          public virtual Task Invoke(DotNetifyHubContext context, NextDelegate next)
          {
             Invoked?.Invoke(this, context);
@@ -44,6 +51,13 @@ namespace UnitTests
       private class CustomMiddleware2 : IMiddleware
       {
          public static event EventHandler<DotNetifyHubContext> Invoked;
+
+         public static void Cleanup()
+         {
+            if (Invoked != null)
+               foreach (Delegate d in Invoked.GetInvocationList())
+                  Invoked -= (EventHandler<DotNetifyHubContext>) d;
+         }
 
          public virtual Task Invoke(DotNetifyHubContext context, NextDelegate next)
          {
@@ -90,6 +104,13 @@ namespace UnitTests
          _vmConnectOptions = new VMConnectOptions();
          _vmConnectOptions.VMArg.Set("Property", "World");
          _vmConnectOptions.Headers.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjI0YTUwOGJlLWJlMTktNDFhZS1iZmI1LTc5OGU4YmNjNDI3ZCIsImlhdCI6MTUxNDUyODgxNiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6WyJhZG1pbiIsImFkbWluIl0sImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImFkbWluIiwibmJmIjoxNTE0NTI4ODE2LCJleHAiOjE4Mjk4ODg4MTYsImlzcyI6IkRvdE5ldGlmeURlbW9TZXJ2ZXIiLCJhdWQiOiJEb3ROZXRpZnlEZW1vQXBwIn0.q2wZyS13FskQ094O9xbz4FLlRPPHf1GfKOUOTHJyLbk");
+      }
+
+      [TestCleanup]
+      public void Cleanup()
+      {
+         CustomMiddleware1.Cleanup();
+         CustomMiddleware2.Cleanup();
       }
 
       [TestMethod]
