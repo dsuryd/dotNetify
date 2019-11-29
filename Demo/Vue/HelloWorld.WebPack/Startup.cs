@@ -21,16 +21,20 @@ namespace HelloWorld.WebPack
         public void Configure(IApplicationBuilder app)
         {
             app.UseWebSockets();
-            app.UseSignalR(routes => routes.MapDotNetifyHub());
             app.UseDotNetify();
 
+#pragma warning disable 618
             app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
             {
                 HotModuleReplacement = true,
                 HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
             });            
+#pragma warning restore 618            
 
             app.UseStaticFiles();
+            app.UseRouting();
+            app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
+
             app.Run(async (context) =>
             {
                 using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))

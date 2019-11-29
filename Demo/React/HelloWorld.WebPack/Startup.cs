@@ -23,11 +23,13 @@ namespace HelloWorld.WebPack
             app.UseWebSockets();
             app.UseDotNetify();
 
+#pragma warning disable 618
             app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
             {
                 HotModuleReplacement = true,
                 HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
             });            
+#pragma warning restore 618            
 
             app.UseStaticFiles();
             app.UseRouting();
