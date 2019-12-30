@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="DotNetify.Elements" Version="1.2.0" />
     <PackageReference Include="DotNetify.Pulse" Version="0.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="1.1.5" />
     <PackageReference Include="System.Reactive" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.0.0" />
     <PackageReference Include="AspNet.Security.OpenIdConnect.Server" Version="2.0.0" />    

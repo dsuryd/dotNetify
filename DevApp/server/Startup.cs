@@ -23,7 +23,9 @@ namespace DotNetify.DevApp
          // Add OpenID Connect server to produce JWT access tokens.
          services.AddAuthenticationServer();
 
-         services.AddSignalR();
+         services.AddSignalR()
+            //.AddMessagePackProtocol()
+            ;
          services.AddDotNetify();
          services.AddDotNetifyPulse();
          services.AddMvc();
