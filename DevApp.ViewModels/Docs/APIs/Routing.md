@@ -1,7 +1,6 @@
 ## Routing
 
 While you certainly can use _React-Router_ to handle all your app's routing needs, dotNetify provides you with an option to declare all the routes in the back-end if you prefer to have your components decoupled from routing concerns. 
-> Demo source code is on GitHub at [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).
 
 #### Defining the Routes
 
@@ -140,5 +139,5 @@ class Page1 extends React.Component{
 
 #### Server-Side Rendering
 
-[Server-side Rendering of Deep Links with React and .NET Core](https://hackernoon.com/server-side-rendering-of-deep-links-with-react-and-net-core-882830ca663)
+[Server-side Rendering of Deep Links with React and .NET Core](https://medium.com/hackernoon/server-side-rendering-of-deep-links-with-react-and-net-core-882830ca663)
 
