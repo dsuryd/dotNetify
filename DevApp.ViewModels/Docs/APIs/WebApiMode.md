@@ -16,7 +16,12 @@ public void ConfigureServices(IServiceCollection services)
 public void Configure(IApplicationBuilder app)
 {
    app.UseDotNetify();
+
+   // .NET Core 2.x
    app.UseMvc();
+
+   // .NET Core 3.x
+   app.UseEndpoints(endpoints => endpoints.MapControllers());
    ...
 }
 ```
@@ -39,6 +44,6 @@ const webApiHubClient = dotnetify.createWebApiHub("http://my-other-domain.net", 
 
 dotnetify.connectHandler = vmConnectArgs => {
   if (vmConnectArgs.options && vmConnectArgs.options.webApi)
-    return webApiHubClient;
+   return { ...vmConnectArgs, hub: webApiHubClient };
 }
 ```
