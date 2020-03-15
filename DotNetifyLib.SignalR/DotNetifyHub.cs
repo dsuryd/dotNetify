@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
 using System.Text.Json;
@@ -123,19 +124,7 @@ namespace DotNetify
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
       public void Request_VM(string vmId, object vmArg)
       {
-         JObject data = null;
-         if (vmArg != null)
-         {
-            if (vmArg is JsonElement)
-               // System.Text.Json protocol.
-               data = JObject.Parse(((JsonElement) vmArg).GetRawText());
-            else if (vmArg is JObject)
-               // Newtonsoft.Json protocol.
-               data = vmArg as JObject;
-            else
-               // MessagePack protocol.
-               data = JObject.FromObject(vmArg);
-         }
+         object data = NormalizeType(vmArg);
 
          try
          {
@@ -168,10 +157,12 @@ namespace DotNetify
       /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
       public void Update_VM(string vmId, Dictionary<string, object> vmData)
       {
+         var data = vmData?.ToDictionary(x => x.Key, x => NormalizeType(x.Value));
+
          try
          {
             _callerContext = Context;
-            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Update_VM), vmId, vmData, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Update_VM), vmId, data, null, Principal);
             _hubPipeline.RunMiddlewares(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
@@ -279,6 +270,27 @@ namespace DotNetify
       }
 
       #endregion Server Responses
+
+      /// <summary>
+      /// Normalizes the type of the object argument to JObject when possible.
+      /// </summary>
+      /// <param name="data">Arbitrary object.</param>
+      /// <returns>JObject if the object is convertible; otherwise unchanged.</returns>
+      private object NormalizeType(object data)
+      {
+         if (data == null)
+            return null;
+         else if (data is JsonElement)
+            // System.Text.Json protocol.
+            return JObject.Parse(((JsonElement)data).GetRawText());
+         else if (data is JObject)
+            // Newtonsoft.Json protocol.
+            return data as JObject;
+         else if (!(data.GetType().IsPrimitive || data is string))
+            // MessagePack protocol.
+            return JObject.FromObject(data);
+         return data;
+      }
 
       /// <summary>
       /// Runs the view model filter.
