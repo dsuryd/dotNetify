@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 import { useState, useEffect, useRef } from 'react';
+import $ from '../libs/jquery-shim';
 import dotnetify from './dotnetify-react';
 
 export default function useConnect(vmId, component, options) {
@@ -36,7 +37,7 @@ export default function useConnect(vmId, component, options) {
           return vmData.current;
         },
         setState: newState => {
-          vmData.current = newState;
+          vmData.current = $.extend({}, vmData.current, newState);
           setState(vmData.current);
         }
       },
