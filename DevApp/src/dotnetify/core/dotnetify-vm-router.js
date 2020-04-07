@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import utils from '../libs/utils';
+import $ from '../libs/jquery-shim';
 
 export default class dotnetifyVMRouter {
   routes = [];
@@ -78,7 +79,7 @@ export default class dotnetifyVMRouter {
       return;
     }
 
-    var templates = this.RoutingState.Templates;
+    const templates = this.RoutingState.Templates;
     if (templates == null || templates.length == 0) return;
 
     // Initialize the router.
@@ -92,9 +93,9 @@ export default class dotnetifyVMRouter {
 
     templates.forEach(template => {
       // If url pattern isn't given, consider Id as the pattern.
-      var urlPattern = template.UrlPattern != null ? template.UrlPattern : template.Id;
+      let urlPattern = template.UrlPattern != null ? template.UrlPattern : template.Id;
       urlPattern = urlPattern != '' ? urlPattern : '/';
-      var mapUrl = this.toUrl(urlPattern);
+      const mapUrl = this.toUrl(urlPattern);
 
       if (this.debug) console.log('router> map ' + mapUrl + ' to template id=' + template.Id);
 
@@ -102,7 +103,7 @@ export default class dotnetifyVMRouter {
         this.router.urlPath = '';
 
         // Construct the path from the template pattern and the params passed by PathJS.
-        var path = urlPattern;
+        let path = urlPattern;
         for (var param in iParams) path = path.replace(':' + param, iParams[param]);
         path = path.replace(/\(\/:([^)]+)\)/g, '').replace(/\(|\)/g, '');
 
@@ -111,7 +112,7 @@ export default class dotnetifyVMRouter {
     });
 
     // Route initial URL.
-    var activeUrl = this.toUrl(this.RoutingState.Active);
+    let activeUrl = this.toUrl(this.RoutingState.Active);
     if (this.router.urlPath == '') this.router.urlPath = activeUrl;
     if (!this.routeUrl())
       // If routing ends incomplete, raise routed event anyway.
@@ -268,47 +269,60 @@ export default class dotnetifyVMRouter {
 
     // We can determine whether the view has already been loaded by matching the 'RoutingState.Origin' argument
     // on the existing view model inside that target selector with the path.
+    const pathUrl = this.toUrl(iPath);
     for (let i = 0; i < viewModels.length; i++) {
-      var vmOther = viewModels[i];
-      var vmArg = vmOther.$router.VMArg;
+      let vmOther = viewModels[i];
+      let vmArg = vmOther.$router.VMArg;
       if (vmArg != null) {
-        if (typeof vmArg['RoutingState.Origin'] === 'string' && utils.equal(vmArg['RoutingState.Origin'], iPath)) return;
+        if (typeof vmArg['RoutingState.Origin'] === 'string' && utils.equal(vmArg['RoutingState.Origin'], pathUrl)) return;
       }
     }
+
+    const activateRoute = () => {
+      // Check if the route has valid target.
+      if (iTemplate.Target == null) {
+        console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
+        return;
+      }
+
+      // If target DOM element isn't found, redirect URL to the path.
+      if (document.getElementById(iTemplate.Target) == null) {
+        if (isRedirect === true) {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
+          return;
+        }
+        else {
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+          return this.router.redirect(this.toUrl(iPath), [ ...viewModels, ...vm.$dotnetify.controller.getViewModels() ]);
+        }
+      }
+
+      // Load the view associated with the route asynchronously.
+      this.loadView('#' + iTemplate.Target, iTemplate.ViewUrl, iTemplate.JSModuleUrl, { 'RoutingState.Origin': iPath }, () => {
+        // If load is successful, update the active route.
+        this.dispatchActiveRoutingState(iPath);
+
+        // Support exit interception.
+        if (iDisableEvent != true && vm.hasOwnProperty('onRouteExit')) vm.onRouteExit(iPath, iTemplate);
+
+        if (typeof iCallbackFn === 'function') iCallbackFn.call(vm);
+      });
+    };
 
     // Support enter interception.
     if (iDisableEvent != true && vm.hasOwnProperty('onRouteEnter')) {
-      if (this.onRouteEnter(iPath, iTemplate) == false || vm.onRouteEnter(iPath, iTemplate) == false) return;
-    }
+      if (this.onRouteEnter(iPath, iTemplate) === false) return;
 
-    // Check if the route has valid target.
-    if (iTemplate.Target == null) {
-      console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
-      return;
-    }
-
-    // If target DOM element isn't found, redirect URL to the path.
-    if (document.getElementById(iTemplate.Target) == null) {
-      if (isRedirect === true) {
-        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
+      const result = vm.onRouteEnter(iPath, iTemplate);
+      if (result === false) return;
+      else if (result && typeof result.then == 'function') {
+        // If returning a promise, wait until it's resolved.
+        result.then(res => res !== false && activateRoute());
         return;
       }
-      else {
-        if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-        return this.router.redirect(this.toUrl(iPath), [ ...viewModels, ...vm.$dotnetify.controller.getViewModels() ]);
-      }
     }
 
-    // Load the view associated with the route asynchronously.
-    this.loadView('#' + iTemplate.Target, iTemplate.ViewUrl, iTemplate.JSModuleUrl, { 'RoutingState.Origin': iPath }, () => {
-      // If load is successful, update the active route.
-      this.dispatchActiveRoutingState(iPath);
-
-      // Support exit interception.
-      if (iDisableEvent != true && vm.hasOwnProperty('onRouteExit')) vm.onRouteExit(iPath, iTemplate);
-
-      if (typeof iCallbackFn === 'function') iCallbackFn.call(vm);
-    });
+    activateRoute();
   }
 
   routeToRoute(iRoute) {
