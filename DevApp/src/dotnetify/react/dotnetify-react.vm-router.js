@@ -102,7 +102,7 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
         resolve(reactElement);
       };
 
-      if (iJsModuleUrl == null || dotnetify.ssr === true) mountViewFunc();
+      if (iJsModuleUrl == null || this.vm.$dotnetify.ssr === true) mountViewFunc();
       else {
         // Load all javascripts first. Multiple files can be specified with comma delimiter.
         var getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
