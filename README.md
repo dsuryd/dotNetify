@@ -39,23 +39,6 @@ Documentation and live demo can be found at [https://dotnetify.net](http://dotne
 * React Native example: [dotnetify-react-native-demo](https://github.com/dsuryd/dotnetify-react-native-demo).
 * Other examples: [demo github repo]([https://github.com/dsuryd/dotNetify/tree/master/Demo]).
 
-
-## Installation
-
-*$ npm install dotnetify --save*
-
-ASP.NET Core:
-
-*PM> Install-Package DotNetify.Core*  
-*PM> Install-Package DotNetify.SignalR*  
-
-ASP.NET Framework:
-
-*PM> Install-Package DotNetify.Core*  
-*PM> Install-Package DotNetify.SignalR.Owin*  
-
-Read the website on how to configure your project.
-
 ## License
 Licensed under the Apache License, Version 2.0.
 
