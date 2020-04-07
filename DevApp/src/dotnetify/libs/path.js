@@ -62,6 +62,7 @@ var Path = {
     }
   },
   match: function(path, parameterize) {
+    if (path === '') path = '/';
     var params = {},
       route = null,
       possible_routes,
