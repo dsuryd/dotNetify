@@ -1,5 +1,5 @@
 {
-  "name": "lazy-load-routing",
+  "name": "lazyloadrouting",
   "private": true,
   "scripts": {
     "clean": "rimraf ./wwwroot/dist",
