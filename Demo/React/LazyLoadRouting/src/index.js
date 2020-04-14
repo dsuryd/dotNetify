@@ -2,5 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './Views/App';
 import './styles.css';
+import { enableSsr } from 'dotnetify';
 
-ReactDOM.render(<App />, document.getElementById('App'));
+enableSsr();
+
+ReactDOM.hydrate(<App />, document.getElementById('App'));

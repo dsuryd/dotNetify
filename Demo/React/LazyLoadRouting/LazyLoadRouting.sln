@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyLoadRouting", "LazyLoadRouting.csproj", "{F9E138DC-D644-4F53-BC8F-4E3629A7DCEC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Core", "..\..\..\DotNetifyLib.Core\DotNetifyLib.Core.csproj", "{433DC8A1-88E4-49FC-9866-6CC91B8F5B01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.SignalR", "..\..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj", "{4128FAFF-F717-4826-8C7C-BAFF18E59DD0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{F9E138DC-D644-4F53-BC8F-4E3629A7DCEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9E138DC-D644-4F53-BC8F-4E3629A7DCEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9E138DC-D644-4F53-BC8F-4E3629A7DCEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{433DC8A1-88E4-49FC-9866-6CC91B8F5B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{433DC8A1-88E4-49FC-9866-6CC91B8F5B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{433DC8A1-88E4-49FC-9866-6CC91B8F5B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{433DC8A1-88E4-49FC-9866-6CC91B8F5B01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4128FAFF-F717-4826-8C7C-BAFF18E59DD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4128FAFF-F717-4826-8C7C-BAFF18E59DD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4128FAFF-F717-4826-8C7C-BAFF18E59DD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4128FAFF-F717-4826-8C7C-BAFF18E59DD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

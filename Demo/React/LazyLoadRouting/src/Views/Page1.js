@@ -1,14 +1,11 @@
 import React from 'react';
-import { useConnect, RouteLink } from 'dotnetify';
-import { lazyLoad } from '../routes';
+import { useConnect, RouteLink, RouteTarget } from 'dotnetify';
+import { setRouteTarget } from '../routes';
 
 export default props => {
-  const { vm, state } = useConnect('Page1', { props, state: { Title: '', Links: [] } });
-  if (vm)
-    vm.onRouteEnter = (path, template) => {
-      template.Target = 'Page1Content';
-      return lazyLoad(template.Id);
-    };
+  const onCreated = _vm => setRouteTarget(_vm, 'Page1Content');
+  const { vm, state } = useConnect('Page1', { props, state: { Title: '', Links: [] } }, onCreated);
+
   return (
     <React.Fragment>
       <h1>{state.Title}</h1>
@@ -21,7 +18,7 @@ export default props => {
           </li>
         ))}
       </ul>
-      <div id="Page1Content" />
+      <RouteTarget id="Page1Content" />
     </React.Fragment>
   );
 };

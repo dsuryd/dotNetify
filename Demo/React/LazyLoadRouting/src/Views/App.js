@@ -1,16 +1,13 @@
 import React from 'react';
-import dotnetify, { useConnect, RouteLink } from 'dotnetify';
-import { lazyLoad } from '../routes';
+import dotnetify, { useConnect, RouteLink, RouteTarget } from 'dotnetify';
+import { setRouteTarget } from '../routes';
 
 dotnetify.debug = true;
 
 export default props => {
-  const { vm, state } = useConnect('App', { props, state: { Links: [] } });
-  if (vm)
-    vm.onRouteEnter = (path, template) => {
-      template.Target = 'Content';
-      return lazyLoad(template.Id);
-    };
+  const onCreated = _vm => setRouteTarget(_vm, 'Content');
+  const { vm, state } = useConnect('App', { props, state: { Links: [] } }, onCreated);
+
   return (
     <main>
       <ul>
@@ -22,7 +19,7 @@ export default props => {
           </li>
         ))}
       </ul>
-      <section id="Content" />
+      <RouteTarget id="Content" />
     </main>
   );
 };

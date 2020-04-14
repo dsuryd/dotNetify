@@ -12,7 +12,8 @@
     ]
   },
   "dependencies": {
-    "dotnetify": "file:dotnetify-3.6.3-rc.tgz",
+    "dotnetify": "file:dotnetify-3.7.0-rc.tgz",
+    "jsdom": "~16.2.2",
     "react": "~16.11.0",
     "react-dom": "~16.11.0"
   },
@@ -23,6 +24,7 @@
     "@babel/preset-react": "^7.9.4",
     "aspnet-webpack": "^3.0.0",
     "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.5.0",
     "rimraf": "^3.0.2",
     "style-loader": "^1.1.3",

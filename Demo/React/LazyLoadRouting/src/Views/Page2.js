@@ -1,14 +1,11 @@
 import React from 'react';
-import { useConnect, RouteLink } from 'dotnetify';
-import { lazyLoad } from '../routes';
+import { useConnect, RouteLink, RouteTarget } from 'dotnetify';
+import { setRouteTarget } from '../routes';
 
 export default props => {
-  const { vm, state } = useConnect('Page2', { props, state: { Title: '', Links: [] } });
-  if (vm)
-    vm.onRouteEnter = (path, template) => {
-      template.Target = 'Page2Content';
-      return lazyLoad(template.Id);
-    };
+  const onCreated = _vm => setRouteTarget(_vm, 'Page2Content');
+  const { vm, state } = useConnect('Page2', { props, state: { Title: '', Links: [] } }, onCreated);
+
   return (
     <React.Fragment>
       <h1>{state.Title}</h1>
@@ -21,7 +18,7 @@ export default props => {
           </li>
         ))}
       </ul>
-      <div id="Page2Content" />
+      <RouteTarget id="Page2Content" />
     </React.Fragment>
   );
 };
@@ -33,13 +30,7 @@ export const Page2Item = props => {
   return (
     <React.Fragment>
       <h3>{state.Title}</h3>
-      <p style={{ textAlign: 'justify' }}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-        laborum.
-      </p>
+      <p style={{ textAlign: 'justify' }}>{state.Content} </p>
     </React.Fragment>
   );
 };

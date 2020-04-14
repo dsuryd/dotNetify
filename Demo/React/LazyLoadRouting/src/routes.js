@@ -1,3 +1,10 @@
+export function setRouteTarget(vm, target) {
+  vm.onRouteEnter = (path, template) => {
+    template.Target = target;
+    return lazyLoad(template.Id);
+  };
+}
+
 const importPromise = (id, dynamicImport, callback) =>
   new Promise(resolve =>
     dynamicImport.then(module => {
@@ -7,7 +14,7 @@ const importPromise = (id, dynamicImport, callback) =>
     })
   );
 
-export function lazyLoad(id) {
+const lazyLoad = id => {
   if (id === 'Home') {
     return importPromise(id, import(/* webpackChunkName: "home" */ './Views/Home'));
   }
@@ -23,4 +30,4 @@ export function lazyLoad(id) {
       window['Page2Item'] = module.Page2Item;
     });
   }
-}
+};
