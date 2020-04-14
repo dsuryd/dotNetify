@@ -21,10 +21,13 @@ import dotnetify from './dotnetify-react';
 export default class RouteLink extends React.Component {
   render() {
     const props = this.props;
-    if (props.vm == null) console.error("RouteLink requires 'vm' property.");
 
     const handleClick = event => {
       event.preventDefault();
+      if (props.vm == null) {
+        console.error("RouteLink requires 'vm' property.");
+        return;
+      }
       if (props.route == null) {
         console.error("RouteLink requires 'route' property.");
         return;
@@ -37,7 +40,7 @@ export default class RouteLink extends React.Component {
       <a
         style={props.style}
         className={props.className}
-        href={props.route != null ? props.vm.$route(props.route) : ''}
+        href={props.route && props.vm ? props.vm.$route(props.route) : '/'}
         children={props.children}
         onClick={handleClick}
       />
