@@ -1,5 +1,5 @@
 /* 
-Copyright 2019 Dicky Suryadi
+Copyright 2019-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@ import { useState, useEffect, useRef } from 'react';
 import $ from '../libs/jquery-shim';
 import dotnetify from './dotnetify-react';
 
-export default function useConnect(vmId, component, options) {
-  let { state, props } = component;
-  if (state == null) state = component || {};
-
+dotnetify.react.useConnect = (iVMId, iComponent, iArg1, iArg2) => {
   if (useState == null || useEffect == null) throw 'Error: using React hooks requires at least v16.8.';
+
+  let { state, props } = iComponent;
+  if (state == null) state = iComponent || {};
+  const onCreated = typeof iArg1 == 'function' ? iArg1 : null;
+  const options = typeof iArg1 !== 'function' ? iArg1 : iArg2;
 
   const [ _state, setState ] = useState(state);
   const vm = useRef();
@@ -30,7 +32,7 @@ export default function useConnect(vmId, component, options) {
 
   useEffect(() => {
     vm.current = dotnetify.react.connect(
-      vmId,
+      iVMId,
       {
         props: props,
         get state() {
@@ -43,8 +45,11 @@ export default function useConnect(vmId, component, options) {
       },
       options
     );
+    onCreated && onCreated(vm.current);
     return () => vm.current.$destroy();
   }, []);
 
   return { vm: vm.current, state: _state };
-}
+};
+
+export default (iVMId, iComponent, iArg1, iArg2) => dotnetify.react.useConnect(iVMId, iComponent, iArg1, iArg2);
