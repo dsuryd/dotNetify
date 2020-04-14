@@ -94,11 +94,11 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
 
         try {
           var reactElement = React.createElement(iComponent, iReactProps);
-          ReactDOM.render(reactElement, document.querySelector(iTargetSelector));
+          ReactDOM.hydrate(reactElement, document.querySelector(iTargetSelector));
         } catch (e) {
           console.error(e);
         }
-        if (typeof callbackFn === 'function') iCallbackFn.call(vm, reactElement);
+        if (typeof iCallbackFn === 'function') iCallbackFn.call(vm, reactElement);
         resolve(reactElement);
       };
 

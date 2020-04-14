@@ -16,27 +16,24 @@ limitations under the License.
 
 import React from 'react';
 import dotnetify from './dotnetify-react';
+import { getSsrState } from './ssr';
 
 const window = window || global || {};
 
 // <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
 export default class RouteTarget extends React.Component {
-  componentWillMount() {
-    var elem = document.getElementById(this.props.id);
-    if (elem != null && window.ssr && !window.ssr[this.props.id]) {
-      window.ssr[this.props.id] = true;
+  constructor(props) {
+    super(props);
+
+    const elem = document.getElementById(props.id);
+    if (elem && getSsrState(props.id)) {
       this.initialHtml = { __html: elem.innerHTML };
     }
     else this.initialHtml = { __html: '' };
   }
 
-  getDOMNode() {
-    return this.elem;
-  }
-
   render() {
-    const { id, ...props } = this.props;
-    return <div id={id} ref={el => (this.elem = el)} {...this.props} dangerouslySetInnerHTML={this.initialHtml} />;
+    return <div {...this.props} dangerouslySetInnerHTML={this.initialHtml} />;
   }
 }
 

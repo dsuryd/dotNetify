@@ -61,12 +61,6 @@ dotnetify.react = {
   connect: function(iVMId, iReact, iOptions) {
     if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
 
-    const vmArg = iOptions && iOptions['vmArg'];
-
-    if (dotnetify.ssr && dotnetify.react.ssrConnect) {
-      return dotnetify.react.ssrConnect(iVMId, iReact, vmArg);
-    }
-
     const self = dotnetify.react;
     if (self.viewModels.hasOwnProperty(iVMId)) {
       console.error(
@@ -74,7 +68,6 @@ dotnetify.react = {
           ` If it's from a dismounted component, you must add vm.$destroy to componentWillUnmount().`
       );
       self.viewModels[iVMId].$destroy();
-      return setTimeout(() => self.connect(iVMId, iReact, iOptions));
     }
 
     const component = {
