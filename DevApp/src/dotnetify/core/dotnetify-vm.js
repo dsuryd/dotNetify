@@ -1,5 +1,5 @@
 /* 
-Copyright 2017-2018 Dicky Suryadi
+Copyright 2017-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ export default class dotnetifyVM {
   // Dispatches a value to the server view model.
   // iValue - Value to dispatch.
   $dispatch(iValue) {
-    if (this.$hub.isConnected) {
+    if (this.$hub && this.$hub.isConnected) {
       const controller = this.$dotnetify.controller;
       try {
         this.$hub.updateVM(this.$vmId, iValue);
