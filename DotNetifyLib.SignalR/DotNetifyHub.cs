@@ -280,9 +280,14 @@ namespace DotNetify
       {
          if (data == null)
             return null;
-         else if (data is JsonElement)
+         else if (data is JsonElement jElement)
+         {
             // System.Text.Json protocol.
-            return JObject.Parse(((JsonElement)data).GetRawText());
+            if (jElement.ValueKind == JsonValueKind.Array || jElement.ValueKind == JsonValueKind.Object)
+               return JObject.Parse(jElement.GetRawText());
+            else
+               return jElement.GetRawText();
+         }
          else if (data is JObject)
             // Newtonsoft.Json protocol.
             return data as JObject;
