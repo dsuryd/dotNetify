@@ -96,7 +96,7 @@ namespace UnitTests
       {
          var viewData = new RoutingViewData("/index/books/category/fiction", "/Index_cshtml", typeof(TestNavBarVM));
 
-         IRoutable model;
+         object model;
          string viewId = String.Empty;
 
          viewId = RoutableExtension.Route(ref viewData, out model);
@@ -132,7 +132,7 @@ namespace UnitTests
       {
          var viewData = new RoutingViewData("/index/books/book/the-martian", "/Index_cshtml", typeof(TestNavBarVM));
 
-         IRoutable model;
+         object model;
          string viewId = String.Empty;
 
          viewId = RoutableExtension.Route(ref viewData, out model);
