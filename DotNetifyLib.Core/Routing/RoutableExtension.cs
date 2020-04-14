@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2015 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,16 +50,19 @@ namespace DotNetify.Routing
       /// <param name="viewData">Routing view data.</param>
       /// <param name="oModel">Model to be passed to the view.</param>
       /// <returns>View URL.</returns>
-      public static string Route(ref RoutingViewData viewData, out IRoutable oModel)
+      public static string Route(ref RoutingViewData viewData, out object oModel)
       {
-         var template = viewData.ActiveTemplate;
+         RouteTemplate template = viewData?.ActiveTemplate;
          if (template != null)
          {
             try
             {
-               oModel = template.VMType != null ? VMController.CreateInstance(template.VMType, null) as IRoutable : null;
-               if (oModel != null)
-                  oModel.RouteUrl(ref viewData);
+               oModel = template.VMType != null ? VMController.CreateInstance(template.VMType, null) : null;
+               if (oModel is IRoutable)
+                  (oModel as IRoutable).RouteUrl(ref viewData);
+               else
+                  viewData = null;
+
                return template.ViewUrl;
             }
             catch (Exception ex)
@@ -162,7 +165,7 @@ namespace DotNetify.Routing
          routingState.Origin = viewData.Origin;
          if (routingState.Templates != null)
          {
-            viewData.Root = viewData.Root + "/" + routingState.Root;
+            viewData.Root = viewData.Root?.TrimEnd('/') + "/" + routingState.Root;
             var bestMatch = MatchTemplate(routingState.Templates, viewData.UrlPath, viewData.Root);
             Trace.WriteLine($"[dotNetify] Matched route {viewData.UrlPath}: {bestMatch?.Value}");
             if (bestMatch != null)
@@ -202,7 +205,7 @@ namespace DotNetify.Routing
          {
             var routingViewData = viewData as RoutingViewData;
             originRoot = routingViewData.OriginRoot;
-            routingViewData.OriginRoot += "/" + routingState.Root;
+            routingViewData.OriginRoot = routingViewData.OriginRoot?.TrimEnd('/') + "/" + routingState.Root;
          }
          return string.Format("data-vm-root=\"{0}\" data-vm-arg = \"{{'RoutingState.Active': '{1}', 'RoutingState.Origin': '{2}'}}\"", originRoot, routingState.Active, routingState.Origin);
       }
