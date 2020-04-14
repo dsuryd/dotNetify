@@ -77,7 +77,7 @@ export default class dotnetifyVueVMRouter extends dotnetifyVMRouter {
   }
 
   // Loads a Vue view.
-  loadVueView(iTargetSelector, iComponent, iJsModuleUrl, iProps, callbackFn) {
+  loadVueView(iTargetSelector, iComponent, iJsModuleUrl, iProps, iCallbackFn) {
     return new Promise((resolve, reject) => {
       const vm = this.vm;
       const vmId = this.vm ? this.vm.$vmId : '';
@@ -115,7 +115,7 @@ export default class dotnetifyVueVMRouter extends dotnetifyVMRouter {
         vueComponent.$mount(iTargetSelector + ' > div');
         this.mountedComponents[iTargetSelector] = () => vueComponent.$destroy();
 
-        if (typeof callbackFn === 'function') callbackFn.call(vm, vueComponent);
+        if (typeof iCallbackFn === 'function') iCallbackFn.call(vm, vueComponent);
         resolve(vueComponent);
       };
 
