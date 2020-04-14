@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import Path from '../libs/path';
+import { createEventEmitter } from '../libs/utils';
 
 const window = window || global || {};
 
@@ -22,6 +23,9 @@ export default class dotnetifyRouter {
 
   // URL path that will be parsed when performing routing.
   urlPath = document.location.pathname;
+
+  // Occurs when a URL path has been routed.
+  routedEvent = createEventEmitter();
 
   constructor(debug) {
     this.debug = debug;

@@ -184,7 +184,7 @@ export default class dotnetifyVMRouter {
     const vm = this.vm;
     if (this.router.urlPath == '' || force == true) {
       if (this.debug) console.log('router> routed');
-      utils.dispatchEvent('dotnetify.routed');
+      this.router.routedEvent.emit();
     }
   }
 
