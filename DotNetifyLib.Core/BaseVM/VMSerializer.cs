@@ -67,7 +67,7 @@ namespace DotNetify
                ),
                new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
 
-            return vmJObject.ToString();
+            return vmJObject.ToString(Formatting.None);
          }
          catch (Exception ex)
          {
