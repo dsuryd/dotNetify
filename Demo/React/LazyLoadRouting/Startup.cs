@@ -1,13 +1,12 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
+using DotNetify;
+using Jering.Javascript.NodeJS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.NodeServices;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.DependencyInjection;
-using DotNetify;
-using DotNetify.Routing;
 
 namespace LazyLoadRouting
 {
@@ -18,10 +17,9 @@ namespace LazyLoadRouting
          services.AddMemoryCache();
          services.AddSignalR();
          services.AddDotNetify();
-         services.AddNodeServices();
       }
 
-      public void Configure(IApplicationBuilder app, INodeServices nodeServices)
+      public void Configure(IApplicationBuilder app)
       {
          app.UseWebSockets();
          app.UseDotNetify(c => c.UseDeveloperLogging());
@@ -37,21 +35,9 @@ namespace LazyLoadRouting
 
          app.UseStaticFiles();
          app.UseRouting();
+
          app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
-
-         var vmFactory = app.ApplicationServices.GetService<IVMFactory>();
-         app.UseWhen(context => context.Request.Query["ssr"] != "false" && !Path.HasExtension(context.Request.Path.Value), appBuilder =>
-         {
-            appBuilder.Run(async context =>
-            {
-               // Server-side rendering.
-               var path = context.Request.Path.Value;
-               var ssrStates = ServerSideRender.GetInitialStates(vmFactory, ref path, typeof(App));
-
-               var result = await nodeServices.InvokeAsync<string>("wwwroot/dist/ssr", path, ssrStates);
-               await context.Response.WriteAsync(result);
-            });
-         });
+         app.UseSsr(typeof(App), (string[] args) => StaticNodeJSService.InvokeFromFileAsync<string>("wwwroot/ssr", null, args));
 
          app.Run(async (context) =>
          {

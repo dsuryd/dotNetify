@@ -18,11 +18,11 @@ namespace LazyLoadRouting
 
       public Page1()
       {
-         this.RegisterRoutes("Page1", new List<RouteTemplate>
+         this.RegisterRoutes("page1", new List<RouteTemplate>
          {
-            new RouteTemplate("Page1Home") { UrlPattern = "", ViewUrl = "Page1A" },
-            new RouteTemplate("Page1A")  { UrlPattern = "Page1A" },
-            new RouteTemplate("Page1B")  { UrlPattern = "Page1B" }
+            new RouteTemplate("Page1Home") { UrlPattern = "", ViewUrl = "page1a" },
+            new RouteTemplate("Page1A")  { UrlPattern = "page1a" },
+            new RouteTemplate("Page1B")  { UrlPattern = "page1b" }
          });
       }
    }

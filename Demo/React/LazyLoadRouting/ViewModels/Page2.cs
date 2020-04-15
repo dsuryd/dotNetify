@@ -19,7 +19,7 @@ namespace LazyLoadRouting
 
       public Page2()
       {
-         this.RegisterRoutes("Page2", new List<RouteTemplate>
+         this.RegisterRoutes("page2", new List<RouteTemplate>
          {
             new RouteTemplate("Page2Home") { UrlPattern = "" },
             new RouteTemplate("Page2Item") { UrlPattern = "item(/:id)", VMType = typeof(Page2Item) }

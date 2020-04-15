@@ -20,8 +20,8 @@ namespace LazyLoadRouting
          this.RegisterRoutes("", new List<RouteTemplate>
           {
               new RouteTemplate("Home")   { UrlPattern = "", VMType = typeof(Home) },
-              new RouteTemplate("Page1")  { UrlPattern = "Page1", VMType = typeof(Page1) },
-              new RouteTemplate("Page2")  { UrlPattern = "Page2", VMType = typeof(Page2) }
+              new RouteTemplate("Page1")  { UrlPattern = "page1", VMType = typeof(Page1) },
+              new RouteTemplate("Page2")  { UrlPattern = "page2", VMType = typeof(Page2) }
           });
       }
    }

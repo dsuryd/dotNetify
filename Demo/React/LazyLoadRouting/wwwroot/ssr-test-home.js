@@ -1,5 +1,5 @@
 // Run: node ./wwwroot/ssr-test-home
-const ssr = require('./dist/ssr.js');
+const ssr = require('./ssr.js');
 
 ssr(
   function(_, output) {
