@@ -20,6 +20,10 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using DotNetify.Security;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using DotNetify.Routing;
+using System.Threading.Tasks;
 
 namespace DotNetify
 {
@@ -33,7 +37,6 @@ namespace DotNetify
       /// </summary>
       /// <param name="appBuilder">Application builder.</param>
       /// <param name="config">Delegate to provide custom configuration.</param>
-      /// <returns></returns>
       public static IApplicationBuilder UseDotNetify(this IApplicationBuilder appBuilder, Action<IDotNetifyConfiguration> config = null)
       {
          var provider = appBuilder.ApplicationServices;
@@ -99,5 +102,29 @@ namespace DotNetify
       /// <param name="dotNetifyConfig">DotNetify configuration.</param>
       /// <param name="args">View model filter arguments.</param>
       public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter => _filterTypes.Add(Tuple.Create(typeof(T), args));
+
+      /// <summary>
+      /// Includes server-side rendering in the application request pipeline.
+      /// </summary>
+      /// <param name="appBuilder">Application builder.</param>
+      /// <param name="mainVMType">Main application view model type.</param>
+      /// <param name="nodeJSInvokeAsync">Function to invoke javascript in NodeJS.</param>
+      public static IApplicationBuilder UseSsr(this IApplicationBuilder appBuilder, Type mainVMType, Func<string[], Task<string>> nodeJSInvokeAsync)
+      {
+         var vmFactory = appBuilder.ApplicationServices.GetRequiredService<IVMFactory>();
+         appBuilder.UseWhen(context => !Path.HasExtension(context.Request.Path.Value), app =>
+         {
+            app.Run(async context =>
+            {
+               // Server-side rendering.
+               string path = context.Request.Path.Value;
+               string ssrStates = ServerSideRender.GetInitialStates(vmFactory, ref path, mainVMType);
+
+               string result = await nodeJSInvokeAsync(new string[] { path, ssrStates });
+               await context.Response.WriteAsync(result);
+            });
+         });
+         return appBuilder;
+      }
    }
 }
