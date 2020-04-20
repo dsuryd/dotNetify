@@ -9,12 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetify.SignalR" Version="3.7.0-RC1" />
     <PackageReference Include="Jering.Javascript.NodeJS" Version="5.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
   </ItemGroup>
   
 </Project>
