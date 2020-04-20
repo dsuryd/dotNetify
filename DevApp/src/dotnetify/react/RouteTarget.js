@@ -16,7 +16,7 @@ limitations under the License.
 
 import React from 'react';
 import dotnetify from './dotnetify-react';
-import { getSsrState } from './ssr';
+import { getSsrState } from './dotnetify-react.router.ssr';
 
 const window = window || global || {};
 
