@@ -34,7 +34,7 @@ export default function enableSsr() {
     const ssrState = getSsrState(iVMId);
     if (ssrState) {
       try {
-        iComponent.state = vmState;
+        iComponent.state = ssrState;
       } catch (e) {}
     }
 
@@ -74,7 +74,13 @@ export default function enableSsr() {
       const onCreated = typeof iArg1 == 'function' ? iArg1 : null;
       const options = typeof iArg1 !== 'function' ? iArg1 : iArg2;
 
-      const vm = dotnetify.react.connect(iVMId, {}, options);
+      const component = {
+        get state() {
+          return ssrState;
+        }
+      };
+
+      const vm = dotnetify.react.connect(iVMId, component, options);
       onCreated && onCreated(vm);
       return { vm, state: ssrState };
     }
