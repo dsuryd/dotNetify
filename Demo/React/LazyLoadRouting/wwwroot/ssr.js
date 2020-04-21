@@ -5,12 +5,12 @@
 const { JSDOM } = require('jsdom');
 module.exports = function(...args) {
   JSDOM.fromFile('./wwwroot/index.html', {
-    url: 'file://wwwroot/',
+    url: 'http://localhost:5000' /*** change this to your web server ***/,
     resources: 'usable',
     runScripts: 'dangerously',
     beforeParse(window) {
       window.__dotnetify_ssr__ = function(ssr) {
-        ssr(...args, 2000 /*timeout*/);
+        ssr(...args, 2000 /* timeout */);
       };
     }
   });

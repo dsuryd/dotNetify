@@ -17,13 +17,14 @@ namespace LazyLoadRouting
          services.AddMemoryCache();
          services.AddSignalR();
          services.AddDotNetify();
+
+         StaticNodeJSService.Configure<OutOfProcessNodeJSServiceOptions>(options => options.TimeoutMS = 2000);
       }
 
       public void Configure(IApplicationBuilder app)
       {
          app.UseWebSockets();
          app.UseDotNetify(c => c.UseDeveloperLogging());
-         ;
 
 #pragma warning disable 618
          app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
