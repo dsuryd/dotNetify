@@ -33,6 +33,9 @@ export default class dotnetifyVMRouter {
     this.vm = vm;
     this.router = router;
     this.debug = vm.$dotnetify.controller.debug;
+
+    // Handle 'onRouteEnter' callback being given in the VM options.
+    if (vm.$options && vm.$options.onRouteEnter) vm.onRouteEnter = vm.$options.onRouteEnter;
   }
 
   // Dispatch the active routing state to the server.
@@ -280,6 +283,7 @@ export default class dotnetifyVMRouter {
 
     const activateRoute = () => {
       // Check if the route has valid target.
+      //iTemplate.Target = iTemplate.Target || vm.$options.routeTarget;
       if (iTemplate.Target == null) {
         console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
         return;

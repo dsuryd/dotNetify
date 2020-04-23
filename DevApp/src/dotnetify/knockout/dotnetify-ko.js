@@ -92,6 +92,10 @@ dotnetify.ko = {
       }
     }, dotnetify.offlineTimeout);
 
+    if (dotnetify.ssr) {
+      console.error('ERROR: dotNetify-ko does not support SSR.');
+      return;
+    }
     dotnetify.startHub(hub);
 
     // Use SignalR event to raise the offline event with true/false argument.

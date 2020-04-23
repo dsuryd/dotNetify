@@ -18,13 +18,11 @@ import { useState, useEffect, useRef } from 'react';
 import $ from '../libs/jquery-shim';
 import dotnetify from './dotnetify-react';
 
-dotnetify.react.useConnect = (iVMId, iComponent, iArg1, iArg2) => {
+dotnetify.react.useConnect = (iVMId, iComponent, iOptions) => {
   if (useState == null || useEffect == null) throw 'Error: using React hooks requires at least v16.8.';
 
   let { state, props } = iComponent;
   if (state == null) state = iComponent || {};
-  const onCreated = typeof iArg1 == 'function' ? iArg1 : null;
-  const options = typeof iArg1 !== 'function' ? iArg1 : iArg2;
 
   const [ _state, setState ] = useState(state);
   const vm = useRef();
@@ -43,13 +41,12 @@ dotnetify.react.useConnect = (iVMId, iComponent, iArg1, iArg2) => {
           setState(vmData.current);
         }
       },
-      options
+      iOptions
     );
-    onCreated && onCreated(vm.current);
     return () => vm.current.$destroy();
   }, []);
 
   return { vm: vm.current, state: _state };
 };
 
-export default (iVMId, iComponent, iArg1, iArg2) => dotnetify.react.useConnect(iVMId, iComponent, iArg1, iArg2);
+export default (iVMId, iComponent, iOptions) => dotnetify.react.useConnect(iVMId, iComponent, iOptions);
