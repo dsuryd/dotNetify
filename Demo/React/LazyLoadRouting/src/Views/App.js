@@ -5,8 +5,8 @@ import { setRouteTarget } from '../routes';
 dotnetify.debug = true;
 
 export default props => {
-  const onCreated = _vm => setRouteTarget(_vm, 'Content');
-  const { vm, state } = useConnect('App', { props, state: { Links: [] } }, onCreated);
+  const onRouteEnter = setRouteTarget('Content');
+  const { vm, state } = useConnect('App', { props, state: { Links: [] } }, { onRouteEnter });
 
   return (
     <main>

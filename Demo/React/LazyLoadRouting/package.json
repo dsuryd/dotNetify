@@ -12,7 +12,7 @@
     ]
   },
   "dependencies": {
-    "dotnetify": "file:dotnetify-3.7.0-RC1.tgz",
+    "dotnetify": "file:dotnetify-3.7.0-rc1.tgz",
     "jsdom": "~16.2.2",
     "react": "~16.11.0",
     "react-dom": "~16.11.0"

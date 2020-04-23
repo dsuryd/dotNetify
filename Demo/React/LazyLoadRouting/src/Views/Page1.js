@@ -3,8 +3,8 @@ import { useConnect, RouteLink, RouteTarget } from 'dotnetify';
 import { setRouteTarget } from '../routes';
 
 export default props => {
-  const onCreated = _vm => setRouteTarget(_vm, 'Page1Content');
-  const { vm, state } = useConnect('Page1', { props, state: { Title: '', Links: [] } }, onCreated);
+  const onRouteEnter = setRouteTarget('Page1Content');
+  const { vm, state } = useConnect('Page1', { props, state: { Title: '', Links: [] } }, { onRouteEnter });
 
   return (
     <React.Fragment>

@@ -20,7 +20,7 @@ namespace LazyLoadRouting
       {
          this.RegisterRoutes("page1", new List<RouteTemplate>
          {
-            new RouteTemplate("Page1Home") { UrlPattern = "", ViewUrl = "page1a" },
+            new RouteTemplate("Page1Home") { UrlPattern = "", ViewUrl = "Page1A" },
             new RouteTemplate("Page1A")  { UrlPattern = "page1a" },
             new RouteTemplate("Page1B")  { UrlPattern = "page1b" }
          });

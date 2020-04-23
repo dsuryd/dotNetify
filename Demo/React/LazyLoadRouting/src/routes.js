@@ -1,5 +1,5 @@
-export function setRouteTarget(vm, target) {
-  vm.onRouteEnter = (path, template) => {
+export function setRouteTarget(target) {
+  return (path, template) => {
     template.Target = target;
     return lazyLoad(template.Id);
   };
