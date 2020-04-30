@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "dotnetify": "^3.6.0",
-    "jquery": "~3.4.1",
+    "jquery": "~3.5.0",
     "knockout": "~3.5.0"
   },
   "devDependencies": {
