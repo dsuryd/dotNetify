@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using DotNetify;
 using Jering.Javascript.NodeJS;
 using Microsoft.AspNetCore.Builder;
@@ -36,16 +37,18 @@ namespace LazyLoadRouting
 
          app.UseStaticFiles();
          app.UseRouting();
-
          app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
-         app.UseSsr(typeof(App), (string[] args) => StaticNodeJSService.InvokeFromFileAsync<string>("wwwroot/ssr", null, args));
 
-         app.Run(async (context) =>
-         {
-            // Client-side rendering.
-            using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
-               await context.Response.WriteAsync(reader.ReadToEnd());
-         });
+         app.UseSsr(typeof(App), (string[] args) => StaticNodeJSService.InvokeFromFileAsync<string>("wwwroot/ssr", null, args), DefaultRequestHandler);
+
+         // Client-side rendering.
+         app.Run(DefaultRequestHandler);
+      }
+
+      private static async Task DefaultRequestHandler(HttpContext context)
+      {
+         using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
+            await context.Response.WriteAsync(reader.ReadToEnd());
       }
    }
 }

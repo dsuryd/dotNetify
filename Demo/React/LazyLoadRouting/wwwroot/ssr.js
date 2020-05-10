@@ -2,15 +2,15 @@
  This script is used for server-side rendering of dotNetify routing.
  Place this script inside "wwwwroot".
  */
-const { JSDOM } = require('jsdom');
-module.exports = function(...args) {
+const { JSDOM, ResourceLoader } = require('jsdom');
+module.exports = function(callback, userAgent, ...args) {
   JSDOM.fromFile('./wwwroot/index.html', {
-    url: 'http://localhost:5000' /*** change this to your web server ***/,
-    resources: 'usable',
+    url: 'http://localhost:5000',
+    resources: new ResourceLoader({ userAgent }),
     runScripts: 'dangerously',
     beforeParse(window) {
       window.__dotnetify_ssr__ = function(ssr) {
-        ssr(...args, 2000 /* timeout */);
+        ssr(callback, ...args, 2000 /*timeout*/);
       };
     }
   });
