@@ -98,7 +98,7 @@ export default function enableSsr() {
     else console.error('router> document head tag is required for server-side render.');
 
     let routed = false;
-    const callback = () => iCallbackFn(null /*for error*/, `<!DOCTYPE html><html>${document.documentElement.innerHTML}</html>`);
+    const callback = () => iCallbackFn(null /*for error*/, `<!DOCTYPE html>${document.documentElement.outerHTML}`);
     const fallback = iTimeout ? setTimeout(() => !routed && callback(), iTimeout) : 0;
 
     // Once routed, do the callback.
