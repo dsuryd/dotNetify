@@ -109,19 +109,29 @@ namespace DotNetify
       /// <param name="appBuilder">Application builder.</param>
       /// <param name="mainVMType">Main application view model type.</param>
       /// <param name="nodeJSInvokeAsync">Function to invoke javascript in NodeJS.</param>
-      public static IApplicationBuilder UseSsr(this IApplicationBuilder appBuilder, Type mainVMType, Func<string[], Task<string>> nodeJSInvokeAsync)
+      /// <param name="onError">Request delegate to handle failure.</param>
+      public static IApplicationBuilder UseSsr(this IApplicationBuilder appBuilder, Type mainVMType, Func<string[], Task<string>> nodeJSInvokeAsync, RequestDelegate onError)
       {
          var vmFactory = appBuilder.ApplicationServices.GetRequiredService<IVMFactory>();
          appBuilder.UseWhen(context => !Path.HasExtension(context.Request.Path.Value), app =>
          {
             app.Run(async context =>
             {
-               // Server-side rendering.
-               string path = context.Request.Path.Value;
-               string ssrStates = ServerSideRender.GetInitialStates(vmFactory, ref path, mainVMType);
+               try
+               {
+                  // Server-side rendering.
+                  string path = context.Request.Path.Value;
+                  string ssrStates = ServerSideRender.GetInitialStates(vmFactory, ref path, mainVMType);
 
-               string result = await nodeJSInvokeAsync(new string[] { path, ssrStates });
-               await context.Response.WriteAsync(result);
+                  string userAgent = context.Request.Headers["User-Agent"];
+                  string result = await nodeJSInvokeAsync(new string[] { userAgent, path, ssrStates });
+                  await context.Response.WriteAsync(result);
+               }
+               catch (Exception ex)
+               {
+                  Trace.WriteLine(ex.Message);
+                  await onError(context);
+               }
             });
          });
          return appBuilder;
