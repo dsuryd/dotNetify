@@ -276,17 +276,15 @@ namespace DotNetify
       /// </summary>
       /// <param name="data">Arbitrary object.</param>
       /// <returns>JObject if the object is convertible; otherwise unchanged.</returns>
-      private object NormalizeType(object data)
+      internal static object NormalizeType(object data)
       {
          if (data == null)
             return null;
          else if (data is JsonElement jElement)
          {
             // System.Text.Json protocol.
-            if (jElement.ValueKind == JsonValueKind.Array || jElement.ValueKind == JsonValueKind.Object)
-               return JObject.Parse(jElement.GetRawText());
-            else
-               return jElement.GetRawText();
+            var value = JToken.Parse(jElement.GetRawText());
+            return value is JValue ? (value as JValue).Value : value;
          }
          else if (data is JObject)
             // Newtonsoft.Json protocol.
