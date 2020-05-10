@@ -57,7 +57,7 @@ namespace DotNetify.Routing
          {
             try
             {
-               oModel = template.VMType != null ? VMController.CreateInstance(template.VMType, null) : null;
+               oModel = ResolveVM(template);
                if (oModel is IRoutable)
                   (oModel as IRoutable).RouteUrl(ref viewData);
                else
@@ -171,7 +171,7 @@ namespace DotNetify.Routing
             if (bestMatch != null)
             {
                viewData.ActiveTemplate = bestMatch.Value.Key;
-               if (bestMatch.Value.Value != null && typeof(IRoutable).GetTypeInfo().IsAssignableFrom(bestMatch.Value.Key.VMType))
+               if (bestMatch.Value.Value != null && bestMatch.Value.Key.VMType != null)
                   routingState.Active = bestMatch.Value.Value;
                else
                   routingState.Active = null;
@@ -297,6 +297,22 @@ namespace DotNetify.Routing
          }
 
          return match;
+      }
+
+      /// <summary>
+      /// Resolves view model of a route template.
+      /// </summary>
+      /// <param name="template">Route template.</param>
+      /// <returns>View model object.</returns>
+      private static object ResolveVM(RouteTemplate template)
+      {
+         Type vmType = template.VMType;
+         if (vmType == null)
+         {
+            vmType = VMController.VMTypes.Find(x => x.Name == template.Id)?.Type;
+         }
+
+         return vmType != null && vmType != typeof(void) ? VMController.CreateInstance(vmType, null) : null;
       }
    }
 }

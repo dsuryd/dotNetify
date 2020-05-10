@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2015 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ namespace DotNetify.Routing
       public string UrlPattern { get; set; }
 
       /// <summary>
-      /// URL for the view to route to.
+      /// URL for the view to route to, or the view component name.
       /// </summary>
       public string ViewUrl { get; set; }
 
