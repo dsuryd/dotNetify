@@ -31,7 +31,7 @@ class DataFlow extends React.Component {
   }
   render() {
     const { framework } = this.state;
-    return framework === 'React' ? <DataFlowReact /> : framework === 'Vue' ? <DataFlowVue /> : null;
+    return framework === 'Knockout' ? null : framework === 'Vue' ? <DataFlowVue /> : <DataFlowReact />;
   }
 }
 
