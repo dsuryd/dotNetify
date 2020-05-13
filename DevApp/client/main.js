@@ -7,11 +7,10 @@ import './app/styles/prism.css';
 import * as views from './app/views';
 import 'dotnetify-elements/dotnetify-elements.css';
 
-import { enableSsr } from 'dotnetify';
-enableSsr();
+//import { enableSsr } from 'dotnetify';
+//enableSsr();
 
 dotnetify.debug = true;
-dotnetify.react.router.notFound404Url = '/404.html';
 
 // Enable this to switch from JSON to MessagePack protocol
 /*
