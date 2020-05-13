@@ -1,5 +1,6 @@
 ﻿using DotNetify.Pulse;
 using DotNetify.Security;
+using Jering.Javascript.NodeJS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace DotNetify.DevApp
 {
@@ -33,6 +35,8 @@ namespace DotNetify.DevApp
          services.AddScoped<IEmployeeRepository, EmployeeRepository>();
          services.AddSingleton<IMovieService, MovieService>();
          services.AddSingleton<IWebStoreService, WebStoreService>();
+
+         StaticNodeJSService.Configure<OutOfProcessNodeJSServiceOptions>(options => options.TimeoutMS = 2000);
       }
 
       public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -91,17 +95,20 @@ namespace DotNetify.DevApp
          app.UseRouting();
          app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
 
-         app.Run(async (context) =>
-         {
-            var uri = context.Request.Path.ToUriComponent();
-            if (uri.EndsWith(".map"))
-               return;
-            else if (uri.EndsWith("_hmr") || uri.Contains("hot-update"))  // Fix HMR for deep links.
-               context.Response.Redirect(Regex.Replace(uri, ".+/dist", "/dist"));
+         //app.UseSsr(typeof(App), (string[] args) => StaticNodeJSService.InvokeFromFileAsync<string>("wwwroot/ssr", null, args), DefaultRequestHandler);
+         app.Run(DefaultRequestHandler);
+      }
 
-            using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
-               await context.Response.WriteAsync(reader.ReadToEnd());
-         });
+      private static async Task DefaultRequestHandler(HttpContext context)
+      {
+         var uri = context.Request.Path.ToUriComponent();
+         if (uri.EndsWith(".map"))
+            return;
+         else if (uri.EndsWith("_hmr") || uri.Contains("hot-update"))  // Fix HMR for deep links.
+            context.Response.Redirect(Regex.Replace(uri, ".+/dist", "/dist"));
+
+         using var reader = new StreamReader(File.OpenRead("wwwroot/index.html"));
+         await context.Response.WriteAsync(reader.ReadToEnd());
       }
    }
 }

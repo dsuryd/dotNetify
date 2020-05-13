@@ -35,8 +35,9 @@ class App extends React.Component {
 
   render() {
     const { theme, framework } = this.state;
+    const onRouteEnter = (_path, template) => (template.Target = 'NavMenuTarget');
     return (
-      <VMContext vm="App">
+      <VMContext vm="App" options={{ onRouteEnter }}>
         <Main theme={theme}>
           <Header>
             <NavDrawerButton show css="margin-left: 1rem" />
