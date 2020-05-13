@@ -75,7 +75,10 @@ export default class dotnetifyVMRouter {
   // Initialize routing templates if the view model implements IRoutable.
   initRouting() {
     const vm = this.vm;
-    if (!this.hasRoutingState) return;
+    if (!this.hasRoutingState) {
+      if (this.router.urlPath) this.raiseRoutedEvent(true);
+      return;
+    }
 
     if (this.RoutingState === null) {
       console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
@@ -183,12 +186,15 @@ export default class dotnetifyVMRouter {
   }
 
   // Raise event indicating the routing process has ended.
-  raiseRoutedEvent(force) {
-    const vm = this.vm;
-    if (this.router.urlPath == '' || force == true) {
-      if (this.debug) console.log('router> routed');
-      this.router.routedEvent.emit();
+  raiseRoutedEvent(noMatch) {
+    if (noMatch) {
+      // Use the no match template if given, otherwise fallback to "/404.html".
+      const noMatchTemplate = this.RoutingState && this.RoutingState.Templates.find(x => x.UrlPattern === '*');
+      if (noMatchTemplate) this.routeTo(this.router.urlPath, noMatchTemplate);
+      else setTimeout(() => (window.location.href = '/404.html'));
     }
+    if (this.debug) console.log('router> routed' + (noMatch ? ' (404)' : ''));
+    this.router.routedEvent.emit();
   }
 
   // Returns the URL for an anchor tag.
@@ -283,7 +289,6 @@ export default class dotnetifyVMRouter {
 
     const activateRoute = () => {
       // Check if the route has valid target.
-      //iTemplate.Target = iTemplate.Target || vm.$options.routeTarget;
       if (iTemplate.Target == null) {
         console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
         return;
