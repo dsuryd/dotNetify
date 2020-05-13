@@ -27,6 +27,14 @@ import Routing from './apis/Routing';
 import Security from './apis/Security';
 import WebApiMode from './apis/WebApiMode';
 
+const NotFound404 = () => (
+  <div style={{ padding: '1.5rem' }}>
+    <h2>Page not found (404)</h2>
+    <p>Redirecting to home page...</p>
+    <script>setTimeout(function() {(window.location.href = '/')}, 2000)</script>
+  </div>
+);
+
 export {
   Overview,
   FromScratchWebPack,
@@ -55,5 +63,6 @@ export {
   Multicast,
   Routing,
   Security,
-  WebApiMode
+  WebApiMode,
+  NotFound404
 };
