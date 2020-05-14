@@ -19,7 +19,7 @@ import { createEventEmitter } from '../libs/utils';
 const window = window || global || {};
 
 export default class dotnetifyRouter {
-  version = '2.0.1';
+  version = '3.0.0';
 
   static _urlPath = document.location.pathname;
 
