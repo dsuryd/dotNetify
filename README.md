@@ -9,8 +9,8 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-* v3.7: routing enhancements: lazy-loading, 404 handling, and SSR - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7)
-* v3.6: [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.6)
+* v3.7: routing enhancements: lazy-loading, 404 handling, and SSR - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7).
+* v3.6: [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.6).
 * v3.5: Multi-hub support, web API + local modes - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.5).
 
 <div/>
