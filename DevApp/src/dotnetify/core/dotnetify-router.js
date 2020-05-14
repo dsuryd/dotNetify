@@ -21,8 +21,15 @@ const window = window || global || {};
 export default class dotnetifyRouter {
   version = '2.0.1';
 
+  static _urlPath = document.location.pathname;
+
   // URL path that will be parsed when performing routing.
-  urlPath = document.location.pathname;
+  get urlPath() {
+    return dotnetifyRouter._urlPath;
+  }
+  set urlPath(value) {
+    dotnetifyRouter._urlPath = value;
+  }
 
   // Occurs when a URL path has been routed.
   routedEvent = createEventEmitter();
