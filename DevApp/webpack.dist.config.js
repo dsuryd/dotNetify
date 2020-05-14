@@ -24,7 +24,7 @@ const baseExport = {
     new CopyWebpackPlugin([
       { from: './src/dotnetify/libs/signalR-netfx.js', to: './' },
       { from: './src/dotnetify/libs/jquery-shim.js', to: './' },
-      { from: './src/dotnetify/typings', to: './typings' }
+      { from: './src/dotnetify/_typings', to: './typings' }
     ])
   ],
   optimization: {
