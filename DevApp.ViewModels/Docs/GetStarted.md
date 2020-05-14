@@ -90,9 +90,7 @@ namespace MyProject
 
 If you use module bundler like WebPack, install __dotnetify__, `react`, and `react-dom` from NPM: 
 ```jsx
-npm i --save dotnetify
-npm i --save react
-npm i --save react-dom
+npm i --save dotnetify react react-dom
 ``` 
 
 The library uses SignalR .NET Core client by default.  To switch to .NET Framework client, add:

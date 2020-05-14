@@ -7,8 +7,7 @@ The easiest way to get started is to perform the following step-by-step instruct
 
 If you use module bundler like WebPack, install __dotnetify__ and `vue` from NPM: 
 ```jsx
-npm i --save dotnetify
-npm i --save vue
+npm i --save dotnetify vue
 ```
 
 The library uses SignalR .NET Core client by default. To switch to .NET Framework client, add:
