@@ -18,10 +18,12 @@
     <PackageProjectUrl>https://dotnetify.net/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageTags>netcore reactive realtime signalr mobile web websocket</PackageTags>
-    <PackageIconUrl>https://dotnetify.net/content/images/dotnetify.png</PackageIconUrl>
+    
+    <PackageIconUrl></PackageIconUrl>
     <AssemblyVersion>3.7.0.0</AssemblyVersion>
     <FileVersion>3.7.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageIcon>dotnetify.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +42,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\DotNetifyLib.Core\Properties\dotnetify.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
