@@ -13,12 +13,39 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import $ from '../libs/jquery-shim';
+import * as $ from "../libs/jquery-shim";
+import { ConnectOptionsType, IDotnetifyImpl, ExceptionHandlerType } from "./dotnetify";
+import { IDotnetifyHub } from "./dotnetify-hub";
+import { OnRouteEnterType, RouteType } from "./dotnetify-vm-router";
 
-const window = window || global || {};
+export interface IDotnetifyVM {
+  $dispatch: (value: any) => void;
+  $destroy: () => void;
+
+  $routeTo: (route: RouteType) => void;
+  onRouteEnter?: OnRouteEnterType;
+}
 
 // Client-side view model that acts as a proxy of the server view model.
-export default class dotnetifyVM {
+export default class DotnetifyVM implements IDotnetifyVM {
+  $vmId: string;
+  $component: any;
+  $options: ConnectOptionsType;
+  $dotnetify: IDotnetifyImpl;
+  $hub: IDotnetifyHub;
+  $vmArg: any;
+  $headers: any;
+  $requested: boolean;
+  $loaded: boolean;
+  $itemKey: { [key: string]: string };
+  $serverUpdate: boolean;
+  $exceptionHandler: ExceptionHandlerType;
+  State: (state?: any) => void | any;
+  Props: (prop: any) => any;
+
+  $routeTo: (route: RouteType) => void;
+  onRouteEnter: OnRouteEnterType = () => true;
+
   // iVMId - identifies the view model.
   // iComponent - component object.
   // iOptions - Optional configuration options:
@@ -29,90 +56,90 @@ export default class dotnetifyVM {
   //    exceptionHandler: called when receiving server-side exception.
   // iDotNetify - framework-specific dotNetify library.
   // iHub - hub connection.
-  constructor(iVMId, iComponent, iOptions, iDotNetify, iHub) {
+  constructor(iVMId: string, iComponent: any, iOptions: ConnectOptionsType, iDotNetify: IDotnetifyImpl, iHub: IDotnetifyHub) {
     this.$vmId = iVMId;
     this.$component = iComponent;
     this.$options = iOptions || {};
-    this.$vmArg = iOptions && iOptions['vmArg'];
-    this.$headers = iOptions && iOptions['headers'];
-    this.$exceptionHandler = iOptions && iOptions['exceptionHandler'];
+    this.$vmArg = iOptions && iOptions["vmArg"];
+    this.$headers = iOptions && iOptions["headers"];
+    this.$exceptionHandler = iOptions && iOptions["exceptionHandler"];
     this.$requested = false;
     this.$loaded = false;
     this.$itemKey = {};
     this.$dotnetify = iDotNetify;
     this.$hub = iHub;
 
-    let getState = iOptions && iOptions['getState'];
-    let setState = iOptions && iOptions['setState'];
-    getState = typeof getState === 'function' ? getState : () => iComponent.state;
-    setState = typeof setState === 'function' ? setState : state => iComponent.setState(state);
+    let getState = iOptions && iOptions["getState"];
+    let setState = iOptions && iOptions["setState"];
+    getState = typeof getState === "function" ? getState : () => iComponent.state;
+    setState = typeof setState === "function" ? setState : (state) => iComponent.setState(state);
 
-    this.State = state => (typeof state === 'undefined' ? getState() : setState(state));
-    this.Props = prop => this.$component.props && this.$component.props[prop];
+    this.State = (state) => (typeof state === "undefined" ? getState() : setState(state));
+    this.Props = (prop) => this.$component.props && this.$component.props[prop];
 
-    const vmArg = this.Props('vmArg');
+    const vmArg = this.Props("vmArg");
     if (vmArg) this.$vmArg = $.extend(this.$vmArg, vmArg);
 
     // Inject plugin functions into this view model.
-    this.$getPlugins().map(plugin => (typeof plugin['$inject'] == 'function' ? plugin.$inject(this) : null));
+    this.$getPlugins().map((plugin) => (typeof plugin["$inject"] == "function" ? plugin.$inject(this) : null));
   }
 
   // Disposes the view model, both here and on the server.
   $destroy() {
     // Call any plugin's $destroy function if provided.
-    this.$getPlugins().map(plugin => (typeof plugin['$destroy'] == 'function' ? plugin.$destroy.apply(this) : null));
+    this.$getPlugins().map((plugin) => (typeof plugin["$destroy"] == "function" ? plugin.$destroy.apply(this) : null));
 
     if (this.$hub.isConnected) {
       try {
         this.$hub.disposeVM(this.$vmId);
       } catch (ex) {
-        this.$dotnetify.controller.handleConnectionStateChanged('error', ex, this.$hub);
+        this.$dotnetify.controller.handleConnectionStateChanged("error", ex, this.$hub);
       }
     }
 
-    delete this.$dotnetify.viewModels[this.$vmId];
+    delete (<any>this.$dotnetify).viewModels[this.$vmId];
   }
 
   // Dispatches a value to the server view model.
   // iValue - Value to dispatch.
-  $dispatch(iValue) {
+  $dispatch(iValue: any) {
     if (this.$hub && this.$hub.isConnected) {
       const controller = this.$dotnetify.controller;
       try {
         this.$hub.updateVM(this.$vmId, iValue);
 
         if (controller.debug) {
-          console.log('[' + this.$vmId + '] sent> ');
+          console.log("[" + this.$vmId + "] sent> ");
           console.log(iValue);
 
-          controller.debugFn && controller.debugFn(this.$vmId, 'sent', iValue);
+          controller.debugFn && controller.debugFn(this.$vmId, "sent", iValue);
         }
       } catch (ex) {
-        controller.handleConnectionStateChanged('error', ex, this.$hub);
+        controller.handleConnectionStateChanged("error", ex, this.$hub);
       }
     }
   }
 
   // Dispatches a state value to the server view model.
   // iValue - State value to dispatch.
-  $dispatchListState(iValue) {
-    for (var listName in iValue) {
+  $dispatchListState(iValue: any) {
+    for (const listName in iValue) {
       const key = this.$itemKey[listName];
       if (!key) {
         console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
         return;
       }
-      var item = iValue[listName];
+      const item = iValue[listName];
       if (!item[key]) {
         console.error(`[${this.$vmId}] couldn't dispatch data from '${listName}' due to missing property '${key}'.`);
         console.error(item);
         return;
       }
 
-      Object.keys(item).forEach(prop => {
+      Object.keys(item).forEach((prop) => {
         if (prop != key) {
           let state = {};
-          state[listName + '.$' + item[key] + '.' + prop] = item[prop];
+          state[listName + ".$" + item[key] + "." + prop] = item[prop];
           this.$dispatch(state);
         }
       });
@@ -121,7 +148,7 @@ export default class dotnetifyVM {
   }
 
   $getPlugins() {
-    return Object.keys(this.$dotnetify.plugins).map(id => this.$dotnetify.plugins[id]);
+    return Object.keys(this.$dotnetify.plugins).map((id) => this.$dotnetify.plugins[id]);
   }
 
   // Preprocess view model update from the server before we set the state.
@@ -135,7 +162,7 @@ export default class dotnetifyVM {
       if (match != null) {
         var listName = match[1];
         if (Array.isArray(this.State()[listName])) vm.$addList(listName, iVMUpdate[prop]);
-        else console.error('unable to resolve ' + prop);
+        else console.error("unable to resolve " + prop);
         delete iVMUpdate[prop];
         continue;
       }
@@ -146,7 +173,7 @@ export default class dotnetifyVM {
       if (match != null) {
         var listName = match[1];
         if (Array.isArray(this.State()[listName])) vm.$updateList(listName, iVMUpdate[prop]);
-        else console.error('[' + this.$vmId + "] '" + listName + "' is not found or not an array.");
+        else console.error("[" + this.$vmId + "] '" + listName + "' is not found or not an array.");
         delete iVMUpdate[prop];
         continue;
       }
@@ -159,12 +186,10 @@ export default class dotnetifyVM {
         if (Array.isArray(this.State()[listName])) {
           var key = this.$itemKey[listName];
           if (key != null) {
-            if (Array.isArray(iVMUpdate[prop])) vm.$removeList(listName, i => iVMUpdate[prop].some(x => i[key] == x));
-            else vm.$removeList(listName, i => i[key] == iVMUpdate[prop]);
-          }
-          else console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
-        }
-        else console.error(`[${this.$vmId}] '${listName}' is not found or not an array.`);
+            if (Array.isArray(iVMUpdate[prop])) vm.$removeList(listName, (i) => iVMUpdate[prop].some((x) => i[key] == x));
+            else vm.$removeList(listName, (i) => i[key] == iVMUpdate[prop]);
+          } else console.error(`[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`);
+        } else console.error(`[${this.$vmId}] '${listName}' is not found or not an array.`);
         delete iVMUpdate[prop];
         continue;
       }
@@ -191,13 +216,13 @@ export default class dotnetifyVM {
 
   // Updates state from the server view model to the view.
   // iVMData - Serialized state from the server.
-  $update(iVMData) {
+  $update(iVMData: any) {
     const controller = this.$dotnetify.controller;
     if (controller.debug) {
-      console.log('[' + this.$vmId + '] received> ');
+      console.log("[" + this.$vmId + "] received> ");
       console.log(JSON.parse(iVMData));
 
-      controller.debugFn && controller.debugFn(this.$vmId, 'received', JSON.parse(iVMData));
+      controller.debugFn && controller.debugFn(this.$vmId, "received", JSON.parse(iVMData));
     }
     let vmData = JSON.parse(iVMData);
     this.$preProcess(vmData);
@@ -212,13 +237,13 @@ export default class dotnetifyVM {
 
   // Handles initial view model load event.
   $onLoad() {
-    this.$getPlugins().map(plugin => (typeof plugin['$ready'] == 'function' ? plugin.$ready.apply(this) : null));
+    this.$getPlugins().map((plugin) => (typeof plugin["$ready"] == "function" ? plugin.$ready.apply(this) : null));
     this.$loaded = true;
   }
 
   // Handles view model update event.
   $onUpdate(vmData) {
-    this.$getPlugins().map(plugin => (typeof plugin['$update'] == 'function' ? plugin.$update.apply(this, [ vmData ]) : null));
+    this.$getPlugins().map((plugin) => (typeof plugin["$update"] == "function" ? plugin.$update.apply(this, [vmData]) : null));
   }
 
   // *** CRUD Functions ***
@@ -234,7 +259,7 @@ export default class dotnetifyVM {
     let items = this.State()[iListName];
 
     if (Array.isArray(iNewItem) && !Array.isArray(items[0] || [])) {
-      iNewItem.forEach(item => this.$addList(iListName, item));
+      iNewItem.forEach((item) => this.$addList(iListName, item));
       return;
     }
 
@@ -263,7 +288,7 @@ export default class dotnetifyVM {
   // Removes an item from a state array.
   $removeList(iListName, iFilter) {
     let state = {};
-    state[iListName] = this.State()[iListName].filter(i => !iFilter(i));
+    state[iListName] = this.State()[iListName].filter((i) => !iFilter(i));
     this.State(state);
   }
 
@@ -272,7 +297,7 @@ export default class dotnetifyVM {
     let items = this.State()[iListName];
 
     if (Array.isArray(iNewItem) && !Array.isArray(items[0] || [])) {
-      iNewItem.forEach(item => this.$updateList(iListName, item));
+      iNewItem.forEach((item) => this.$updateList(iListName, item));
       return;
     }
 
@@ -288,7 +313,6 @@ export default class dotnetifyVM {
         return i[key] == iNewItem[key] ? $.extend(i, iNewItem) : i;
       });
       this.State(state);
-    }
-    else console.error(`[${this.$vmId}] missing item key for '${iListName}'; add '${iListName}_itemKey' property to the view model.`);
+    } else console.error(`[${this.$vmId}] missing item key for '${iListName}'; add '${iListName}_itemKey' property to the view model.`);
   }
 }

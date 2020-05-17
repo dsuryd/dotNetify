@@ -1,5 +1,5 @@
 /* 
-Copyright 2017-2018 Dicky Suryadi
+Copyright 2017-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,54 +13,58 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import Path from '../libs/path';
-import { createEventEmitter } from '../libs/utils';
+import Path from "../libs/path";
+import { createEventEmitter } from "../libs/utils";
+import { IDotnetifyVM } from "./dotnetify-vm";
+import { IDotnetifyVMRouter } from "./dotnetify-vm-router";
 
-const window = window || global || {};
+export default class DotnetifyRouter {
+  version = "3.0.0";
+  debug: boolean = false;
+  $router: IDotnetifyVMRouter;
 
-export default class dotnetifyRouter {
-  version = '3.0.0';
+  static _urlPath: string = document.location.pathname;
 
-  static _urlPath = document.location.pathname;
+  // Internal variable.
+  _init: boolean = false;
 
   // URL path that will be parsed when performing routing.
-  get urlPath() {
-    return dotnetifyRouter._urlPath;
+  get urlPath(): string {
+    return DotnetifyRouter._urlPath;
   }
-  set urlPath(value) {
-    dotnetifyRouter._urlPath = value;
+  set urlPath(value: string) {
+    DotnetifyRouter._urlPath = value;
   }
 
   // Occurs when a URL path has been routed.
   routedEvent = createEventEmitter();
 
-  constructor(debug) {
+  constructor(debug: boolean) {
     this.debug = debug;
   }
 
   // Initialize routing using PathJS.
   init() {
-    if (typeof Path !== 'undefined') {
+    if (typeof Path !== "undefined") {
       Path.history.listen(true);
       Path.routes.rescue = function() {
-        //window.location.replace(document.location.pathname);
+        //location.replace(document.location.pathname);
       };
-    }
-    else throw new Error('Pathjs library is required for routing.');
+    } else throw new Error("Pathjs library is required for routing.");
   }
 
   // Map a route to an action.
-  mapTo(iPath, iFn) {
-    iPath = iPath.length > 0 ? iPath : '/';
-    if (typeof Path !== 'undefined')
+  mapTo(iPath: string, iFn: Function) {
+    iPath = iPath.length > 0 ? iPath : "/";
+    if (typeof Path !== "undefined")
       Path.map(iPath).to(function() {
         iFn(this.params);
       });
   }
 
   // Match a URL path to a route and run the action.
-  match(iUrlPath) {
-    if (typeof Path !== 'undefined') {
+  match(iUrlPath: string) {
+    if (typeof Path !== "undefined") {
       var matched = Path.match(iUrlPath, true);
       if (matched != null) {
         matched.run();
@@ -71,29 +75,29 @@ export default class dotnetifyRouter {
   }
 
   // Optional callback to override a URL before performing routing.
-  overrideUrl(iUrl) {
+  overrideUrl(iUrl: string, iTargetSelector: string) {
     return iUrl;
   }
 
   // Push state to HTML history.
-  pushState(iState, iTitle, iPath) {
-    this.urlPath = '';
-    if (typeof Path !== 'undefined') Path.history.pushState(iState, iTitle, iPath);
+  pushState(iState: any, iTitle: string, iPath: string) {
+    this.urlPath = "";
+    if (typeof Path !== "undefined") Path.history.pushState(iState, iTitle, iPath);
   }
 
   // Redirect to the a URL.
-  redirect(iUrl, viewModels) {
+  redirect(iUrl: string, viewModels: IDotnetifyVM[]) {
     // Check first whether existing views can handle routing this URL.
     // Otherwise, do a hard browser redirect.
     this.urlPath = iUrl;
     for (let i = 0; i < viewModels.length; i++) {
       const vm = viewModels[i];
-      if (vm.$router.routeUrl(iUrl)) {
-        if (this.debug) console.log('router> redirected');
+      if ((<any>vm).$router.routeUrl(iUrl)) {
+        if (this.debug) console.log("router> redirected");
         return;
       }
     }
-    window.location.replace(iUrl);
+    location.replace(iUrl);
   }
 
   // Called by dotNetify when a view model is ready.
@@ -102,7 +106,7 @@ export default class dotnetifyRouter {
   }
 
   // Called by dotNetify when a view model receives update.
-  $update(vmData) {
+  $update(vmData: any) {
     if (vmData && vmData.RoutingState) this.$router.initRouting();
   }
 }

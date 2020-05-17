@@ -13,42 +13,44 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import React from 'react';
-import ReactDOM from 'react-dom';
-import dotnetifyVMRouter from '../core/dotnetify-vm-router';
-import $ from '../libs/jquery-shim';
-import utils from '../libs/utils';
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import DotnetifyVMRouter, { RoutingStateType, RoutingTemplateType } from "../core/dotnetify-vm-router";
+import DotnetifyRouter from "../core/dotnetify-router";
+import DotnetifyVM from "../core/dotnetify-vm";
+import * as $ from "../libs/jquery-shim";
+import utils from "../libs/utils";
 
-const window = window || global || {};
+const _window = window || global || <any>{};
 
-export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
-  get hasRoutingState() {
+export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
+  get hasRoutingState(): boolean {
     const state = this.vm.State();
-    return state && state.hasOwnProperty('RoutingState');
+    return state && state.hasOwnProperty("RoutingState");
   }
-  get RoutingState() {
+  get RoutingState(): RoutingStateType {
     return this.vm.State().RoutingState;
   }
-  get VMRoot() {
-    return this.vm.Props('vmRoot');
+  get VMRoot(): string {
+    return this.vm.Props("vmRoot");
   }
-  get VMArg() {
-    return this.vm.Props('vmArg');
+  get VMArg(): any {
+    return this.vm.Props("vmArg");
   }
 
-  constructor(iVM, iDotNetifyRouter) {
+  constructor(iVM: DotnetifyVM, iDotNetifyRouter: DotnetifyRouter) {
     super(iVM, iDotNetifyRouter);
   }
 
-  onRouteEnter(iPath, iTemplate) {
+  onRouteEnter(iPath: string, iTemplate: RoutingTemplateType) {
     if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id;
     return true;
   }
 
   // Loads a view into a target element.
-  loadView(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
+  loadView(iTargetSelector: string, iViewUrl: any, iJsModuleUrl?: string, iVmArg?: any, iCallbackFn?: Function) {
     const vm = this.vm;
-    let reactProps;
+    let reactProps: any;
 
     // If the view model supports routing, add the root path to the view, to be used
     // to build the absolute route path, and view model argument if provided.
@@ -59,7 +61,7 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
       }
 
       let root = this.VMRoot;
-      root = root != null ? '/' + utils.trim(this.RoutingState.Root) + '/' + utils.trim(root) : this.RoutingState.Root;
+      root = root != null ? "/" + utils.trim(this.RoutingState.Root) + "/" + utils.trim(root) : this.RoutingState.Root;
       reactProps = { vmRoot: root, vmArg: iVmArg };
     }
 
@@ -67,10 +69,10 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
     iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-    if (utils.endsWith(iViewUrl, 'html')) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
+    if (utils.endsWith(iViewUrl, "html")) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
     else {
       let component = iViewUrl;
-      if (typeof iViewUrl === 'string' && window.hasOwnProperty(iViewUrl)) component = window[iViewUrl];
+      if (typeof iViewUrl === "string" && _window.hasOwnProperty(iViewUrl)) component = _window[iViewUrl];
 
       if (component instanceof HTMLElement) this.loadHtmlElementView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
       else this.loadReactView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
@@ -78,13 +80,13 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
   }
 
   // Loads a React view.
-  loadReactView(iTargetSelector, iComponent, iJsModuleUrl, iReactProps, iCallbackFn) {
+  loadReactView(iTargetSelector: string, iComponent: any, iJsModuleUrl?: string, iReactProps?: any, iCallbackFn?: Function) {
     return new Promise((resolve, reject) => {
       const vm = this.vm;
-      const vmId = this.vm ? this.vm.$vmId : '';
+      const vmId = this.vm ? this.vm.$vmId : "";
 
       const mountViewFunc = () => {
-        if (typeof iComponent !== 'function' && (typeof iComponent !== 'object' || iComponent.name == null)) {
+        if (typeof iComponent !== "function" && (typeof iComponent !== "object" || iComponent.name == null)) {
           console.error(`[${vmId}] failed to load view '${iComponent}' because it's not a valid React element.`);
           reject();
           return;
@@ -98,21 +100,21 @@ export default class dotnetifyReactVMRouter extends dotnetifyVMRouter {
         } catch (e) {
           console.error(e);
         }
-        if (typeof iCallbackFn === 'function') iCallbackFn.call(vm, reactElement);
+        if (typeof iCallbackFn === "function") iCallbackFn.call(vm, reactElement);
         resolve(reactElement);
       };
 
-      if (iJsModuleUrl == null || this.vm.$dotnetify.ssr === true) mountViewFunc();
+      if (iJsModuleUrl == null || this.vm.$dotnetify["ssr"] === true) mountViewFunc();
       else {
         // Load all javascripts first. Multiple files can be specified with comma delimiter.
-        var getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
+        var getScripts = iJsModuleUrl.split(",").map((i) => $.getScript(i));
         $.when.apply($, getScripts).done(mountViewFunc);
       }
     });
   }
 
   // Unmount a React view if there's one on the target selector.
-  unmountView(iTargetSelector) {
+  unmountView(iTargetSelector: string) {
     try {
       ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
     } catch (e) {

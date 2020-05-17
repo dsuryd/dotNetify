@@ -20,7 +20,7 @@ module.exports = {
   devtool: 'source-map',
   resolve: {
     modules: [ 'src', 'client', 'node_modules' ],
-    extensions: [ '.js', '.jsx', '.tsx', '.vue' ],
+    extensions: [ '.js', '.jsx', '.ts', '.tsx', '.vue' ],
     alias: {
       vue$: 'vue/dist/vue.esm.js',
       'styled-components': path.resolve(__dirname, 'node_modules', 'dotnetify-elements/node_modules/styled-components')
@@ -29,7 +29,7 @@ module.exports = {
   module: {
     rules: [
       { test: /\.jsx?$/, use: 'babel-loader', exclude: /node_modules/ },
-      { test: /\.tsx?$/, use: 'awesome-typescript-loader?silent=true' },
+      { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
       { test: /\.vue$/, use: 'vue-loader' },
       { test: /\.html$/, loader: 'html-loader' },
       { test: /\.css$/, use: [ MiniCssExtractPlugin.loader, 'css-loader?minimize' ] },

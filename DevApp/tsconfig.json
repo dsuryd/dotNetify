@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "target": "es5",
     "noImplicitAny": false,
     "removeComments": true,
     "preserveConstEnums": true,
-    "sourceMap": false
+    "sourceMap": true,
+    "jsx": "react",
+    "allowJs": true,
+    "declaration": true,
+    "declarationDir": "./typings",
+    "lib": ["dom", "es7"]
   },
-  "include": ["client/**/*"],
+  "include": ["src/**/*", "./node_modules/@types/node/index.d.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

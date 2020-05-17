@@ -14,22 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-import React from 'react';
-import dotnetify from './dotnetify-react';
-import { getSsrState } from './dotnetify-react.router.ssr';
+import * as React from "react";
+import dotnetify from "./dotnetify-react";
+import { getSsrState } from "./dotnetify-react.router.ssr";
 
-const window = window || global || {};
+export interface IRouteTargetProps {
+  id: string;
+}
 
 // <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
-export default class RouteTarget extends React.Component {
-  constructor(props) {
+export default class RouteTarget extends React.Component<IRouteTargetProps, any> {
+  private initialHtml: any = {};
+
+  constructor(props: IRouteTargetProps) {
     super(props);
 
     const elem = document.getElementById(props.id);
     if (elem && getSsrState(props.id)) {
       this.initialHtml = { __html: elem.innerHTML };
-    }
-    else this.initialHtml = { __html: '' };
+    } else this.initialHtml = { __html: "" };
   }
 
   render() {

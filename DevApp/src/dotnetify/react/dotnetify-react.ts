@@ -13,54 +13,57 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import _dotnetify from '../core/dotnetify';
-import dotnetifyVM from '../core/dotnetify-vm';
+import * as React from "react";
+import _dotnetify, { IDotnetifyImpl, Dotnetify, ConnectOptionsType } from "../core/dotnetify";
+import DotnetifyVM, { IDotnetifyVM } from "../core/dotnetify-vm";
+import { IDotnetifyHub } from "../core/dotnetify-hub";
 
-const window = window || global || {};
-let dotnetify = window.dotnetify || _dotnetify;
+const _window = window || global || <any>{};
+let dotnetify: Dotnetify = _window.dotnetify || _dotnetify;
 
-dotnetify.react = {
-  version: '3.0.0',
-  viewModels: {},
-  plugins: {},
-  controller: dotnetify,
+export interface IDotnetifyReact {
+  connect(iVMId: string, iReact: React.Component | any, iOptions?: ConnectOptionsType): IDotnetifyVM;
+}
+
+export class DotnetifyReact implements IDotnetifyReact, IDotnetifyImpl {
+  version = "3.0.0";
+  viewModels: { [vmId: string]: DotnetifyVM } = {};
+  plugins: { [pluginId: string]: any } = {};
+  controller = dotnetify;
 
   // Internal variables.
-  _hubs: [],
+  _hubs = [];
 
   // Initializes connection to SignalR server hub.
-  init: function(iHub) {
-    const self = dotnetify.react;
-    const hubInitialized = self._hubs.some(hub => hub === iHub);
+  init(iHub: IDotnetifyHub) {
+    const hubInitialized = this._hubs.some((hub) => hub === iHub);
 
-    const start = function() {
+    const start = () => {
       if (!iHub.isHubStarted)
-        Object.keys(self.viewModels)
-          .filter(vmId => self.viewModels[vmId].$hub === iHub)
-          .forEach(vmId => (self.viewModels[vmId].$requested = false));
+        Object.keys(this.viewModels)
+          .filter((vmId) => this.viewModels[vmId].$hub === iHub)
+          .forEach((vmId) => (this.viewModels[vmId].$requested = false));
 
       dotnetify.startHub(iHub);
     };
 
     if (!hubInitialized) {
-      iHub.responseEvent.subscribe((iVMId, iVMData) => self._responseVM(iVMId, iVMData));
+      iHub.responseEvent.subscribe((iVMId, iVMData) => this._responseVM(iVMId, iVMData));
       iHub.connectedEvent.subscribe(() =>
-        Object.keys(self.viewModels)
-          .filter(vmId => self.viewModels[vmId].$hub === iHub && !self.viewModels[vmId].$requested)
-          .forEach(vmId => self.viewModels[vmId].$request())
+        Object.keys(this.viewModels)
+          .filter((vmId) => this.viewModels[vmId].$hub === iHub && !this.viewModels[vmId].$requested)
+          .forEach((vmId) => this.viewModels[vmId].$request())
       );
       iHub.reconnectedEvent.subscribe(start);
 
-      if (iHub.mode !== 'local') self._hubs.push(iHub);
+      if (iHub.mode !== "local") this._hubs.push(iHub);
     }
 
     start();
-  },
+  }
 
   // Connects to a server view model.
-  connect: function(iVMId, iReact, iOptions) {
-    if (arguments.length < 2) throw new Error('[dotNetify] Missing arguments. Usage: connect(vmId, component) ');
-
+  connect(iVMId: string, iReact: React.Component | any, iOptions: ConnectOptionsType): IDotnetifyVM {
     const self = dotnetify.react;
     if (self.viewModels.hasOwnProperty(iVMId)) {
       console.error(
@@ -77,25 +80,25 @@ dotnetify.react = {
       get state() {
         return iReact.state;
       },
-      setState(state) {
+      setState(state: any) {
         iReact.setState(state);
-      }
+      },
     };
 
     const connectInfo = dotnetify.selectHub({ vmId: iVMId, options: iOptions, hub: null });
-    self.viewModels[iVMId] = new dotnetifyVM(connectInfo.vmId, component, connectInfo.options, self, connectInfo.hub);
+    self.viewModels[iVMId] = new DotnetifyVM(connectInfo.vmId, component, connectInfo.options, self, connectInfo.hub);
     if (connectInfo.hub) self.init(connectInfo.hub);
 
     return self.viewModels[iVMId];
-  },
+  }
 
   // Get all view models.
-  getViewModels: function() {
+  getViewModels(): IDotnetifyVM[] {
     const self = dotnetify.react;
-    return Object.keys(self.viewModels).map(vmId => self.viewModels[vmId]);
-  },
+    return Object.keys(self.viewModels).map((vmId) => self.viewModels[vmId]);
+  }
 
-  _responseVM: function(iVMId, iVMData) {
+  _responseVM(iVMId: string, iVMData: any): boolean {
     const self = dotnetify.react;
 
     if (self.viewModels.hasOwnProperty(iVMId)) {
@@ -106,8 +109,9 @@ dotnetify.react = {
     }
     return false;
   }
-};
+}
 
+dotnetify.react = new DotnetifyReact();
 dotnetify.addVMAccessor(dotnetify.react.getViewModels);
 
 export default dotnetify;

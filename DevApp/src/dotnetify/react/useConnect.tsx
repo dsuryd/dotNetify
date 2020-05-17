@@ -14,18 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-import { useState, useEffect, useRef } from 'react';
-import $ from '../libs/jquery-shim';
-import dotnetify from './dotnetify-react';
+import { useState, useEffect, useRef } from "react";
+import * as $ from "../libs/jquery-shim";
+import dotnetify from "./dotnetify-react";
+import { ConnectOptionsType } from "./../core/dotnetify";
+import { IDotnetifyVM } from "../core/dotnetify-vm";
 
-dotnetify.react.useConnect = (iVMId, iComponent, iOptions) => {
-  if (useState == null || useEffect == null) throw 'Error: using React hooks requires at least v16.8.';
+dotnetify.react.useConnect = (iVMId: string, iComponent?: { state: any; props: any } | any, iOptions?: ConnectOptionsType) => {
+  if (useState == null || useEffect == null) throw "Error: using React hooks requires at least v16.8.";
 
   let { state, props } = iComponent;
   if (state == null) state = iComponent || {};
 
-  const [ _state, setState ] = useState(state);
-  const vm = useRef();
+  const [_state, setState] = useState(state);
+  const vm = useRef<IDotnetifyVM>();
   const vmData = useRef(_state);
 
   useEffect(() => {
@@ -36,10 +38,10 @@ dotnetify.react.useConnect = (iVMId, iComponent, iOptions) => {
         get state() {
           return vmData.current;
         },
-        setState: newState => {
+        setState: (newState: any) => {
           vmData.current = $.extend({}, vmData.current, newState);
           setState(vmData.current);
-        }
+        },
       },
       iOptions
     );
@@ -49,4 +51,5 @@ dotnetify.react.useConnect = (iVMId, iComponent, iOptions) => {
   return { vm: vm.current, state: _state };
 };
 
-export default (iVMId, iComponent, iOptions) => dotnetify.react.useConnect(iVMId, iComponent, iOptions);
+export default (iVMId: string, iComponent?: { state: any; props: any } | any, iOptions?: ConnectOptionsType) =>
+  dotnetify.react.useConnect(iVMId, iComponent, iOptions);

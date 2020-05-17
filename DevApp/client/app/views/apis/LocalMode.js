@@ -1,26 +1,26 @@
-import React from 'react';
-import { Markdown, withTheme } from 'dotnetify-elements';
-import { Alert, NavMenu, Panel, VMContext } from 'dotnetify-elements';
-import Article from '../../components/Article';
-import Expander from '../../components/Expander';
-import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
+import React from "react";
+import { Markdown, withTheme } from "dotnetify-elements";
+import { Alert, NavMenu, Panel, VMContext } from "dotnetify-elements";
+import Article from "../../components/Article";
+import Expander from "../../components/Expander";
+import { currentFramework, frameworkSelectEvent } from "app/components/SelectFramework";
 
 class LocalMode extends React.Component {
   constructor() {
     super();
     this.state = { framework: currentFramework };
-    this.unsubs = frameworkSelectEvent.subscribe(framework => this.setState({ framework: framework }));
+    this.unsubs = frameworkSelectEvent.subscribe((framework) => this.setState({ framework: framework }));
   }
   componentWillUnmount() {
     this.unsubs();
   }
   render() {
     const { framework } = this.state;
-    return framework === 'Vue' ? <LocalModeVue /> : <LocalModeReact />;
+    return framework === "Vue" ? <LocalModeVue /> : <LocalModeReact />;
   }
 }
 
-const LocalModeReact = _ => (
+const LocalModeReact = (_) => (
   <Article vm="LocalMode" id="Content">
     <Markdown id="Content">
       <Markdown>{localModeHelloWorldReactCode()}</Markdown>
@@ -30,7 +30,7 @@ const LocalModeReact = _ => (
   </Article>
 );
 
-const LocalModeVue = _ => (
+const LocalModeVue = (_) => (
   <Article vm="LocalModeVue" id="Content">
     <Markdown id="Content">
       <Markdown>{localModeHelloWorldVueCode()}</Markdown>
@@ -39,7 +39,7 @@ const LocalModeVue = _ => (
   </Article>
 );
 
-const SeeItLive = _ => <b>See It Live!</b>;
+const SeeItLive = (_) => <b>See It Live!</b>;
 
 const localModeHelloWorldReactCode = () =>
   `
@@ -76,14 +76,17 @@ class MyApp extends React.Component {
 class LocalModeHelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    this.vm = dotnetify.react.connect('LocalHelloWorld', this);
-    this.state = { Greetings: '', name: '' };
+    this.vm = dotnetify.react.connect(
+      "LocalHelloWorld",
+      this
+    );
+    this.state = { Greetings: "", name: "" };
   }
   componentWillUnmount() {
     this.vm.$destroy();
   }
   render() {
-    const handleName = e => this.setState({ name: e.target.value });
+    const handleName = (e) => this.setState({ name: e.target.value });
     const handleSubmit = () => this.vm.$dispatch({ Submit: { Name: this.state.name } });
     return (
       <div>
@@ -97,11 +100,11 @@ class LocalModeHelloWorld extends React.Component {
 
 window.LocalHelloWorld = {
   onConnect() {
-    return { Greetings: 'Hello World' };
+    return { Greetings: "Hello World" };
   },
   onDispatch(data) {
-    return { Greetings: 'Hello ' + data.Submit.Name };
-  }
+    return { Greetings: "Hello " + data.Submit.Name };
+  },
 };
 
 const localModeHelloWorldVueCode = () =>
@@ -132,11 +135,11 @@ const localModeHelloWorldVueCode = () =>
 
 window.LocalHelloWorldVue = {
   onConnect() {
-    return { Greetings: 'Hello World' };
+    return { Greetings: "Hello World" };
   },
   onDispatch(data) {
-    return { Greetings: 'Hello ' + data.Name };
-  }
+    return { Greetings: "Hello " + data.Name };
+  },
 };
 
 class LocalModeHelloWorldVue extends React.Component {
@@ -144,19 +147,19 @@ class LocalModeHelloWorldVue extends React.Component {
     this.app = new Vue(
       dotnetify.vue.component(
         {
-          name: 'LocalHelloWorldVue',
+          name: "LocalHelloWorldVue",
           template: `
           <div>
             <div>{{state.Greetings}}</div>
             <input type="text" v-model="state.Name" />
           </div>
-        `
+        `,
         },
-        'LocalHelloWorldVue',
-        { watch: [ 'Name' ] }
+        "LocalHelloWorldVue",
+        { watch: ["Name"] }
       )
     );
-    this.app.$mount('#LocalModeHelloWorldVue');
+    this.app.$mount("#LocalModeHelloWorldVue");
   }
   componentWillUnmount() {
     this.app.$destroy();
@@ -165,44 +168,50 @@ class LocalModeHelloWorldVue extends React.Component {
     return <div id="LocalModeHelloWorldVue" />;
   }
 }
-window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
-window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
+window.LocalPage1 = (_) => <Alert>You selected Page 1</Alert>;
+window.LocalPage2 = (_) => <Alert danger>You selected Page 2</Alert>;
 
 window.LocalMode_LocalVM = new class {
   initialState = {
     RoutingState: {
       Templates: [
         {
-          Id: 'Page1',
-          Root: '',
-          UrlPattern: 'page1',
-          ViewUrl: 'LocalPage1'
+          Id: "Home",
+          Root: "",
+          UrlPattern: "",
+          ViewUrl: "LocalPage1",
         },
         {
-          Id: 'Page2',
-          Root: '',
-          UrlPattern: 'page2',
-          ViewUrl: 'LocalPage2'
-        }
+          Id: "Page1",
+          Root: "",
+          UrlPattern: "page1",
+          ViewUrl: "LocalPage1",
+        },
+        {
+          Id: "Page2",
+          Root: "",
+          UrlPattern: "page2",
+          ViewUrl: "LocalPage2",
+        },
       ],
-      Root: 'core/api/localmode'
+      Root: "core/api/localmode",
     },
     NavMenu: [
       {
         Route: {
-          TemplateId: 'Page1',
-          Path: 'page1'
+          TemplateId: "Page1",
+          Path: "page1",
         },
-        Label: 'Page 1'
+        Label: "Page 1",
       },
       {
         Route: {
-          TemplateId: 'Page2',
-          Path: 'page2'
+          TemplateId: "Page2",
+          Path: "page2",
         },
-        Label: 'Page 2'
-      }
-    ]
+        Label: "Page 2",
+      },
+    ],
   };
 
   onConnect() {
@@ -210,7 +219,7 @@ window.LocalMode_LocalVM = new class {
   }
 }();
 
-const LocalModeApp = _ => (
+const LocalModeApp = (_) => (
   <VMContext vm="LocalVM">
     <Panel horizontal>
       <Panel flex="30%">

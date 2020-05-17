@@ -1,5 +1,5 @@
 /* 
-Copyright 2019 Dicky Suryadi
+Copyright 2019-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,19 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import { createEventEmitter } from '../libs/utils';
+import { createEventEmitter } from "../libs/utils";
+import { IDotnetifyHub } from "./dotnetify-hub";
 
-const window = window || global || {};
+const _window = window || global || {};
 
-const normalize = iVMId => iVMId && iVMId.replace(/\./g, '_');
-const hasLocalVM = iVMId => {
+const normalize = (iVMId) => iVMId && iVMId.replace(/\./g, "_");
+const hasLocalVM = (iVMId) => {
   const vmId = normalize(iVMId);
-  const vm = window[vmId];
-  return typeof vm == 'object' && typeof vm.onConnect == 'function';
+  const vm = _window[vmId];
+  return typeof vm == "object" && typeof vm.onConnect == "function";
 };
 
-export class dotNetifyHubLocal {
-  mode = 'local';
+export class dotNetifyHubLocal implements IDotnetifyHub {
+  url = null;
+  mode = "local";
   debug = false;
   isConnected = false;
   isHubStarted = false;
@@ -35,21 +37,27 @@ export class dotNetifyHubLocal {
   connectedEvent = createEventEmitter();
   connectionFailedEvent = createEventEmitter();
 
+  reconnectDelay = [];
+  reconnectRetry: 0;
+
+  init() {}
+  stateChanged() {}
+
   startHub() {
     this.isConnected = true;
     this.isHubStarted = true;
     this.connectedEvent.emit();
   }
 
-  requestVM(iVMId, iVMArgs) {
+  requestVM(iVMId: string, iVMArgs: any) {
     const vmId = normalize(iVMId);
-    const vm = window[vmId];
+    const vm = _window[vmId];
 
-    if (typeof vm === 'object' && typeof vm.onConnect == 'function') {
+    if (typeof vm === "object" && typeof vm.onConnect == "function") {
       if (this.debug) console.log(`[${iVMId}] *** local mode ***`);
 
-      vm.$pushUpdate = update => {
-        if (typeof update == 'object') update = JSON.stringify(update);
+      vm.$pushUpdate = (update) => {
+        if (typeof update == "object") update = JSON.stringify(update);
         setTimeout(() => this.responseEvent.emit(iVMId, update));
       };
 
@@ -57,24 +65,24 @@ export class dotNetifyHubLocal {
     }
   }
 
-  updateVM(iVMId, iValue) {
+  updateVM(iVMId: string, iValue: any) {
     const vmId = normalize(iVMId);
-    const vm = window[vmId];
+    const vm = _window[vmId];
 
-    if (typeof vm === 'object' && typeof vm.onDispatch == 'function') {
+    if (typeof vm === "object" && typeof vm.onDispatch == "function") {
       let state = vm.onDispatch(iValue);
       if (state) {
-        if (typeof state == 'object') state = JSON.stringify(state);
+        if (typeof state == "object") state = JSON.stringify(state);
         setTimeout(() => this.responseEvent.emit(iVMId, state));
       }
     }
   }
 
-  disposeVM(iVMId) {
+  disposeVM(iVMId: string) {
     const vmId = normalize(iVMId);
-    const vm = window[vmId];
+    const vm = _window[vmId];
 
-    if (typeof vm === 'object' && typeof vm.onDestroy == 'function') {
+    if (typeof vm === "object" && typeof vm.onDestroy == "function") {
       vm.onDestroy(iVMId);
     }
   }

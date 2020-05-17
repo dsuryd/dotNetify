@@ -14,15 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-import React from 'react';
-import dotnetify from './dotnetify-react';
+import * as React from "react";
+import dotnetify from "./dotnetify-react";
+import { IDotnetifyVM } from "../core/dotnetify-vm";
+import { RouteType } from "../core/dotnetify-vm-router";
+
+export interface IRouteLinkProps {
+  vm: IDotnetifyVM;
+  route: RouteType;
+  style?: React.CSSProperties;
+  className?: string;
+  onClick?: (e: React.MouseEvent) => boolean;
+}
 
 // <RouteLink> is a helper component to set anchor tags for routes.
-export default class RouteLink extends React.Component {
+export default class RouteLink extends React.Component<IRouteLinkProps, any> {
   render() {
     const props = this.props;
 
-    const handleClick = event => {
+    const handleClick = (event: React.MouseEvent) => {
       event.preventDefault();
       if (props.vm == null) {
         console.error("RouteLink requires 'vm' property.");
@@ -32,15 +42,15 @@ export default class RouteLink extends React.Component {
         console.error("RouteLink requires 'route' property.");
         return;
       }
-      if (typeof props.onClick === 'function' && props.onClick(event) === false) return;
-      return props.vm.$handleRoute(event);
+      if (typeof props.onClick === "function" && props.onClick(event) === false) return;
+      return (props.vm as any).$handleRoute(event);
     };
 
     return (
       <a
         style={props.style}
         className={props.className}
-        href={props.route && props.vm ? props.vm.$route(props.route) : '/'}
+        href={props.route && props.vm ? (props.vm as any).$route(props.route) : "/"}
         children={props.children}
         onClick={handleClick}
       />
