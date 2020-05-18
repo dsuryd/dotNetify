@@ -13,47 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import { createEventEmitter, IEventEmitter } from "../libs/utils";
+import { createEventEmitter } from "../libs/utils";
 import * as jQueryShim from "../libs/jquery-shim";
 import * as signalRNetCore from "@aspnet/signalr";
-import { HubConnectionBuilder } from "@aspnet/signalr";
+import { IDotnetifyHub } from "../_typings";
 
 let $ = jQueryShim;
 const _window = window || global || <any>{};
-
-export interface IDotnetifyHub {
-  url: string;
-  mode: string;
-  reconnectDelay: number[];
-  reconnectRetry: number;
-
-  isConnected: boolean;
-  isHubStarted: boolean;
-
-  responseEvent: IEventEmitter;
-  reconnectedEvent: IEventEmitter;
-  connectedEvent: IEventEmitter;
-  connectionFailedEvent: IEventEmitter;
-
-  init: (hubPath: string, hubServerUrl: string, hubLib: any) => void;
-  startHub: (hubOptions: HubOptionsType, doneHandler: () => void, failHandler: (ex: any) => void, iForceRestart: boolean) => void;
-
-  stateChanged: (handler: (state: string) => void) => void;
-
-  requestVM: (vmId: string, payload: RequestPayloadType) => void;
-  updateVM: (vmId: string, payload: any) => void;
-  disposeVM: (vmId: string) => void;
-}
-
-export type RequestPayloadType = {
-  $vmArg: any;
-  $headers: any;
-};
-
-export type HubOptionsType = {
-  transport: string[];
-  connectionBuilder: (builder: HubConnectionBuilder) => HubConnectionBuilder;
-};
 
 export class dotnetifyHubFactory {
   static create(): IDotnetifyHub {

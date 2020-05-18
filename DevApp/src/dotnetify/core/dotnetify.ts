@@ -13,48 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import dotnetifyHub, { dotnetifyHubFactory, IDotnetifyHub, HubOptionsType } from "./dotnetify-hub";
+
+import dotnetifyHub, { dotnetifyHubFactory } from "./dotnetify-hub";
 import localHub, { hasLocalVM } from "./dotnetify-hub-local";
-import webApiHub, { createWebApiHub, RequestHandlerType } from "./dotnetify-hub-webapi";
-import DotnetifyVM, { IDotnetifyVM } from "./dotnetify-vm";
-import { OnRouteEnterType } from "./dotnetify-vm-router";
-import { IDotnetifyReact } from "../react/dotnetify-react";
-import { IDotnetifyVue } from "../vue/dotnetify-vue";
-
-export interface IDotnetify {
-  // Supported JS framework.
-  react?: IDotnetifyReact;
-  vue?: IDotnetifyVue;
-  ko?: any;
-
-  // SignalR hub options.
-  hub: IDotnetifyHub;
-  hubOptions: HubOptionsType;
-  hubPath: string;
-  hubLib: any;
-
-  // Debug mode.
-  debug: boolean;
-  debugFn: (vmId: string, direction: string, payload: any) => void;
-
-  // Use this to get notified of connection state changed events.
-  connectionStateHandler: (state: string, exception: ExceptionType, hub: IDotnetifyHub) => void;
-
-  // Use this intercept a view model prior to establishing connection.
-  connectHandler: (args: VMConnectArgsType) => VMConnectArgsType;
-
-  // Connect to server. Use it for non-supported frameworks.
-  connect: (vmId: string, options?: IConnectOptions) => IDotnetifyVM;
-
-  // Creates a SignalR hub client.
-  createHub: (iHubServerUrl: string, iHubPath: string, iHubLib: any) => IDotnetifyHub;
-
-  // Creates a Web API hub client.
-  createWebApiHub: (iBaseUrl: string, iRequestHandler: RequestHandlerType) => IDotnetifyHub;
-
-  // Active view models.
-  getViewModels(): IDotnetifyVM[];
-}
+import webApiHub, { createWebApiHub } from "./dotnetify-hub-webapi";
+import DotnetifyVM from "./dotnetify-vm";
+import {
+  IDotnetify,
+  IDotnetifyHub,
+  IDotnetifyVM,
+  IConnectOptions,
+  VMConnectArgsType,
+  ExceptionType,
+  ExceptionHandlerType,
+  RequestHandlerType,
+} from "../_typings";
 
 export interface IDotnetifyImpl {
   // Core instance.
@@ -73,20 +46,7 @@ export interface IDotnetifyImpl {
   getViewModels(): IDotnetifyVM[];
 }
 
-export interface IConnectOptions {
-  getState?: () => any;
-  setState?: (state: any) => void;
-  vmArg?: any;
-  headers?: any;
-  exceptionHandler?: (exception: any) => void;
-  webApi?: boolean;
-  onRouteEnter?: OnRouteEnterType;
-}
-
 export type VMAccessorsType = () => IDotnetifyVM[];
-export type VMConnectArgsType = { vmId: string; options: IConnectOptions; hub: IDotnetifyHub };
-export type ExceptionType = { name: string; message: string };
-export type ExceptionHandlerType = (exception: ExceptionType) => void;
 
 export class Dotnetify implements IDotnetify {
   // Supported JS framework.

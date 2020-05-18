@@ -16,19 +16,10 @@ limitations under the License.
 
 import * as React from "react";
 import dotnetify from "./dotnetify-react";
-import { IDotnetifyVM } from "../core/dotnetify-vm";
-import { RouteType } from "../core/dotnetify-vm-router";
-
-export interface IRouteLinkProps {
-  vm: IDotnetifyVM;
-  route: RouteType;
-  style?: React.CSSProperties;
-  className?: string;
-  onClick?: (e: React.MouseEvent) => boolean;
-}
+import { IRouteLinkProps } from "../_typings";
 
 // <RouteLink> is a helper component to set anchor tags for routes.
-export default class RouteLink extends React.Component<IRouteLinkProps, any> {
+export default class RouteLink extends React.Component<IRouteLinkProps> {
   render() {
     const props = this.props;
 

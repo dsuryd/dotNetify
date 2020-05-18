@@ -17,13 +17,10 @@ limitations under the License.
 import * as React from "react";
 import dotnetify from "./dotnetify-react";
 import { getSsrState } from "./dotnetify-react.router.ssr";
-
-export interface IRouteTargetProps {
-  id: string;
-}
+import { IRouteTargetProps } from "../_typings";
 
 // <RouteTarget> is a helper component to provide DOM target for routes, and is essential for server-side rendering.
-export default class RouteTarget extends React.Component<IRouteTargetProps, any> {
+export default class RouteTarget extends React.Component<IRouteTargetProps> {
   private initialHtml: any = {};
 
   constructor(props: IRouteTargetProps) {

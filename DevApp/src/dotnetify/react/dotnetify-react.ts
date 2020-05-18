@@ -14,16 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import * as React from "react";
-import _dotnetify, { IDotnetifyImpl, Dotnetify, IConnectOptions } from "../core/dotnetify";
-import DotnetifyVM, { IDotnetifyVM } from "../core/dotnetify-vm";
-import { IDotnetifyHub } from "../core/dotnetify-hub";
+import _dotnetify, { IDotnetifyImpl, Dotnetify } from "../core/dotnetify";
+import DotnetifyVM from "../core/dotnetify-vm";
+import { IDotnetifyReact, IDotnetifyHub, IConnectOptions, IDotnetifyVM } from "../_typings";
 
 const _window = window || global || <any>{};
 let dotnetify: Dotnetify = _window.dotnetify || _dotnetify;
-
-export interface IDotnetifyReact {
-  connect(iVMId: string, iReact: React.Component | any, iOptions?: IConnectOptions): IDotnetifyVM;
-}
 
 export class DotnetifyReact implements IDotnetifyReact, IDotnetifyImpl {
   version = "3.0.0";

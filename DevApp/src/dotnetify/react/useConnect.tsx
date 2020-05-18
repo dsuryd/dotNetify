@@ -17,8 +17,7 @@ limitations under the License.
 import { useState, useEffect, useRef } from "react";
 import * as $ from "../libs/jquery-shim";
 import dotnetify from "./dotnetify-react";
-import { IConnectOptions } from "./../core/dotnetify";
-import { IDotnetifyVM } from "../core/dotnetify-vm";
+import { IDotnetifyVM, IConnectOptions } from "../_typings";
 
 dotnetify.react.useConnect = function<T>(iVMId: string, iComponent?: { state: T; props: any } | any, iOptions?: IConnectOptions) {
   if (useState == null || useEffect == null) throw "Error: using React hooks requires at least v16.8.";

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import { createEventEmitter } from "../libs/utils";
-import { IDotnetifyHub } from "./dotnetify-hub";
+import { IDotnetifyHub } from "../_typings";
 
 const _window = window || global || {};
 

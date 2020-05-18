@@ -15,8 +15,7 @@ limitations under the License.
  */
 import Path from "../libs/path";
 import { createEventEmitter } from "../libs/utils";
-import { IDotnetifyVM } from "./dotnetify-vm";
-import { IDotnetifyVMRouter } from "./dotnetify-vm-router";
+import { IDotnetifyVMRouter, IDotnetifyVM } from "../_typings";
 
 export default class DotnetifyRouter {
   version = "3.0.0";

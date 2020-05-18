@@ -14,17 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import * as $ from "../libs/jquery-shim";
-import { IConnectOptions, IDotnetifyImpl, ExceptionHandlerType } from "./dotnetify";
-import { IDotnetifyHub } from "./dotnetify-hub";
-import { OnRouteEnterType, RouteType } from "./dotnetify-vm-router";
-
-export interface IDotnetifyVM {
-  $dispatch: (value: any) => void;
-  $destroy: () => void;
-
-  $routeTo: (route: RouteType) => void;
-  onRouteEnter?: OnRouteEnterType;
-}
+import { IDotnetifyImpl } from "./dotnetify";
+import { IDotnetifyVM, IConnectOptions, IDotnetifyHub, ExceptionHandlerType, RouteType, OnRouteEnterType } from "../_typings";
 
 // Client-side view model that acts as a proxy of the server view model.
 export default class DotnetifyVM implements IDotnetifyVM {

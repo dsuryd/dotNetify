@@ -16,9 +16,8 @@ limitations under the License.
 
 import dotnetify from "./dotnetify-react";
 import DotnetifyVM from "../core/dotnetify-vm";
-import { IConnectOptions } from "../core/dotnetify";
-import { IDotnetifyHub } from "./../core/dotnetify-hub";
 import * as $ from "../libs/jquery-shim";
+import { IConnectOptions, IDotnetifyHub } from "../_typings";
 
 const _window = window || global || <any>{};
 const ssrStatesKey = "__dotnetify_ssr_states__";

@@ -17,33 +17,7 @@ import utils from "../libs/utils";
 import * as $ from "../libs/jquery-shim";
 import DotnetifyVM from "./dotnetify-vm";
 import DotnetifyRouter from "./dotnetify-router";
-
-export interface IDotnetifyVMRouter {
-  initRouting: () => void;
-}
-
-export type RoutingStateType = {
-  Root: string;
-  Active: string;
-  Templates: RoutingTemplateType[];
-};
-
-export type RoutingTemplateType = {
-  Id: string;
-  UrlPattern: string;
-  Target: string;
-  ViewUrl?: string;
-  JSModuleUrl?: string;
-};
-
-export type RouteType = {
-  TemplateId: string;
-  Path: string;
-  Url?: string;
-  RedirectRoot?: string;
-};
-
-export type OnRouteEnterType = (path: string, template: RoutingTemplateType) => boolean | Promise<boolean>;
+import { IDotnetifyVMRouter, RouteType, RoutingStateType, RoutingTemplateType } from "../_typings";
 
 export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
   routes: RouteType[] = [];

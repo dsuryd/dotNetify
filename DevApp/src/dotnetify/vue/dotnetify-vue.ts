@@ -13,17 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import _dotnetify, { Dotnetify, IConnectOptions, IDotnetifyImpl } from "../core/dotnetify";
-import dotnetifyVM, { IDotnetifyVM } from "../core/dotnetify-vm";
+import _dotnetify, { Dotnetify, IDotnetifyImpl } from "../core/dotnetify";
+import dotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyVM from "../core/dotnetify-vm";
-import { IDotnetifyHub } from "../core/dotnetify-hub";
+import { IDotnetifyVue, IConnectOptions, IDotnetifyHub, IDotnetifyVM } from "../_typings";
 
 const _window = window || global || <any>{};
 let dotnetify: Dotnetify = _window.dotnetify || _dotnetify;
-
-export interface IDotnetifyVue {
-  connect(iVMId: string, iVue: any, iOptions?: IConnectOptions): IDotnetifyVM;
-}
 
 export interface IVueConnectOptions extends IConnectOptions {
   watch: string[];

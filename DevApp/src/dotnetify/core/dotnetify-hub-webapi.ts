@@ -14,9 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import { createEventEmitter, fetch } from "../libs/utils";
-import { IDotnetifyHub } from "./dotnetify-hub";
-
-export type RequestHandlerType = (url: string, request: any, payload?: any) => void;
+import { IDotnetifyHub, RequestHandlerType } from "../_typings";
 
 export class DotNetifyHubWebApi implements IDotnetifyHub {
   url = "";

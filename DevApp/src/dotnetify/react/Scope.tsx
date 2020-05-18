@@ -17,15 +17,9 @@ limitations under the License.
 import * as React from "react";
 import * as PropTypes from "prop-types";
 import dotnetify from "./dotnetify-react";
-import { IDotnetifyVM } from "../core/dotnetify-vm";
-import { IConnectOptions } from "../core/dotnetify";
+import { IScopeProps, IConnectOptions } from "../_typings";
 
 const _window = window || global || ({} as any);
-
-export interface IScopeProps {
-  vm: IDotnetifyVM;
-  options?: IConnectOptions;
-}
 
 // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
 // of the parent component, so that when the child component connects to its back-end view model, the child view model
@@ -33,7 +27,7 @@ export interface IScopeProps {
 //
 // The <Scope> component also provides the 'connect' function for a component to connect to the back-end view model and
 // injects properties and dispatch functions into the component.
-export default class Scope extends React.Component<IScopeProps, any> {
+export default class Scope extends React.Component<IScopeProps> {
   static displayName = "Scope";
   static version = "1.3.0";
 

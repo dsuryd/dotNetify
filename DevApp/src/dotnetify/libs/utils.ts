@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+import { IEventEmitter } from "../_typings";
+
 class Utils {
   // Trim slashes from start and end of string.
   trim(iStr: string) {
@@ -51,11 +53,6 @@ class Utils {
   grep(iArray: any[], iFilter: any) {
     return Array.isArray(iArray) ? iArray.filter(iFilter) : [];
   }
-}
-
-export interface IEventEmitter {
-  emit: (...args: any) => void;
-  subscribe: (subscriber: any) => () => void;
 }
 
 export const createEventEmitter = () => {

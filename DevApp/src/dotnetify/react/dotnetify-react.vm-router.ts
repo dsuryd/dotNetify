@@ -15,11 +15,12 @@ limitations under the License.
  */
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import DotnetifyVMRouter, { RoutingStateType, RoutingTemplateType } from "../core/dotnetify-vm-router";
+import DotnetifyVMRouter from "../core/dotnetify-vm-router";
 import DotnetifyRouter from "../core/dotnetify-router";
 import DotnetifyVM from "../core/dotnetify-vm";
 import * as $ from "../libs/jquery-shim";
 import utils from "../libs/utils";
+import { RoutingStateType, RoutingTemplateType } from "../_typings";
 
 const _window = window || global || <any>{};
 
