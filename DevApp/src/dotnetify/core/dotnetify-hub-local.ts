@@ -18,14 +18,14 @@ import { IDotnetifyHub } from "./dotnetify-hub";
 
 const _window = window || global || {};
 
-const normalize = (iVMId) => iVMId && iVMId.replace(/\./g, "_");
-const hasLocalVM = (iVMId) => {
+const normalize = (iVMId: string) => iVMId && iVMId.replace(/\./g, "_");
+const hasLocalVM = (iVMId: string) => {
   const vmId = normalize(iVMId);
   const vm = _window[vmId];
   return typeof vm == "object" && typeof vm.onConnect == "function";
 };
 
-export class dotNetifyHubLocal implements IDotnetifyHub {
+export class DotNetifyHubLocal implements IDotnetifyHub {
   url = null;
   mode = "local";
   debug = false;
@@ -88,5 +88,5 @@ export class dotNetifyHubLocal implements IDotnetifyHub {
   }
 }
 
-export default new dotNetifyHubLocal();
+export default new DotNetifyHubLocal();
 export { hasLocalVM };

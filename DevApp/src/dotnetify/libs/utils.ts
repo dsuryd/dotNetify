@@ -1,5 +1,5 @@
 /* 
-Copyright 2018 Dicky Suryadi
+Copyright 2018-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-class utils {
+class Utils {
   // Trim slashes from start and end of string.
   trim(iStr: string) {
     if (typeof iStr !== "string") return "";
@@ -95,4 +95,4 @@ export const fetch = (iMethod: string, iUrl: string, iData: string, iOptions: (r
   });
 };
 
-export default new utils();
+export default new Utils();

@@ -17,10 +17,10 @@ limitations under the License.
 import { useState, useEffect, useRef } from "react";
 import * as $ from "../libs/jquery-shim";
 import dotnetify from "./dotnetify-react";
-import { ConnectOptionsType } from "./../core/dotnetify";
+import { IConnectOptions } from "./../core/dotnetify";
 import { IDotnetifyVM } from "../core/dotnetify-vm";
 
-dotnetify.react.useConnect = (iVMId: string, iComponent?: { state: any; props: any } | any, iOptions?: ConnectOptionsType) => {
+dotnetify.react.useConnect = function<T>(iVMId: string, iComponent?: { state: T; props: any } | any, iOptions?: IConnectOptions) {
   if (useState == null || useEffect == null) throw "Error: using React hooks requires at least v16.8.";
 
   let { state, props } = iComponent;
@@ -51,5 +51,6 @@ dotnetify.react.useConnect = (iVMId: string, iComponent?: { state: any; props: a
   return { vm: vm.current, state: _state };
 };
 
-export default (iVMId: string, iComponent?: { state: any; props: any } | any, iOptions?: ConnectOptionsType) =>
-  dotnetify.react.useConnect(iVMId, iComponent, iOptions);
+export default function<T>(iVMId: string, iComponent?: { state: T; props: any } | any, iOptions?: IConnectOptions) {
+  return dotnetify.react.useConnect(iVMId, iComponent, iOptions);
+}

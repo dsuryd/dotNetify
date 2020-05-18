@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import * as $ from "../libs/jquery-shim";
-import { ConnectOptionsType, IDotnetifyImpl, ExceptionHandlerType } from "./dotnetify";
+import { IConnectOptions, IDotnetifyImpl, ExceptionHandlerType } from "./dotnetify";
 import { IDotnetifyHub } from "./dotnetify-hub";
 import { OnRouteEnterType, RouteType } from "./dotnetify-vm-router";
 
@@ -30,7 +30,7 @@ export interface IDotnetifyVM {
 export default class DotnetifyVM implements IDotnetifyVM {
   $vmId: string;
   $component: any;
-  $options: ConnectOptionsType;
+  $options: IConnectOptions;
   $dotnetify: IDotnetifyImpl;
   $hub: IDotnetifyHub;
   $vmArg: any;
@@ -56,7 +56,7 @@ export default class DotnetifyVM implements IDotnetifyVM {
   //    exceptionHandler: called when receiving server-side exception.
   // iDotNetify - framework-specific dotNetify library.
   // iHub - hub connection.
-  constructor(iVMId: string, iComponent: any, iOptions: ConnectOptionsType, iDotNetify: IDotnetifyImpl, iHub: IDotnetifyHub) {
+  constructor(iVMId: string, iComponent: any, iOptions: IConnectOptions, iDotNetify: IDotnetifyImpl, iHub: IDotnetifyHub) {
     this.$vmId = iVMId;
     this.$component = iComponent;
     this.$options = iOptions || {};

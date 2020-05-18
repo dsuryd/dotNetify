@@ -16,11 +16,11 @@ limitations under the License.
 
 import dotnetify from "./dotnetify-react";
 import DotnetifyVM from "../core/dotnetify-vm";
-import { ConnectOptionsType } from "../core/dotnetify";
+import { IConnectOptions } from "../core/dotnetify";
 import { IDotnetifyHub } from "./../core/dotnetify-hub";
 import * as $ from "../libs/jquery-shim";
 
-const _window = window || global || {};
+const _window = window || global || <any>{};
 const ssrStatesKey = "__dotnetify_ssr_states__";
 const ssrCallbackKey = "__dotnetify_ssr__";
 
@@ -33,7 +33,7 @@ export function getSsrState(iVMId: string) {
 export default function enableSsr() {
   // Override dotnetify.react.connect for server-side render.
   const connect = dotnetify.react.connect;
-  dotnetify.react.connect = function(iVMId: string, iComponent: any, iOptions: ConnectOptionsType) {
+  dotnetify.react.connect = function(iVMId: string, iComponent: any, iOptions: IConnectOptions) {
     const ssrState = getSsrState(iVMId);
     if (ssrState) {
       try {

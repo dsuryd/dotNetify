@@ -18,7 +18,7 @@ import { IDotnetifyHub } from "./dotnetify-hub";
 
 export type RequestHandlerType = (url: string, request: any, payload?: any) => void;
 
-export class dotNetifyHubWebApi implements IDotnetifyHub {
+export class DotNetifyHubWebApi implements IDotnetifyHub {
   url = "";
   mode = "webapi";
   debug = false;
@@ -43,7 +43,7 @@ export class dotNetifyHubWebApi implements IDotnetifyHub {
   }
 
   static create(iBaseUrl?: string, iOnRequest?: RequestHandlerType): IDotnetifyHub {
-    return new dotNetifyHubWebApi(iBaseUrl, iOnRequest);
+    return new DotNetifyHubWebApi(iBaseUrl, iOnRequest);
   }
 
   init() {}
@@ -97,7 +97,7 @@ export class dotNetifyHubWebApi implements IDotnetifyHub {
   }
 }
 
-const createWebApiHub = dotNetifyHubWebApi.create;
+const createWebApiHub = DotNetifyHubWebApi.create;
 
 export { createWebApiHub };
-export default dotNetifyHubWebApi.create();
+export default DotNetifyHubWebApi.create();

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import * as React from "react";
-import _dotnetify, { IDotnetifyImpl, Dotnetify, ConnectOptionsType } from "../core/dotnetify";
+import _dotnetify, { IDotnetifyImpl, Dotnetify, IConnectOptions } from "../core/dotnetify";
 import DotnetifyVM, { IDotnetifyVM } from "../core/dotnetify-vm";
 import { IDotnetifyHub } from "../core/dotnetify-hub";
 
@@ -22,7 +22,7 @@ const _window = window || global || <any>{};
 let dotnetify: Dotnetify = _window.dotnetify || _dotnetify;
 
 export interface IDotnetifyReact {
-  connect(iVMId: string, iReact: React.Component | any, iOptions?: ConnectOptionsType): IDotnetifyVM;
+  connect(iVMId: string, iReact: React.Component | any, iOptions?: IConnectOptions): IDotnetifyVM;
 }
 
 export class DotnetifyReact implements IDotnetifyReact, IDotnetifyImpl {
@@ -63,7 +63,7 @@ export class DotnetifyReact implements IDotnetifyReact, IDotnetifyImpl {
   }
 
   // Connects to a server view model.
-  connect(iVMId: string, iReact: React.Component | any, iOptions: ConnectOptionsType): IDotnetifyVM {
+  connect(iVMId: string, iReact: React.Component | any, iOptions: IConnectOptions): IDotnetifyVM {
     const self = dotnetify.react;
     if (self.viewModels.hasOwnProperty(iVMId)) {
       console.error(

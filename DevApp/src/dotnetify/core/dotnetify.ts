@@ -44,7 +44,7 @@ export interface IDotnetify {
   connectHandler: (args: VMConnectArgsType) => VMConnectArgsType;
 
   // Connect to server. Use it for non-supported frameworks.
-  connect: (vmId: string, options?: ConnectOptionsType) => IDotnetifyVM;
+  connect: (vmId: string, options?: IConnectOptions) => IDotnetifyVM;
 
   // Creates a SignalR hub client.
   createHub: (iHubServerUrl: string, iHubPath: string, iHubLib: any) => IDotnetifyHub;
@@ -73,7 +73,7 @@ export interface IDotnetifyImpl {
   getViewModels(): IDotnetifyVM[];
 }
 
-export type ConnectOptionsType = {
+export interface IConnectOptions {
   getState?: () => any;
   setState?: (state: any) => void;
   vmArg?: any;
@@ -81,10 +81,10 @@ export type ConnectOptionsType = {
   exceptionHandler?: (exception: any) => void;
   webApi?: boolean;
   onRouteEnter?: OnRouteEnterType;
-};
+}
 
 export type VMAccessorsType = () => IDotnetifyVM[];
-export type VMConnectArgsType = { vmId: string; options: ConnectOptionsType; hub: IDotnetifyHub };
+export type VMConnectArgsType = { vmId: string; options: IConnectOptions; hub: IDotnetifyHub };
 export type ExceptionType = { name: string; message: string };
 export type ExceptionHandlerType = (exception: ExceptionType) => void;
 
@@ -130,8 +130,8 @@ export class Dotnetify implements IDotnetify {
   }
 
   // Generic connect function for non-React app.
-  connect(iVMId: string, iOptions: ConnectOptionsType) {
-    return dotnetify.react.connect(
+  connect(iVMId: string, iOptions: IConnectOptions) {
+    return _dotnetify.react.connect(
       iVMId,
       {},
       iOptions
@@ -218,11 +218,5 @@ export class Dotnetify implements IDotnetify {
   }
 }
 
-export class DotnetifyFactory {
-  static create(): IDotnetify {
-    return new Dotnetify();
-  }
-}
-
-const dotnetify = DotnetifyFactory.create();
-export default dotnetify;
+const _dotnetify = new Dotnetify();
+export default _dotnetify;

@@ -18,13 +18,13 @@ import * as React from "react";
 import * as PropTypes from "prop-types";
 import dotnetify from "./dotnetify-react";
 import { IDotnetifyVM } from "../core/dotnetify-vm";
-import { ConnectOptionsType } from "../core/dotnetify";
+import { IConnectOptions } from "../core/dotnetify";
 
 const _window = window || global || ({} as any);
 
 export interface IScopeProps {
   vm: IDotnetifyVM;
-  options?: ConnectOptionsType;
+  options?: IConnectOptions;
 }
 
 // The <Scope> component uses React's 'context' to pass down the component hierarchy the name of the back-end view model
@@ -52,7 +52,7 @@ export default class Scope extends React.Component<IScopeProps, any> {
     return scope ? scope + "." + vmId : vmId;
   }
 
-  scopedOptions(options: ConnectOptionsType) {
+  scopedOptions(options: IConnectOptions) {
     let scopedOptions = this.context.scoped ? this.context.scopedOptions(this.props.options) : this.props.options;
     return scopedOptions ? { ...scopedOptions, ...options } : options;
   }
