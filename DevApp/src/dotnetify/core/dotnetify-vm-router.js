@@ -52,8 +52,7 @@ export default class dotnetifyVMRouter {
     if (typeof iArg === 'object') {
       iArg.preventDefault();
       path = iArg.currentTarget.pathname;
-    }
-    else if (typeof iArg === 'string') path = iArg;
+    } else if (typeof iArg === 'string') path = iArg;
 
     if (path == null || path == '') throw new Error('$handleRoute requires path argument or event with pathname.');
     setTimeout(() => this.router.pushState({}, '', path));
@@ -143,8 +142,7 @@ export default class dotnetifyVMRouter {
       if (iJsModuleUrl != null) {
         const getScripts = iJsModuleUrl.split(',').map(i => $.getScript(i));
         $.when.apply($, getScripts).done(() => typeof callbackFn === 'function' && iCallbackFn.call(vm));
-      }
-      else if (typeof callbackFn === 'function') iCallbackFn.call(vm);
+      } else if (typeof callbackFn === 'function') iCallbackFn.call(vm);
     });
   }
 
@@ -189,9 +187,11 @@ export default class dotnetifyVMRouter {
   raiseRoutedEvent(noMatch) {
     if (noMatch) {
       // Use the no match template if given, otherwise fallback to "/404.html".
-      const noMatchTemplate = this.RoutingState && this.RoutingState.Templates.find(x => x.UrlPattern === '*');
-      if (noMatchTemplate) this.routeTo(this.router.urlPath, noMatchTemplate);
-      else setTimeout(() => (window.location.href = '/404.html'));
+      if (this.RoutingState) {
+        const noMatchTemplate = this.RoutingState.Templates.find(x => x.UrlPattern === '*');
+        if (noMatchTemplate) this.routeTo(this.router.urlPath, noMatchTemplate);
+        else if (this.router.notFound404Url) setTimeout(() => (window.location.href = this.router.notFound404Url));
+      }
     }
     if (this.debug) console.log('router> routed' + (noMatch ? ' (404)' : ''));
     this.router.routedEvent.emit();
@@ -224,8 +224,7 @@ export default class dotnetifyVMRouter {
           path = template.UrlPattern != null ? template.UrlPattern : template.Id;
           iRoute.Path = path;
         }
-      }
-      else if (iRoute.RedirectRoot == null) throw new Error(`vmRoute cannot find route template ${iRoute.TemplateId}`);
+      } else if (iRoute.RedirectRoot == null) throw new Error(`vmRoute cannot find route template ${iRoute.TemplateId}`);
     }
 
     // If the path has a redirect root, the path doesn't belong to the current root and needs to be
@@ -299,10 +298,9 @@ export default class dotnetifyVMRouter {
         if (isRedirect === true) {
           if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
           return;
-        }
-        else {
+        } else {
           if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
-          return this.router.redirect(this.toUrl(iPath), [ ...viewModels, ...vm.$dotnetify.controller.getViewModels() ]);
+          return this.router.redirect(this.toUrl(iPath), [...viewModels, ...vm.$dotnetify.controller.getViewModels()]);
         }
       }
 
@@ -393,12 +391,10 @@ export default class dotnetifyVMRouter {
           // If route's not already active, route to it.
           if (!utils.equal(this.RoutingState.Active, path)) {
             this.routeTo(path, template, false, () => this.raiseRoutedEvent(), isRedirect);
-          }
-          else this.raiseRoutedEvent();
+          } else this.raiseRoutedEvent();
           return true;
         }
-      }
-      else if (this.router.match(urlPath)) {
+      } else if (this.router.match(urlPath)) {
         // If no vmRoute binding matches, try to match with any template's URL pattern.
         this.router.urlPath = '';
         this.raiseRoutedEvent();

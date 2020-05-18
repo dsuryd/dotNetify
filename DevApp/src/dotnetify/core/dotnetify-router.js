@@ -20,6 +20,7 @@ const window = window || global || {};
 
 export default class dotnetifyRouter {
   version = '3.0.0';
+  notFound404Url = '/404.html';
 
   static _urlPath = document.location.pathname;
 
@@ -45,8 +46,7 @@ export default class dotnetifyRouter {
       Path.routes.rescue = function() {
         //window.location.replace(document.location.pathname);
       };
-    }
-    else throw new Error('Pathjs library is required for routing.');
+    } else throw new Error('Pathjs library is required for routing.');
   }
 
   // Map a route to an action.

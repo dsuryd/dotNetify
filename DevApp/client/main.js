@@ -5,7 +5,6 @@ import App from './app/views/App';
 import './app/styles/app.css';
 import './app/styles/prism.css';
 import * as views from './app/views';
-import 'dotnetify-elements/dotnetify-elements.css';
 
 //import { enableSsr } from 'dotnetify';
 //enableSsr();
