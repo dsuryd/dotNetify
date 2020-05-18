@@ -15,11 +15,13 @@ limitations under the License.
  */
 import Path from "../libs/path";
 import { createEventEmitter } from "../libs/utils";
-import { IDotnetifyVMRouter, IDotnetifyVM } from "../_typings";
+import { IDotnetifyVMRouter, IDotnetifyVM, IDotnetifyRouter } from "../_typings";
 
-export default class DotnetifyRouter {
+export default class DotnetifyRouter implements IDotnetifyRouter {
   version = "3.0.0";
   debug: boolean = false;
+  notFound404Url: string = "/404.html";
+
   $router: IDotnetifyVMRouter;
 
   static _urlPath: string = document.location.pathname;

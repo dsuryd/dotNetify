@@ -1,5 +1,5 @@
-import { HubConnectionBuilder } from "@aspnet/signalr";
-import * as React from "react";
+import { HubConnectionBuilder } from '@aspnet/signalr';
+import * as React from 'react';
 
 export interface IDotnetify {
   // Supported JS framework.
@@ -108,6 +108,12 @@ export type ExceptionType = { name: string; message: string };
 export type ExceptionHandlerType = (exception: ExceptionType) => void;
 
 export type RequestHandlerType = (url: string, request: any, payload?: any) => void;
+
+export interface IDotnetifyRouter {
+  notFound404Url: string;
+  urlPath: string;
+  routedEvent: IEventEmitter;
+}
 
 export interface IDotnetifyVMRouter {
   initRouting: () => void;

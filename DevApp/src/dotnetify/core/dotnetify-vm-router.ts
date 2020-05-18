@@ -114,7 +114,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
 
       if (this.debug) console.log("router> map " + mapUrl + " to template id=" + template.Id);
 
-      this.router.mapTo(mapUrl, (iParams) => {
+      this.router.mapTo(mapUrl, iParams => {
         this.router.urlPath = "";
 
         // Construct the path from the template pattern and the params passed by PathJS.
@@ -150,7 +150,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     // Load the HTML view.
     $(iTargetSelector).load(iViewUrl, null, function() {
       if (iJsModuleUrl != null) {
-        const getScripts = iJsModuleUrl.split(",").map((i) => $.getScript(i));
+        const getScripts = iJsModuleUrl.split(",").map(i => $.getScript(i));
         $.when.apply($, getScripts).done(() => typeof iCallbackFn === "function" && iCallbackFn.call(vm));
       } else if (typeof iCallbackFn === "function") iCallbackFn.call(vm);
     });
@@ -171,7 +171,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     if (iJsModuleUrl == null) mountViewFunc();
     else {
       // Load all javascripts first. Multiple files can be specified with comma delimiter.
-      const getScripts = iJsModuleUrl.split(",").map((i) => $.getScript(i));
+      const getScripts = iJsModuleUrl.split(",").map(i => $.getScript(i));
       $.when.apply($, getScripts).done(mountViewFunc);
     }
   }
@@ -196,10 +196,12 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
   // Raise event indicating the routing process has ended.
   raiseRoutedEvent(noMatch?: boolean) {
     if (noMatch) {
-      // Use the no match template if given, otherwise fallback to "/404.html".
-      const noMatchTemplate = this.RoutingState && this.RoutingState.Templates.find((x) => x.UrlPattern === "*");
-      if (noMatchTemplate) this.routeTo(this.router.urlPath, noMatchTemplate);
-      else setTimeout(() => (window.location.href = "/404.html"));
+      if (this.RoutingState) {
+        // Use the no match template if given, otherwise fallback to "/404.html".
+        const noMatchTemplate = this.RoutingState && this.RoutingState.Templates.find(x => x.UrlPattern === "*");
+        if (noMatchTemplate) this.routeTo(this.router.urlPath, noMatchTemplate);
+        else if (this.router.notFound404Url) setTimeout(() => (window.location.href = this.router.notFound404Url));
+      }
     }
     if (this.debug) console.log("router> routed" + (noMatch ? " (404)" : ""));
     this.router.routedEvent.emit();
@@ -257,7 +259,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
 
       urlRedirect += redirectRoot + "/" + path;
       urlRedirect = urlRedirect.replace(/\/\/+/g, "/");
-      if (!this.routes.some((x) => x.Path === path)) this.routes.push({ TemplateId: null, Path: path, Url: urlRedirect });
+      if (!this.routes.some(x => x.Path === path)) this.routes.push({ TemplateId: null, Path: path, Url: urlRedirect });
       return urlRedirect;
     }
 
@@ -272,7 +274,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     // the anchor click event and instead do push to HTML5 history state.
     let url = this.toUrl(path);
     url = url.length > 0 ? url : "/";
-    if (!this.routes.some((x) => x.Path === path)) this.routes.push({ TemplateId: null, Path: path, Url: url });
+    if (!this.routes.some(x => x.Path === path)) this.routes.push({ TemplateId: null, Path: path, Url: url });
     return url;
   }
 
