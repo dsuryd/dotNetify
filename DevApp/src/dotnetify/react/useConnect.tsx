@@ -19,7 +19,11 @@ import * as $ from "../libs/jquery-shim";
 import dotnetify from "./dotnetify-react";
 import { IDotnetifyVM, IConnectOptions } from "../_typings";
 
-dotnetify.react.useConnect = function<T>(iVMId: string, iComponent?: { state: T; props: any } | any, iOptions?: IConnectOptions) {
+dotnetify.react.useConnect = function<T>(
+  iVMId: string,
+  iComponent?: { state: T; props: any } | any,
+  iOptions?: IConnectOptions
+): { vm: IDotnetifyVM; state: T } {
   if (useState == null || useEffect == null) throw "Error: using React hooks requires at least v16.8.";
 
   let { state, props } = iComponent;
@@ -50,6 +54,10 @@ dotnetify.react.useConnect = function<T>(iVMId: string, iComponent?: { state: T;
   return { vm: vm.current, state: _state };
 };
 
-export default function<T>(iVMId: string, iComponent?: { state: T; props: any } | any, iOptions?: IConnectOptions) {
+export default function<T>(
+  iVMId: string,
+  iComponent?: { state: T; props: any } | any,
+  iOptions?: IConnectOptions
+): { vm: IDotnetifyVM; state: T } {
   return dotnetify.react.useConnect(iVMId, iComponent, iOptions);
 }

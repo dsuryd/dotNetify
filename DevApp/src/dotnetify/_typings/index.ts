@@ -168,13 +168,4 @@ export interface IScopeProps {
 
 export class Scope extends React.Component<IScopeProps> {}
 
-export const useConnect = function<T>(
-  vmId: string,
-  component?:
-    | {
-        state: T;
-        props: any;
-      }
-    | any,
-  options?: IConnectOptions
-): any {};
+export declare const useConnect: <T>(vmId: string, component?: any, options?: IConnectOptions) => { vm: IDotnetifyVM; state: T };
