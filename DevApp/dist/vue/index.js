@@ -1,1 +1,1 @@
-module.exports = require('../dist/dotnetify-vue');
+export { default, Scope } from "../dist/dotnetify-vue";

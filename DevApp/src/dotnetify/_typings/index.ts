@@ -1,5 +1,8 @@
-import { HubConnectionBuilder } from '@aspnet/signalr';
-import * as React from 'react';
+import { HubConnectionBuilder } from "@aspnet/signalr";
+import * as React from "react";
+
+declare const dotnetify: IDotnetify;
+export default dotnetify;
 
 export interface IDotnetify {
   // Supported JS framework.

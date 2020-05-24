@@ -1,1 +1,1 @@
-module.exports = require('../dist/dotnetify');
+export { default } from "../dist/dotnetify";
