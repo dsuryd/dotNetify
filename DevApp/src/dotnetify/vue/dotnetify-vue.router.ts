@@ -13,16 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import dotnetify from './dotnetify-vue';
-import dotnetifyRouter from '../core/dotnetify-router';
-import dotnetifyVueVMRouter from './dotnetify-vue.vm-router';
+import dotnetify from "./dotnetify-vue";
+import DotnetifyRouter from "../core/dotnetify-router";
+import DotnetifyVueVMRouter from "./dotnetify-vue.vm-router";
 
 // Add plugin functions.
-dotnetify.vue.router = new dotnetifyRouter(dotnetify.debug);
+dotnetify.vue.router = new DotnetifyRouter(dotnetify.debug);
 
 // Inject a view model with functions.
 dotnetify.vue.router.$inject = function(iVM) {
-  const router = new dotnetifyVueVMRouter(iVM, dotnetify.vue.router);
+  const router = new DotnetifyVueVMRouter(iVM, dotnetify.vue.router);
 
   // Put functions inside $router namespace.
   iVM.$router = router;
@@ -39,8 +39,8 @@ dotnetify.vue.router.$inject = function(iVM) {
 
 // Provide function to load a view.
 dotnetify.vue.router.$mount = function(iTargetSelector, iComponent, iProps, iCallbackFn) {
-  return dotnetifyVueVMRouter.prototype.loadVueView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
+  return DotnetifyVueVMRouter.prototype.loadVueView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
 };
 
 // Register the plugin to dotNetify.
-dotnetify.vue.plugins['router'] = dotnetify.vue.router;
+dotnetify.vue.plugins["router"] = dotnetify.vue.router;
