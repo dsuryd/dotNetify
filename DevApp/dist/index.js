@@ -1,1 +1,2 @@
-module.exports = require("./dist/dotnetify-react");
+export * from "./react";
+export { default } from "./react";
