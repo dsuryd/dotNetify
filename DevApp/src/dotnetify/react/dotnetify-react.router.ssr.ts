@@ -30,6 +30,8 @@ export function getSsrState(iVMId: string) {
 }
 
 export default function enableSsr() {
+  dotnetify["ssrEnabled"] = true;
+
   // Override dotnetify.react.connect for server-side render.
   const connect = dotnetify.react.connect;
   dotnetify.react.connect = function(iVMId: string, iComponent: any, iOptions: IConnectOptions) {
