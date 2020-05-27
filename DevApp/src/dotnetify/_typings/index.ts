@@ -143,7 +143,7 @@ export type RouteType = {
   RedirectRoot?: string;
 };
 
-export type OnRouteEnterType = (path: string, template: RoutingTemplateType) => boolean | Promise<boolean>;
+export type OnRouteEnterType = (path: string, template: RoutingTemplateType) => void | boolean | Promise<boolean>;
 
 export interface IRouteLinkProps {
   vm: IDotnetifyVM;
@@ -155,7 +155,7 @@ export interface IRouteLinkProps {
 
 export class RouteLink extends React.Component<IRouteLinkProps> {}
 
-export interface IRouteTargetProps {
+export interface IRouteTargetProps extends React.HTMLAttributes<HTMLElement> {
   id: string;
 }
 

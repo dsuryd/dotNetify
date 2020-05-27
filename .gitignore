@@ -2,6 +2,7 @@
 wwwroot/dist
 DevApp/dist/dist/*.js
 DevApp/dist/dist/*.map
+Demo/**/wwwroot/dist
 
 ### Code ###
 # Visual Studio Code - https://code.visualstudio.com/
@@ -363,4 +364,5 @@ __pycache__/
 ASP.NET Demo/WebApplication.Knockout/Scripts/lib
 
 # End of https://www.gitignore.io/api/node,code,visualstudio
+
 

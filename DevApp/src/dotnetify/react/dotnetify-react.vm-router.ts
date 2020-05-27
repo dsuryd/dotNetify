@@ -87,7 +87,10 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
       const vmId = this.vm ? this.vm.$vmId : "";
 
       const mountViewFunc = () => {
-        if (typeof iComponent !== "function" && (typeof iComponent !== "object" || iComponent.name == null)) {
+        let reactElement = null;
+        try {
+          reactElement = React.createElement(iComponent, iReactProps);
+        } catch (e) {
           console.error(`[${vmId}] failed to load view '${iComponent}' because it's not a valid React element.`);
           reject();
           return;
@@ -96,8 +99,9 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
         this.unmountView(iTargetSelector);
 
         try {
-          var reactElement = React.createElement(iComponent, iReactProps);
-          ReactDOM.hydrate(reactElement, document.querySelector(iTargetSelector));
+          const args = [reactElement, document.querySelector(iTargetSelector)];
+          if (vm.$dotnetify["ssrEnabled"] === true) ReactDOM.hydrate(...args);
+          else ReactDOM.render(...args);
         } catch (e) {
           console.error(e);
         }
@@ -108,7 +112,7 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
       if (iJsModuleUrl == null || this.vm.$dotnetify["ssr"] === true) mountViewFunc();
       else {
         // Load all javascripts first. Multiple files can be specified with comma delimiter.
-        var getScripts = iJsModuleUrl.split(",").map((i) => $.getScript(i));
+        var getScripts = iJsModuleUrl.split(",").map(i => $.getScript(i));
         $.when.apply($, getScripts).done(mountViewFunc);
       }
     });
