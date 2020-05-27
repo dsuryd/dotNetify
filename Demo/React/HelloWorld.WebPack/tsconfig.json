@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
+    "moduleResolution": "node",
     "target": "es5",
     "noImplicitAny": false,
     "removeComments": true,
@@ -10,7 +11,8 @@
     "allowJs": true,
     "declaration": true,
     "declarationDir": "./typings",
-    "lib": ["dom", "es7"]
+    "lib": ["dom", "es7"],
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]

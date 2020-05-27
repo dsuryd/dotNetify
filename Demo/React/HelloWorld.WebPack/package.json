@@ -11,7 +11,7 @@
     ]
   },
   "dependencies": {
-    "dotnetify": "file:dotnetify-4.0.0-DEV.tgz",
+    "dotnetify": "^3.7.1",
     "react": "~16.11.0",
     "react-dom": "~16.11.0"
   },
