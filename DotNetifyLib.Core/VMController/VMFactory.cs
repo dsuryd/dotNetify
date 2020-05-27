@@ -105,6 +105,9 @@ namespace DotNetify
          string key = vmType.FullName;
          MulticastVM vm = null;
 
+         if (!string.IsNullOrWhiteSpace(vmInstanceId))
+            key += $"${vmInstanceId}";
+
          lock (_keyBasedLock.GetOrAdd(key, _ => new object()))
          {
             if (!_memoryCache.TryGetValue(key, out HashSet<MulticastVM> vmCollections))

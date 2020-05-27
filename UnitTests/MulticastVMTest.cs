@@ -196,5 +196,43 @@ namespace UnitTests
          Assert.IsFalse(vm.DisposeCalls[0]);
          Assert.IsTrue(vm.DisposeCalls[1]);
       }
+
+      [TestMethod]
+      public async Task MulticastVM_MultiInstances()
+      {
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
+         var client3 = _hubEmulator.CreateClient();
+         var client4 = _hubEmulator.CreateClient();
+
+         client1.Connect(nameof(MulticastTestVM) + "$A");
+         client2.Connect(nameof(MulticastTestVM) + "$A");
+         client3.Connect(nameof(MulticastTestVM) + "$B");
+         client4.Connect(nameof(MulticastTestVM) + "$B");
+
+         var client2ResponsesTask = client2.ListenAsync();
+         var client3ResponsesTask = client3.ListenAsync();
+
+         var update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Goodbye" } };
+         client1.Dispatch(update);
+
+         var client2Response = (await client2ResponsesTask).As<dynamic>();
+         var client3Response = await client3ResponsesTask;
+
+         Assert.AreEqual("Goodbye", (string) client2Response.Message);
+         Assert.AreEqual(0, client3Response.Count);
+
+         client2ResponsesTask = client2.ListenAsync();
+         client3ResponsesTask = client3.ListenAsync();
+
+         update = new Dictionary<string, object>() { { nameof(MulticastTestVM.Message), "Adios" } };
+         client4.Dispatch(update);
+
+         var client2Response2 = await client2ResponsesTask;
+         var client3Response2 = (await client3ResponsesTask).As<dynamic>();
+
+         Assert.AreEqual(0, client2Response2.Count);
+         Assert.AreEqual("Adios", (string) client3Response2.Message);
+      }
    }
 }
