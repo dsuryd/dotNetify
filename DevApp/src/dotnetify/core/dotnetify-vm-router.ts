@@ -195,15 +195,15 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
 
   // Raise event indicating the routing process has ended.
   raiseRoutedEvent(noMatch?: boolean) {
-    if (noMatch) {
-      if (this.RoutingState) {
+    if (this.RoutingState && this.RoutingState.Templates) {
+      if (noMatch) {
         // Use the no match template if given, otherwise fallback to "/404.html".
-        const noMatchTemplate = this.RoutingState && this.RoutingState.Templates.find(x => x.UrlPattern === "*");
+        const noMatchTemplate = this.RoutingState.Templates.find(x => x.UrlPattern === "*");
         if (noMatchTemplate) this.routeTo(this.router.urlPath, noMatchTemplate);
         else if (this.router.notFound404Url) setTimeout(() => (window.location.href = this.router.notFound404Url));
       }
+      if (this.debug) console.log("router> routed" + (noMatch ? " (404)" : ""));
     }
-    if (this.debug) console.log("router> routed" + (noMatch ? " (404)" : ""));
     this.router.routedEvent.emit();
   }
 

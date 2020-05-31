@@ -13,9 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import dotnetifyVMRouter from '../core/dotnetify-vm-router';
-import $ from 'jquery';
-import utils from '../libs/utils';
+import dotnetifyVMRouter from "../core/dotnetify-vm-router";
+import $ from "jquery";
+import utils from "../libs/utils";
 
 class templateWrapper {
   constructor(template) {
@@ -61,7 +61,7 @@ class routingStateWrapper {
     this.routingState.Root(value);
   }
   get Templates() {
-    const templates = typeof this.routingState.Templates == 'function' ? this.routingState.Templates() : null;
+    const templates = this.routingState && typeof this.routingState.Templates == "function" ? this.routingState.Templates() : null;
     return templates ? templates.map(template => new templateWrapper(template)) : null;
   }
   get Active() {
@@ -80,16 +80,16 @@ class routingStateWrapper {
 
 export default class dotnetifyKoVMRouter extends dotnetifyVMRouter {
   get hasRoutingState() {
-    return this.vm.hasOwnProperty('RoutingState');
+    return this.vm.hasOwnProperty("RoutingState");
   }
   get RoutingState() {
     return new routingStateWrapper(this.vm.RoutingState);
   }
   get VMRoot() {
-    return this.vm.$element.attr('data-vm-root');
+    return this.vm.$element.attr("data-vm-root");
   }
   get VMArg() {
-    return this.vm.$element.attr('data-vm-arg');
+    return this.vm.$element.attr("data-vm-arg");
   }
 
   constructor(iVM, iDotNetifyRouter) {
@@ -101,7 +101,7 @@ export default class dotnetifyKoVMRouter extends dotnetifyVMRouter {
     this.RoutingState.Active = iPath;
   }
   onRouteEnter(iPath, iTemplate) {
-    if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id + '.html';
+    if (!iTemplate.ViewUrl) iTemplate.ViewUrl = iTemplate.Id + ".html";
     return true;
   }
 
@@ -111,7 +111,7 @@ export default class dotnetifyKoVMRouter extends dotnetifyVMRouter {
     const vm = this.vm;
 
     // If no view URL is given, empty the target DOM element.
-    if (iViewUrl == null || iViewUrl == '') {
+    if (iViewUrl == null || iViewUrl == "") {
       $(iTargetSelector).empty();
       return;
     }
@@ -120,25 +120,27 @@ export default class dotnetifyKoVMRouter extends dotnetifyVMRouter {
       // If the view model supports routing, add the root path to the view, to be used
       // to build the absolute route path, and view model argument if provided.
       if (this.hasRoutingState && this.RoutingState.Root) {
-        const vmElems = $(iTargetSelector).find('[data-vm]').toArray();
+        const vmElems = $(iTargetSelector)
+          .find("[data-vm]")
+          .toArray();
         vmElems.forEach(element => {
-          var root = $(element).attr('data-vm-root');
-          root = root != null ? '/' + utils.trim(vm.RoutingState.Root()) + '/' + utils.trim(root) : vm.RoutingState.Root();
-          $(element).attr('data-vm-root', root);
+          var root = $(element).attr("data-vm-root");
+          root = root != null ? "/" + utils.trim(vm.RoutingState.Root()) + "/" + utils.trim(root) : vm.RoutingState.Root();
+          $(element).attr("data-vm-root", root);
 
           if (iVmArg != null && !$.isEmptyObject(iVmArg)) {
             // If there's already a data-vm-arg, combine the values.
             // Take care not to override server-side routing arguments.
-            var vmArg = $(element).attr('data-vm-arg');
+            var vmArg = $(element).attr("data-vm-arg");
             vmArg = vmArg != null ? $.extend(iVmArg, $.parseJSON(vmArg.replace(/'/g, '"'))) : iVmArg;
 
-            $(element).attr('data-vm-arg', JSON.stringify(vmArg));
+            $(element).attr("data-vm-arg", JSON.stringify(vmArg));
           }
         });
       }
 
       // Call the callback function.
-      if (typeof iCallbackFn === 'function') iCallbackFn.apply(this);
+      if (typeof iCallbackFn === "function") iCallbackFn.apply(this);
     };
 
     // Provide the opportunity to override the URL.
