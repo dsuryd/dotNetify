@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import Vue from "vue";
+import * as Vue from "vue";
 import DotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyRouter from "../core/dotnetify-router";
 import DotnetifyVMRouter from "../core/dotnetify-vm-router";
@@ -113,7 +113,7 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
           for (const prop in iProps) if (!vueClass.props.hasOwnProperty(prop)) vueClass.props[prop] = { type: null };
         }
 
-        const vueComponentType = Vue.extend(vueClass);
+        const vueComponentType = (<any>Vue).extend(vueClass);
         const vueComponent = new vueComponentType({ propsData: { ...iProps } });
 
         document.querySelector(iTargetSelector).innerHTML = "<div />";

@@ -5,6 +5,8 @@
     "noImplicitAny": false,
     "removeComments": true,
     "preserveConstEnums": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "jsx": "react",
     "allowJs": true,
