@@ -8,7 +8,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>3.7.0</Version>
+    <Version>4.0.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Simple, lightweight, yet powerful way to build reactive, real-time web apps. Library for .NET Core.</Description>
     <Authors>Dicky Suryadi</Authors>
@@ -18,8 +18,8 @@
     <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageTags>netcore reactive realtime signalr mobile web websocket</PackageTags>
     <PackageIconUrl></PackageIconUrl>
-    <AssemblyVersion>3.7.0.0</AssemblyVersion>
-    <FileVersion>3.7.0.0</FileVersion>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <FileVersion>4.0.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>dotnetify.png</PackageIcon>
   </PropertyGroup>
