@@ -1,5 +1,4 @@
-import * as React from 'react';
-//@ts-ignore
+import React from 'react';
 import { useConnect } from 'dotnetify';
 
 interface State {
