@@ -8,7 +8,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-- **4.0: Typescript support** - [release notes](https://github.com/dsuryd/dotNetify/releases)
+- **v4.0: Typescript support** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0)
 - v3.7: Routing enhancements: lazy-loading, server-side rendering, 404 error handling - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7)
 
 - v3.6: [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.6).
