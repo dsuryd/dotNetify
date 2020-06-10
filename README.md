@@ -8,8 +8,8 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-- **4.0: Typescript support** - [release notes](https://github.com/dsuryd/dotNetify/releases)
-- v3.7: Routing enhancements: lazy-loading, server-side rendering, 404 error handling - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7)
+- **v4.0: Typescript support** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0).
+- v3.7: Routing enhancements: lazy-loading, server-side rendering, 404 error handling - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7).
 
 - v3.6: [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.6).
 - v3.5: Multi-hub support, web API + local modes - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.5).
@@ -37,9 +37,9 @@ Documentation and live demo can be found at [https://dotnetify.net](https://dotn
 
 ## Code Examples
 
-- React example: [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).
+- React example: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).
 - React Native example: [dotnetify-react-native-demo](https://github.com/dsuryd/dotnetify-react-native-demo).
-- Other examples: [demo github repo]([https://github.com/dsuryd/dotNetify/tree/master/Demo]).
+- Other examples: [demo repo](https://github.com/dsuryd/dotNetify/tree/master/Demo).
 
 ## License
 
