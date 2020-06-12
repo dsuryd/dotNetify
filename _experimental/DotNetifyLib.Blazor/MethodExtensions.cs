@@ -12,27 +12,30 @@ namespace DotNetify.Blazor
          return services;
       }
 
-      public static T As<T>(this object arg) => arg.As(s => JsonConvert.DeserializeObject<T>(s));
+      internal static T As<T>(this object arg) => arg.As(s => JsonConvert.DeserializeObject<T>(s));
 
-      public static T As<T>(this object arg, JsonSerializerSettings settings) => arg.As(s => JsonConvert.DeserializeObject<T>(s, settings));
+      internal static T As<T>(this object arg, JsonSerializerSettings settings) => arg.As(s => JsonConvert.DeserializeObject<T>(s, settings));
 
-      public static T As<T>(this object arg, params JsonConverter[] converters) => arg.As(s => JsonConvert.DeserializeObject<T>(s, converters));
+      internal static T As<T>(this object arg, params JsonConverter[] converters) => arg.As(s => JsonConvert.DeserializeObject<T>(s, converters));
 
-      public static T As<T>(this object arg, Func<string, T> deserialize)
+      internal static T As<T>(this object arg, Func<string, T> deserialize)
       {
-         if(typeof(T) == typeof(object))
+         if (typeof(T) == typeof(object))
             return (T) arg;
 
          try
          {
             return typeof(T) == typeof(string) ? (T) (object) $"{arg}" : deserialize($"{arg}");
          }
-         catch(Exception ex)
+         catch (Exception ex)
          {
             throw new JsonSerializationException($"Cannot deserialize {arg} to {typeof(T)}", ex);
          }
       }
 
-      public static string AsLiteral(this bool arg) => arg.ToString().ToLower();
+      /// <summary>
+      /// Converts a boolean value to its string literal "true" or "false".
+      /// </summary>
+      public static string ToBoolString(this bool arg) => arg.ToString().ToLower();
    }
 }

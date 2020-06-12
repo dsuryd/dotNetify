@@ -15,10 +15,10 @@ namespace DotNetify.Blazor
       ElementReference ElementRef { get; set; }
 
       /// <summary>
-      /// Listens to the state changed event from the server-side view model.
+      /// Listens to the state change event from the server-side view model.
       /// </summary>
-      /// <param name="stateChangedEventCallback">Gets called when the client receives state change from the server-side view model.</param>
-      Task HandleStateChangedAsync<TState>(Action<TState> stateChangedEventCallback);
+      /// <param name="stateChangeEventCallback">Gets called when the client receives state change from the server-side view model.</param>
+      Task HandleStateChangeAsync<TState>(Action<TState> stateChangeEventCallback);
 
       /// <summary>
       /// Listens to the events from the web component elements under this VM context.
@@ -74,7 +74,7 @@ namespace DotNetify.Blazor
          await _jsRuntime.InvokeAsync<object>("dotnetify_blazor.removeAllEventListeners", _vmContextElemRef);
       }
 
-      public Task HandleStateChangedAsync<TState>(Action<TState> stateChangeCallback)
+      public Task HandleStateChangeAsync<TState>(Action<TState> stateChangeCallback)
       {
          if (!_vmContextElemRef.HasValue)
             throw new ArgumentNullException("ElementRef was not set. Make sure you assign it to the \"ref\" attribute of the \"d-vm-context\" tag.");

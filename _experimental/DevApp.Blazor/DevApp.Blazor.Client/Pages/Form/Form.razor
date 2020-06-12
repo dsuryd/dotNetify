@@ -1,6 +1,6 @@
 ﻿@page "/form"
 
-<VMContext @ref="@vm" VM="CustomerForm" OnStateChange="@HandleStateChange" OnElementEvent="@HandleElementEvent">
+<VMContext @ref="@vm" VM="CustomerForm" TState="object" OnStateChange="@HandleStateChange" OnElementEvent="@HandleElementEvent">
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -9,16 +9,16 @@
     {
         <d-panel>
             <d-data-grid id="Contacts"></d-data-grid>
-            <d-form id="_form" plaintext="@((!editMode).AsLiteral())">
+            <d-form id="_form" plaintext="@((!editMode).ToBoolString())">
                 <d-panel>
                     <d-panel horizontal="true">
                         <d-panel horizontal="true">
-                            <d-button id="_edit" label="Edit" enable="@((!editMode).AsLiteral())"></d-button>
-                            <d-button id="Submit" label="Update" submit="true" show="@editMode.AsLiteral()"></d-button>
-                            <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="@editMode.AsLiteral()"></d-button>
+                            <d-button id="_edit" label="Edit" enable="@((!editMode).ToBoolString())"></d-button>
+                            <d-button id="Submit" label="Update" submit="true" show="@editMode.ToBoolString()"></d-button>
+                            <d-button id="_cancel" label="Cancel" cancel="true" secondary="true" show="@editMode.ToBoolString()"></d-button>
                         </d-panel>
                         <d-panel right="true">
-                            <d-button id="_new" label="New Customer" enable="@((!editMode).AsLiteral())"></d-button>
+                            <d-button id="_new" label="New Customer" enable="@((!editMode).ToBoolString())"></d-button>
                         </d-panel>
                     </d-panel>
                     <d-tab margin="1.5rem 0">
@@ -51,7 +51,7 @@
 
 @code {
     private object state;
-    private VMContext vm;
+    private VMContext<object> vm;
     private bool editMode = false;
     private bool showDialog = false;
 

@@ -1,14 +1,14 @@
-﻿<VMContext @ref="@vm" VM="ServerUpdate" OnStateChange="@HandleStateChange">
+﻿<VMContext @ref="@vm" VM="ServerUpdate" TState="ServerUpdateState" OnStateChange="@HandleStateChange">
     <div>
         <p>@state?.Greetings</p>
         <input type="text" @bind="person.FirstName" />
         <input type="text" @bind="person.LastName" />
-        <button @onclick="@HandleSubmit">Submit</button>
+        <button @onclick="@HandleSubmitAsync">Submit</button>
     </div>
 </VMContext>
 
 @code {
-    VMContext vm;
+    VMContext<ServerUpdateState> vm;
     ServerUpdateState state;
     Person person = new Person();
 
@@ -23,14 +23,14 @@
         public string LastName { get; set; }
     }
 
-    void HandleSubmit()
+    async Task HandleSubmitAsync()
     {
-        vm.DispatchAsync("Submit", person);
+        await vm.DispatchAsync("Submit", person);
     }
 
-    void HandleStateChange(object newState)
+    void HandleStateChange(ServerUpdateState newState)
     {
-        state = newState.As<ServerUpdateState>();
+        state = newState;
         StateHasChanged();
     }
 }

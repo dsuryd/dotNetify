@@ -41,6 +41,5 @@
       <PackagePath></PackagePath>
     </None>
     <None Include="wwwroot\dotnetify-blazor.js" />
-    <None Include="wwwroot\dotnetify-elements.bundle.js" />
   </ItemGroup>
 </Project>
