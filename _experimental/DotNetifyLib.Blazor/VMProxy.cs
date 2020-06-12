@@ -12,7 +12,7 @@ namespace DotNetify.Blazor
       /// <summary>
       /// Reference to the associated 'd-vm-context' HTML markup.
       /// </summary>
-      ElementRef ElementRef { get; set; }
+      ElementReference ElementRef { get; set; }
 
       /// <summary>
       /// Listens to the state changed event from the server-side view model.
@@ -33,7 +33,7 @@ namespace DotNetify.Blazor
       /// <param name="domElement">Document element.</param>
       /// <param name="eventName">Event name.</param>
       /// <param name="eventHandler">Event callback.</param>
-      Task HandleDomEventAsync<TEventArg>(string eventName, ElementRef domElement, Action<TEventArg> eventCallback);
+      Task HandleDomEventAsync<TEventArg>(string eventName, ElementReference domElement, Action<TEventArg> eventCallback);
 
       /// <summary>
       /// Dispatches property value to server-side view model.
@@ -51,10 +51,10 @@ namespace DotNetify.Blazor
 
    public class VMProxy : ComponentInterop, IVMProxy
    {
-      private ElementRef? _vmContextElemRef;
+      private ElementReference? _vmContextElemRef;
       private HashSet<Delegate> _delegates = new HashSet<Delegate>();
 
-      public ElementRef ElementRef
+      public ElementReference ElementRef
       {
          get => _vmContextElemRef.Value;
          set => _vmContextElemRef = value;
@@ -66,43 +66,46 @@ namespace DotNetify.Blazor
 
       public void Dispose()
       {
-         DisposeAsync();
+         _ = DisposeAsync();
       }
 
-      public Task DisposeAsync()
+      public async Task DisposeAsync()
       {
-         return _jsRuntime.InvokeAsync<object>("dotnetify_blazor.removeAllEventListeners", _vmContextElemRef);
+         await _jsRuntime.InvokeAsync<object>("dotnetify_blazor.removeAllEventListeners", _vmContextElemRef);
       }
 
-      public Task HandleStateChangedAsync<TState>(Action<TState> stateChangedCallback)
+      public Task HandleStateChangedAsync<TState>(Action<TState> stateChangeCallback)
       {
-         if(!_vmContextElemRef.HasValue)
+         if (!_vmContextElemRef.HasValue)
             throw new ArgumentNullException("ElementRef was not set. Make sure you assign it to the \"ref\" attribute of the \"d-vm-context\" tag.");
 
-         return HandleDomEventAsync("onStateChange", ElementRef, stateChangedCallback);
+         return HandleDomEventAsync("onStateChange", ElementRef, stateChangeCallback);
       }
 
       public Task HandleElementEventAsync(Action<ElementEvent> eventCallback)
       {
-         if(!_vmContextElemRef.HasValue)
+         if (!_vmContextElemRef.HasValue)
             throw new ArgumentNullException("ElementRef was not set. Make sure you assign it to the \"ref\" attribute of the \"d-vm-context\" tag.");
 
          return HandleDomEventAsync<ElementEvent>("onElementEvent", ElementRef, eventCallback);
       }
 
-      public Task HandleDomEventAsync<TEventArg>(string eventName, ElementRef domElement, Action<TEventArg> eventCallback)
+      public Task HandleDomEventAsync<TEventArg>(string eventName, ElementReference domElement, Action<TEventArg> eventCallback)
       {
-         if(_delegates.Contains(eventCallback))
+         if (_delegates.Contains(eventCallback))
             return Task.CompletedTask;
 
          _delegates.Add(eventCallback);
          return AddEventListenerAsync<TEventArg>(eventName, domElement, arg => eventCallback?.Invoke(arg));
       }
 
-      public Task DispatchAsync(string propertyName, object propertyValue = null)
+      public async Task DispatchAsync(string propertyName, object propertyValue = null)
       {
          var data = new Dictionary<string, object>() { { propertyName, propertyValue } };
-         return _jsRuntime.InvokeAsync<object>("dotnetify_blazor.dispatch", _vmContextElemRef, JsonConvert.SerializeObject(data));
+         await _jsRuntime.InvokeAsync<object>("dotnetify_blazor.dispatch", _vmContextElemRef, JsonConvert.SerializeObject(data, new JsonSerializerSettings
+         {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+         }));
       }
    }
 }

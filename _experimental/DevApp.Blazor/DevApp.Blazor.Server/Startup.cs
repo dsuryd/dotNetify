@@ -1,8 +1,6 @@
-using System.Linq;
 using DotNetify;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -14,16 +12,15 @@ namespace DevApp.Blazor.Server
       // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
       public void ConfigureServices(IServiceCollection services)
       {
-         services.AddMemoryCache();
-         services.AddSignalR().AddNewtonsoftJsonProtocol();
-         services.AddDotNetify();
+         services.AddCors(options => options.AddPolicy(name: "BlazorClient", builder => builder
+            .WithOrigins("http://localhost:8080")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()));
 
-         services.AddMvc().AddNewtonsoftJson();
-         services.AddResponseCompression(opts =>
-        {
-           opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                  new[] { "application/octet-stream" });
-        });
+         services.AddMemoryCache();
+         services.AddSignalR();
+         services.AddDotNetify();
 
          services.AddTransient<ILiveDataService, MockLiveDataService>();
          services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -32,32 +29,31 @@ namespace DevApp.Blazor.Server
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
       public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
       {
+         app.UseCors("BlazorClient");
          app.UseWebSockets();
-         app.UseSignalR(routes => routes.MapDotNetifyHub());
+
          app.UseDotNetify(config =>
         {
-           config.RegisterAssembly("DevApp.Blazor.Server");
-           config.RegisterAssembly("DotNetify.DevApp.ViewModels");
            config.UseDeveloperLogging();
+           config.RegisterAssembly(GetType().Assembly);
+           config.RegisterAssembly("DotNetify.DevApp.ViewModels");
         });
 
-         app.UseResponseCompression();
-
-         if(env.IsDevelopment())
+         if (env.IsDevelopment())
          {
             app.UseDeveloperExceptionPage();
-            app.UseBlazorDebugging();
+            app.UseWebAssemblyDebugging();
          }
 
+         app.UseBlazorFrameworkFiles();
+         app.UseStaticFiles();
+
          app.UseRouting();
-
-         app.UseClientSideBlazorFiles<Client.Startup>();
-
          app.UseEndpoints(endpoints =>
-        {
-           endpoints.MapDefaultControllerRoute();
-           endpoints.MapFallbackToClientSideBlazor<Client.Startup>("index.html");
-        });
+         {
+            endpoints.MapHub<DotNetifyHub>("/dotnetify");
+            endpoints.MapFallbackToFile("index.html");
+         });
       }
    }
 }

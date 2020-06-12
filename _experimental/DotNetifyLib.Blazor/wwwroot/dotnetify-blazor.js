@@ -1,5 +1,5 @@
 dotnetify_blazor = {
-    version: 0.1,
+    version: 1.0,
     _eventListeners: [],
     addEventListener: function (event, elem, callbackHelper) {
         if (typeof elem === 'string') elem = document.querySelector(elem);

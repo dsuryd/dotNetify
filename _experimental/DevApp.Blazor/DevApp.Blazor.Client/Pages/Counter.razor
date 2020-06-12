@@ -2,10 +2,10 @@
 
 <h1>Counter</h1>
 
-<VMContext @ref="@vm" VM="Counter" OnStateChanged="@HandleStateChanged">
+<VMContext @ref="@vm" VM="Counter" OnStateChange="HandleStateChange">
     <p>Current count: @state?.CurrentCount</p>
 
-    <button class="btn btn-primary" onclick="@IncrementCount">Click me</button>
+    <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 </VMContext>
 
 @code {
@@ -17,14 +17,14 @@
         public int CurrentCount { get; set; }
     }
 
-    void HandleStateChanged( object newState )
+    void HandleStateChange( object newState )
     {
         state = newState.As<CounterState>();
         StateHasChanged();
     }
 
-    void IncrementCount()
+    async void IncrementCount()
     {
-        vm.DispatchAsync( nameof( IncrementCount ) );
+        await vm.DispatchAsync( nameof( IncrementCount ) );
     }
 }

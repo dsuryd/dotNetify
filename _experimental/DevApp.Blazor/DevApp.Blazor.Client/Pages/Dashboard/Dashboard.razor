@@ -1,7 +1,7 @@
 ﻿@page "/dashboard"
 @using Newtonsoft.Json;
 
-<VMContext VM="Dashboard" OnStateChanged=@((object e) => { state = e; StateHasChanged(); })>
+<VMContext VM="Dashboard" OnStateChange=@((object e) => { state = e; StateHasChanged(); })>
     @if (state == null)
     {
         <p><em>Loading...</em></p>

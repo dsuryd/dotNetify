@@ -1,6 +1,6 @@
 ﻿@page "/form"
 
-<VMContext @ref="@vm" VM="CustomerForm" OnStateChanged="@HandleStateChanged" OnElementEvent="@HandleElementEvent">
+<VMContext @ref="@vm" VM="CustomerForm" OnStateChange="@HandleStateChange" OnElementEvent="@HandleElementEvent">
     @if (state == null)
     {
         <p><em>Loading...</em></p>
@@ -55,7 +55,7 @@
     private bool editMode = false;
     private bool showDialog = false;
 
-    private void HandleStateChanged(object newState)
+    private void HandleStateChange(object newState)
     {
         state = newState;
         StateHasChanged();

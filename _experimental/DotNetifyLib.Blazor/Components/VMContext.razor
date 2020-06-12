@@ -2,46 +2,47 @@
 @implements IDisposable
 @inject IVMProxy vm
 
-<d-vm-context @ref="vm.ElementRef" vm="@VM">
+<d-vm-context @ref="vm.ElementRef" vm="@VM" options="@Options">
     @ChildContent
 </d-vm-context>
 
 @code {
-    [Parameter] protected string VM { get; set; }
-    [Parameter] protected RenderFragment ChildContent { get; set; }
-    [Parameter] protected Action<object> OnStateChanged { get; set; }
-    [Parameter] protected Action<ElementEvent> OnElementEvent { get; set; }
+   [Parameter] public string VM { get; set; }
+   [Parameter] public object Options { get; set; }
+   [Parameter] public RenderFragment ChildContent { get; set; }
+   [Parameter] public Action<object> OnStateChange { get; set; }
+   [Parameter] public Action<ElementEvent> OnElementEvent { get; set; }
 
-    private readonly string[] DomSelectorPrefixes = new string[] { "#", ".", "[" };
+   private readonly string[] DomSelectorPrefixes = new string[] { "#", ".", "[" };
 
-    protected override async Task OnAfterRenderAsync()
-    {
-        await vm.HandleStateChangedAsync<object>(state => OnStateChanged?.Invoke(state));
-        await vm.HandleElementEventAsync(args => HandleElementEvent(args));
-    }
+   protected override async Task OnAfterRenderAsync(bool firstRender)
+   {
+       await vm.HandleStateChangedAsync<object>(state => OnStateChange?.Invoke(state));
+       await vm.HandleElementEventAsync(args => HandleElementEvent(args));
+   }
 
-    public void Dispose()
-    {
-        vm.Dispose();
-    }
+   public void Dispose()
+   {
+       vm.Dispose();
+   }
 
-    public async Task DispatchAsync(string propertyName, object propertyValue = null)
-    {
-        await vm.DispatchAsync(propertyName, propertyValue);
-    }
+   public async Task DispatchAsync(string propertyName, object propertyValue = null)
+   {
+       await vm.DispatchAsync(propertyName, propertyValue);
+   }
 
-    public void HandleEvent(ElementRef elementRef, string eventName, Action eventHandler)
-    {
-        vm.HandleDomEventAsync<object>(eventName, elementRef, e => eventHandler?.Invoke());
-    }
+   public void HandleEvent(ElementReference elementRef, string eventName, Action eventHandler)
+   {
+       vm.HandleDomEventAsync<object>(eventName, elementRef, e => eventHandler?.Invoke());
+   }
 
-    public void HandleEvent<TEventArg>(ElementRef elementRef, string eventName, Action<TEventArg> eventHandler)
-    {
-        vm.HandleDomEventAsync<TEventArg>(eventName, elementRef, e => eventHandler?.Invoke(e));
-    }
+   public void HandleEvent<TEventArg>(ElementReference elementRef, string eventName, Action<TEventArg> eventHandler)
+   {
+       vm.HandleDomEventAsync<TEventArg>(eventName, elementRef, e => eventHandler?.Invoke(e));
+   }
 
-    private void HandleElementEvent(ElementEvent args)
-    {
-        OnElementEvent?.Invoke(args);
-    }
+   private void HandleElementEvent(ElementEvent args)
+   {
+       OnElementEvent?.Invoke(args);
+   }
 }

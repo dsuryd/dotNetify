@@ -1,4 +1,4 @@
-﻿<VMContext VM="RealTimePush" OnStateChanged="@HandleStateChanged">
+﻿<VMContext VM="RealTimePush" OnStateChange="@HandleStateChange">
     <div>
         <p>@state?.Greetings</p>
         <p>Server time is: @state?.ServerTime</p>
@@ -14,7 +14,7 @@
         public string ServerTime { get; set; }
     }
 
-    void HandleStateChanged(object newState)
+    void HandleStateChange(object newState)
     {
         state = newState.As<HelloWorldState>();
         StateHasChanged();

@@ -1,4 +1,4 @@
-﻿<VMContext VM="@VM" OnStateChanged=@((object e) => { state = e; StateHasChanged(); })>
+﻿<VMContext VM="@VM" OnStateChange=@((object e) => { state = e; StateHasChanged(); })>
     @if(state != null)
     {
         <d-panel horizontal="true" css="@layoutCss" gap="10%">
@@ -18,9 +18,9 @@
 </VMContext>
 
 @code {
-    [Parameter] string VM { get; set; }
-    [Parameter] string Id { get; set; } = "Content";
-    [Parameter] RenderFragment ChildContent { get; set; }
+    [Parameter] public string VM { get; set; }
+    [Parameter] public string Id { get; set; } = "Content";
+    [Parameter] public RenderFragment ChildContent { get; set; }
 
     private object state;
 

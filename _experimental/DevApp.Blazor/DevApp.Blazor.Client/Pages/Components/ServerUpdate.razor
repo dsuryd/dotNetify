@@ -1,4 +1,4 @@
-﻿<VMContext @ref="@vm" VM="ServerUpdate" OnStateChanged="@HandleStateChanged">
+﻿<VMContext @ref="@vm" VM="ServerUpdate" OnStateChange="@HandleStateChange">
     <div>
         <p>@state?.Greetings</p>
         <input type="text" @bind="person.FirstName" />
@@ -28,7 +28,7 @@
         vm.DispatchAsync("Submit", person);
     }
 
-    void HandleStateChanged(object newState)
+    void HandleStateChange(object newState)
     {
         state = newState.As<ServerUpdateState>();
         StateHasChanged();

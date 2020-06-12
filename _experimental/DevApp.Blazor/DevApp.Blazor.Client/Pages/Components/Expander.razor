@@ -5,8 +5,8 @@
 </d-panel>
 
 @code {
-    [Parameter] RenderFragment ChildContent { get; set; }
-    [Parameter] string Label { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public string Label { get; set; }
 
     string expanderCss = @"
 margin: 1rem 0;

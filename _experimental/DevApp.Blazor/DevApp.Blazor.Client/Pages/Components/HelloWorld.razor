@@ -1,4 +1,4 @@
-﻿<VMContext VM="HelloWorld" OnStateChanged="@HandleStateChanged">
+﻿<VMContext VM="HelloWorld" OnStateChange="@HandleStateChange">
     <div>@state?.Greetings</div>
 </VMContext>
 
@@ -10,7 +10,7 @@
         public string Greetings { get; set; }
     }
 
-    void HandleStateChanged(object newState)
+    void HandleStateChange(object newState)
     {
         state = newState.As<HelloWorldState>();
         StateHasChanged();

@@ -30,6 +30,25 @@ namespace DevApp.Blazor.Server
                   },
                   IsExpanded = true
                },
+               new NavGroup
+               {
+                  Label = "API Reference",
+                  Routes = new NavRoute[]
+                  {
+                     new NavRoute (".NET Client", "dotnetclient"),
+                     //new NavRoute ("Connection Management", this.GetRoute (nameof (Route.Connection))),
+                     new NavRoute ("CRUD", "crud"),
+                     new NavRoute ("Dependency Injection", "di"),
+                     new NavRoute ("Filter", "filter"),
+                     //new NavRoute ("Local Mode", this.GetRoute (nameof (Route.LocalMode))),
+                     new NavRoute ("Middleware", "middleware"),
+                     new NavRoute ("Multicast","multicast"),
+                     //new NavRoute ("Routing", this.GetRoute (nameof (Route.Routing))),
+                     //new NavRoute ("Security", this.GetRoute (nameof (Route.Security))),
+                     //new NavRoute ("Web API Mode", this.GetRoute (nameof (Route.WebApiMode))),
+                  },
+                  IsExpanded = true
+               }
             })
          );
       }

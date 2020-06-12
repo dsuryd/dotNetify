@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <IsPackable>true</IsPackable>
     <RestoreAdditionalProjectSources>
       https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
@@ -11,28 +11,22 @@
     <RazorLangVersion>3.0</RazorLangVersion>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <RootNamespace>DotNetify.Blazor</RootNamespace>
-    <Version>1.0.6-alpha2</Version>
+    <Version>1.0.0-RC1</Version>
     <PackageId>DotNetify.Blazor</PackageId>
     <Authors>Dicky Suryadi</Authors>
     <Product>DotNetify.Blazor</Product>
     <Description>Simple, lightweight, yet powerful way to build reactive, real-time client-side Blazor web apps.</Description>
-    <Copyright>Copyright 2019</Copyright>
-    <PackageProjectUrl>http://dotnetify.net/elements</PackageProjectUrl>
-    <PackageIconUrl>http://dotnetify.net/content/images/dotnetify.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/dsuryd/dotNetify-Elements</RepositoryUrl>
+    <Copyright>Copyright 2019-2020</Copyright>
+    <PackageProjectUrl>https://dotnetify.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageIcon>dotnetify.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- .js/.css files will be referenced via <script>/<link> tags; other content files will just be included in the app's 'dist' directory without any tags referencing them -->
-    <EmbeddedResource Include="content\**\*.js" LogicalName="blazor:js:%(RecursiveDir)%(Filename)%(Extension)" />
-    <EmbeddedResource Include="content\**\*.css" LogicalName="blazor:css:%(RecursiveDir)%(Filename)%(Extension)" />
-    <EmbeddedResource Include="content\**" Exclude="**\*.js;**\*.css" LogicalName="blazor:file:%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Browser" Version="3.0.0-preview6.19307.2" />
+     <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.4" />
+     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
@@ -42,5 +36,11 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+    <None Include="..\..\DotNetifyLib.Core\Properties\dotnetify.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="wwwroot\dotnetify-blazor.js" />
+    <None Include="wwwroot\dotnetify-elements.bundle.js" />
   </ItemGroup>
 </Project>

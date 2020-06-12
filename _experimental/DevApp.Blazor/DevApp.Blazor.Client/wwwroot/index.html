@@ -22,12 +22,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.1.2/dist/browser/signalr.min.js"></script>
     <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-react.min.js"></script>
 
-    <script src="_framework/blazor.webassembly.js"></script>
-
-    <script src="/_content/DotNetifyLib.Blazor/dotnetify-elements.bundle.js"></script>
-    <script src="/_content/DotNetifyLib.Blazor/dotnetify-blazor.js"></script>
+    <script src="_content/DotNetify.Blazor/dotnetify-elements.bundle.js"></script>
+    <script src="_content/DotNetify.Blazor/dotnetify-blazor.js"></script>
     <script>
         dotnetify.debug = true;
+        dotnetify.hubServerUrl = "http://localhost:8090"
     </script>
+
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

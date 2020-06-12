@@ -1,17 +1,17 @@
 ## Overview
 
-DotNetify makes it super easy to connect your client-side [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/client) app to a .NET back-end in a declarative, real-time and reactive manner.  It uses [SignalR](https://docs.microsoft.com/en-us/aspnet/core/signalr/?view=aspnetcore-2.1) to communicate with the server through an MVVM-styled abstraction, while making sure that you still have control over what gets sent over the network.
+DotNetify makes it super easy to connect your client-side [Blazor](https://docs.microsoft.com/en-us/aspnet/core/blazor/) app to a .NET back-end in a declarative, real-time and reactive manner. It uses [SignalR](https://docs.microsoft.com/en-us/aspnet/core/signalr/) to communicate with the server through an MVVM-styled abstraction, while making sure that you still have control over what gets sent over the network.
 
-DotNetify is a good fit for building complex web applications that requires clear separation of concerns between client-side UI, presentation, and domain logic for long-term testability, maintainability and extensiblity.  Furthermore, its integration with SignalR allows you to easily implement asynchronous data updates to multiple clients in real-time.
+DotNetify is a good fit for building complex web applications that requires clear separation of concerns between client-side UI, presentation, and domain logic for long-term testability, maintainability and extensiblity. Furthermore, its integration with SignalR allows you to easily implement asynchronous data updates to multiple clients in real-time.
 
-DotNetify also comes with a library of HTML native web components called __DotNetify-Elements__.  Some are pre-wired to talk directly to your server-side view model, which make them great for quickly implementing input forms.  Others provide UI elements such as tabs, modals, collapsibles and more --- all supporting scoped CSS customization.
+DotNetify also comes with a library of HTML native web components called **DotNetify-Elements**. Some are pre-wired to talk directly to your server-side view model, which make them great for quickly implementing input forms. Others provide UI elements such as tabs, modals, collapsibles and more --- all supporting scoped CSS customization.
 
 #### Hello World
 
-In the most basic form, you can just use dotNetify to quickly fetch from the server the initial state of your Blazor component. You do this by nesting your component's HTML inside a __VMContext__ component, and specify its __VM__ attribute value with the name of the C# view model class that will provide the state.
+In the most basic form, you can just use dotNetify to quickly fetch from the server the initial state of your Blazor component. You do this by nesting your component's HTML inside a **VMContext** component, and specify its **VM** attribute value with the name of the C# view model class that will provide the state.
 
 ```jsx
-<VMContext VM="HelloWorld" OnStateChanged="@HandleStateChanged">
+<VMContext VM="HelloWorld" OnStateChange="@HandleStateChange">
     <div>@state?.Greetings</div>
 </VMContext>
 
@@ -23,13 +23,14 @@ In the most basic form, you can just use dotNetify to quickly fetch from the ser
         public string Greetings { get; set; }
     }
 
-    void HandleStateChanged(object newState)
+    void HandleStateChange(object newState)
     {
         state = newState.As<HelloWorldState>();
         StateHasChanged();
     }
 }
 ```
+
 ```csharp
 public class HelloWorld : BaseVM
 {
@@ -37,18 +38,18 @@ public class HelloWorld : BaseVM
 }
 ```
 
-Write a C# class that inherits from __BaseVM__ in your ASP.NET project, and add public properties for all the data your component will need. When the connection is established, the class instance will be serialized to JSON and sent as the initial state for the component.
+Write a C# class that inherits from **BaseVM** in your ASP.NET project, and add public properties for all the data your component will need. When the connection is established, the class instance will be serialized to JSON and sent as the initial state for the component.
 
 #### Real-Time Push
 
 With very little effort, you can make your app gets real-time data update from the back-end:
 
 ```jsx
-<VMContext VM="HelloWorld" OnStateChanged="@HandleStateChanged">
+<VMContext VM="HelloWorld" OnStateChange="@HandleStateChange">
     <div>
       <p>@state?.Greetings</p>
       <p>Server time is: @state?ServerTime</p>
-    </div>    
+    </div>
 </VMContext>
 
 @code {
@@ -60,13 +61,14 @@ With very little effort, you can make your app gets real-time data update from t
         public string ServerTime { get; set; }
     }
 
-    void HandleStateChanged(object newState)
+    void HandleStateChange(object newState)
     {
         state = newState.As<HelloWorldState>();
         StateHasChanged();
     }
 }
 ```
+
 ```csharp
 public class HelloWorld : BaseVM
 {
@@ -83,17 +85,18 @@ public class HelloWorld : BaseVM
       }, null, 0, 1000); // every 1000 ms.
    }
    public override void Dispose() => _timer.Dispose();
-} 
+}
 ```
+
 [inset]
-We added two new back-end APIs, __Changed__ that accepts the name of the property we want to update, and __PushUpdates__ to do the actual push of all changed properties to the front-end.
+We added two new back-end APIs, **Changed** that accepts the name of the property we want to update, and **PushUpdates** to do the actual push of all changed properties to the front-end.
 
 #### Server Update
 
 At some point in your app, you probably want to send data back to the server to be persisted. Let's add to this example something to submit:
 
 ```jsx
-<VMContext @ref="@vm" VM="ServerUpdate" OnStateChanged="@HandleStateChanged">
+<VMContext @ref="@vm" VM="ServerUpdate" OnStateChange="@HandleStateChange">
     <div>
         <p>@state?.Greetings</p>
         <input type="text" bind="@person.FirstName" />
@@ -118,7 +121,7 @@ At some point in your app, you probably want to send data back to the server to 
         public string LastName { get; set; }
     }
 
-    void HandleStateChanged(object newState)
+    void HandleStateChange(object newState)
     {
         state = newState.As<ServerUpdateState>();
         StateHasChanged();
@@ -130,6 +133,7 @@ At some point in your app, you probably want to send data back to the server to 
     }
 }
 ```
+
 ```csharp
 public class HelloWorld : BaseVM
 {
@@ -147,13 +151,13 @@ public class HelloWorld : BaseVM
    };
 }
 ```
+
 [inset]
-Notice that we now uses the _ref_ attribute on the _VMContext_ component to capture the reference.  This reference serves as a proxy to the back-end class instance that's connecting to the component. Through this proxy, we have access to the __DispatchAsync__ API, which we use to send the state to the back-end instance. The state value will be set to the property name matching the state name.
+Notice that we now uses the _ref_ attribute on the _VMContext_ component to capture the reference. This reference serves as a proxy to the back-end class instance that's connecting to the component. Through this proxy, we have access to the **DispatchAsync** API, which we use to send the state to the back-end instance. The state value will be set to the property name matching the state name.
 
-On the back-end, we set up the Submit property to be of an Action delegate type since we don't expect it to send any value to the front-end. Invoking the __DispatchAsync__ Submit on the front-end will cause that action to be invoked, with the dispatched state value being the argument. After the action modifies the Greetings property, it marks it as changed so that the new text will get sent to the front-end.
+On the back-end, we set up the Submit property to be of an Action delegate type since we don't expect it to send any value to the front-end. Invoking the **DispatchAsync** Submit on the front-end will cause that action to be invoked, with the dispatched state value being the argument. After the action modifies the Greetings property, it marks it as changed so that the new text will get sent to the front-end.
 
-Notice that we don't need to use __PushUpdates__ to get the new greetings sent. That's because dotNetify employs something similar to the request-response cycle, but in this case it's _action-reaction cycle_: the front-end initiates an action that mutates the state, the back-end processes the action and then sends back to the front-end any other states that mutate as the reaction to that action.
-
+Notice that we don't need to use **PushUpdates** to get the new greetings sent. That's because dotNetify employs something similar to the request-response cycle, but in this case it's _action-reaction cycle_: the front-end initiates an action that mutates the state, the back-end processes the action and then sends back to the front-end any other states that mutate as the reaction to that action.
 
 #### Object Lifetime
 
@@ -163,24 +167,26 @@ View-models gets their model data from the back-end service layer and shape them
 
 View model objects stay alive on the back-end until the browser page is closed, reloaded, navigated away, or the session times out.
 
-
 #### API Essentials
 
 ##### Client APIs
 
-__VMContext__ component attributes:
-- __VM__:  the name of the view model type to connect to.
-- __OnStateChanged__: callback when a new state is received from the back-end.
-- __ref__: captures the VMContext reference to access the __DispatchAsync__ method.
+**VMContext** component attributes:
 
-__As(_type_): helper extension method to deserialize the state object.
+- **VM**: the name of the view model type to connect to.
+- **OnStateChange**: callback when a new state is received from the back-end.
+- **ref**: captures the VMContext reference to access the **DispatchAsync** method.
+
+\__As(\_type_): helper extension method to deserialize the state object.
 
 ##### Server APIs
-On the back-end, inherit from __BaseVM__ and use:
-- __Changed__(_propName_)
-- __PushUpdates__(): for real-time push.
 
-Not essential, but these property accessor/mutator helper __Get/Set__ can make your code more concise:
+On the back-end, inherit from **BaseVM** and use:
+
+- **Changed**(_propName_)
+- **PushUpdates**(): for real-time push.
+
+Not essential, but these property accessor/mutator helper **Get/Set** can make your code more concise:
 
 ```csharp
 public string Greetings

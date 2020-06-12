@@ -1,26 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <RestoreAdditionalProjectSources>
-      https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
-      https://dotnet.myget.org/F/blazor-dev/api/v3/index.json;
-    </RestoreAdditionalProjectSources>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
      <PackageReference Include="Bogus" Version="22.1.3" />
-     <PackageReference Include="DotNetify.Elements" Version="1.0.0" />
-     <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.0.0-preview6.19307.2" />
-     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview6.19307.2" />
-     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.0.0-preview6.19307.2" />
+     <PackageReference Include="DotNetify.Elements" Version="1.3.0" />
+     <PackageReference Include="DotNetify.SignalR" Version="4.0.0" />
+     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DevApp.ViewModels\DevApp.ViewModels.csproj" />
-    <ProjectReference Include="..\..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
+    <ProjectReference Include="..\..\DotNetifyLib.Blazor\DotNetifyLib.Blazor.csproj" />
     <ProjectReference Include="..\DevApp.Blazor.Client\DevApp.Blazor.Client.csproj" />
   </ItemGroup>
+
+   <ItemGroup>
+     <Reference Include="DotNetify.DevApp.ViewModels">
+       <HintPath>DotNetify.DevApp.ViewModels.dll</HintPath>
+     </Reference>
+   </ItemGroup>      
 
 </Project>
