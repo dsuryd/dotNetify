@@ -15,9 +15,9 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 <div/>
 
 - [**DotNetify-Blazor**](https://github.com/dsuryd/dotNetify-Blazor) (in development).
-- [**DotNetify-Pulse**](https://github.com/dsuryd/dotnetify-pulse): customizable realtime monitoring for .NET Core services.
-- [**DotNetify-Elements**](https://dotnetify.net/elements"): React + web component library for dotNetify apps.
-- React SPA template for ASP.NET Core 3.x - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
+- [DotNetify-Pulse](https://github.com/dsuryd/dotnetify-pulse): customizable realtime monitoring for .NET Core services.
+- [DotNetify-Elements](https://dotnetify.net/elements"): React + web component library for dotNetify apps.
+- [React SPA template for ASP.NET Core 3.x](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
 
 ## Features
 
