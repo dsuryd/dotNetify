@@ -59,7 +59,7 @@ namespace DotNetify
 
       public Task<Exception> OnException(HubCallerContext context, Exception exception)
       {
-         _trace($"[dotNetify] connId={context.ConnectionId} {exception.GetType().Name}={exception.Message}");
+         _trace($"[dotNetify] connId={context?.ConnectionId} {exception.GetType().Name}={exception.Message}");
          return Task.FromResult(exception);
       }
    }
