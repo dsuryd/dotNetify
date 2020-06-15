@@ -7,7 +7,7 @@ using DotNetify.Elements;
 
 namespace DotNetify.DevApp
 {
-  public class SetAccessTokenAttribute : Attribute { }
+   public class SetAccessTokenAttribute : Attribute { }
 
    public class SecurePageExample : BaseVM
    {
@@ -21,12 +21,12 @@ namespace DotNetify.DevApp
          AddProperty("ViewModelSource", markdown.GetSection("SecurePageVM.cs"));
       }
 
-        private string GetViewSource(string framework)
-        {
-            return framework == "Vue" ?
-               new Markdown("DotNetify.DevApp.Docs.Vue.Examples.SecurePage.md") :
-               new Markdown("DotNetify.DevApp.Docs.Examples.SecurePage.md").GetSection(null, "SecurePageVM.cs");
-        }      
+      private string GetViewSource(string framework)
+      {
+         return framework == "Vue" ?
+            new Markdown("DotNetify.DevApp.Docs.Vue.Examples.SecurePage.md") :
+            new Markdown("DotNetify.DevApp.Docs.Examples.SecurePage.md").GetSection(null, "SecurePageVM.cs");
+      }
    }
 
    [Authorize]
@@ -34,16 +34,17 @@ namespace DotNetify.DevApp
    public class SecurePageVM : BaseVM
    {
       private Timer _timer;
-      private string _userName;
       private SecurityToken _accessToken;
-      private int AccessExpireTime => (int)(_accessToken.ValidTo - DateTime.UtcNow).TotalSeconds;
+      private readonly IPrincipalAccessor _principalAccessor;
+
+      private int AccessExpireTime => (int) (_accessToken.ValidTo - DateTime.UtcNow).TotalSeconds;
 
       public string SecureCaption { get; set; }
       public string SecureData { get; set; }
 
       public SecurePageVM(IPrincipalAccessor principalAccessor)
       {
-         _userName = principalAccessor.Principal?.Identity.Name;
+         _principalAccessor = principalAccessor;
       }
 
       public override void Dispose() => _timer?.Dispose();
@@ -51,7 +52,7 @@ namespace DotNetify.DevApp
       public void SetAccessToken(SecurityToken accessToken)
       {
          _accessToken = accessToken;
-         SecureCaption = $"Authenticated user: \"{_userName}\"";
+         SecureCaption = $"Authenticated user: \"{_principalAccessor.Principal?.Identity.Name}\"";
          Changed(nameof(SecureCaption));
 
          _timer = _timer ?? new Timer(state =>
@@ -70,6 +71,8 @@ namespace DotNetify.DevApp
       public string TokenIssuer { get; set; }
       public string TokenValidFrom { get; set; }
       public string TokenValidTo { get; set; }
+
+      public Action Refresh => () => { };
 
       public void SetAccessToken(SecurityToken accessToken)
       {

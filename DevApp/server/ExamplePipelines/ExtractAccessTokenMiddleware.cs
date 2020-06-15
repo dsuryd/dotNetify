@@ -13,7 +13,7 @@ namespace DotNetify.DevApp
 
       public override Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
-         if (hubContext.CallType == nameof(DotNetifyHub.Request_VM))
+         if (hubContext.Headers != null)
          {
             try
             {

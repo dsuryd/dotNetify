@@ -4,6 +4,19 @@ import 'whatwg-fetch';
 import TextBox from '../components/TextBox';
 import { SecurePageCss } from '../components/css';
 
+function fetchToken(username, password) {
+  return fetch('/token', {
+    method: 'post',
+    body: 'username=' + username + '&password=' + password + '&grant_type=password&client_id=dotnetifydemo',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+  })
+    .then(response => {
+      if (!response.ok) throw Error(response.statusText);
+      return response.json();
+    })
+    .catch(_ => this.setState({ loginError: 'Invalid user name or password' }));
+}
+
 export default class SecurePage extends React.Component {
   constructor(props) {
     super(props);
@@ -14,20 +27,10 @@ export default class SecurePage extends React.Component {
   }
 
   signIn(username, password) {
-    fetch('/token', {
-      method: 'post',
-      body: 'username=' + username + '&password=' + password + '&grant_type=password&client_id=dotnetifydemo',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
-    })
-      .then(response => {
-        if (!response.ok) throw Error(response.statusText);
-        return response.json();
-      })
-      .then(token => {
-        window.sessionStorage.setItem('access_token', token.access_token);
-        this.setState({ loginError: null, accessToken: token.access_token });
-      })
-      .catch(_ => this.setState({ loginError: 'Invalid user name or password' }));
+    fetchToken(username, password).then(token => {
+      window.sessionStorage.setItem('access_token', token.access_token);
+      this.setState({ loginError: null, accessToken: token.access_token });
+    });
   }
 
   signOut() {
@@ -113,10 +116,14 @@ class SecurePageView extends React.Component {
 
     if (this.props.accessToken) {
       let authHeader = { Authorization: 'Bearer ' + this.props.accessToken };
-      this.vm = dotnetify.react.connect('SecurePageVM', this, {
-        headers: authHeader,
-        exceptionHandler: ex => this.onException(ex)
-      });
+      this.vm = dotnetify.react.connect(
+        'SecurePageVM',
+        this,
+        {
+          headers: authHeader,
+          exceptionHandler: ex => this.onException(ex)
+        }
+      );
     }
   }
 
@@ -129,14 +136,16 @@ class SecurePageView extends React.Component {
   }
 
   render() {
-    let handleExpiredAccess = () => this.props.onExpiredAccess();
+    const handleExpiredAccess = () => this.props.onExpiredAccess();
     return (
       <div className="card">
         <div className="card-header">
           <h4>{this.state.SecureCaption}</h4>
         </div>
         <div className="card-body">
-          <b>{this.state.SecureData}</b>
+          <p>
+            <b>{this.state.SecureData}</b>
+          </p>
           <AdminSecurePageView accessToken={this.props.accessToken} onExpiredAccess={handleExpiredAccess} />
         </div>
       </div>
@@ -151,7 +160,11 @@ class AdminSecurePageView extends React.Component {
 
     if (this.props.accessToken) {
       let authHeader = { Authorization: 'Bearer ' + this.props.accessToken };
-      this.vm = dotnetify.react.connect('AdminSecurePageVM', this, { headers: authHeader, exceptionHandler: ex => {} });
+      this.vm = dotnetify.react.connect(
+        'AdminSecurePageVM',
+        this,
+        { headers: authHeader, exceptionHandler: ex => {} }
+      );
     }
   }
 
@@ -161,13 +174,27 @@ class AdminSecurePageView extends React.Component {
 
   render() {
     if (!this.state.TokenIssuer) return null;
+
+    const handleRefreshToken = () => {
+      fetchToken('admin', 'dotnetify').then(token =>
+        this.vm.$dispatch({
+          $headers: { Authorization: 'Bearer ' + token.access_token },
+          Refresh: true
+        })
+      );
+    };
+
     return (
-      <div>
+      <section>
         <h5>Admin-only view:</h5>
         <div>{this.state.TokenIssuer}</div>
         <div>{this.state.TokenValidFrom}</div>
         <div>{this.state.TokenValidTo}</div>
-      </div>
+        <br />
+        <button className="btn btn-secondary" onClick={handleRefreshToken}>
+          Refresh Token
+        </button>
+      </section>
     );
   }
 }

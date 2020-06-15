@@ -1,14 +1,17 @@
 <template>
-  <div v-if="TokenIssuer">
+  <section v-if="TokenIssuer">
     <h5>Admin-only view:</h5>
     <div>{{TokenIssuer}}</div>
     <div>{{TokenValidFrom}}</div>
     <div>{{TokenValidTo}}</div>
-  </div>
+    <br />
+    <button class="btn btn-secondary" @click="refreshToken">Refresh Token</button>
+  </section>
 </template>
 
 <script>
 import dotnetify from 'dotnetify/vue';
+import { fetchToken } from './SecurePage.vue';
 
 export default {
   name: 'AdminView',
@@ -17,10 +20,14 @@ export default {
   },
   created() {
     let authHeader = { Authorization: 'Bearer ' + this.accessToken };
-    this.vm = dotnetify.vue.connect("AdminSecurePageVM", this, {
-      headers: authHeader,
-      exceptionHandler: ex => { }
-    });
+    this.vm = dotnetify.vue.connect(
+      'AdminSecurePageVM',
+      this,
+      {
+        headers: authHeader,
+        exceptionHandler: ex => {}
+      }
+    );
   },
   destroyed() {
     this.vm.$destroy();
@@ -32,7 +39,17 @@ export default {
       TokenValidTo: '',
       ExceptionType: '',
       Message: ''
+    };
+  },
+  methods: {
+    refreshToken: function() {
+      fetchToken('admin', 'dotnetify').then(token =>
+        this.vm.$dispatch({
+          $headers: { Authorization: 'Bearer ' + token.access_token },
+          Refresh: true
+        })
+      );
     }
   }
-}
+};
 </script>

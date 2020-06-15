@@ -90,7 +90,7 @@ namespace DotNetify.Security
       {
          object headers = null;
 
-         if (typeof(T) == typeof(Dictionary<string, object>))
+         if (data is Dictionary<string, object>)
          {
             var vmData = data as Dictionary<string, object>;
             if (vmData.ContainsKey(DotNetifyClient.TOKEN_HEADERS))

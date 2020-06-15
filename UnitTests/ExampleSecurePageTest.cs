@@ -37,7 +37,7 @@ namespace UnitTests
 
          public override Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
          {
-            if (hubContext.CallType == nameof(DotNetifyHub.Request_VM))
+            if (hubContext.Headers != null)
             {
                try
                {
@@ -117,6 +117,33 @@ namespace UnitTests
          var state = client.GetState<ClientState>();
          Assert.AreEqual("Authenticated user: \"john\"", state.SecureCaption);
          Assert.IsTrue(state.SecureData.StartsWith("Access token will expire in"));
+      }
+
+      [TestMethod]
+      public void ExampleSecurePage_Connect_ReplaceToken_ReturnsCorrectUser()
+      {
+         var expireSeconds = 5;
+
+         var client = _hubEmulator.CreateClient();
+
+         var options = new VMConnectOptions();
+         options.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
+
+         client.Connect(nameof(SecurePageVM), options);
+
+         client.Listen(1000);
+
+         var state = client.GetState<ClientState>();
+         Assert.AreEqual("Authenticated user: \"john\"", state.SecureCaption);
+
+         client.Dispatch(new Dictionary<string, object> {
+            { "$headers", new { Authorization = "Bearer " + CreateBearerToken("bob", "guest", expireSeconds) } },
+            { "Refresh", "true" }
+         });
+
+         client.Listen(1000);
+         state = client.GetState<ClientState>();
+         Assert.AreEqual("Authenticated user: \"bob\"", state.SecureCaption);
       }
 
       [TestMethod]

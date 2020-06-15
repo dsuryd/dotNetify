@@ -15,12 +15,12 @@
             class="form-control"
             placeholder="Type guest or admin"
             v-model.lazy="username"
-          >
+          />
           <b>{{loginError}}</b>
         </div>
         <div>
           <label>Password:</label>
-          <input type="password" class="form-control" v-model.lazy="password">
+          <input type="password" class="form-control" v-model.lazy="password" />
           <b>{{loginError}}</b>
         </div>
       </div>
@@ -33,15 +33,30 @@
         <h4>Not authenticated</h4>
       </div>
     </div>
-    <secure-view v-if="accessToken" :accessToken="accessToken" @expiredAccess="signOut"/>
+    <secure-view v-if="accessToken" :accessToken="accessToken" @expiredAccess="signOut" />
   </div>
 </template>
 
 <script>
-import SecureView from './SecurePage.SecureView.vue'
+import SecureView from './SecurePage.SecureView.vue';
+
+export function fetchToken(username, password) {
+  return fetch('/token', {
+    method: 'post',
+    body: 'username=' + username + '&password=' + password + '&grant_type=password&client_id=dotnetifydemo',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+    }
+  })
+    .then(response => {
+      if (!response.ok) throw Error(response.statusText);
+      return response.json();
+    })
+    .catch(_ => this.setState({ loginError: 'Invalid user name or password' }));
+}
 
 export default {
-  name: "SecurePage",
+  name: 'SecurePage',
   components: {
     'secure-view': SecureView
   },
@@ -51,35 +66,24 @@ export default {
       password: 'dotnetify',
       loginError: null,
       accessToken: window.sessionStorage.getItem('access_token')
-    }
+    };
   },
   methods: {
-    submit: function () {
+    submit: function() {
       this.signIn(this.username, this.password);
     },
 
     signIn(username, password) {
-      fetch('/token', {
-        method: 'post',
-        mode: 'no-cors',
-        body: 'username=' + username + '&password=' + password + '&grant_type=password&client_id=dotnetifydemo',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
-      })
-        .then(response => {
-          if (!response.ok) throw Error(response.statusText);
-          return response.json();
-        })
-        .then(token => {
-          window.sessionStorage.setItem('access_token', token.access_token);
-          this.loginError = null;
-          this.accessToken = token.access_token;
-        })
-        .catch(error => this.loginError = 'Invalid user name or password');
+      fetchToken(username, password).then(token => {
+        window.sessionStorage.setItem('access_token', token.access_token);
+        this.loginError = null;
+        this.accessToken = token.access_token;
+      });
     },
     signOut() {
       window.sessionStorage.clear();
       this.accessToken = null;
     }
   }
-}
+};
 </script>
