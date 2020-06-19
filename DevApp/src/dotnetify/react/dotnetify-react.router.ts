@@ -22,7 +22,7 @@ import DotnetifyVM from "../core/dotnetify-vm";
 dotnetify.react.router = new DotnetifyRouter(dotnetify.debug);
 
 // Inject a view model with functions.
-dotnetify.react.router.$inject = function(iVM: DotnetifyVM) {
+dotnetify.react.router.$inject = function (iVM: DotnetifyVM) {
   const router = new DotnetifyReactVMRouter(iVM, dotnetify.react.router);
   const vm: any = iVM;
 
@@ -30,18 +30,29 @@ dotnetify.react.router.$inject = function(iVM: DotnetifyVM) {
   vm.$router = router;
 
   // Handles click event from anchor tags.  Argument can be event object or path string.
-  vm.$handleRoute = (iArg) => router.handleRoute(iArg);
+  vm.$handleRoute = iArg => router.handleRoute(iArg);
 
   // Returns the URL for an anchor tag.
   vm.$route = (iRoute, iTarget) => router.route(iRoute, iTarget);
 
   // Executes the given route.
-  vm.$routeTo = (iRoute) => router.routeToRoute(iRoute);
+  vm.$routeTo = iRoute => router.routeToRoute(iRoute);
 };
 
 // Provide function to load a view.
-dotnetify.react.router.$mount = function(iTargetSelector: string, iComponent: any, iProps?: any, iCallbackFn?: Function) {
-  return DotnetifyReactVMRouter.prototype.loadReactView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
+dotnetify.react.router.$mount = function (
+  iTargetSelector: string,
+  iComponent: any,
+  iProps?: any,
+  iCallbackFn?: Function
+) {
+  return DotnetifyReactVMRouter.prototype.loadReactView(
+    iTargetSelector,
+    iComponent,
+    null,
+    iProps,
+    iCallbackFn
+  );
 };
 
 // Register the plugin to dotNetify.

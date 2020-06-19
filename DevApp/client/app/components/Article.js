@@ -1,6 +1,13 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Element, Frame, MarkdownTOC, Panel, Tab, VMContext } from 'dotnetify-elements';
+import React from "react";
+import styled from "styled-components";
+import {
+  Element,
+  Frame,
+  MarkdownTOC,
+  Panel,
+  Tab,
+  VMContext
+} from "dotnetify-elements";
 
 const Sidebar = styled.div`
   position: fixed;
@@ -15,7 +22,7 @@ const Sidebar = styled.div`
 `;
 
 const Title = styled.div`
-  ${props => (!props.show ? 'display: none' : '')};
+  ${props => (!props.show ? "display: none" : "")};
   ${props => props.theme.MarkdownTOC.Container};
   margin-bottom: 1rem;
   font-size: 1.1rem;
@@ -49,7 +56,8 @@ const panelCss = `
     }  
 `;
 
-const scrollIntoView = id => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+const scrollIntoView = id =>
+  document.getElementById(id).scrollIntoView({ behavior: "smooth" });
 
 const Article = props => (
   <VMContext vm={props.vm}>
@@ -57,7 +65,10 @@ const Article = props => (
       <Panel css={panelCss} children={props.children} />
       <Sidebar>
         <Title show={props.tocTitle}>
-          <a href="javascript:void(0)" onClick={_ => scrollIntoView(props.title)}>
+          <a
+            href="javascript:void(0)"
+            onClick={_ => scrollIntoView(props.title)}
+          >
             {props.tocTitle}
           </a>
         </Title>
@@ -72,14 +83,22 @@ export class TabsArticle extends React.Component {
   render() {
     const { vm, children } = this.props;
     const { id, title, tocTitle } = this.state;
-    const handleActivate = (key, label) => this.setState({ id: key.length > 1 ? key : null, tocTitle: key.length > 1 ? label : null });
-    const handleTitle = title => this.setState({ title: title, tocTitle: this.props.id });
+    const handleActivate = (key, label) =>
+      this.setState({
+        id: key.length > 1 ? key : null,
+        tocTitle: key.length > 1 ? label : null
+      });
+    const handleTitle = title =>
+      this.setState({ title: title, tocTitle: this.props.id });
     return (
       <Article vm={vm} id={id} title={title} tocTitle={tocTitle}>
         <h2 id={this.state.title}>
           <Element id="Title" onChange={handleTitle} />
         </h2>
-        <Tab css="margin: 0 .5rem; margin-top: 2rem" onActivate={handleActivate}>
+        <Tab
+          css="margin: 0 .5rem; margin-top: 2rem"
+          onActivate={handleActivate}
+        >
           {children}
         </Tab>
       </Article>

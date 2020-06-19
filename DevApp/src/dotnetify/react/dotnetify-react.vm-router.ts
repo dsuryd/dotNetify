@@ -49,7 +49,13 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
   }
 
   // Loads a view into a target element.
-  loadView(iTargetSelector: string, iViewUrl: any, iJsModuleUrl?: string, iVmArg?: any, iCallbackFn?: Function) {
+  loadView(
+    iTargetSelector: string,
+    iViewUrl: any,
+    iJsModuleUrl?: string,
+    iVmArg?: any,
+    iCallbackFn?: Function
+  ) {
     const vm = this.vm;
     let reactProps: any;
 
@@ -57,12 +63,19 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
     // to build the absolute route path, and view model argument if provided.
     if (this.hasRoutingState) {
       if (this.RoutingState === null) {
-        console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
+        console.error(
+          "router> the RoutingState prop of '" +
+            vm.$vmId +
+            "' was not initialized."
+        );
         return;
       }
 
       let root = this.VMRoot;
-      root = root != null ? "/" + utils.trim(this.RoutingState.Root) + "/" + utils.trim(root) : this.RoutingState.Root;
+      root =
+        root != null
+          ? "/" + utils.trim(this.RoutingState.Root) + "/" + utils.trim(root)
+          : this.RoutingState.Root;
       reactProps = { vmRoot: root, vmArg: iVmArg };
     }
 
@@ -70,18 +83,40 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
     iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-    if (utils.endsWith(iViewUrl, "html")) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
+    if (utils.endsWith(iViewUrl, "html"))
+      this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
     else {
       let component = iViewUrl;
-      if (typeof iViewUrl === "string" && _window.hasOwnProperty(iViewUrl)) component = _window[iViewUrl];
+      if (typeof iViewUrl === "string" && _window.hasOwnProperty(iViewUrl))
+        component = _window[iViewUrl];
 
-      if (component instanceof HTMLElement) this.loadHtmlElementView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
-      else this.loadReactView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
+      if (component instanceof HTMLElement)
+        this.loadHtmlElementView(
+          iTargetSelector,
+          component,
+          iJsModuleUrl,
+          reactProps,
+          iCallbackFn
+        );
+      else
+        this.loadReactView(
+          iTargetSelector,
+          component,
+          iJsModuleUrl,
+          reactProps,
+          iCallbackFn
+        );
     }
   }
 
   // Loads a React view.
-  loadReactView(iTargetSelector: string, iComponent: any, iJsModuleUrl?: string, iReactProps?: any, iCallbackFn?: Function) {
+  loadReactView(
+    iTargetSelector: string,
+    iComponent: any,
+    iJsModuleUrl?: string,
+    iReactProps?: any,
+    iCallbackFn?: Function
+  ) {
     return new Promise((resolve, reject) => {
       const vm = this.vm;
       const vmId = this.vm ? this.vm.$vmId : "";
@@ -91,7 +126,9 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
         try {
           reactElement = React.createElement(iComponent, iReactProps);
         } catch (e) {
-          console.error(`[${vmId}] failed to load view '${iComponent}' because it's not a valid React element.`);
+          console.error(
+            `[${vmId}] failed to load view '${iComponent}' because it's not a valid React element.`
+          );
           reject();
           return;
         }
@@ -105,11 +142,13 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
         } catch (e) {
           console.error(e);
         }
-        if (typeof iCallbackFn === "function") iCallbackFn.call(vm, reactElement);
+        if (typeof iCallbackFn === "function")
+          iCallbackFn.call(vm, reactElement);
         resolve(reactElement);
       };
 
-      if (iJsModuleUrl == null || this.vm.$dotnetify["ssr"] === true) mountViewFunc();
+      if (iJsModuleUrl == null || this.vm.$dotnetify["ssr"] === true)
+        mountViewFunc();
       else {
         // Load all javascripts first. Multiple files can be specified with comma delimiter.
         var getScripts = iJsModuleUrl.split(",").map(i => $.getScript(i));

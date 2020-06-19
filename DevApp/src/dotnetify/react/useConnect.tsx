@@ -19,12 +19,13 @@ import * as $ from "../libs/jquery-shim";
 import dotnetify from "./dotnetify-react";
 import { IDotnetifyVM, IConnectOptions } from "../_typings";
 
-dotnetify.react.useConnect = function<T>(
+dotnetify.react.useConnect = function <T>(
   iVMId: string,
   iComponent?: { state: T; props: any } | any,
   iOptions?: IConnectOptions
 ): { vm: IDotnetifyVM; state: T } {
-  if (useState == null || useEffect == null) throw "Error: using React hooks requires at least v16.8.";
+  if (useState == null || useEffect == null)
+    throw "Error: using React hooks requires at least v16.8.";
 
   let { state, props } = iComponent;
   if (state == null) state = iComponent || {};
@@ -44,7 +45,7 @@ dotnetify.react.useConnect = function<T>(
         setState: (newState: any) => {
           vmData.current = $.extend({}, vmData.current, newState);
           setState(vmData.current);
-        },
+        }
       },
       iOptions
     );
@@ -54,7 +55,7 @@ dotnetify.react.useConnect = function<T>(
   return { vm: vm.current, state: _state };
 };
 
-export default function<T>(
+export default function <T>(
   iVMId: string,
   iComponent?: { state: T; props: any } | any,
   iOptions?: IConnectOptions

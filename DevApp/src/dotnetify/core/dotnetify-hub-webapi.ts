@@ -40,7 +40,10 @@ export class DotNetifyHubWebApi implements IDotnetifyHub {
     this.onRequest = iOnRequest;
   }
 
-  static create(iBaseUrl?: string, iOnRequest?: RequestHandlerType): IDotnetifyHub {
+  static create(
+    iBaseUrl?: string,
+    iOnRequest?: RequestHandlerType
+  ): IDotnetifyHub {
     return new DotNetifyHubWebApi(iBaseUrl, iOnRequest);
   }
 
@@ -55,39 +58,48 @@ export class DotNetifyHubWebApi implements IDotnetifyHub {
 
   requestVM(iVMId: string, iVMArgs: any) {
     const vmArgs = iVMArgs || {};
-    const vmArgQuery = vmArgs.$vmArg ? "?vmarg=" + JSON.stringify(vmArgs.$vmArg) : "";
+    const vmArgQuery = vmArgs.$vmArg
+      ? "?vmarg=" + JSON.stringify(vmArgs.$vmArg)
+      : "";
     const headers = vmArgs.$headers || {};
 
     this._vmArgs[iVMId] = vmArgs;
     const url = this.url + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`;
 
-    fetch("GET", url, null, (request) => {
-      Object.keys(headers).forEach((key) => request.setRequestHeader(key, headers[key]));
+    fetch("GET", url, null, request => {
+      Object.keys(headers).forEach(key =>
+        request.setRequestHeader(key, headers[key])
+      );
       if (typeof this.onRequest == "function") this.onRequest(url, request);
     })
-      .then((response) => {
+      .then(response => {
         this.responseEvent.emit(iVMId, response);
       })
-      .catch((request) => console.error(`[${iVMId}] Request failed`, request));
+      .catch(request => console.error(`[${iVMId}] Request failed`, request));
   }
 
   updateVM(iVMId: string, iValue: any) {
     const vmArgs = this._vmArgs[iVMId] || {};
-    const vmArgQuery = vmArgs.$vmArg ? "?vmarg=" + JSON.stringify(vmArgs.$vmArg) : "";
+    const vmArgQuery = vmArgs.$vmArg
+      ? "?vmarg=" + JSON.stringify(vmArgs.$vmArg)
+      : "";
     const headers = vmArgs.$headers || {};
     const payload = typeof iValue == "object" ? JSON.stringify(iValue) : iValue;
 
     const url = this.url + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`;
 
-    fetch("POST", url, payload, (request) => {
+    fetch("POST", url, payload, request => {
       request.setRequestHeader("Content-Type", "application/json");
-      Object.keys(headers).forEach((key) => request.setRequestHeader(key, headers[key]));
-      if (typeof this.onRequest == "function") this.onRequest(url, request, payload);
+      Object.keys(headers).forEach(key =>
+        request.setRequestHeader(key, headers[key])
+      );
+      if (typeof this.onRequest == "function")
+        this.onRequest(url, request, payload);
     })
-      .then((response) => {
+      .then(response => {
         this.responseEvent.emit(iVMId, response);
       })
-      .catch((request) => console.error(`[${iVMId}] Update failed`, request));
+      .catch(request => console.error(`[${iVMId}] Update failed`, request));
   }
 
   disposeVM(iVMId) {

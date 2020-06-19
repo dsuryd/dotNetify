@@ -1,20 +1,27 @@
-import React from 'react';
-import dotnetify from 'dotnetify';
-import 'whatwg-fetch';
-import TextBox from '../components/TextBox';
-import { SecurePageCss } from '../components/css';
+import React from "react";
+import dotnetify from "dotnetify";
+import "whatwg-fetch";
+import TextBox from "../components/TextBox";
+import { SecurePageCss } from "../components/css";
 
 function fetchToken(username, password) {
-  return fetch('/token', {
-    method: 'post',
-    body: 'username=' + username + '&password=' + password + '&grant_type=password&client_id=dotnetifydemo',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+  return fetch("/token", {
+    method: "post",
+    body:
+      "username=" +
+      username +
+      "&password=" +
+      password +
+      "&grant_type=password&client_id=dotnetifydemo",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    }
   })
     .then(response => {
       if (!response.ok) throw Error(response.statusText);
       return response.json();
     })
-    .catch(_ => this.setState({ loginError: 'Invalid user name or password' }));
+    .catch(_ => this.setState({ loginError: "Invalid user name or password" }));
 }
 
 export default class SecurePage extends React.Component {
@@ -22,13 +29,13 @@ export default class SecurePage extends React.Component {
     super(props);
     this.state = {
       loginError: null,
-      accessToken: window.sessionStorage.getItem('access_token')
+      accessToken: window.sessionStorage.getItem("access_token")
     };
   }
 
   signIn(username, password) {
     fetchToken(username, password).then(token => {
-      window.sessionStorage.setItem('access_token', token.access_token);
+      window.sessionStorage.setItem("access_token", token.access_token);
       this.setState({ loginError: null, accessToken: token.access_token });
     });
   }
@@ -48,7 +55,10 @@ export default class SecurePage extends React.Component {
           authenticated={this.state.accessToken != null}
         />
         {this.state.accessToken ? (
-          <SecurePageView accessToken={this.state.accessToken} onExpiredAccess={() => this.signOut()} />
+          <SecurePageView
+            accessToken={this.state.accessToken}
+            onExpiredAccess={() => this.signOut()}
+          />
         ) : (
           <NotAuthenticatedView />
         )}
@@ -58,13 +68,16 @@ export default class SecurePage extends React.Component {
 }
 
 class LoginForm extends React.Component {
-  state = { username: '', password: 'dotnetify' };
+  state = { username: "", password: "dotnetify" };
 
   render() {
     if (this.props.authenticated)
       return (
         <div className="card logout">
-          <button className="btn btn-primary" onClick={_ => this.props.onSignOut()}>
+          <button
+            className="btn btn-primary"
+            onClick={_ => this.props.onSignOut()}
+          >
             Sign Out
           </button>
         </div>
@@ -92,7 +105,10 @@ class LoginForm extends React.Component {
           />
         </div>
         <div className="card-footer">
-          <button className="btn btn-primary" onClick={_ => this.props.onSubmit(this.state)}>
+          <button
+            className="btn btn-primary"
+            onClick={_ => this.props.onSubmit(this.state)}
+          >
             Submit
           </button>
         </div>
@@ -112,18 +128,14 @@ const NotAuthenticatedView = () => (
 class SecurePageView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { SecureCaption: 'Not authenticated' };
+    this.state = { SecureCaption: "Not authenticated" };
 
     if (this.props.accessToken) {
-      let authHeader = { Authorization: 'Bearer ' + this.props.accessToken };
-      this.vm = dotnetify.react.connect(
-        'SecurePageVM',
-        this,
-        {
-          headers: authHeader,
-          exceptionHandler: ex => this.onException(ex)
-        }
-      );
+      let authHeader = { Authorization: "Bearer " + this.props.accessToken };
+      this.vm = dotnetify.react.connect("SecurePageVM", this, {
+        headers: authHeader,
+        exceptionHandler: ex => this.onException(ex)
+      });
     }
   }
 
@@ -132,7 +144,8 @@ class SecurePageView extends React.Component {
   }
 
   onException(exception) {
-    if (exception.name == 'UnauthorizedAccessException') this.props.onExpiredAccess && this.props.onExpiredAccess();
+    if (exception.name == "UnauthorizedAccessException")
+      this.props.onExpiredAccess && this.props.onExpiredAccess();
   }
 
   render() {
@@ -146,7 +159,10 @@ class SecurePageView extends React.Component {
           <p>
             <b>{this.state.SecureData}</b>
           </p>
-          <AdminSecurePageView accessToken={this.props.accessToken} onExpiredAccess={handleExpiredAccess} />
+          <AdminSecurePageView
+            accessToken={this.props.accessToken}
+            onExpiredAccess={handleExpiredAccess}
+          />
         </div>
       </div>
     );
@@ -159,12 +175,11 @@ class AdminSecurePageView extends React.Component {
     this.state = {};
 
     if (this.props.accessToken) {
-      let authHeader = { Authorization: 'Bearer ' + this.props.accessToken };
-      this.vm = dotnetify.react.connect(
-        'AdminSecurePageVM',
-        this,
-        { headers: authHeader, exceptionHandler: ex => {} }
-      );
+      let authHeader = { Authorization: "Bearer " + this.props.accessToken };
+      this.vm = dotnetify.react.connect("AdminSecurePageVM", this, {
+        headers: authHeader,
+        exceptionHandler: ex => {}
+      });
     }
   }
 
@@ -176,9 +191,9 @@ class AdminSecurePageView extends React.Component {
     if (!this.state.TokenIssuer) return null;
 
     const handleRefreshToken = () => {
-      fetchToken('admin', 'dotnetify').then(token =>
+      fetchToken("admin", "dotnetify").then(token =>
         this.vm.$dispatch({
-          $headers: { Authorization: 'Bearer ' + token.access_token },
+          $headers: { Authorization: "Bearer " + token.access_token },
           Refresh: true
         })
       );

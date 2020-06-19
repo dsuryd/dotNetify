@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const HelloWorldCss = styled.div`
   padding: 0 1rem;
@@ -57,7 +57,7 @@ export const ControlTypesCss = styled.div`
         margin-left: 0rem;
         margin-right: 0rem;
         > li {
-          padding-left: .75rem;
+          padding-left: 0.75rem;
         }
       }
       label {
@@ -381,7 +381,7 @@ export const BookCss = styled.div`
 export const ChatRoomCss = styled.div`
   footer {
     max-width: 1268px;
-    padding: .5rem;
+    padding: 0.5rem;
     font-size: small;
     font-style: italic;
     margin-top: 1rem;
@@ -395,7 +395,7 @@ export const ChatRoomCss = styled.div`
     flex: 1;
     flex-direction: row;
     border: 1px solid #ccc;
-    border-radius: .2rem;
+    border-radius: 0.2rem;
     nav {
       padding: 1rem;
       min-width: 11rem;
@@ -409,7 +409,7 @@ export const ChatRoomCss = styled.div`
       }
       p > *:not(b) {
         font-size: x-small;
-        line-height: .8rem;
+        line-height: 0.8rem;
         color: #999;
       }
       p > span {
@@ -429,7 +429,7 @@ export const ChatRoomCss = styled.div`
         flex: 1;
         overflow: auto;
         > div {
-          margin-bottom: .5rem;
+          margin-bottom: 0.5rem;
           &:nth-last-child(2),
           &:last-child {
             margin-bottom: 0;

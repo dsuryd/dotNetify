@@ -15,7 +15,11 @@ limitations under the License.
  */
 import Path from "../libs/path";
 import { createEventEmitter } from "../libs/utils";
-import { IDotnetifyVMRouter, IDotnetifyVM, IDotnetifyRouter } from "../_typings";
+import {
+  IDotnetifyVMRouter,
+  IDotnetifyVM,
+  IDotnetifyRouter
+} from "../_typings";
 
 export default class DotnetifyRouter implements IDotnetifyRouter {
   version = "3.0.0";
@@ -48,7 +52,7 @@ export default class DotnetifyRouter implements IDotnetifyRouter {
   init() {
     if (typeof Path !== "undefined") {
       Path.history.listen(true);
-      Path.routes.rescue = function() {
+      Path.routes.rescue = function () {
         //location.replace(document.location.pathname);
       };
     } else throw new Error("Pathjs library is required for routing.");
@@ -58,7 +62,7 @@ export default class DotnetifyRouter implements IDotnetifyRouter {
   mapTo(iPath: string, iFn: Function) {
     iPath = iPath.length > 0 ? iPath : "/";
     if (typeof Path !== "undefined")
-      Path.map(iPath).to(function() {
+      Path.map(iPath).to(function () {
         iFn(this.params);
       });
   }
@@ -83,7 +87,8 @@ export default class DotnetifyRouter implements IDotnetifyRouter {
   // Push state to HTML history.
   pushState(iState: any, iTitle: string, iPath: string) {
     this.urlPath = "";
-    if (typeof Path !== "undefined") Path.history.pushState(iState, iTitle, iPath);
+    if (typeof Path !== "undefined")
+      Path.history.pushState(iState, iTitle, iPath);
   }
 
   // Redirect to the a URL.

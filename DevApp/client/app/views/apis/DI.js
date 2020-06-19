@@ -1,6 +1,6 @@
-import React from 'react';
-import { Markdown, withTheme } from 'dotnetify-elements';
-import Article from '../../components/Article';
+import React from "react";
+import { Markdown, withTheme } from "dotnetify-elements";
+import Article from "../../components/Article";
 
 const DI = props => (
   <Article vm="DI" id="Content">

@@ -1,11 +1,11 @@
-import RenderKnockout from './RenderKnockout';
-import { BookStoreCss } from '../../components/css';
-import BookStoreHtml from '../BookStore.html';
+import RenderKnockout from "./RenderKnockout";
+import { BookStoreCss } from "../../components/css";
+import BookStoreHtml from "../BookStore.html";
 
-window.BookStoreVM = require('../BookStoreVM.ts').default;
+window.BookStoreVM = require("../BookStoreVM.ts").default;
 
 export default props => (
-	<BookStoreCss>
-		<RenderKnockout html={BookStoreHtml} htmlAttrs={props} />
-	</BookStoreCss>
+  <BookStoreCss>
+    <RenderKnockout html={BookStoreHtml} htmlAttrs={props} />
+  </BookStoreCss>
 );

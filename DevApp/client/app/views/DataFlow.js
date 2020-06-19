@@ -1,14 +1,17 @@
-import React from 'react';
-import Vue from 'vue';
-import dotnetify from 'dotnetify';
-import { Markdown, withTheme } from 'dotnetify-elements';
-import styled from 'styled-components';
-import Article from '../components/Article';
-import Expander from '../components/Expander';
-import SingleVMImage from '../images/SingleVMPattern.svg';
-import SiloedVMImage from '../images/SiloedVMPattern.svg';
-import ScopedVMImage from '../images/ScopedVMPattern.svg';
-import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
+import React from "react";
+import Vue from "vue";
+import dotnetify from "dotnetify";
+import { Markdown, withTheme } from "dotnetify-elements";
+import styled from "styled-components";
+import Article from "../components/Article";
+import Expander from "../components/Expander";
+import SingleVMImage from "../images/SingleVMPattern.svg";
+import SiloedVMImage from "../images/SiloedVMPattern.svg";
+import ScopedVMImage from "../images/ScopedVMPattern.svg";
+import {
+  currentFramework,
+  frameworkSelectEvent
+} from "app/components/SelectFramework";
 
 const Image = styled.img`
   display: flex;
@@ -21,17 +24,24 @@ class DataFlow extends React.Component {
   constructor() {
     super();
     this.state = { framework: currentFramework };
-    this.unsubs = frameworkSelectEvent.subscribe(framework => this.setState({ framework: framework }));
+    this.unsubs = frameworkSelectEvent.subscribe(framework =>
+      this.setState({ framework: framework })
+    );
   }
   componentWillUnmount() {
     this.unsubs();
   }
   componentDidUpdate() {
-    if (this.state.framework === 'Knockout') dotnetify.react.router.pushState({}, null, '/core/overview');
+    if (this.state.framework === "Knockout")
+      dotnetify.react.router.pushState({}, null, "/core/overview");
   }
   render() {
     const { framework } = this.state;
-    return framework === 'Knockout' ? null : framework === 'Vue' ? <DataFlowVue /> : <DataFlowReact />;
+    return framework === "Knockout" ? null : framework === "Vue" ? (
+      <DataFlowVue />
+    ) : (
+      <DataFlowReact />
+    );
   }
 }
 
@@ -60,7 +70,7 @@ const DataFlowVue = props => (
 const SeeItLive = _ => <b>See It Live!</b>;
 
 const MasterDetails = _ => (
-  <div style={{ display: 'flex' }}>
+  <div style={{ display: "flex" }}>
     <MasterList />
     <Details />
   </div>
@@ -70,7 +80,7 @@ class MasterList extends React.Component {
   constructor() {
     super();
     this.state = { ListItems: [], selected: 0 };
-    this.vm = dotnetify.react.connect('MasterDetails.MasterList', this);
+    this.vm = dotnetify.react.connect("MasterDetails.MasterList", this);
   }
 
   componentWillUnmount() {
@@ -83,9 +93,16 @@ class MasterList extends React.Component {
   };
 
   render() {
-    const itemStyle = selected => ({ cursor: 'pointer', background: selected ? '#eee' : 'none' });
+    const itemStyle = selected => ({
+      cursor: "pointer",
+      background: selected ? "#eee" : "none"
+    });
     const items = this.state.ListItems.map(item => (
-      <li key={item.Id} style={itemStyle(item.Id === this.state.selected)} onClick={() => this.handleSelect(item.Id)}>
+      <li
+        key={item.Id}
+        style={itemStyle(item.Id === this.state.selected)}
+        onClick={() => this.handleSelect(item.Id)}
+      >
         {item.Title}
       </li>
     ));
@@ -97,7 +114,7 @@ class Details extends React.Component {
   constructor() {
     super();
     this.state = { ItemImageUrl: null };
-    this.vm = dotnetify.react.connect('MasterDetails.Details', this);
+    this.vm = dotnetify.react.connect("MasterDetails.Details", this);
   }
 
   componentWillUnmount() {
@@ -106,14 +123,14 @@ class Details extends React.Component {
 
   render() {
     if (!this.state.ItemImageUrl) return null;
-    return <img src={this.state.ItemImageUrl} style={{ margin: '0 1rem' }} />;
+    return <img src={this.state.ItemImageUrl} style={{ margin: "0 1rem" }} />;
   }
 }
 
 class MasterDetailsVue extends React.Component {
   componentDidMount() {
     this.app = new Vue({
-      el: '#MasterDetailsVue',
+      el: "#MasterDetailsVue",
       components: {
         MasterList: MasterListVue,
         Details: DetailsVue
@@ -134,7 +151,7 @@ class MasterDetailsVue extends React.Component {
   }
 }
 
-const MasterListVue = Vue.component('MasterList', {
+const MasterListVue = Vue.component("MasterList", {
   template: `
     <ul>
       <li 
@@ -148,7 +165,7 @@ const MasterListVue = Vue.component('MasterList', {
     </ul>
   `,
   created() {
-    this.vm = dotnetify.vue.connect('MasterDetails.MasterList', this);
+    this.vm = dotnetify.vue.connect("MasterDetails.MasterList", this);
   },
   destroyed() {
     this.vm.$destroy();
@@ -158,7 +175,10 @@ const MasterListVue = Vue.component('MasterList', {
   },
   methods: {
     getStyle(id) {
-      return { cursor: 'pointer', background: id === this.selected ? '#eee' : 'none' };
+      return {
+        cursor: "pointer",
+        background: id === this.selected ? "#eee" : "none"
+      };
     },
     onClick(id) {
       this.selected = id;
@@ -167,10 +187,11 @@ const MasterListVue = Vue.component('MasterList', {
   }
 });
 
-const DetailsVue = Vue.component('Details', {
-  template: '<img v-if="ItemImageUrl" :src="ItemImageUrl" style="margin: 0 1rem" />',
+const DetailsVue = Vue.component("Details", {
+  template:
+    '<img v-if="ItemImageUrl" :src="ItemImageUrl" style="margin: 0 1rem" />',
   created() {
-    this.vm = dotnetify.vue.connect('MasterDetails.Details', this);
+    this.vm = dotnetify.vue.connect("MasterDetails.Details", this);
   },
   destroyed() {
     this.vm.$destroy();

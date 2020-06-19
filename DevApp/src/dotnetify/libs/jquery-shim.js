@@ -16,61 +16,60 @@ limitations under the License.
 
 const window = window || global || {};
 
-const jQueryDeferred = require('jquery-deferred');
+const jQueryDeferred = require("jquery-deferred");
 const jQueryShim = jQueryDeferred.extend(
-  function(selector) {
+  function (selector) {
     if (selector === window || selector.document)
       return {
         0: selector,
-        on: function(iEvent, iHandler) {
+        on: function (iEvent, iHandler) {
           window.addEventListener(iEvent, iHandler);
         },
-        bind: function(iEvent, iHandler) {
+        bind: function (iEvent, iHandler) {
           window.addEventListener(iEvent, iHandler, false);
         },
-        unbind: function(iEvent, iHandler) {
+        unbind: function (iEvent, iHandler) {
           window.removeEventListener(iEvent, iHandler, false);
         }
       };
 
-    if (typeof selector !== 'string') selector.events = selector.events || {};
+    if (typeof selector !== "string") selector.events = selector.events || {};
 
     return {
       0: selector,
 
-      bind: function(iEvent, iHandler) {
+      bind: function (iEvent, iHandler) {
         var event = selector.events[iEvent] || [];
         event.push(iHandler);
         selector.events[iEvent] = event;
       },
 
-      unbind: function(iEvent, iHandler) {
+      unbind: function (iEvent, iHandler) {
         var handlers = selector.events[iEvent] || [];
         if (iHandler) {
           var idx = handlers.indexOf(iHandler);
           if (idx !== -1) handlers.splice(idx, 1);
-        }
-        else handlers = [];
+        } else handlers = [];
         selector.events[iEvent] = handlers;
       },
 
-      triggerHandler: function(iEvent, iArgs) {
+      triggerHandler: function (iEvent, iArgs) {
         var handlers = selector.events[iEvent] || [];
-        var args = [ { type: iEvent } ];
+        var args = [{ type: iEvent }];
         if (Array.isArray(iArgs))
-          iArgs.forEach(function(arg) {
+          iArgs.forEach(function (arg) {
             args.push(arg);
           });
         else if (iArgs) args.push(iArgs);
-        handlers.forEach(function(handler) {
+        handlers.forEach(function (handler) {
           handler.apply(this, args);
         });
       },
 
-      load: function(iUrl, iArgs, iHandler) {
+      load: function (iUrl, iArgs, iHandler) {
         var request = new window.XMLHttpRequest();
-        request.open('GET', iUrl, true);
-        request.onload = function() {
+        request.open("GET", iUrl, true);
+        request.onload = function () {
           if (request.status >= 200 && request.status < 400) {
             var response = request.responseText;
             document.querySelector(selector).innerHTML = response;
@@ -79,7 +78,7 @@ const jQueryShim = jQueryDeferred.extend(
         };
         request.send();
         return {
-          abort: function(reason) {
+          abort: function (reason) {
             return request.abort(reason);
           }
         };
@@ -90,11 +89,11 @@ const jQueryShim = jQueryDeferred.extend(
   {
     support: { cors: true },
 
-    trim: function(iStr) {
-      return typeof iStr === 'string' ? iStr.trim() : iStr;
+    trim: function (iStr) {
+      return typeof iStr === "string" ? iStr.trim() : iStr;
     },
 
-    inArray: function(iArray, iItem) {
+    inArray: function (iArray, iItem) {
       return iArray.indexOf(iItem) !== -1;
     },
 
@@ -102,50 +101,55 @@ const jQueryShim = jQueryDeferred.extend(
       return [].slice.call(iArray, 0);
     },
 
-    merge: function(iArray1, iArray2) {
+    merge: function (iArray1, iArray2) {
       Array.prototype.push.apply(iArray1, iArray2);
       return iArray1;
     },
 
-    isEmptyObject: function(iObj) {
+    isEmptyObject: function (iObj) {
       return !iObj || Object.keys(iObj).length === 0;
     },
 
-    ajax: function(iOptions) {
+    ajax: function (iOptions) {
       var request = new window.XMLHttpRequest();
-      request.onreadystatechange = function() {
+      request.onreadystatechange = function () {
         if (request.readyState !== 4) return;
         if (request.status === 200 && !request._hasError) {
           try {
-            iOptions.success && iOptions.success(JSON.parse(request.responseText));
+            iOptions.success &&
+              iOptions.success(JSON.parse(request.responseText));
           } catch (error) {
             iOptions.success && iOptions.success(request.responseText);
           }
-        }
-        else iOptions.error && iOptions.error(request);
+        } else iOptions.error && iOptions.error(request);
       };
       request.open(iOptions.type, iOptions.url);
-      request.setRequestHeader('content-type', iOptions.contentType);
-      request.send(iOptions.data.data && 'data=' + iOptions.data.data);
+      request.setRequestHeader("content-type", iOptions.contentType);
+      request.send(iOptions.data.data && "data=" + iOptions.data.data);
       return {
-        abort: function(reason) {
+        abort: function (reason) {
           return request.abort(reason);
         }
       };
     },
 
-    getScript: function(iUrl, iSuccess) {
+    getScript: function (iUrl, iSuccess) {
       var done = false;
       var promise = jQueryDeferred.Deferred();
-      var head = document.getElementsByTagName('head')[0];
-      var script = document.createElement('script');
+      var head = document.getElementsByTagName("head")[0];
+      var script = document.createElement("script");
       script.src = iUrl;
-      script.onload = script.onreadystatechange = function() {
-        if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
+      script.onload = script.onreadystatechange = function () {
+        if (
+          !done &&
+          (!this.readyState ||
+            this.readyState == "loaded" ||
+            this.readyState == "complete")
+        ) {
           done = true;
           script.onload = script.onreadystatechange = null;
           head.removeChild(script);
-          if (typeof iSuccess === 'function') iSuccess();
+          if (typeof iSuccess === "function") iSuccess();
           promise.resolve();
         }
       };
@@ -155,6 +159,7 @@ const jQueryShim = jQueryDeferred.extend(
   }
 );
 
-if (typeof window !== 'undefined') window.jQuery = window.jQuery || jQueryShim;
+if (typeof window !== "undefined") window.jQuery = window.jQuery || jQueryShim;
 
-if (typeof exports === 'object' && typeof module === 'object') module.exports = jQueryShim;
+if (typeof exports === "object" && typeof module === "object")
+  module.exports = jQueryShim;

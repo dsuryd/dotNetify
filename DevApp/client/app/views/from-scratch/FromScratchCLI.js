@@ -1,23 +1,29 @@
-import React from 'react';
-import { Markdown, withTheme } from 'dotnetify-elements';
-import Article from 'app/components/Article';
-import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
+import React from "react";
+import { Markdown, withTheme } from "dotnetify-elements";
+import Article from "app/components/Article";
+import {
+  currentFramework,
+  frameworkSelectEvent
+} from "app/components/SelectFramework";
 
 class FromScratchCLI extends React.Component {
   constructor() {
     super();
     this.state = { framework: currentFramework };
-    this.unsubs = frameworkSelectEvent.subscribe(framework => this.setState({ framework: framework }));
+    this.unsubs = frameworkSelectEvent.subscribe(framework =>
+      this.setState({ framework: framework })
+    );
   }
   componentWillUnmount() {
     this.unsubs();
   }
   componentDidUpdate() {
-    if (this.state.framework !== 'Vue') dotnetify.react.router.pushState({}, null, '/core/overview');
+    if (this.state.framework !== "Vue")
+      dotnetify.react.router.pushState({}, null, "/core/overview");
   }
   render() {
     const { framework } = this.state;
-    return framework === 'Vue' ? <FromScratchVueCLI /> : null;
+    return framework === "Vue" ? <FromScratchVueCLI /> : null;
   }
 }
 

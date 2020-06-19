@@ -21,7 +21,7 @@ import DotnetifyVueVMRouter from "./dotnetify-vue.vm-router";
 dotnetify.vue.router = new DotnetifyRouter(dotnetify.debug);
 
 // Inject a view model with functions.
-dotnetify.vue.router.$inject = function(iVM) {
+dotnetify.vue.router.$inject = function (iVM) {
   const router = new DotnetifyVueVMRouter(iVM, dotnetify.vue.router);
 
   // Put functions inside $router namespace.
@@ -38,8 +38,19 @@ dotnetify.vue.router.$inject = function(iVM) {
 };
 
 // Provide function to load a view.
-dotnetify.vue.router.$mount = function(iTargetSelector, iComponent, iProps, iCallbackFn) {
-  return DotnetifyVueVMRouter.prototype.loadVueView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
+dotnetify.vue.router.$mount = function (
+  iTargetSelector,
+  iComponent,
+  iProps,
+  iCallbackFn
+) {
+  return DotnetifyVueVMRouter.prototype.loadVueView(
+    iTargetSelector,
+    iComponent,
+    null,
+    iProps,
+    iCallbackFn
+  );
 };
 
 // Register the plugin to dotNetify.

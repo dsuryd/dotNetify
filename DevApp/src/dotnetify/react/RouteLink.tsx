@@ -33,7 +33,8 @@ export default class RouteLink extends React.Component<IRouteLinkProps> {
         console.error("RouteLink requires 'route' property.");
         return;
       }
-      if (typeof props.onClick === "function" && props.onClick(event) === false) return;
+      if (typeof props.onClick === "function" && props.onClick(event) === false)
+        return;
       return (props.vm as any).$handleRoute(event);
     };
 
@@ -41,7 +42,9 @@ export default class RouteLink extends React.Component<IRouteLinkProps> {
       <a
         style={props.style}
         className={props.className}
-        href={props.route && props.vm ? (props.vm as any).$route(props.route) : "/"}
+        href={
+          props.route && props.vm ? (props.vm as any).$route(props.route) : "/"
+        }
         children={props.children}
         onClick={handleClick}
       />

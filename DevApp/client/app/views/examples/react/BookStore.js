@@ -1,19 +1,16 @@
-import React, { Fragment } from 'react';
-import dotnetify from 'dotnetify';
-import { RouteLink } from 'dotnetify/react';
-import { Modal, Theme } from 'dotnetify-elements';
-import { BookStoreCss, BookCss } from '../components/css';
+import React, { Fragment } from "react";
+import dotnetify from "dotnetify";
+import { RouteLink } from "dotnetify/react";
+import { Modal, Theme } from "dotnetify-elements";
+import { BookStoreCss, BookCss } from "../components/css";
 
 export default class BookStore extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
 
-    this.vm = dotnetify.react.connect(
-      'BookStoreVM',
-      this
-    );
-    this.vm.onRouteEnter = (path, template) => (template.Target = 'BookPanel');
+    this.vm = dotnetify.react.connect("BookStoreVM", this);
+    this.vm.onRouteEnter = (path, template) => (template.Target = "BookPanel");
   }
 
   componentWillUnmount() {
@@ -24,8 +21,8 @@ export default class BookStore extends React.Component {
     return (
       <BookStoreCss>
         <header>
-          Each product here is represented by a unique URL that can be entered into the address bar to go directly to that specific product
-          page.
+          Each product here is represented by a unique URL that can be entered
+          into the address bar to go directly to that specific product page.
         </header>
         <BookStoreFront vm={this.vm} books={this.state.Books} />
         <div id="BookPanel" />
@@ -46,7 +43,7 @@ const BookStoreFront = ({ vm, books }) => {
             </RouteLink>
             <div>
               <b>{book.Info.Title}</b>
-              <div>{'by ' + book.Info.Author}</div>
+              <div>{"by " + book.Info.Author}</div>
             </div>
           </center>
         </div>
@@ -60,11 +57,11 @@ export const BookDefault = () => <div />;
 export class Book extends React.Component {
   constructor(props) {
     super(props);
-    this.vm = dotnetify.react.connect(
-      'BookDetailsVM',
-      this
-    );
-    this.state = { Book: { Title: '', ImageUrl: '', Author: '', ItemUrl: '' }, open: true };
+    this.vm = dotnetify.react.connect("BookDetailsVM", this);
+    this.state = {
+      Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" },
+      open: true
+    };
   }
 
   componentWillUnmount() {
@@ -94,7 +91,8 @@ export class Book extends React.Component {
             </BookCss>
           ) : (
             <div>
-              Sorry, we couldn't find any book title that matches <b>{this.state.SearchTitle}</b>.
+              Sorry, we couldn't find any book title that matches{" "}
+              <b>{this.state.SearchTitle}</b>.
             </div>
           )}
           <footer>

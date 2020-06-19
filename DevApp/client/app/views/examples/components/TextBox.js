@@ -1,4 +1,4 @@
-import React, { createRef } from 'react';
+import React, { createRef } from "react";
 
 class TextBox extends React.Component {
   constructor(props) {
@@ -33,7 +33,7 @@ class TextBox extends React.Component {
       <div>
         <label>{this.props.label}</label>
         <input
-          type={this.props.type || 'text'}
+          type={this.props.type || "text"}
           className="form-control"
           value={this.props.value}
           placeholder={this.props.placeholder}

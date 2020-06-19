@@ -1,24 +1,35 @@
-import React, { useState } from 'react';
-import Vue from 'vue';
-import dotnetify, { useConnect } from 'dotnetify';
-import { Markdown, Tab, TabItem, withTheme } from 'dotnetify-elements';
-import Article from '../components/Article';
-import Expander from '../components/Expander';
-import FromScratchLink from './from-scratch/FromScratchLink';
-import { currentFramework, frameworkSelectEvent } from 'app/components/SelectFramework';
+import React, { useState } from "react";
+import Vue from "vue";
+import dotnetify, { useConnect } from "dotnetify";
+import { Markdown, Tab, TabItem, withTheme } from "dotnetify-elements";
+import Article from "../components/Article";
+import Expander from "../components/Expander";
+import FromScratchLink from "./from-scratch/FromScratchLink";
+import {
+  currentFramework,
+  frameworkSelectEvent
+} from "app/components/SelectFramework";
 
 class Overview extends React.Component {
   constructor() {
     super();
     this.state = { framework: currentFramework };
-    this.unsubs = frameworkSelectEvent.subscribe(framework => this.setState({ framework: framework }));
+    this.unsubs = frameworkSelectEvent.subscribe(framework =>
+      this.setState({ framework: framework })
+    );
   }
   componentWillUnmount() {
     this.unsubs();
   }
   render() {
     const { framework } = this.state;
-    return framework === 'Knockout' ? <OverviewKO /> : framework === 'Vue' ? <OverviewVue /> : <OverviewReact />;
+    return framework === "Knockout" ? (
+      <OverviewKO />
+    ) : framework === "Vue" ? (
+      <OverviewVue />
+    ) : (
+      <OverviewReact />
+    );
   }
 }
 
@@ -28,7 +39,11 @@ const OverviewReact = _ => (
       <FromScratchLink />
       <HelloWorldCode />
       <RealtimePushCode />
-      <Expander label={<SeeItLive />} content={<RealTimePush />} connectOnExpand />
+      <Expander
+        label={<SeeItLive />}
+        content={<RealTimePush />}
+        connectOnExpand
+      />
       <ServerUpdateCode />
       <Expander label={<SeeItLive />} content={<ServerUpdate />} />
     </Markdown>
@@ -39,7 +54,11 @@ const OverviewKO = _ => (
   <Article vm="OverviewKO" id="Content">
     <Markdown id="Content">
       <FromScratchLink framework="Knockout" />
-      <Expander label={<SeeItLive />} content={<RealTimePushKO />} connectOnExpand />
+      <Expander
+        label={<SeeItLive />}
+        content={<RealTimePushKO />}
+        connectOnExpand
+      />
       <Expander label={<SeeItLive />} content={<ServerUpdateKO />} />
     </Markdown>
   </Article>
@@ -49,7 +68,11 @@ const OverviewVue = _ => (
   <Article vm="OverviewVue" id="Content">
     <Markdown id="Content">
       <FromScratchLink framework="Vue" />
-      <Expander label={<SeeItLive />} content={<RealTimePushVue />} connectOnExpand />
+      <Expander
+        label={<SeeItLive />}
+        content={<RealTimePushVue />}
+        connectOnExpand
+      />
       <Expander label={<SeeItLive />} content={<ServerUpdateVue />} />
       <Expander label={<SeeItLive />} content={<TwoWayBindingVue />} />
     </Markdown>
@@ -144,7 +167,10 @@ const RealtimePushCode = _ => (
 );
 
 const RealTimePush = () => {
-  const { state } = useConnect('RealTimePush', { Greetings: '', ServerTime: '' });
+  const { state } = useConnect("RealTimePush", {
+    Greetings: "",
+    ServerTime: ""
+  });
   return (
     <div>
       <p>{state.Greetings}</p>
@@ -170,18 +196,19 @@ class RealTimePushKO extends React.Component {
 class RealTimePushVue extends React.Component {
   componentDidMount() {
     this.app = new Vue({
-      template: '<div><p>{{Greetings}}</p><p>Server time is: {{ServerTime}}</p></div>',
+      template:
+        "<div><p>{{Greetings}}</p><p>Server time is: {{ServerTime}}</p></div>",
       created() {
-        this.vm = dotnetify.vue.connect('RealTimePush', this);
+        this.vm = dotnetify.vue.connect("RealTimePush", this);
       },
       destroyed() {
         this.vm.$destroy();
       },
       data() {
-        return { Greetings: '', ServerTime: '' };
+        return { Greetings: "", ServerTime: "" };
       }
     });
-    this.app.$mount('#RealTimePushVue');
+    this.app.$mount("#RealTimePushVue");
   }
   componentWillUnmount() {
     this.app.$destroy();
@@ -256,13 +283,14 @@ const ServerUpdateCode = _ => (
 );
 
 const ServerUpdate = () => {
-  const { vm, state } = useConnect('ServerUpdate', { Greetings: '' });
-  const [ firstName, setFirstName ] = useState('');
-  const [ lastName, setLastName ] = useState('');
+  const { vm, state } = useConnect("ServerUpdate", { Greetings: "" });
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const handleFirstName = e => setFirstName(e.target.value);
   const handleLastName = e => setLastName(e.target.value);
-  const handleSubmit = () => vm.$dispatch({ Submit: { FirstName: firstName, LastName: lastName } });
+  const handleSubmit = () =>
+    vm.$dispatch({ Submit: { FirstName: firstName, LastName: lastName } });
   return (
     <div>
       <div>{state.Greetings}</div>
@@ -278,7 +306,7 @@ class ServerUpdateKO extends React.Component {
     window.ServerUpdate = {
       firstName: ko.observable(),
       lastName: ko.observable(),
-      submit: function() {
+      submit: function () {
         this.Submit({ FirstName: this.firstName(), LastName: this.lastName() });
       }
     };
@@ -307,21 +335,23 @@ class ServerUpdateVue extends React.Component {
         <button @click="onSubmit">Submit</button>
       </div>`,
       created() {
-        this.vm = dotnetify.vue.connect('ServerUpdate', this);
+        this.vm = dotnetify.vue.connect("ServerUpdate", this);
       },
       destroyed() {
         this.vm.$destroy();
       },
       data() {
-        return { Greetings: '', firstName: '', lastName: '' };
+        return { Greetings: "", firstName: "", lastName: "" };
       },
       methods: {
         onSubmit() {
-          this.vm.$dispatch({ Submit: { FirstName: this.firstName, LastName: this.lastName } });
+          this.vm.$dispatch({
+            Submit: { FirstName: this.firstName, LastName: this.lastName }
+          });
         }
       }
     });
-    this.app.$mount('#ServerUpdateVue');
+    this.app.$mount("#ServerUpdateVue");
   }
   componentWillUnmount() {
     this.app.$destroy();
@@ -336,7 +366,7 @@ class TwoWayBindingVue extends React.Component {
     this.app = new Vue(
       dotnetify.vue.component(
         {
-          name: 'TwoWayBinding',
+          name: "TwoWayBinding",
           template: `
           <div>
             <div>{{state.Greetings}}</div>
@@ -344,11 +374,11 @@ class TwoWayBindingVue extends React.Component {
           </div>
         `
         },
-        'TwoWayBinding',
-        { watch: [ 'Name' ] }
+        "TwoWayBinding",
+        { watch: ["Name"] }
       )
     );
-    this.app.$mount('#TwoWayBindingVue');
+    this.app.$mount("#TwoWayBindingVue");
   }
   componentWillUnmount() {
     this.app.$destroy();

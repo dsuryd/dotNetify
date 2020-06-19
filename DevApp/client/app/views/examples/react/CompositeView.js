@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Scope } from 'dotnetify/react';
-import TextBox from '../components/TextBox';
-import { CompositeViewCss } from '../components/css';
+import React from "react";
+import PropTypes from "prop-types";
+import { Scope } from "dotnetify/react";
+import TextBox from "../components/TextBox";
+import { CompositeViewCss } from "../components/css";
 
 const CompositeView = () => (
   <CompositeViewCss>
@@ -26,7 +26,7 @@ class MovieTable extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = { Headers: [], Data: [], Pagination: [] };
-    this.context.connect('MovieTableVM', this);
+    this.context.connect("MovieTableVM", this);
   }
 
   componentWillUnmount() {
@@ -38,11 +38,17 @@ class MovieTable extends React.Component {
       <div>
         <table>
           <tbody>
-            <tr>{this.state.Headers.map((text, idx) => <th key={idx}>{text}</th>)}</tr>
+            <tr>
+              {this.state.Headers.map((text, idx) => (
+                <th key={idx}>{text}</th>
+              ))}
+            </tr>
             {this.state.Data.map((data, idx) => (
               <tr
                 key={idx}
-                className={this.state.SelectedKey === data.Rank ? 'selected' : ''}
+                className={
+                  this.state.SelectedKey === data.Rank ? "selected" : ""
+                }
                 onClick={_ => this.dispatchState({ SelectedKey: data.Rank })}
               >
                 <td>{data.Rank}</td>
@@ -57,7 +63,7 @@ class MovieTable extends React.Component {
           {this.state.Pagination.map(num => (
             <div
               key={num}
-              className={this.state.SelectedPage === num ? 'current' : ''}
+              className={this.state.SelectedPage === num ? "current" : ""}
               onClick={_ => this.dispatchState({ SelectedPage: num })}
             >
               {num}
@@ -75,7 +81,7 @@ class MovieDetails extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = { Movie: {} };
-    this.context.connect('MovieDetailsVM', this);
+    this.context.connect("MovieDetailsVM", this);
   }
 
   componentWillUnmount() {
@@ -84,7 +90,7 @@ class MovieDetails extends React.Component {
 
   render() {
     const movie = this.state.Movie || {};
-    const casts = movie.Cast ? movie.Cast.split(',') : [];
+    const casts = movie.Cast ? movie.Cast.split(",") : [];
 
     return (
       <div className="card">
@@ -96,7 +102,9 @@ class MovieDetails extends React.Component {
           <b>Director</b>
           <p>{movie.Director}</p>
           <b>Cast</b>
-          {casts.map((cast, idx) => <div key={idx}>{cast}</div>)}
+          {casts.map((cast, idx) => (
+            <div key={idx}>{cast}</div>
+          ))}
         </section>
       </div>
     );
@@ -111,12 +119,12 @@ class MovieFilter extends React.Component {
     this.state = {
       filters: [],
       filterId: 0,
-      filter: 'Any',
-      operation: 'contains',
-      operations: [ 'contains' ],
-      text: ''
+      filter: "Any",
+      operation: "contains",
+      operations: ["contains"],
+      text: ""
     };
-    this.context.connect('MovieFilterVM', this);
+    this.context.connect("MovieFilterVM", this);
   }
 
   componentWillUnmount() {
@@ -133,27 +141,39 @@ class MovieFilter extends React.Component {
     };
     this.setState({
       filterId: newId,
-      filters: [ filter, ...this.state.filters ],
-      text: ''
+      filters: [filter, ...this.state.filters],
+      text: ""
     });
     this.dispatch({ Apply: filter });
 
-    this.updateFilterDropdown('Any'); // Reset filter dropdown.
+    this.updateFilterDropdown("Any"); // Reset filter dropdown.
   };
 
   handleDelete = id => {
     this.dispatch({ Delete: id });
-    this.setState({ filters: this.state.filters.filter(filter => filter.id != id) });
+    this.setState({
+      filters: this.state.filters.filter(filter => filter.id != id)
+    });
   };
 
   updateFilterDropdown = value => {
     this.setState({ filter: value });
-    if (value == 'Rank' || value == 'Year') this.setState({ filter: value, operations: [ 'equals', '>=', '<=' ], operation: 'equals' });
-    else this.setState({ filter: value, operations: [ 'contains' ], operation: 'contains' });
+    if (value == "Rank" || value == "Year")
+      this.setState({
+        filter: value,
+        operations: ["equals", ">=", "<="],
+        operation: "equals"
+      });
+    else
+      this.setState({
+        filter: value,
+        operations: ["contains"],
+        operation: "contains"
+      });
   };
 
   render() {
-    const movieProps = [ 'Any', 'Rank', 'Movie', 'Year', 'Cast', 'Director' ];
+    const movieProps = ["Any", "Rank", "Movie", "Year", "Cast", "Director"];
 
     const filters = this.state.filters.map(filter => (
       <div className="chip" key={filter.id}>
@@ -169,7 +189,11 @@ class MovieFilter extends React.Component {
         <div className="filter card">
           <div className="card-header">Filters</div>
           <div className="card-body">
-            <select className="form-control" value={this.state.filter} onChange={e => this.updateFilterDropdown(e.target.value)}>
+            <select
+              className="form-control"
+              value={this.state.filter}
+              onChange={e => this.updateFilterDropdown(e.target.value)}
+            >
               {movieProps.map((text, idx) => (
                 <option key={idx} value={text}>
                   {text}
@@ -193,11 +217,19 @@ class MovieFilter extends React.Component {
                 </div>
               ))}
             </div>
-            <TextBox id="FilterText" value={this.state.text} onChange={val => this.setState({ text: val })} />
+            <TextBox
+              id="FilterText"
+              value={this.state.text}
+              onChange={val => this.setState({ text: val })}
+            />
             <div>{filters}</div>
           </div>
           <div className="card-footer">
-            <button className="btn btn-primary" onClick={this.handleApply} disabled={!this.state.text}>
+            <button
+              className="btn btn-primary"
+              onClick={this.handleApply}
+              disabled={!this.state.text}
+            >
               Apply
             </button>
           </div>

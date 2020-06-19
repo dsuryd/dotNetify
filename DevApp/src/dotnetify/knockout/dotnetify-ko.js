@@ -13,31 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import _dotnetify from '../core/dotnetify';
-import $ from 'jquery';
-import './jquery-ui-widget';
-import * as ko from 'knockout';
+import _dotnetify from "../core/dotnetify";
+import $ from "jquery";
+import "./jquery-ui-widget";
+import * as ko from "knockout";
 
-ko.mapping = require('./knockout.mapping-latest');
+ko.mapping = require("./knockout.mapping-latest");
 
 const window = window || global || {};
 let dotnetify = window.dotnetify || _dotnetify;
 
 dotnetify.ko = {
-  version: '2.0.0',
+  version: "2.0.0",
   controller: dotnetify,
 
   // Internal variables.
   _responseSubs: null,
   _connectedSubs: null,
 
-  _responseVM: function(iVMId, iVMData) {
+  _responseVM: function (iVMId, iVMData) {
     // Construct a selector from iVMId to find the associated widget.
     // First parse the instance Id out of the string, if present.
     var vmType = iVMId;
     var vmInstanceId = null;
-    if (vmType.indexOf('$') >= 0) {
-      var path = iVMId.split('$');
+    if (vmType.indexOf("$") >= 0) {
+      var path = iVMId.split("$");
       vmType = path[0];
       vmInstanceId = path[1];
     }
@@ -45,11 +45,12 @@ dotnetify.ko = {
     var selector = "[data-vm='" + vmType + "']";
 
     // If present, add the master view models to the selector.
-    var path = vmType.split('.');
+    var path = vmType.split(".");
     if (path.length > 1) {
-      selector = '';
+      selector = "";
       let i = 0;
-      for (i = 0; i < path.length - 1; i++) selector += "[data-master-vm='" + path[i] + "'] ";
+      for (i = 0; i < path.length - 1; i++)
+        selector += "[data-master-vm='" + path[i] + "'] ";
       selector += "[data-vm='" + path[i] + "']";
     }
 
@@ -60,60 +61,63 @@ dotnetify.ko = {
     var element = $(selector);
     if (element.length > 0) {
       dotnetify.checkServerSideException(iVMId, iVMData);
-      element.data('ko-dotnetify').UpdateVM(iVMData);
+      element.data("ko-dotnetify").UpdateVM(iVMData);
       return true;
     }
     return false;
   },
 
-  init: function() {
+  init: function () {
     const self = dotnetify.ko;
     const hub = dotnetify.selectHub().hub;
 
-    var applyWidget = function() {
-      $.each($('[data-vm]'), function() {
+    var applyWidget = function () {
+      $.each($("[data-vm]"), function () {
         $(this).dotnetify();
       });
     };
 
-    if (!self._responseSubs) self._responseSubs = hub.responseEvent.subscribe(self._responseVM);
+    if (!self._responseSubs)
+      self._responseSubs = hub.responseEvent.subscribe(self._responseVM);
 
     if (!self._connectedSubs)
-      self._connectedSubs = hub.connectedEvent.subscribe(function() {
+      self._connectedSubs = hub.connectedEvent.subscribe(function () {
         applyWidget();
       });
 
     // If offline mode is enabled, apply the widget anyway when there's no connection.
-    setTimeout(function() {
+    setTimeout(function () {
       if (dotnetify.offline && !hub.isConnected) {
         applyWidget();
         dotnetify.isOffline = true;
-        $(document).trigger('offline', dotnetify.isOffline);
+        $(document).trigger("offline", dotnetify.isOffline);
       }
     }, dotnetify.offlineTimeout);
 
     if (dotnetify.ssr) {
-      console.error('ERROR: dotNetify-ko does not support SSR.');
+      console.error("ERROR: dotNetify-ko does not support SSR.");
       return;
     }
     dotnetify.startHub(hub);
 
     // Use SignalR event to raise the offline event with true/false argument.
-    hub.stateChanged(function(state) {
-      if (dotnetify.debug) console.log('SignalR: ' + state);
+    hub.stateChanged(function (state) {
+      if (dotnetify.debug) console.log("SignalR: " + state);
 
-      var isOffline = state != 'connected';
+      var isOffline = state != "connected";
       if (dotnetify.isOffline != isOffline) {
         dotnetify.isOffline = isOffline;
-        $(document).trigger('offline', dotnetify.isOffline);
+        $(document).trigger("offline", dotnetify.isOffline);
       }
     });
 
     if (dotnetify.offline) applyWidget();
   },
 
-  destroy: function(iParent) {
-    const elems = iParent ? $(iParent).find('[data-vm]').addBack(iParent) : $('[data-vm]');
+  destroy: function (iParent) {
+    const elems = iParent
+      ? $(iParent).find("[data-vm]").addBack(iParent)
+      : $("[data-vm]");
     elems.toArray().forEach(elem => {
       const widget = dotnetify.ko.widget(elem);
       if (widget) widget.destroy();
@@ -121,9 +125,9 @@ dotnetify.ko = {
   },
 
   // Get all view models.
-  getViewModels: function() {
+  getViewModels: function () {
     const self = dotnetify.ko;
-    const elems = $('[data-vm]').toArray();
+    const elems = $("[data-vm]").toArray();
     return elems
       .map(elem => {
         const widget = dotnetify.ko.widget(elem);
@@ -132,32 +136,32 @@ dotnetify.ko = {
       .filter(x => x);
   },
 
-  widget: function(iElement) {
-    return $(iElement).data('ko-dotnetify');
+  widget: function (iElement) {
+    return $(iElement).data("ko-dotnetify");
   },
 
   plugins: {}
 };
 
-$(function() {
+$(function () {
   dotnetify.ko.init();
 });
 
-$.widget('ko.dotnetify', {
+$.widget("ko.dotnetify", {
   // Widget constructor.
-  _create: function() {
+  _create: function () {
     var self = this;
 
-    self.VMType = self.element.attr('data-vm');
+    self.VMType = self.element.attr("data-vm");
     self.VMId = self.VMType;
 
     // If an instance Id is specified, add it to VMId.
-    var instanceId = self.element.attr('data-vm-id');
-    if (instanceId != null) self.VMId += '$' + instanceId;
+    var instanceId = self.element.attr("data-vm-id");
+    if (instanceId != null) self.VMId += "$" + instanceId;
 
     // If inside master view scope, combine the names into VMId.
-    $.each(self.element.parents('[data-master-vm]'), function() {
-      self.VMId = $(this).attr('data-master-vm') + '.' + self.VMId;
+    $.each(self.element.parents("[data-master-vm]"), function () {
+      self.VMId = $(this).attr("data-master-vm") + "." + self.VMId;
     });
 
     // Handle offline mode.
@@ -167,25 +171,30 @@ $.widget('ko.dotnetify', {
     if (self.VMId != null) {
       if (dotnetify.hub.isConnected) self._RequestVM();
       else if (dotnetify.offline) self._GetOfflineVM();
-    }
-    else console.error("ERROR: dotnetify - failed to find 'data-vm' attribute in the element where .dotnetify() was applied.");
+    } else
+      console.error(
+        "ERROR: dotnetify - failed to find 'data-vm' attribute in the element where .dotnetify() was applied."
+      );
   },
 
   // Widget destructor.
-  _destroy: function() {
+  _destroy: function () {
     try {
       var self = this;
 
       // Stop listening to offline event.
-      if (typeof self.OfflineFn === 'function') $(document).off('offline', self.OfflineFn);
+      if (typeof self.OfflineFn === "function")
+        $(document).off("offline", self.OfflineFn);
 
       // Call any plugin's $destroy function if provided.
-      $.each(dotnetify.plugins, function(pluginId, plugin) {
-        if (typeof plugin['$destroy'] === 'function') plugin.$destroy.apply(self.VM);
+      $.each(dotnetify.plugins, function (pluginId, plugin) {
+        if (typeof plugin["$destroy"] === "function")
+          plugin.$destroy.apply(self.VM);
       });
 
       // Call view model's $destroy function if provided.
-      if (self.VM != null && self.VM.hasOwnProperty('$destroy')) self.VM.$destroy();
+      if (self.VM != null && self.VM.hasOwnProperty("$destroy"))
+        self.VM.$destroy();
     } catch (e) {
       console.error(e.stack);
     }
@@ -194,7 +203,7 @@ $.widget('ko.dotnetify', {
   },
 
   // Convert the server VM into knockout VM.
-  UpdateVM: function(iVMData) {
+  UpdateVM: function (iVMData) {
     var self = this;
     try {
       // If no view model yet, create one from the server data.
@@ -207,19 +216,21 @@ $.widget('ko.dotnetify', {
         self.VM.$dotnetify = dotnetify.ko;
 
         // Add an observable to carry the offline state.
-        if (dotnetify.offline) self.VM.$vmOffline = ko.observable(self.IsOffline);
+        if (dotnetify.offline)
+          self.VM.$vmOffline = ko.observable(self.IsOffline);
 
         // Add built-in functions to the view model.
         this._AddBuiltInFunctions();
 
         // Call any plugin's $init function if provided to give a chance to do
         // things before initial binding is applied.
-        $.each(dotnetify.ko.plugins, function(pluginId, plugin) {
-          if (typeof plugin['$init'] === 'function') plugin.$init.apply(self.VM);
+        $.each(dotnetify.ko.plugins, function (pluginId, plugin) {
+          if (typeof plugin["$init"] === "function")
+            plugin.$init.apply(self.VM);
         });
 
         // Call view model's init function if provided.
-        if (typeof self.VM['$init'] === 'function') self.VM.$init();
+        if (typeof self.VM["$init"] === "function") self.VM.$init();
 
         // Apply knockout view model to the HTML element.
         try {
@@ -232,28 +243,35 @@ $.widget('ko.dotnetify', {
         self.VM.$serverUpdate = true;
 
         // Raise the ready event after all knockout components are ready.
-        self._OnComponentReady(function() {
+        self._OnComponentReady(function () {
           // Call any plugin's $ready function if provided to give a chance to do
           // things when the view model is ready.
-          $.each(dotnetify.ko.plugins, function(pluginId, plugin) {
-            if (typeof plugin['$ready'] === 'function') plugin.$ready.apply(self.VM);
+          $.each(dotnetify.ko.plugins, function (pluginId, plugin) {
+            if (typeof plugin["$ready"] === "function")
+              plugin.$ready.apply(self.VM);
           });
 
           // Subscribe to change events to allow sending updates back to server.
           self._SubscribeObservables(self.VM);
 
           // Call view model's $ready function if provided.
-          if (typeof self.VM['$ready'] === 'function') self.VM.$ready();
+          if (typeof self.VM["$ready"] === "function") self.VM.$ready();
 
           // Send 'ready' event after a new view model was received.
-          self.element.trigger('ready', { VMId: self.VMId, VM: self.VM });
+          self.element.trigger("ready", { VMId: self.VMId, VM: self.VM });
         });
 
         // Cache the VM data in case of offline mode.
-        if (dotnetify.offline && dotnetify.hub.isConnected && typeof dotnetify.offlineCacheFn === 'function')
-          dotnetify.offlineCacheFn(self.VMId + self.element.attr('data-vm-arg'), iVMData);
-      }
-      else {
+        if (
+          dotnetify.offline &&
+          dotnetify.hub.isConnected &&
+          typeof dotnetify.offlineCacheFn === "function"
+        )
+          dotnetify.offlineCacheFn(
+            self.VMId + self.element.attr("data-vm-arg"),
+            iVMData
+          );
+      } else {
         // Disable server update because we're going to update the value in the knockout VM
         // and that will trigger change event back to server if we don't stop it now.
         self.VM.$serverUpdate = false;
@@ -272,7 +290,7 @@ $.widget('ko.dotnetify', {
 
         // Subscribe to change events to allow sending updates back to server,
         // but do it after all the knockout components are ready.
-        self._OnComponentReady(function() {
+        self._OnComponentReady(function () {
           self._SubscribeObservables(self.VM);
         });
       }
@@ -281,32 +299,35 @@ $.widget('ko.dotnetify', {
     }
 
     if (dotnetify.debug) {
-      console.log('[' + self.VMId + '] received> ');
+      console.log("[" + self.VMId + "] received> ");
       console.log(JSON.parse(iVMData));
 
-      if (dotnetify.debugFn != null) dotnetify.debugFn(self.VMId, 'received', JSON.parse(iVMData));
+      if (dotnetify.debugFn != null)
+        dotnetify.debugFn(self.VMId, "received", JSON.parse(iVMData));
     }
   },
 
   // Adds built-in functions to the view model.
-  _AddBuiltInFunctions: function() {
+  _AddBuiltInFunctions: function () {
     var self = this;
 
     // Executes the given function in a scope where server update is temporarily disabled.
-    self.VM.$preventBinding = function(fn) {
+    self.VM.$preventBinding = function (fn) {
       self.VM.$serverUpdate = false;
       fn.apply(self.VM);
       self.VM.$serverUpdate = true;
     };
 
     // Adds a new item to an observable array.
-    self.VM.$addList = function(iList, iNewItem) {
-      const newItem = Array.isArray(iNewItem) ? iNewItem : ko.mapping.fromJS(iNewItem);
+    self.VM.$addList = function (iList, iNewItem) {
+      const newItem = Array.isArray(iNewItem)
+        ? iNewItem
+        : ko.mapping.fromJS(iNewItem);
 
       // Check if the list already has an item with the same key. If so, replace it.
-      var key = iList()['$vmKey'];
+      var key = iList()["$vmKey"];
       if (key != null) {
-        var match = ko.utils.arrayFirst(iList(), function(i) {
+        var match = ko.utils.arrayFirst(iList(), function (i) {
           return i[key]() == newItem[key]();
         });
         if (match != null) {
@@ -318,17 +339,17 @@ $.widget('ko.dotnetify', {
     };
 
     // Updates existing item to an observable array.
-    self.VM.$updateList = function(iList, iNewItem) {
+    self.VM.$updateList = function (iList, iNewItem) {
       var newItem = ko.mapping.fromJS(iNewItem);
 
       // Check if the list already has an item with the same key. If so, update it.
-      var key = iList()['$vmKey'];
+      var key = iList()["$vmKey"];
       if (key != null) {
         if (!newItem.hasOwnProperty(key)) {
           console.error("ERROR: object requires property '" + key + "'");
           return;
         }
-        var match = ko.utils.arrayFirst(iList(), function(i) {
+        var match = ko.utils.arrayFirst(iList(), function (i) {
           return i[key]() == newItem[key]();
         });
         if (match != null) {
@@ -345,22 +366,22 @@ $.widget('ko.dotnetify', {
     // Removes an item from an observable array.
     // Unlike the push operation, the ko remove operation will cause the list to trigger
     // change event, therefore disable server update while we do this.
-    self.VM.$removeList = function(iList, iCriteria) {
-      self.VM.$preventBinding(function() {
+    self.VM.$removeList = function (iList, iCriteria) {
+      self.VM.$preventBinding(function () {
         iList.remove(iCriteria);
       });
     };
 
     // Listens to a view model property change event.
-    self.VM.$on = function(iProperty, iCallback) {
-      iProperty.subscribe(function(iNewValue) {
+    self.VM.$on = function (iProperty, iCallback) {
+      iProperty.subscribe(function (iNewValue) {
         iCallback(iNewValue);
       });
     };
 
     // Listens to a view model property change event once.
-    self.VM.$once = function(iProperty, iCallback) {
-      var subscription = iProperty.subscribe(function(iNewValue) {
+    self.VM.$once = function (iProperty, iCallback) {
+      var subscription = iProperty.subscribe(function (iNewValue) {
         subscription.dispose();
         iCallback(iNewValue);
       });
@@ -368,49 +389,53 @@ $.widget('ko.dotnetify', {
 
     // Loads a view into a target element.
     // Method parameters: TargetSelector, ViewUrl, [iJsModuleUrl], [iVmArg], iCallbackFn
-    self.VM.$loadView = function(iTargetSelector, iViewUrl, iJsModuleUrl, iVmArg, iCallbackFn) {
-      if (typeof iJsModuleUrl === 'object' && iJsModuleUrl != null) {
+    self.VM.$loadView = function (
+      iTargetSelector,
+      iViewUrl,
+      iJsModuleUrl,
+      iVmArg,
+      iCallbackFn
+    ) {
+      if (typeof iJsModuleUrl === "object" && iJsModuleUrl != null) {
         iCallbackFn = iVmArg;
         iVmArg = iJsModuleUrl;
         iJsModuleUrl = null;
-      }
-      else if (typeof iJsModuleUrl === 'function') {
+      } else if (typeof iJsModuleUrl === "function") {
         iCallbackFn = iJsModuleUrl;
         iJsModuleUrl = null;
-      }
-      else if (typeof iVmArg === 'function') {
+      } else if (typeof iVmArg === "function") {
         iCallbackFn = iVmArg;
         iVmArg = null;
       }
 
       // If no view URL is given, empty the target DOM element.
-      if (iViewUrl == null || iViewUrl == '') {
+      if (iViewUrl == null || iViewUrl == "") {
         $(iTargetSelector).empty();
         return;
       }
 
       // Loads the view template to the target DOM element.
-      $(iTargetSelector).load(iViewUrl, null, function() {
+      $(iTargetSelector).load(iViewUrl, null, function () {
         // Adds view model arguments when provided.
-        if (iVmArg != null && !$.isEmptyObject(iVmArg)) $(this).attr('data-vm-arg', JSON.stringify(iVmArg));
+        if (iVmArg != null && !$.isEmptyObject(iVmArg))
+          $(this).attr("data-vm-arg", JSON.stringify(iVmArg));
 
         // Call the callback function.
-        if (typeof iCallbackFn === 'function') iCallbackFn.apply(this);
+        if (typeof iCallbackFn === "function") iCallbackFn.apply(this);
 
         // Load the Javascript module if specified.
         if (iJsModuleUrl != null) {
-          $.getScript(iJsModuleUrl, function() {
+          $.getScript(iJsModuleUrl, function () {
             dotnetify.ko.init();
           });
-        }
-        else dotnetify.ko.init();
+        } else dotnetify.ko.init();
       });
     };
 
     // Injects a context with observables mapped from an object. Context can be an object or an observable array.
-    self.VM.$inject = function(iContext, iObject) {
-      if (ko.isObservable(iContext) && 'push' in iContext)
-        $.each(iContext(), function(idx, item) {
+    self.VM.$inject = function (iContext, iObject) {
+      if (ko.isObservable(iContext) && "push" in iContext)
+        $.each(iContext(), function (idx, item) {
           self._Inject(item, iObject);
         });
       else self._Inject(iContext, iObject);
@@ -420,31 +445,33 @@ $.widget('ko.dotnetify', {
     var jsModule = window[self.VMType];
     if (jsModule != null) {
       // If the module is a Typescript class, instantiate it.
-      if (typeof jsModule === 'function') {
+      if (typeof jsModule === "function") {
         let jsInstance = new jsModule(self.VM);
         Object.assign(jsInstance, jsModule.prototype);
         self._Inject(self.VM, jsInstance);
-      }
-      else self._Inject(self.VM, jsModule);
+      } else self._Inject(self.VM, jsModule);
     }
 
     // Add plugin functions.
-    $.each(dotnetify.ko.plugins, function(pluginId, plugin) {
-      if (plugin.hasOwnProperty('$inject')) plugin.$inject(self.VM);
+    $.each(dotnetify.ko.plugins, function (pluginId, plugin) {
+      if (plugin.hasOwnProperty("$inject")) plugin.$inject(self.VM);
     });
   },
 
   // Gets offline view model data from the local cache.
-  _GetOfflineVM: function() {
+  _GetOfflineVM: function () {
     var self = this;
 
-    if (typeof dotnetify.offlineCacheFn === 'function') {
+    if (typeof dotnetify.offlineCacheFn === "function") {
       // SignalR connection isn't available; use cached VM data for offline mode.
-      var cachedData = dotnetify.offlineCacheFn(self.VMId + self.element.attr('data-vm-arg'));
+      var cachedData = dotnetify.offlineCacheFn(
+        self.VMId + self.element.attr("data-vm-arg")
+      );
       if (cachedData == null) cachedData = dotnetify.offlineCacheFn(self.VMId);
 
       if (cachedData != null) {
-        if (dotnetify.debug) console.warn('[' + self.VMId + '] using offline data');
+        if (dotnetify.debug)
+          console.warn("[" + self.VMId + "] using offline data");
 
         self.IsOffline = true;
         self.UpdateVM(cachedData);
@@ -453,61 +480,59 @@ $.widget('ko.dotnetify', {
   },
 
   // Initializes offline mode handling.
-  _ListenToOfflineEvent: function() {
+  _ListenToOfflineEvent: function () {
     var self = this;
 
     self.IsOffline = false;
-    self.OfflineFn = function(event, isOffline) {
-      if (self.VM != null && self.VM.hasOwnProperty('$vmOffline')) self.VM.$vmOffline(isOffline);
+    self.OfflineFn = function (event, isOffline) {
+      if (self.VM != null && self.VM.hasOwnProperty("$vmOffline"))
+        self.VM.$vmOffline(isOffline);
 
       self.IsOffline = isOffline;
       if (!isOffline) self._RequestVM();
       else if (self.VM == null) self._GetOfflineVM();
 
-      $(document).one('offline', self.OfflineFn.bind(self));
+      $(document).one("offline", self.OfflineFn.bind(self));
     };
 
-    $(document).one('offline', self.OfflineFn.bind(self));
+    $(document).one("offline", self.OfflineFn.bind(self));
   },
 
   // Inject the context with observables mapped from an object.
   // Properties that start with underscore are mapped to observables.
   // Functions that start with underscore are mapped to pure computed observables.
-  _Inject: function(iContext, iObject) {
+  _Inject: function (iContext, iObject) {
     Object.keys(iObject).forEach(prop => {
       // Skip if the context already has a property with the same name.
       if (iContext.hasOwnProperty(prop)) return;
 
-      if (typeof iObject[prop] === 'function') {
-        if (prop.indexOf('_') == 0) {
+      if (typeof iObject[prop] === "function") {
+        if (prop.indexOf("_") == 0) {
           iContext[prop] = ko.pureComputed(iObject[prop], iContext);
-        }
-        else iContext[prop] = iObject[prop];
-      }
-      else if (prop.indexOf('_') == 0) {
+        } else iContext[prop] = iObject[prop];
+      } else if (prop.indexOf("_") == 0) {
         iContext[prop] = ko.observable(iObject[prop]);
 
         // Prevent it from being subscribed so it won't get sent to server.
         iContext[prop].$subscribe = true;
-      }
-      else iContext[prop] = iObject[prop];
+      } else iContext[prop] = iObject[prop];
     });
   },
 
   // Calls the callback function only if all the knockout components are ready.
   // This is a workaround until knockout issue #1533 is closed.
-  _OnComponentReady: function(iCallbackFn) {
+  _OnComponentReady: function (iCallbackFn) {
     var self = this;
     var retry = 0;
-    var checkComponentReadyFn = function() {
+    var checkComponentReadyFn = function () {
       var isReady = true;
 
       // Assume the knockout components are those with 'params' attribute,
       // and that it's ready if it has at least one child element.
-      var components = self.element.find('[params]');
+      var components = self.element.find("[params]");
       if (components.length > 0)
         isReady =
-          $.grep(components, function(i) {
+          $.grep(components, function (i) {
             return i.childElementCount == 0;
           }).length == 0;
 
@@ -519,19 +544,21 @@ $.widget('ko.dotnetify', {
   },
 
   // On value changed from a knockout VM's observable, update the server VM.
-  _OnValueChanged: function(iVMPath, iNewValue) {
+  _OnValueChanged: function (iVMPath, iNewValue) {
     var update = {};
-    update[iVMPath] = iNewValue instanceof Object ? $.extend({}, iNewValue) : iNewValue;
+    update[iVMPath] =
+      iNewValue instanceof Object ? $.extend({}, iNewValue) : iNewValue;
 
     if (dotnetify.hub.isConnected) {
       try {
         dotnetify.hub.updateVM(this.VMId, update);
 
         if (dotnetify.debug) {
-          console.log('[' + this.VMId + '] sent> ');
+          console.log("[" + this.VMId + "] sent> ");
           console.log(update);
 
-          if (dotnetify.debugFn != null) dotnetify.debugFn(this.VMId, 'sent', update);
+          if (dotnetify.debugFn != null)
+            dotnetify.debugFn(this.VMId, "sent", update);
         }
       } catch (e) {
         console.error(e);
@@ -540,7 +567,7 @@ $.widget('ko.dotnetify', {
   },
 
   // Preprocess view model update from the server before we map it to knockout view model.
-  _PreProcess: function(iVMUpdate) {
+  _PreProcess: function (iVMUpdate) {
     Object.keys(iVMUpdate).forEach(prop => {
       // Look for property that end with '_add'. Interpret the value as a list item to be added
       // to an existing list whose property name precedes that suffix.
@@ -548,7 +575,7 @@ $.widget('ko.dotnetify', {
       if (match != null) {
         var list = this.VM[match[1]];
         if (list != null) this.VM.$addList(list, iVMUpdate[prop]);
-        else throw new Error('unable to resolve ' + prop);
+        else throw new Error("unable to resolve " + prop);
         delete iVMUpdate[prop];
         return;
       }
@@ -559,7 +586,7 @@ $.widget('ko.dotnetify', {
       if (match != null) {
         var list = this.VM[match[1]];
         if (list != null) this.VM.$updateList(list, iVMUpdate[prop]);
-        else throw new Error('unable to resolve ' + prop);
+        else throw new Error("unable to resolve " + prop);
         delete iVMUpdate[prop];
         return;
       }
@@ -570,14 +597,18 @@ $.widget('ko.dotnetify', {
       if (match != null) {
         var list = this.VM[match[1]];
         if (list != null) {
-          var key = list()['$vmKey'];
+          var key = list()["$vmKey"];
           if (key != null)
-            this.VM.$removeList(this.VM[match[1]], function(i) {
+            this.VM.$removeList(this.VM[match[1]], function (i) {
               return i[key]() == iVMUpdate[prop];
             });
-          else throw new Error('unable to resolve ' + prop + ' due to missing vmItemKey attribute');
-        }
-        else throw new Error('unable to resolve ' + prop);
+          else
+            throw new Error(
+              "unable to resolve " +
+                prop +
+                " due to missing vmItemKey attribute"
+            );
+        } else throw new Error("unable to resolve " + prop);
         delete iVMUpdate[prop];
         return;
       }
@@ -585,9 +616,9 @@ $.widget('ko.dotnetify', {
   },
 
   // Requests view model data from the server.
-  _RequestVM: function() {
+  _RequestVM: function () {
     var self = this;
-    var vmArg = self.element.attr('data-vm-arg');
+    var vmArg = self.element.attr("data-vm-arg");
     vmArg = vmArg != null ? $.parseJSON(vmArg.replace(/'/g, '"')) : null;
 
     if (dotnetify.hub.isConnected) {
@@ -600,39 +631,44 @@ $.widget('ko.dotnetify', {
   },
 
   // Subscribe to value change events raised by knockout VM's observables.
-  _SubscribeObservables: function(iParam, iVMPath) {
+  _SubscribeObservables: function (iParam, iVMPath) {
     var self = this;
 
     if (iParam == null) return;
     else if (ko.isObservable(iParam)) {
-      if ('$subscribe' in iParam === false) {
-        iParam.subscribe(function(iNewValue) {
+      if ("$subscribe" in iParam === false) {
+        iParam.subscribe(function (iNewValue) {
           // Handle value change event from observables.
-          if (self.VM.$serverUpdate === true) self._OnValueChanged(iVMPath, iNewValue);
+          if (self.VM.$serverUpdate === true)
+            self._OnValueChanged(iVMPath, iNewValue);
         });
-        iParam['$subscribe'] = true;
+        iParam["$subscribe"] = true;
       }
       this._SubscribeObservables(iParam(), iVMPath);
-    }
-    else if (typeof iParam == 'object') {
+    } else if (typeof iParam == "object") {
       // The property with $vmKey means it's an enumerable and the $vmKey indicates the key to identify
       // the item in that enumerable.  When we send value update to the server, we'll use the property
       // path in this format: <enumerable property name>.$<key value>.<property name>.
       // For example: ListContent.$3.FirstName.
-      var key = '$vmKey' in iParam ? iParam['$vmKey'] : null;
+      var key = "$vmKey" in iParam ? iParam["$vmKey"] : null;
 
       Object.keys(iParam).forEach(property => {
-        if (property.charAt(0) == '$' || property.charAt(0) == '_') return;
+        if (property.charAt(0) == "$" || property.charAt(0) == "_") return;
         if (property.charAt(0) == property.charAt(0).toLowerCase()) return;
         if (!isNaN(property.charAt(0))) return;
-        const path = key != null ? '$' + iParam[property][key]() : property;
-        this._SubscribeObservables(iParam[property], iVMPath == null ? path : iVMPath + '.' + path);
+        const path = key != null ? "$" + iParam[property][key]() : property;
+        this._SubscribeObservables(
+          iParam[property],
+          iVMPath == null ? path : iVMPath + "." + path
+        );
       });
-    }
-    else if (iParam instanceof Array) {
+    } else if (iParam instanceof Array) {
       Object.keys(iParam).forEach(index => {
-        path = '$' + index;
-        this._SubscribeObservables(iParam[index], iVMPath == null ? path : iVMPath + '.' + path);
+        path = "$" + index;
+        this._SubscribeObservables(
+          iParam[index],
+          iVMPath == null ? path : iVMPath + "." + path
+        );
       });
     }
   }
@@ -640,25 +676,39 @@ $.widget('ko.dotnetify', {
 
 // Custom knockout binding to indicate the item key of an items collection property.
 ko.bindingHandlers.vmItemKey = {
-  preprocess: function(value) {
+  preprocess: function (value) {
     // Make sure the item key is enclosed with quotes.
     return value.charAt(0) != "'" ? "'" + value + "'" : value;
   },
-  update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  update: function (
+    element,
+    valueAccessor,
+    allBindings,
+    viewModel,
+    bindingContext
+  ) {
     var value = valueAccessor();
-    var items = allBindings.get('foreach');
+    var items = allBindings.get("foreach");
 
     // Test whether the foreach value is object literal where items is set to 'data' property.
-    if (!ko.isObservable(items) && items.hasOwnProperty('data')) items = items.data;
+    if (!ko.isObservable(items) && items.hasOwnProperty("data"))
+      items = items.data;
 
     // Store the item key in a special property '$vmKey' in the element's view model.
-    if (ko.isObservable(items) && items() != null && value != null) items()['$vmKey'] = value;
+    if (ko.isObservable(items) && items() != null && value != null)
+      items()["$vmKey"] = value;
   }
 };
 
 // Custom knockout binding to bind the specified function the click event of the element.
 ko.bindingHandlers.vmCommand = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (
+    element,
+    valueAccessor,
+    allBindings,
+    viewModel,
+    bindingContext
+  ) {
     var vm = bindingContext.$root;
     var fnName = null;
     var fnArg = null;
@@ -669,29 +719,29 @@ ko.bindingHandlers.vmCommand = {
     if (matchFnNameArg != null) {
       fnName = matchFnNameArg[1].trim();
       fnArg = matchFnNameArg[2].trim();
-    }
-    else {
+    } else {
       var matchFnName = /return\s(.*)\s/.exec(valueAccessor.toString());
       if (matchFnName != null) fnName = matchFnName[1].trim();
     }
 
-    if (fnName == null) throw new Error('invalid vmCommand value at ' + element.outerHTML);
+    if (fnName == null)
+      throw new Error("invalid vmCommand value at " + element.outerHTML);
 
     // Support whether function is defined globally or inside a namespace that matches view model Id.
-    var getFn = function() {
+    var getFn = function () {
       return vm[fnName] != null ? vm[fnName] : valueAccessor();
     };
 
     // Trim the argument from enclosing quotes.  If it's an observable name, replace it with the value.
     if (fnArg != null) {
-      if (fnArg.charAt(0) == "'") fnArg = fnArg.replace(/(^'|'$)/g, '');
-      else if (ko.isObservable(viewModel[fnArg])) fnArg = ko.unwrap(viewModel[fnArg]);
-      else if (fnArg == '$data') fnArg = viewModel;
-    }
-    else fnArg = true;
+      if (fnArg.charAt(0) == "'") fnArg = fnArg.replace(/(^'|'$)/g, "");
+      else if (ko.isObservable(viewModel[fnArg]))
+        fnArg = ko.unwrap(viewModel[fnArg]);
+      else if (fnArg == "$data") fnArg = viewModel;
+    } else fnArg = true;
 
-    var newValueAccessor = function() {
-      return function() {
+    var newValueAccessor = function () {
+      return function () {
         var fn = getFn();
 
         // If function is an observable, which means it's a server view model property, then set its value to
@@ -699,29 +749,54 @@ ko.bindingHandlers.vmCommand = {
         // be a client-side function, in which case just invoke it and pass all possible objects it may need.
         if (ko.isObservable(fn)) {
           // Reset the value locally first to ensure that setting the value will raise change events.
-          vm.$preventBinding(function() {
+          vm.$preventBinding(function () {
             fn(fnArg === true ? false : null);
           });
 
           fn(fnArg);
-        }
-        else fn.apply(vm, [ viewModel, element, bindingContext.$parent ]);
+        } else fn.apply(vm, [viewModel, element, bindingContext.$parent]);
       };
     };
-    ko.bindingHandlers.click.init(element, newValueAccessor, allBindings, viewModel, bindingContext);
+    ko.bindingHandlers.click.init(
+      element,
+      newValueAccessor,
+      allBindings,
+      viewModel,
+      bindingContext
+    );
   }
 };
 
 // Custom knockout binding to call a function on initial property change event.
 ko.bindingHandlers.vmOnce = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-    ko.bindingHandlers.vmOn.init(element, valueAccessor, allBindings, viewModel, bindingContext, true);
+  init: function (
+    element,
+    valueAccessor,
+    allBindings,
+    viewModel,
+    bindingContext
+  ) {
+    ko.bindingHandlers.vmOn.init(
+      element,
+      valueAccessor,
+      allBindings,
+      viewModel,
+      bindingContext,
+      true
+    );
   }
 };
 
 // Custom knockout binding to call a function on a property change event.
 ko.bindingHandlers.vmOn = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext, once) {
+  init: function (
+    element,
+    valueAccessor,
+    allBindings,
+    viewModel,
+    bindingContext,
+    once
+  ) {
     var vm = bindingContext.$root;
     var property = null;
     var fnName = null;
@@ -734,23 +809,25 @@ ko.bindingHandlers.vmOn = {
       fnName = match[2].trim();
     }
 
-    if (fnName == null) throw new Error('invalid vmOn function at ' + element.outerHTML);
+    if (fnName == null)
+      throw new Error("invalid vmOn function at " + element.outerHTML);
 
     // Support whether function is defined globally or inside a namespace that matches view model Id.
-    var getFn = function() {
+    var getFn = function () {
       return vm[fnName] != null ? vm[fnName] : valueAccessor()[property];
     };
 
     // Make sure the property is an observable.
-    if (property != null && !ko.isObservable(viewModel[property])) throw new Error('invalid vmOn data: ' + valueAccessor());
+    if (property != null && !ko.isObservable(viewModel[property]))
+      throw new Error("invalid vmOn data: " + valueAccessor());
 
     // Call the function with the initial data.
-    getFn().apply(vm, [ viewModel, element, bindingContext.$parent ]);
+    getFn().apply(vm, [viewModel, element, bindingContext.$parent]);
 
     // Call the function on every data update.
     if (once == null)
-      viewModel[property].subscribe(function(iNewValue) {
-        getFn().apply(vm, [ viewModel, element, bindingContext.$parent ]);
+      viewModel[property].subscribe(function (iNewValue) {
+        getFn().apply(vm, [viewModel, element, bindingContext.$parent]);
       });
   }
 };

@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import TextBox from './TextBox';
+import React from "react";
+import styled from "styled-components";
+import TextBox from "./TextBox";
 
 const EditableText = styled.div`
   display: inline-block;
@@ -19,7 +19,8 @@ class InlineEdit extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    if (prevProps.text !== this.props.text) this.setState({ value: this.props.text });
+    if (prevProps.text !== this.props.text)
+      this.setState({ value: this.props.text });
   }
 
   handleBlur = () => this.setState({ edit: false });
@@ -33,8 +34,7 @@ class InlineEdit extends React.Component {
     this.setState({ edit: false });
     if (this.state.value.length > 0 && this.state.value != this.props.text) {
       this.props.onChange(this.state.value);
-    }
-    else this.setState({ value: this.props.text });
+    } else this.setState({ value: this.props.text });
   };
 
   render() {
@@ -53,7 +53,9 @@ class InlineEdit extends React.Component {
         </div>
       );
 
-    return <EditableText onClick={this.handleClick}>{this.state.value}</EditableText>;
+    return (
+      <EditableText onClick={this.handleClick}>{this.state.value}</EditableText>
+    );
   }
 }
 

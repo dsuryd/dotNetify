@@ -3,13 +3,18 @@ import { Markdown, withTheme } from "dotnetify-elements";
 import { Alert, NavMenu, Panel, VMContext } from "dotnetify-elements";
 import Article from "../../components/Article";
 import Expander from "../../components/Expander";
-import { currentFramework, frameworkSelectEvent } from "app/components/SelectFramework";
+import {
+  currentFramework,
+  frameworkSelectEvent
+} from "app/components/SelectFramework";
 
 class LocalMode extends React.Component {
   constructor() {
     super();
     this.state = { framework: currentFramework };
-    this.unsubs = frameworkSelectEvent.subscribe((framework) => this.setState({ framework: framework }));
+    this.unsubs = frameworkSelectEvent.subscribe(framework =>
+      this.setState({ framework: framework })
+    );
   }
   componentWillUnmount() {
     this.unsubs();
@@ -20,7 +25,7 @@ class LocalMode extends React.Component {
   }
 }
 
-const LocalModeReact = (_) => (
+const LocalModeReact = _ => (
   <Article vm="LocalMode" id="Content">
     <Markdown id="Content">
       <Markdown>{localModeHelloWorldReactCode()}</Markdown>
@@ -30,7 +35,7 @@ const LocalModeReact = (_) => (
   </Article>
 );
 
-const LocalModeVue = (_) => (
+const LocalModeVue = _ => (
   <Article vm="LocalModeVue" id="Content">
     <Markdown id="Content">
       <Markdown>{localModeHelloWorldVueCode()}</Markdown>
@@ -39,7 +44,7 @@ const LocalModeVue = (_) => (
   </Article>
 );
 
-const SeeItLive = (_) => <b>See It Live!</b>;
+const SeeItLive = _ => <b>See It Live!</b>;
 
 const localModeHelloWorldReactCode = () =>
   `
@@ -76,18 +81,16 @@ class MyApp extends React.Component {
 class LocalModeHelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    this.vm = dotnetify.react.connect(
-      "LocalHelloWorld",
-      this
-    );
+    this.vm = dotnetify.react.connect("LocalHelloWorld", this);
     this.state = { Greetings: "", name: "" };
   }
   componentWillUnmount() {
     this.vm.$destroy();
   }
   render() {
-    const handleName = (e) => this.setState({ name: e.target.value });
-    const handleSubmit = () => this.vm.$dispatch({ Submit: { Name: this.state.name } });
+    const handleName = e => this.setState({ name: e.target.value });
+    const handleSubmit = () =>
+      this.vm.$dispatch({ Submit: { Name: this.state.name } });
     return (
       <div>
         <div>{this.state.Greetings}</div>
@@ -104,7 +107,7 @@ window.LocalHelloWorld = {
   },
   onDispatch(data) {
     return { Greetings: "Hello " + data.Submit.Name };
-  },
+  }
 };
 
 const localModeHelloWorldVueCode = () =>
@@ -139,7 +142,7 @@ window.LocalHelloWorldVue = {
   },
   onDispatch(data) {
     return { Greetings: "Hello " + data.Name };
-  },
+  }
 };
 
 class LocalModeHelloWorldVue extends React.Component {
@@ -153,7 +156,7 @@ class LocalModeHelloWorldVue extends React.Component {
             <div>{{state.Greetings}}</div>
             <input type="text" v-model="state.Name" />
           </div>
-        `,
+        `
         },
         "LocalHelloWorldVue",
         { watch: ["Name"] }
@@ -168,10 +171,10 @@ class LocalModeHelloWorldVue extends React.Component {
     return <div id="LocalModeHelloWorldVue" />;
   }
 }
-window.LocalPage1 = (_) => <Alert>You selected Page 1</Alert>;
-window.LocalPage2 = (_) => <Alert danger>You selected Page 2</Alert>;
+window.LocalPage1 = _ => <Alert>You selected Page 1</Alert>;
+window.LocalPage2 = _ => <Alert danger>You selected Page 2</Alert>;
 
-window.LocalMode_LocalVM = new class {
+window.LocalMode_LocalVM = new (class {
   initialState = {
     RoutingState: {
       Templates: [
@@ -179,47 +182,47 @@ window.LocalMode_LocalVM = new class {
           Id: "Home",
           Root: "",
           UrlPattern: "",
-          ViewUrl: "LocalPage1",
+          ViewUrl: "LocalPage1"
         },
         {
           Id: "Page1",
           Root: "",
           UrlPattern: "page1",
-          ViewUrl: "LocalPage1",
+          ViewUrl: "LocalPage1"
         },
         {
           Id: "Page2",
           Root: "",
           UrlPattern: "page2",
-          ViewUrl: "LocalPage2",
-        },
+          ViewUrl: "LocalPage2"
+        }
       ],
-      Root: "core/api/localmode",
+      Root: "core/api/localmode"
     },
     NavMenu: [
       {
         Route: {
           TemplateId: "Page1",
-          Path: "page1",
+          Path: "page1"
         },
-        Label: "Page 1",
+        Label: "Page 1"
       },
       {
         Route: {
           TemplateId: "Page2",
-          Path: "page2",
+          Path: "page2"
         },
-        Label: "Page 2",
-      },
-    ],
+        Label: "Page 2"
+      }
+    ]
   };
 
   onConnect() {
     return this.initialState;
   }
-}();
+})();
 
-const LocalModeApp = (_) => (
+const LocalModeApp = _ => (
   <VMContext vm="LocalVM">
     <Panel horizontal>
       <Panel flex="30%">

@@ -1,24 +1,24 @@
-import React from 'react';
-import dotnetify from 'dotnetify';
-import { ControlTypesCss } from '../components/css';
+import React from "react";
+import dotnetify from "dotnetify";
+import { ControlTypesCss } from "../components/css";
 
 export default class ControlTypes extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      TextBoxValue: '',
-      SearchBox: '',
+      TextBoxValue: "",
+      SearchBox: "",
       SearchResults: [],
       ShowMeCheckBox: true,
       EnableMeCheckBox: true,
-      SimpleDropDownValue: '',
+      SimpleDropDownValue: "",
       SimpleDropDownOptions: [],
-      DropDownValue: '',
+      DropDownValue: "",
       DropDownOptions: []
     };
 
     // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect('ControlTypesVM', this);
+    this.vm = dotnetify.react.connect("ControlTypesVM", this);
 
     // Set up function to dispatch state to the back-end with optimistic update.
     this.dispatchState = state => {
@@ -47,8 +47,14 @@ export default class ControlTypes extends React.Component {
                   className="form-control"
                   placeholder={this.state.TextBoxPlaceHolder}
                   value={this.state.TextBoxValue}
-                  onChange={e => this.setState({ TextBoxValue: e.target.value })}
-                  onBlur={_ => this.dispatchState({ TextBoxValue: this.state.TextBoxValue })}
+                  onChange={e =>
+                    this.setState({ TextBoxValue: e.target.value })
+                  }
+                  onBlur={_ =>
+                    this.dispatchState({
+                      TextBoxValue: this.state.TextBoxValue
+                    })
+                  }
                 />
                 <b>{this.state.TextBoxResult}</b>
               </td>
@@ -65,12 +71,18 @@ export default class ControlTypes extends React.Component {
                   className="form-control"
                   placeholder={this.state.SearchBoxPlaceHolder}
                   value={this.state.SearchBox}
-                  onChange={e => this.dispatchState({ SearchBox: e.target.value })}
+                  onChange={e =>
+                    this.dispatchState({ SearchBox: e.target.value })
+                  }
                 />
                 {this.state.SearchResults.length > 0 && (
                   <ul className="list-group">
                     {this.state.SearchResults.map((text, idx) => (
-                      <li className="list-group-item" key={idx} onClick={_ => this.dispatchState({ SearchBox: text })}>
+                      <li
+                        className="list-group-item"
+                        key={idx}
+                        onClick={_ => this.dispatchState({ SearchBox: text })}
+                      >
                         {text}
                       </li>
                     ))}
@@ -86,7 +98,11 @@ export default class ControlTypes extends React.Component {
                   <input
                     type="checkbox"
                     checked={this.state.ShowMeCheckBox}
-                    onChange={_ => this.dispatchState({ ShowMeCheckBox: !this.state.ShowMeCheckBox })}
+                    onChange={_ =>
+                      this.dispatchState({
+                        ShowMeCheckBox: !this.state.ShowMeCheckBox
+                      })
+                    }
                   />
                   <span>Show me</span>
                 </label>
@@ -94,12 +110,19 @@ export default class ControlTypes extends React.Component {
                   <input
                     type="checkbox"
                     checked={this.state.EnableMeCheckBox}
-                    onChange={_ => this.dispatchState({ EnableMeCheckBox: !this.state.EnableMeCheckBox })}
+                    onChange={_ =>
+                      this.dispatchState({
+                        EnableMeCheckBox: !this.state.EnableMeCheckBox
+                      })
+                    }
                   />
                   <span>Enable me</span>
                 </label>
                 {this.state.ShowMeCheckBox && (
-                  <button className="btn btn-secondary" disabled={!this.state.EnableMeCheckBox}>
+                  <button
+                    className="btn btn-secondary"
+                    disabled={!this.state.EnableMeCheckBox}
+                  >
                     {this.state.CheckBoxResult}
                   </button>
                 )}
@@ -115,7 +138,9 @@ export default class ControlTypes extends React.Component {
                 <select
                   className="form-control"
                   value={this.state.SimpleDropDownValue}
-                  onChange={e => this.dispatchState({ SimpleDropDownValue: e.target.value })}
+                  onChange={e =>
+                    this.dispatchState({ SimpleDropDownValue: e.target.value })
+                  }
                 >
                   <option value="" disabled>
                     Choose...
@@ -139,7 +164,9 @@ export default class ControlTypes extends React.Component {
                 <select
                   className="form-control"
                   value={this.state.DropDownValue}
-                  onChange={e => this.dispatchState({ DropDownValue: e.target.value })}
+                  onChange={e =>
+                    this.dispatchState({ DropDownValue: e.target.value })
+                  }
                 >
                   <option value="0" disabled>
                     {this.state.DropDownCaption}
@@ -161,8 +188,10 @@ export default class ControlTypes extends React.Component {
                   <input
                     type="radio"
                     value="green"
-                    checked={this.state.RadioButtonValue == 'green'}
-                    onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
+                    checked={this.state.RadioButtonValue == "green"}
+                    onChange={e =>
+                      this.dispatchState({ RadioButtonValue: e.target.value })
+                    }
                   />
                   <span>Green</span>
                 </label>
@@ -170,23 +199,31 @@ export default class ControlTypes extends React.Component {
                   <input
                     type="radio"
                     value="yellow"
-                    checked={this.state.RadioButtonValue == 'yellow'}
-                    onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
+                    checked={this.state.RadioButtonValue == "yellow"}
+                    onChange={e =>
+                      this.dispatchState({ RadioButtonValue: e.target.value })
+                    }
                   />
                   <span>Yellow</span>
                 </label>
-                <button className={'btn ' + this.state.RadioButtonStyle}>Result</button>
+                <button className={"btn " + this.state.RadioButtonStyle}>
+                  Result
+                </button>
               </td>
             </tr>
 
             <tr>
               <td>Button: </td>
               <td>
-                <button type="button" className="btn btn-secondary" onClick={_ => this.dispatchState({ ButtonClicked: true })}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={_ => this.dispatchState({ ButtonClicked: true })}
+                >
                   Click Me
                 </button>
                 {this.state.ClickCount > 0 && (
-                  <span style={{ marginLeft: '2rem' }}>
+                  <span style={{ marginLeft: "2rem" }}>
                     You clicked me <b>{this.state.ClickCount}</b>
                     &nbsp;times!
                   </span>

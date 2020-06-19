@@ -13,16 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import dotnetify from './dotnetify-vue';
+import dotnetify from "./dotnetify-vue";
 
 export default {
-  name: 'Scope',
+  name: "Scope",
   props: {
     vm: String,
     tag: String
   },
-  inject: { scoped: { name: 'scoped', default: null } },
-  provide: function() {
+  inject: { scoped: { name: "scoped", default: null } },
+  provide: function () {
     const _this = this;
     return {
       scoped: vmId => _this.getScope(vmId),
@@ -32,13 +32,13 @@ export default {
       }
     };
   },
-  render: function(createElement) {
-    return createElement(this.tag || 'div', null, this.$slots.default);
+  render: function (createElement) {
+    return createElement(this.tag || "div", null, this.$slots.default);
   },
   methods: {
-    getScope: function(vmId) {
+    getScope: function (vmId) {
       let scope = this.scoped ? this.scoped(this.vm) : this.vm;
-      return scope ? scope + '.' + vmId : vmId;
+      return scope ? scope + "." + vmId : vmId;
     }
   }
 };

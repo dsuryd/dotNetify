@@ -1,7 +1,7 @@
-import React from 'react';
-import { Markdown, withTheme } from 'dotnetify-elements';
-import Article from '../components/Article';
-import MfeImage from '../images/MicroFrontend.svg';
+import React from "react";
+import { Markdown, withTheme } from "dotnetify-elements";
+import Article from "../components/Article";
+import MfeImage from "../images/MicroFrontend.svg";
 
 const Image = styled.img`
   display: flex;

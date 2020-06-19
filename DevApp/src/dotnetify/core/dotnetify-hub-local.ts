@@ -56,7 +56,7 @@ export class DotNetifyHubLocal implements IDotnetifyHub {
     if (typeof vm === "object" && typeof vm.onConnect == "function") {
       if (this.debug) console.log(`[${iVMId}] *** local mode ***`);
 
-      vm.$pushUpdate = (update) => {
+      vm.$pushUpdate = update => {
         if (typeof update == "object") update = JSON.stringify(update);
         setTimeout(() => this.responseEvent.emit(iVMId, update));
       };

@@ -5,55 +5,57 @@ const window = window || global || {};
 
 var Path = {
   // Need this specific version, because latest version is causing issue.
-  version: '0.8.5',
-  map: function(path) {
+  version: "0.8.5",
+  map: function (path) {
     if (Path.routes.defined.hasOwnProperty(path)) {
       return Path.routes.defined[path];
-    }
-    else {
+    } else {
       return new Path.core.route(path);
     }
   },
-  root: function(path) {
+  root: function (path) {
     Path.routes.root = path;
   },
-  rescue: function(fn) {
+  rescue: function (fn) {
     Path.routes.rescue = fn;
   },
   history: {
     initial: {}, // Empty container for "Initial Popstate" checking variables.
-    pushState: function(state, title, path) {
+    pushState: function (state, title, path) {
       if (Path.history.supported) {
         if (Path.dispatch(path)) {
           history.pushState(state, title, path);
         }
-      }
-      else {
+      } else {
         if (Path.history.fallback) {
-          window.location.hash = '#' + path;
+          window.location.hash = "#" + path;
         }
       }
     },
-    popState: function(event) {
-      var initialPop = !Path.history.initial.popped && location.href == Path.history.initial.URL;
+    popState: function (event) {
+      var initialPop =
+        !Path.history.initial.popped &&
+        location.href == Path.history.initial.URL;
       Path.history.initial.popped = true;
       if (initialPop) return;
-      Path.dispatch(document.location.pathname === '/' ? '' : document.location.pathname);
+      Path.dispatch(
+        document.location.pathname === "/" ? "" : document.location.pathname
+      );
     },
-    listen: function(fallback) {
+    listen: function (fallback) {
       Path.history.supported = !!(window.history && window.history.pushState);
       Path.history.fallback = fallback;
 
       if (Path.history.supported) {
-        (Path.history.initial.popped = 'state' in window.history), (Path.history.initial.URL = location.href);
+        (Path.history.initial.popped = "state" in window.history),
+          (Path.history.initial.URL = location.href);
         window.onpopstate = Path.history.popState;
-      }
-      else {
+      } else {
         if (Path.history.fallback) {
           for (route in Path.routes.defined) {
-            if (route.charAt(0) != '#') {
-              Path.routes.defined['#' + route] = Path.routes.defined[route];
-              Path.routes.defined['#' + route].path = '#' + route;
+            if (route.charAt(0) != "#") {
+              Path.routes.defined["#" + route] = Path.routes.defined[route];
+              Path.routes.defined["#" + route].path = "#" + route;
             }
           }
           Path.listen();
@@ -61,8 +63,8 @@ var Path = {
       }
     }
   },
-  match: function(path, parameterize) {
-    if (path === '') path = '/';
+  match: function (path, parameterize) {
+    if (path === "") path = "/";
     var params = {},
       route = null,
       possible_routes,
@@ -79,12 +81,17 @@ var Path = {
           slice = possible_routes[j];
           compare = path;
           if (slice.search(/:/) > 0) {
-            for (i = 0; i < slice.split('/').length; i++) {
-              if (i < compare.split('/').length && slice.split('/')[i].charAt(0) === ':') {
-                params[slice.split('/')[i].replace(/:/, '')] = compare.split('/')[i];
-                result = compare.split('/');
-                result[i] = slice.split('/')[i];
-                compare = result.join('/');
+            for (i = 0; i < slice.split("/").length; i++) {
+              if (
+                i < compare.split("/").length &&
+                slice.split("/")[i].charAt(0) === ":"
+              ) {
+                params[slice.split("/")[i].replace(/:/, "")] = compare.split(
+                  "/"
+                )[i];
+                result = compare.split("/");
+                result[i] = slice.split("/")[i];
+                compare = result.join("/");
               }
             }
           }
@@ -99,7 +106,7 @@ var Path = {
     }
     return null;
   },
-  dispatch: function(passed_route) {
+  dispatch: function (passed_route) {
     var previous_route, matched_route;
     if (Path.routes.current !== passed_route) {
       Path.routes.previous = Path.routes.current;
@@ -116,20 +123,19 @@ var Path = {
       if (matched_route !== null) {
         matched_route.run();
         return true;
-      }
-      else {
+      } else {
         if (Path.routes.rescue !== null) {
           Path.routes.rescue();
         }
       }
     }
   },
-  listen: function() {
-    var fn = function() {
+  listen: function () {
+    var fn = function () {
       Path.dispatch(location.hash);
     };
 
-    if (location.hash === '') {
+    if (location.hash === "") {
       if (Path.routes.root !== null) {
         location.hash = Path.routes.root;
       }
@@ -137,19 +143,21 @@ var Path = {
 
     // The 'document.documentMode' checks below ensure that PathJS fires the right events
     // even in IE "Quirks Mode".
-    if ('onhashchange' in window && (!document.documentMode || document.documentMode >= 8)) {
+    if (
+      "onhashchange" in window &&
+      (!document.documentMode || document.documentMode >= 8)
+    ) {
       window.onhashchange = fn;
-    }
-    else {
+    } else {
       setInterval(fn, 50);
     }
 
-    if (location.hash !== '') {
+    if (location.hash !== "") {
       Path.dispatch(location.hash);
     }
   },
   core: {
-    route: function(path) {
+    route: function (path) {
       this.path = path;
       this.action = null;
       this.do_enter = [];
@@ -168,24 +176,23 @@ var Path = {
 };
 
 Path.core.route.prototype = {
-  to: function(fn) {
+  to: function (fn) {
     this.action = fn;
     return this;
   },
-  enter: function(fns) {
+  enter: function (fns) {
     if (fns instanceof Array) {
       this.do_enter = this.do_enter.concat(fns);
-    }
-    else {
+    } else {
       this.do_enter.push(fns);
     }
     return this;
   },
-  exit: function(fn) {
+  exit: function (fn) {
     this.do_exit = fn;
     return this;
   },
-  partition: function() {
+  partition: function () {
     var parts = [],
       options = [],
       re = /\(([^}]+?)\)/g,
@@ -194,19 +201,19 @@ Path.core.route.prototype = {
     while ((text = re.exec(this.path))) {
       parts.push(text[1]);
     }
-    options.push(this.path.split('(')[0]);
+    options.push(this.path.split("(")[0]);
     for (i = 0; i < parts.length; i++) {
       options.push(options[options.length - 1] + parts[i]);
     }
     return options;
   },
-  run: function() {
+  run: function () {
     var halt_execution = false,
       i,
       result,
       previous;
 
-    if (Path.routes.defined[this.path].hasOwnProperty('do_enter')) {
+    if (Path.routes.defined[this.path].hasOwnProperty("do_enter")) {
       if (Path.routes.defined[this.path].do_enter.length > 0) {
         for (i = 0; i < Path.routes.defined[this.path].do_enter.length; i++) {
           result = Path.routes.defined[this.path].do_enter[i].apply(this, null);

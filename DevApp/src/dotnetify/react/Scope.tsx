@@ -33,21 +33,25 @@ export default class Scope extends React.Component<IScopeProps> {
 
   static contextTypes = {
     scoped: PropTypes.func,
-    scopedOptions: PropTypes.func,
+    scopedOptions: PropTypes.func
   };
   static childContextTypes = {
     scoped: PropTypes.func.isRequired,
     scopedOptions: PropTypes.func.isRequired,
-    connect: PropTypes.func.isRequired,
+    connect: PropTypes.func.isRequired
   };
 
   scoped(vmId: string) {
-    let scope = this.context.scoped ? this.context.scoped(this.props.vm) : this.props.vm;
+    let scope = this.context.scoped
+      ? this.context.scoped(this.props.vm)
+      : this.props.vm;
     return scope ? scope + "." + vmId : vmId;
   }
 
   scopedOptions(options: IConnectOptions) {
-    let scopedOptions = this.context.scoped ? this.context.scopedOptions(this.props.options) : this.props.options;
+    let scopedOptions = this.context.scoped
+      ? this.context.scopedOptions(this.props.options)
+      : this.props.options;
     return scopedOptions ? { ...scopedOptions, ...options } : options;
   }
 
@@ -55,8 +59,8 @@ export default class Scope extends React.Component<IScopeProps> {
     const _this = this;
 
     return {
-      scoped: (vmId) => _this.scoped(vmId),
-      scopedOptions: (options) => _this.scopedOptions(options),
+      scoped: vmId => _this.scoped(vmId),
+      scopedOptions: options => _this.scopedOptions(options),
       connect: (vmId, component, options) => {
         component.vmId = _this.scoped(vmId);
         component.options = _this.scopedOptions(options);
@@ -65,14 +69,14 @@ export default class Scope extends React.Component<IScopeProps> {
           component,
           component.options
         );
-        component.dispatch = (state) => component.vm.$dispatch(state);
+        component.dispatch = state => component.vm.$dispatch(state);
 
-        component.dispatchState = (state) => {
+        component.dispatchState = state => {
           component.vm.State(state);
           component.vm.$dispatch(state);
         };
         return _window.vmStates ? _window.vmStates[component.vmId] : null;
-      },
+      }
     };
   }
   render() {

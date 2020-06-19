@@ -5,7 +5,8 @@
   "scripts": {
     "build": "webpack",
     "prod": "webpack -p --progress && dotnet publish -c Release",
-    "dist": "webpack --config ./webpack.dist.config.js"
+    "dist": "webpack --config ./webpack.dist.config.js",
+    "pretty": "prettier --write \"./{src,client}/**/*.{ts,tsx,js,json,vue}\""
   },
   "babel": {
     "presets": [
@@ -17,6 +18,12 @@
       "babel-plugin-transform-object-rest-spread",
       "babel-plugin-transform-class-properties"
     ]
+  },
+  "prettier": {
+    "trailingComma": "none",
+    "arrowParens": "avoid",
+    "tabWidth": 2,
+    "singleQuote": false
   },
   "dependencies": {
     "@aspnet/signalr": "^1.1.4",
@@ -50,6 +57,7 @@
     "file-loader": "~1.1.11",
     "html-loader": "~0.5.5",
     "mini-css-extract-plugin": "~0.4.0",
+    "prettier": "2.0.5",
     "style-loader": "~0.21.0",
     "svg-url-loader": "^2.3.2",
     "ts-loader": "^7.0.4",

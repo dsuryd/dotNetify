@@ -21,14 +21,19 @@ class Utils {
   trim(iStr: string) {
     if (typeof iStr !== "string") return "";
 
-    while (iStr.indexOf("/", iStr.length - 1) >= 0) iStr = iStr.substr(0, iStr.length - 1);
+    while (iStr.indexOf("/", iStr.length - 1) >= 0)
+      iStr = iStr.substr(0, iStr.length - 1);
     while (iStr.indexOf("/") == 0) iStr = iStr.substr(1, iStr.length - 1);
     return iStr;
   }
 
   // Match two strings case-insensitive.
   equal(iStr1: string, iStr2: string) {
-    return iStr1 != null && iStr2 != null && iStr1.toLowerCase() == iStr2.toLowerCase();
+    return (
+      iStr1 != null &&
+      iStr2 != null &&
+      iStr1.toLowerCase() == iStr2.toLowerCase()
+    );
   }
 
   // Whether the string starts or ends with a value.
@@ -37,7 +42,10 @@ class Utils {
   }
 
   endsWith(iStr: string, iValue: string) {
-    return iValue == "" || iStr.toLowerCase().slice(-iValue.length) == iValue.toLowerCase();
+    return (
+      iValue == "" ||
+      iStr.toLowerCase().slice(-iValue.length) == iValue.toLowerCase()
+    );
   }
 
   // Dispatch event with IE polyfill.
@@ -60,7 +68,7 @@ export const createEventEmitter = () => {
   return {
     emit(...args) {
       let handled = false;
-      subscribers.forEach((subscriber) => {
+      subscribers.forEach(subscriber => {
         handled = subscriber(...args) || handled;
       });
       return handled;
@@ -68,24 +76,29 @@ export const createEventEmitter = () => {
 
     subscribe(subscriber) {
       !subscribers.includes(subscriber) && subscribers.push(subscriber);
-      return () => (subscribers = subscribers.filter((x) => x !== subscriber));
-    },
+      return () => (subscribers = subscribers.filter(x => x !== subscriber));
+    }
   } as IEventEmitter;
 };
 
-export const fetch = (iMethod: string, iUrl: string, iData: string, iOptions: (request: XMLHttpRequest) => void) => {
+export const fetch = (
+  iMethod: string,
+  iUrl: string,
+  iData: string,
+  iOptions: (request: XMLHttpRequest) => void
+) => {
   return new Promise((resolve, reject) => {
     let request = new XMLHttpRequest();
     request.open(iMethod, iUrl, true);
     if (typeof iOptions == "function") iOptions(request);
 
-    request.onload = function() {
+    request.onload = function () {
       if (request.status >= 200 && request.status < 400) {
         var response = request.responseText;
         resolve(response);
       } else reject(request);
     };
-    request.onerror = function() {
+    request.onerror = function () {
       reject(request);
     };
     request.send(iData);

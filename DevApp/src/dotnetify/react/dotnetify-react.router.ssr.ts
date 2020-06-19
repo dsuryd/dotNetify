@@ -34,7 +34,11 @@ export default function enableSsr() {
 
   // Override dotnetify.react.connect for server-side render.
   const connect = dotnetify.react.connect;
-  dotnetify.react.connect = function(iVMId: string, iComponent: any, iOptions: IConnectOptions) {
+  dotnetify.react.connect = function (
+    iVMId: string,
+    iComponent: any,
+    iOptions: IConnectOptions
+  ) {
     const ssrState = getSsrState(iVMId);
     if (ssrState) {
       try {
@@ -50,26 +54,28 @@ export default function enableSsr() {
       const options = {
         ...iOptions,
         getState: () => vmState,
-        setState: (state: any) => (vmState = $.extend(vmState, state)),
+        setState: (state: any) => (vmState = $.extend(vmState, state))
       };
 
-      const vm = (self.viewModels[iVMId] = new DotnetifyVM(iVMId, iComponent, options, self, <IDotnetifyHub>{}));
+      const vm = (self.viewModels[iVMId] = new DotnetifyVM(
+        iVMId,
+        iComponent,
+        options,
+        self,
+        <IDotnetifyHub>{}
+      ));
 
       // Need to be asynch to allow initial state to be processed.
       setTimeout(() => vm.$update(JSON.stringify(vmState)));
       return vm;
     }
 
-    return connect(
-      iVMId,
-      iComponent,
-      iOptions
-    );
+    return connect(iVMId, iComponent, iOptions);
   };
 
   // Override useConnect for server-side render.
   const useConnect = dotnetify.react.useConnect;
-  dotnetify.react.useConnect = function(iVMId, iComponent, iOptions) {
+  dotnetify.react.useConnect = function (iVMId, iComponent, iOptions) {
     const ssrState = getSsrState(iVMId);
     if (ssrState) {
       if (iComponent.state) iComponent.state = ssrState;
@@ -82,14 +88,10 @@ export default function enableSsr() {
       const component = {
         get state() {
           return ssrState;
-        },
+        }
       };
 
-      const vm = dotnetify.react.connect(
-        iVMId,
-        component,
-        iOptions
-      );
+      const vm = dotnetify.react.connect(iVMId, component, iOptions);
       return { vm, state: ssrState };
     }
 
@@ -97,7 +99,12 @@ export default function enableSsr() {
   };
 
   // Called from server to configure server-side rendering.
-  dotnetify.react.router.ssr = function(iCallbackFn, iRequestUrlPath, iInitialState, iTimeout) {
+  dotnetify.react.router.ssr = function (
+    iCallbackFn,
+    iRequestUrlPath,
+    iInitialState,
+    iTimeout
+  ) {
     dotnetify["ssr"] = true;
     dotnetify.react.router.urlPath = iRequestUrlPath;
 
@@ -107,11 +114,20 @@ export default function enableSsr() {
     script.type = "text/javascript";
     script.text = `window['${ssrStatesKey}'] = ${iInitialState};`;
     if (head) head.insertBefore(script, head.firstChild);
-    else console.error("router> document head tag is required for server-side render.");
+    else
+      console.error(
+        "router> document head tag is required for server-side render."
+      );
 
     let routed = false;
-    const callback = () => iCallbackFn(null /*for error*/, `<!DOCTYPE html>${document.documentElement.outerHTML}`);
-    const fallback = iTimeout ? setTimeout(() => !routed && callback(), iTimeout) : 0;
+    const callback = () =>
+      iCallbackFn(
+        null /*for error*/,
+        `<!DOCTYPE html>${document.documentElement.outerHTML}`
+      );
+    const fallback = iTimeout
+      ? setTimeout(() => !routed && callback(), iTimeout)
+      : 0;
 
     // Once routed, do the callback.
     const unsub = dotnetify.react.router.routedEvent.subscribe(() => {
@@ -129,7 +145,9 @@ export default function enableSsr() {
   dotnetify.react.router.getSsrState = getSsrState;
 
   // To initiate SSR, the app needs to set up a callback function in the global window which calls the 'ssr.js' script.
-  if (typeof _window[ssrCallbackKey] == "function") _window[ssrCallbackKey](dotnetify.react.router.ssr);
+  if (typeof _window[ssrCallbackKey] == "function")
+    _window[ssrCallbackKey](dotnetify.react.router.ssr);
 }
 
-dotnetify.react.router.ssr = () => console.error("To run server-side render, call enableSsr().");
+dotnetify.react.router.ssr = () =>
+  console.error("To run server-side render, call enableSsr().");

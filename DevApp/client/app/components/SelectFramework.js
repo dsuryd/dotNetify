@@ -1,11 +1,11 @@
-import styled from 'styled-components';
-import { Element } from 'dotnetify-elements';
-import * as utils from '../utils';
+import styled from "styled-components";
+import { Element } from "dotnetify-elements";
+import * as utils from "../utils";
 
 const Select = styled.select`
   width: calc(100% - 1.5rem);
 
-  margin-left: .75rem;
+  margin-left: 0.75rem;
   margin-top: 1rem;
   font-weight: 500;
   border-color: #92d050;
@@ -16,13 +16,14 @@ const Select = styled.select`
 `;
 
 export const frameworkSelectEvent = utils.createEventEmitter();
-export const getCurrentFramework = () => window.localStorage['framework'] || React;
+export const getCurrentFramework = () =>
+  window.localStorage["framework"] || React;
 export let currentFramework = getCurrentFramework();
 
 frameworkSelectEvent.subscribe(framework => {
   if (framework) {
     currentFramework = framework;
-    window.localStorage['framework'] = currentFramework;
+    window.localStorage["framework"] = currentFramework;
   }
 });
 
@@ -39,7 +40,11 @@ export default class SelectFramework extends Element {
 
   render() {
     return (
-      <Select className="form-control" value={currentFramework} onChange={e => this.handleChange(e.target.value)}>
+      <Select
+        className="form-control"
+        value={currentFramework}
+        onChange={e => this.handleChange(e.target.value)}
+      >
         <option>React</option>
         <option>Vue</option>
         <option>Knockout</option>

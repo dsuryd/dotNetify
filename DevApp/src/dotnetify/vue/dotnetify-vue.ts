@@ -16,7 +16,12 @@ limitations under the License.
 import _dotnetify, { Dotnetify, IDotnetifyImpl } from "../core/dotnetify";
 import dotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyVM from "../core/dotnetify-vm";
-import { IDotnetifyVue, IConnectOptions, IDotnetifyHub, IDotnetifyVM } from "../_typings";
+import {
+  IDotnetifyVue,
+  IConnectOptions,
+  IDotnetifyHub,
+  IDotnetifyVM
+} from "../_typings";
 
 const _window = window || global || <any>{};
 let dotnetify: Dotnetify = _window.dotnetify || _dotnetify;
@@ -37,23 +42,29 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
 
   // Initializes connection to SignalR server hub.
   init(iHub: IDotnetifyHub) {
-    const hubInitialized = this._hubs.some((hub) => hub === iHub);
+    const hubInitialized = this._hubs.some(hub => hub === iHub);
 
     const start = () => {
       if (!iHub.isHubStarted)
         Object.keys(this.viewModels)
-          .filter((vmId) => this.viewModels[vmId].$hub === iHub)
-          .forEach((vmId) => (this.viewModels[vmId].$requested = false));
+          .filter(vmId => this.viewModels[vmId].$hub === iHub)
+          .forEach(vmId => (this.viewModels[vmId].$requested = false));
 
       dotnetify.startHub(iHub);
     };
 
     if (!hubInitialized) {
-      iHub.responseEvent.subscribe((iVMId, iVMData) => this._responseVM(iVMId, iVMData));
+      iHub.responseEvent.subscribe((iVMId, iVMData) =>
+        this._responseVM(iVMId, iVMData)
+      );
       iHub.connectedEvent.subscribe(() =>
         Object.keys(this.viewModels)
-          .filter((vmId) => this.viewModels[vmId].$hub === iHub && !this.viewModels[vmId].$requested)
-          .forEach((vmId) => this.viewModels[vmId].$request())
+          .filter(
+            vmId =>
+              this.viewModels[vmId].$hub === iHub &&
+              !this.viewModels[vmId].$requested
+          )
+          .forEach(vmId => this.viewModels[vmId].$request())
       );
       iHub.reconnectedEvent.subscribe(start);
       this._hubs.push(iHub);
@@ -63,7 +74,11 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
   }
 
   // Connects to a server view model.
-  connect(iVMId: string, iVue: any, iOptions: IVueConnectOptions): IDotnetifyVM {
+  connect(
+    iVMId: string,
+    iVue: any,
+    iOptions: IVueConnectOptions
+  ): IDotnetifyVM {
     if (this.viewModels.hasOwnProperty(iVMId)) {
       console.error(
         `Component is attempting to connect to an already active '${iVMId}'. ` +
@@ -79,10 +94,12 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       },
       get state() {
         const vm = self.viewModels[iVMId];
-        return vm && vm["$useState"] ? { ...iVue.$data, ...iVue.state } : iVue.$data;
+        return vm && vm["$useState"]
+          ? { ...iVue.$data, ...iVue.state }
+          : iVue.$data;
       },
       setState(state: any) {
-        Object.keys(state).forEach((key) => {
+        Object.keys(state).forEach(key => {
           const value = state[key];
 
           // If 'useState' option is enabled, store server state in the Vue instance's 'state' property.
@@ -92,14 +109,27 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
             else if (value) iVue.$set(iVue.state, key, value);
           } else {
             if (iVue.hasOwnProperty(key)) iVue[key] = value;
-            else if (value) console.error(`'${key}' is received, but the Vue instance doesn't declare the property.`);
+            else if (value)
+              console.error(
+                `'${key}' is received, but the Vue instance doesn't declare the property.`
+              );
           }
         });
-      },
+      }
     };
 
-    const connectInfo = dotnetify.selectHub({ vmId: iVMId, options: iOptions, hub: null });
-    this.viewModels[iVMId] = new dotnetifyVM(connectInfo.vmId, component, connectInfo.options, this, connectInfo.hub);
+    const connectInfo = dotnetify.selectHub({
+      vmId: iVMId,
+      options: iOptions,
+      hub: null
+    });
+    this.viewModels[iVMId] = new dotnetifyVM(
+      connectInfo.vmId,
+      component,
+      connectInfo.options,
+      this,
+      connectInfo.hub
+    );
     if (connectInfo.hub) this.init(connectInfo.hub);
 
     if (iOptions) {
@@ -109,11 +139,15 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       // Otherwise, they will be placed in the root data property.
       if (iOptions.useState) {
         if (iVue.hasOwnProperty("state")) vm["$useState"] = true;
-        else console.error(`Option 'useState' requires the 'state' data property on the Vue instance.`);
+        else
+          console.error(
+            `Option 'useState' requires the 'state' data property on the Vue instance.`
+          );
       }
 
       // 'watch' array specifies properties to dispatch to server when the values change.
-      if (Array.isArray(iOptions.watch)) this._addWatchers(iOptions.watch, vm, iVue);
+      if (Array.isArray(iOptions.watch))
+        this._addWatchers(iOptions.watch, vm, iVue);
     }
 
     return this.viewModels[iVMId];
@@ -124,37 +158,39 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
     const obj = {
       vm: null,
       created() {
-        this.vm = dotnetify.vue.connect(
-          iVMId,
-          this,
-          { ...iOptions, useState: true }
-        );
+        this.vm = dotnetify.vue.connect(iVMId, this, {
+          ...iOptions,
+          useState: true
+        });
       },
       destroyed() {
         this.vm.$destroy();
       },
       data() {
         return { state: {} };
-      },
+      }
     };
 
-    if (typeof iComponentOrName == "string") return { name: iComponentOrName, ...obj };
+    if (typeof iComponentOrName == "string")
+      return { name: iComponentOrName, ...obj };
     else return { ...obj, ...iComponentOrName };
   }
 
   // Gets all view models.
   getViewModels(): IDotnetifyVM[] {
     const self = dotnetify.vue;
-    return Object.keys(self.viewModels).map((vmId) => self.viewModels[vmId]);
+    return Object.keys(self.viewModels).map(vmId => self.viewModels[vmId]);
   }
 
   _addWatchers(iWatchlist, iVM: DotnetifyVM, iVue: any) {
     const callback = (prop: string) =>
-      function(newValue: any) {
+      function (newValue: any) {
         iVM.$serverUpdate !== false && iVM.$dispatch({ [prop]: newValue });
       }.bind(iVM);
 
-    iWatchlist.forEach((prop: string) => iVue.$watch(iVM["$useState"] ? `state.${prop}` : prop, callback(prop)));
+    iWatchlist.forEach((prop: string) =>
+      iVue.$watch(iVM["$useState"] ? `state.${prop}` : prop, callback(prop))
+    );
   }
 
   _responseVM(iVMId: string, iVMData: any) {

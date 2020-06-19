@@ -1,10 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import dotnetify from 'dotnetify';
-import App from './app/views/App';
-import './app/styles/app.css';
-import './app/styles/prism.css';
-import * as views from './app/views';
+import React from "react";
+import ReactDOM from "react-dom";
+import dotnetify from "dotnetify";
+import App from "./app/views/App";
+import "./app/styles/app.css";
+import "./app/styles/prism.css";
+import * as views from "./app/views";
 
 //import { enableSsr } from 'dotnetify';
 //enableSsr();
@@ -21,4 +21,4 @@ dotnetify.hubOptions.connectionBuilder = builder => builder.withHubProtocol(prot
 // Import all the routeable views into the global window variable.
 Object.assign(window, { ...views });
 
-ReactDOM.hydrate(<App />, document.getElementById('App'));
+ReactDOM.hydrate(<App />, document.getElementById("App"));

@@ -1,6 +1,6 @@
-import RenderVue from './RenderVue';
-import { SimpleListCss } from '../../components/css';
-import SimpleList from '../SimpleList.vue';
+import RenderVue from "./RenderVue";
+import { SimpleListCss } from "../../components/css";
+import SimpleList from "../SimpleList.vue";
 
 export default _ => (
   <SimpleListCss>
