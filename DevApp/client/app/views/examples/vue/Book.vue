@@ -23,28 +23,33 @@
 </template>
 
 <script>
-import dotnetify from "dotnetify/vue";
+import dotnetify from 'dotnetify/vue';
 
 export default {
-  name: "Book",
+  name: 'Book',
   created() {
-    this.vm = dotnetify.vue.connect("BookDetailsVM", this);
+    this.vm = dotnetify.vue.connect(
+      'BookDetailsVM',
+      this
+    );
   },
   mounted() {
     const self = this;
-    $("#BookDetails").modal();
-    $("#BookDetails").on("hidden.bs.modal", function(e) {
+    $('#BookDetails').modal();
+    $('#BookDetails').on('hidden.bs.modal', function(e) {
       self.vm.$routeTo(self.BookDefaultRoute);
       self.$destroy();
     });
   },
   destroyed() {
+    $('#BookDetails').modal('dispose');
+    $('.modal-backdrop').remove();
     this.vm.$destroy();
   },
   data() {
     return {
       Book: {},
-      SearchTitle: "",
+      SearchTitle: '',
       BookDefaultRoute: null
     };
   }
