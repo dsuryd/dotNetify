@@ -54,14 +54,14 @@ class SimpleList extends React.Component {
                 <td>
                   <InlineEdit
                     text={employee.FirstName}
-                    onChange={value => this.dispatch({ Id: employee.Id, FirstName: value })}
+                    onChange={value => this.dispatch({ Update: { Id: employee.Id, FirstName: value } })}
                   />
                 </td>
                 <td>
                   {" "}
                   <InlineEdit
                     text={employee.LastName}
-                    onChange={value => this.dispatch({ Id: employee.Id, LastName: value })}
+                    onChange={value => this.dispatch({ Update: { Id: employee.Id, LastName: value } })}
                   />
                 </td>
                 <td>
@@ -82,9 +82,9 @@ class SimpleList extends React.Component {
 ##### InlineEdit.js
 
 ```jsx
-import React from "react";
-import styled from "styled-components";
-import TextBox from "./TextBox";
+import React from 'react';
+import styled from 'styled-components';
+import TextBox from './TextBox';
 
 const EditableText = styled.div`
   /* styles */
@@ -98,7 +98,7 @@ class InlineEdit extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.text !== this.props.text) this.setState({ value: this.props.text });
-  }  
+  }
 
   handleBlue = _ => {
     this.setState({ edit: false });
@@ -121,7 +121,7 @@ class InlineEdit extends React.Component {
       return (
         <div>
           <TextBox
-            id="EditField"
+            id='EditField'
             ref={input => input && input.focus()}
             value={this.state.value}
             onClick={this.handleClick}
@@ -142,7 +142,7 @@ export default InlineEdit;
 ##### TextBox.js
 
 ```jsx
-import React, { createRef } from "react";
+import React, { createRef } from 'react';
 
 class TextBox extends React.Component {
   constructor(props) {
@@ -175,8 +175,8 @@ class TextBox extends React.Component {
       <div>
         <label>{this.props.label}</label>
         <input
-          type="text"
-          className="form-control"
+          type='text'
+          className='form-control'
           value={this.props.value}
           placeholder={this.props.placeholder}
           onChange={this.handleChange}
@@ -242,12 +242,12 @@ public class SimpleListVM : MulticastVM
             employee.LastName = employeeInfo.LastName ?? employee.LastName;
             _repository.Update(employee);
 
-            this.UpdateList(nameof(Employees), new EmployeeInfo 
-            { 
-              Id = employee.Id, 
-              FirstName = employee.FirstName, 
-              LastName = employee.LastName 
-            });            
+            this.UpdateList(nameof(Employees), new EmployeeInfo
+            {
+              Id = employee.Id,
+              FirstName = employee.FirstName,
+              LastName = employee.LastName
+            });
         }
     };
 
@@ -260,7 +260,7 @@ public class SimpleListVM : MulticastVM
     };
 
     // Clients from the same IP address will share the same VM instance.
-    public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();    
+    public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();
 
     public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
     {
