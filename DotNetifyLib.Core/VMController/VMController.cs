@@ -19,6 +19,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -210,10 +211,30 @@ namespace DotNetify
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional view model's initialization argument.</param>
       /// <returns>Group name, if the request is for a multicast view model associated with one.</returns>
+      [Obsolete]
       public virtual string OnRequestVM(string connectionId, string vmId, object vmArg = null)
       {
-         // Create a new view model instance whose class name is matching the given VMId.
-         BaseVM vmInstance = !_activeVMs.ContainsKey(vmId) ? CreateVM(vmId, vmArg) : _activeVMs[vmId].Instance;
+         return OnRequestVMAsync(connectionId, vmId, vmArg).ConfigureAwait(false).GetAwaiter().GetResult();
+      }
+
+      /// <summary>
+      /// Handles a request for a view model from a browser client.
+      /// </summary>
+      /// <param name="connectionId">Identifies the client connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmArg">Optional view model's initialization argument.</param>
+      /// <returns>Group name, if the request is for a multicast view model associated with one.</returns>
+      public async virtual Task<string> OnRequestVMAsync(string connectionId, string vmId, object vmArg = null)
+      {
+         BaseVM vmInstance = null;
+         if (_activeVMs.ContainsKey(vmId))
+            vmInstance = _activeVMs[vmId].Instance;
+         else
+         {
+            // Create a new view model instance whose class name is matching the given VMId.
+            vmInstance = CreateVM(vmId, vmArg);
+            await vmInstance.OnCreatedAsync();
+         }
 
          RequestVMFilter.Invoke(vmId, vmInstance, vmArg, data =>
          {
@@ -256,14 +277,26 @@ namespace DotNetify
       /// <param name="connectionId">Identifies the client connection.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="iData">View model update.</param>
-      public virtual void OnUpdateVM(string connectionId, string vmId, Dictionary<string, object> data)
+      [Obsolete]
+      public void OnUpdateVM(string connectionId, string vmId, Dictionary<string, object> data)
+      {
+         _ = OnUpdateVMAsync(connectionId, vmId, data);
+      }
+
+      /// <summary>
+      /// Handles view model update from a browser client.
+      /// </summary>
+      /// <param name="connectionId">Identifies the client connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="iData">View model update.</param>
+      public async Task OnUpdateVMAsync(string connectionId, string vmId, Dictionary<string, object> data)
       {
          bool isRecreated = false;
          if (!_activeVMs.ContainsKey(vmId))
          {
             // No view model found; it must have expired and needs to be recreated.
             isRecreated = true;
-            OnRequestVM(connectionId, vmId);
+            await OnRequestVMAsync(connectionId, vmId);
             if (!_activeVMs.ContainsKey(vmId))
                return;
          }
@@ -271,13 +304,32 @@ namespace DotNetify
          // Update the new values from the client to the server view model.
          var vmInstance = _activeVMs[vmId].Instance;
 
+         var taskCompletionSource = new TaskCompletionSource<Task>();
+
          // Invoke the interception delegate.
-         UpdateVMFilter.Invoke(vmId, vmInstance, data, filteredData =>
+         UpdateVMFilter.Invoke(vmId, vmInstance, data, async filteredData =>
          {
-            lock (vmInstance)
+            try
             {
-               foreach (var kvp in filteredData as Dictionary<string, object>)
-                  UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
+               lock (vmInstance)
+               {
+                  foreach (var kvp in filteredData as Dictionary<string, object>)
+                     UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
+               }
+
+               /// Await for any asynchronous command executed during deserialization.
+               if (vmInstance.AsyncCommands.Count > 0)
+                  await Task.WhenAll(vmInstance.AsyncCommands);
+
+               lock (vmInstance)
+               {
+                  vmInstance.AsyncCommands.Clear();
+               }
+            }
+            catch (Exception ex)
+            {
+               taskCompletionSource.TrySetResult(Task.FromException(ex is TargetInvocationException ? ex.InnerException : ex));
+               return;
             }
 
             // If the updates cause some properties of this and other view models to change, push those new values back to the client.
@@ -309,7 +361,13 @@ namespace DotNetify
             // Push updates on other view model instances in case they too change.
             foreach (var vmInfo in _activeVMs.Values.Where(vm => vm.Instance != vmInstance))
                PushUpdates(vmInfo);
+
+            taskCompletionSource.TrySetResult(Task.CompletedTask);
          });
+
+         var task = await taskCompletionSource.Task;
+         if (task.Exception != null)
+            throw task.Exception is AggregateException ? task.Exception.InnerException : task.Exception;
       }
 
       /// <summary>

@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetify;
 using DotNetify.DevApp;
@@ -11,10 +12,7 @@ using DotNetify.Security;
 using DotNetify.Testing;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Text.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections;
-using System.Linq;
 
 namespace UnitTests
 {
@@ -141,9 +139,36 @@ namespace UnitTests
             { "Refresh", "true" }
          });
 
-         client.Listen(1000);
+         client.Listen(2000);
          state = client.GetState<ClientState>();
          Assert.AreEqual("Authenticated user: \"bob\"", state.SecureCaption);
+      }
+
+      [TestMethod]
+      public void ExampleSecurePage_Connect_Multiple_ReturnsCorrectUser()
+      {
+         var expireSeconds = 5;
+
+         var client1 = _hubEmulator.CreateClient();
+         var client2 = _hubEmulator.CreateClient();
+
+         var options1 = new VMConnectOptions();
+         options1.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
+
+         var options2 = new VMConnectOptions();
+         options2.Headers.Set("Authorization", "Bearer " + CreateBearerToken("bob", "admin", expireSeconds));
+
+         client1.Connect(nameof(SecurePageVM), options1);
+         client2.Connect(nameof(SecurePageVM), options2);
+
+         client1.Listen(1000);
+         client2.Listen(1000);
+
+         var state1 = client1.GetState<ClientState>();
+         var state2 = client2.GetState<ClientState>();
+
+         Assert.AreEqual("Authenticated user: \"john\"", state1.SecureCaption);
+         Assert.AreEqual("Authenticated user: \"bob\"", state2.SecureCaption);
       }
 
       [TestMethod]

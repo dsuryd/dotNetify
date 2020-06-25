@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2017 Dicky Suryadi
+Copyright 2017-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -133,12 +134,23 @@ namespace DotNetify
                   // If the property type is ICommand, execute the command.
                   (propInfo.GetValue(viewModel) as ICommand)?.Execute(newValue);
                }
-               else if (propType.IsSubclassOf(typeof(MulticastDelegate)) && propType.GetMethod(nameof(Action.Invoke)).ReturnType == typeof(void))
+               else if (propType.IsSubclassOf(typeof(MulticastDelegate)))
                {
-                  // If the property type is Action, wrap the action in a Command object and execute it.
+                  // If the property type is a delegate, wrap the action in a Command object and execute it.
                   var argTypes = propType.GetGenericArguments();
-                  var cmdType = argTypes.Length > 0 ? typeof(Command<>).MakeGenericType(argTypes) : typeof(Command);
-                  (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommand)?.Execute(newValue);
+                  Type delegateReturnType = propType.GetMethod(nameof(Action.Invoke)).ReturnType;
+                  if (delegateReturnType == typeof(void))
+                  {
+                     var cmdType = argTypes.Length > 0 ? typeof(Command<>).MakeGenericType(argTypes) : typeof(Command);
+                     (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommand)?.Execute(newValue);
+                  }
+                  else if (delegateReturnType == typeof(Task))
+                  {
+                     var cmdType = argTypes.Length > 1 ? typeof(Command<>).MakeGenericType(argTypes[0]) : typeof(Command);
+                     var task = (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommandAsync)?.ExecuteAsync(newValue);
+                     if (viewModel is BaseVM)
+                        (viewModel as BaseVM).AsyncCommands.Add(task);
+                  }
                }
                else if (typeof(IReactiveProperty).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType))
                {

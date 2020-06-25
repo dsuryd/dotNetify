@@ -17,18 +17,27 @@ limitations under the License.
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Newtonsoft.Json;
 
 namespace DotNetify
 {
    /// <summary>
+   /// Defines a command that needs to execute asynchronously.
+   /// </summary>
+   public interface ICommandAsync
+   {
+      Task ExecuteAsync(object parameter);
+   }
+
+   /// <summary>
    /// Basic implementation of ICommand.
    /// </summary>
    public class Command : ICommand
    {
-      private Action _executeAction;
-      private Func<object, bool> _canExecuteAction;
+      private readonly Action _executeAction;
+      private readonly Func<object, bool> _canExecuteAction;
 
       /// <summary>
       /// Not implemented.
@@ -76,10 +85,11 @@ namespace DotNetify
    /// Basic implementation of ICommand that accepts parameter.
    /// </summary>
    /// <typeparam name="T">Parameter type.</typeparam>
-   public class Command<T> : ICommand
+   public class Command<T> : ICommand, ICommandAsync
    {
-      private Action<T> _executeAction;
-      private Func<object, bool> _canExecuteAction;
+      private readonly Action<T> _executeAction;
+      private readonly Func<T, Task> _executeAsyncAction;
+      private readonly Func<object, bool> _canExecuteAction;
 
       /// <summary>
       /// Not implemented.
@@ -100,20 +110,16 @@ namespace DotNetify
       /// <param name="parameter">command parameter.</param>
       public void Execute(object parameter)
       {
-         // Convert the parameter to the expected type.
-         if (parameter != null)
-         {
-            if (typeof(T).GetTypeInfo().IsClass && typeof(T) != typeof(string))
-               parameter = JsonConvert.DeserializeObject<T>(parameter.ToString());
-            else
-            {
-               var typeConverter = TypeDescriptor.GetConverter(typeof(T));
-               if (typeConverter != null)
-                  parameter = typeConverter.ConvertFromString(parameter.ToString());
-            }
-         }
+         _executeAction?.Invoke(ConvertParameter(parameter));
+      }
 
-         _executeAction?.Invoke((T)parameter);
+      /// <summary>
+      /// Executes asynchronous command.
+      /// </summary>
+      /// <param name="parameter">command parameter.</param>
+      public Task ExecuteAsync(object parameter)
+      {
+         return _executeAsyncAction?.Invoke(ConvertParameter(parameter));
       }
 
       /// <summary>
@@ -125,6 +131,11 @@ namespace DotNetify
          _executeAction = executeAction;
       }
 
+      public Command(Func<T, Task> executeAsyncAction)
+      {
+         _executeAsyncAction = executeAsyncAction;
+      }
+
       /// <summary>
       /// Constructor.
       /// </summary>
@@ -133,6 +144,26 @@ namespace DotNetify
       public Command(Action<T> executeAction, Func<object, bool> canExecuteAction) : this(executeAction)
       {
          _canExecuteAction = canExecuteAction;
+      }
+
+      /// <summary>
+      /// Convert the parameter to the expected type.
+      /// </summary>
+      /// <param name="parameter">Parameter to convert.</param>
+      private T ConvertParameter(object parameter)
+      {
+         if (parameter != null)
+         {
+            if (typeof(T).GetTypeInfo().IsClass && typeof(T) != typeof(string))
+               parameter = JsonConvert.DeserializeObject<T>(parameter.ToString());
+            else
+            {
+               var typeConverter = TypeDescriptor.GetConverter(typeof(T));
+               if (typeConverter != null)
+                  parameter = typeConverter.ConvertFromString(parameter.ToString());
+            }
+         }
+         return (T) parameter;
       }
    }
 }

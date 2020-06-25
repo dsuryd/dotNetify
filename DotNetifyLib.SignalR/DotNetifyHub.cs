@@ -122,25 +122,39 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
-      public void Request_VM(string vmId, object vmArg)
+      [HubMethodName(nameof(Request_VM))]
+      public async Task RequestVMAsync(string vmId, object vmArg)
       {
          object data = NormalizeType(vmArg);
 
          try
          {
+            var taskCompletionSource = new TaskCompletionSource<Task>();
+
             _callerContext = Context;
             _hubContext = new DotNetifyHubContext(_callerContext, nameof(Request_VM), vmId, data, null, Principal);
-            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
+            _hubPipeline.RunMiddlewares(_hubContext, async ctx =>
             {
-               Principal = ctx.Principal;
-               string groupName = VMController.OnRequestVM(Context.ConnectionId, ctx.VMId, ctx.Data);
+               try
+               {
+                  Principal = ctx.Principal;
+                  string groupName = await VMController.OnRequestVMAsync(Context.ConnectionId, ctx.VMId, ctx.Data);
 
-               // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
-               if (!string.IsNullOrEmpty(groupName))
-                  _globalHubContext.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+                  // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
+                  if (!string.IsNullOrEmpty(groupName))
+                     await _globalHubContext.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-               return Task.CompletedTask;
+                  taskCompletionSource.TrySetResult(Task.CompletedTask);
+               }
+               catch (Exception ex)
+               {
+                  taskCompletionSource.TrySetResult(Task.FromException(ex));
+               }
             });
+
+            var task = await taskCompletionSource.Task;
+            if (task.Exception != null)
+               throw task.Exception is AggregateException ? task.Exception.InnerException : task.Exception;
          }
          catch (Exception ex)
          {
@@ -149,26 +163,45 @@ namespace DotNetify
                Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
+
+      [Obsolete]
+      [HubMethodName("Request_VM_Obsolete")]
+      public void Request_VM(string vmId, object vmArg) => _ = RequestVMAsync(vmId, vmArg);
 
       /// <summary>
       /// This method is called by browser clients to update a view model's value.
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
-      public void Update_VM(string vmId, Dictionary<string, object> vmData)
+      [HubMethodName(nameof(Update_VM))]
+      public async Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData)
       {
          var data = vmData?.ToDictionary(x => x.Key, x => NormalizeType(x.Value));
 
          try
          {
+            var taskCompletionSource = new TaskCompletionSource<Task>();
+
             _callerContext = Context;
             _hubContext = new DotNetifyHubContext(_callerContext, nameof(Update_VM), vmId, data, null, Principal);
-            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
+            _hubPipeline.RunMiddlewares(_hubContext, async ctx =>
             {
-               Principal = ctx.Principal;
-               VMController.OnUpdateVM(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
-               return Task.CompletedTask;
+               try
+               {
+                  Principal = ctx.Principal;
+                  await VMController.OnUpdateVMAsync(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
+
+                  taskCompletionSource.TrySetResult(Task.CompletedTask);
+               }
+               catch (Exception ex)
+               {
+                  taskCompletionSource.TrySetResult(Task.FromException(ex));
+               }
             });
+
+            var task = await taskCompletionSource.Task;
+            if (task.Exception != null)
+               throw task.Exception is AggregateException ? task.Exception.InnerException : task.Exception;
          }
          catch (Exception ex)
          {
@@ -177,6 +210,10 @@ namespace DotNetify
                Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
+
+      [Obsolete]
+      [HubMethodName("Update_VM_Obsolete")]
+      public void Update_VM(string vmId, Dictionary<string, object> vmData) => _ = UpdateVMAsync(vmId, vmData);
 
       /// <summary>
       /// This method is called by browser clients to remove its view model as it's no longer used.

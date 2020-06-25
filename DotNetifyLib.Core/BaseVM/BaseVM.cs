@@ -18,11 +18,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace DotNetify
@@ -56,6 +56,8 @@ namespace DotNetify
       private static readonly VMSerializer _vmSerializer = new VMSerializer();
       protected ISerializer _serializer = _vmSerializer;
       protected IDeserializer _deserializer = _vmSerializer;
+
+      internal List<Task> AsyncCommands { get; } = new List<Task>();
 
       /// <summary>
       /// Occurs when the view model wants to push updates to the client.
@@ -248,7 +250,7 @@ namespace DotNetify
       /// </summary>
       /// <typeparam name="T">Property type.</typeparam>
       /// <param name="expression">Expression containing property name, to avoid hardcoding it.</param>
-      public void Ignore<T>(Expression<Func<T>> expression) => Ignore(((MemberExpression)expression.Body).Member.Name);
+      public void Ignore<T>(Expression<Func<T>> expression) => Ignore(((MemberExpression) expression.Body).Member.Name);
 
       /// <summary>
       /// Prevent a property from being bound.
@@ -259,6 +261,13 @@ namespace DotNetify
          if (!IgnoredProperties.Contains(propertyName))
             IgnoredProperties.Add(propertyName);
       }
+
+      /// <summary>
+      /// Override this method to perform asynchronous initialization of properties after the view model
+      /// instance is created but before it is sent to the requesting client.
+      /// </summary>
+      /// <returns></returns>
+      public virtual Task OnCreatedAsync() => Task.CompletedTask;
 
       /// <summary>
       /// Override this method to access new instances of subordinates view models as soon as they're created.

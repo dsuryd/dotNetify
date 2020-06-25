@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2016 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -89,7 +89,7 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overrides this method to prevent serialization of ICommand or Action property type.
+      /// Overrides this method to prevent serialization of ICommand or delegate property type.
       /// </summary>
       protected override JsonConverter ResolveContractConverter(Type objectType)
       {
@@ -100,7 +100,7 @@ namespace DotNetify
          else
          {
             var typeInfo = objectType.GetTypeInfo();
-            if (typeInfo.IsSubclassOf(typeof(MulticastDelegate)) && typeInfo.GetMethod(nameof(Action.Invoke)).ReturnType == typeof(void))
+            if (typeInfo.IsSubclassOf(typeof(MulticastDelegate)))
                return new CommandConverter();
          }
          return base.ResolveContractConverter(objectType);

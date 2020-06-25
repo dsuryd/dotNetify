@@ -89,18 +89,30 @@ namespace DotNetify.WebApi
 
          try
          {
+            var requestTaskCompletionSource = new TaskCompletionSource<Task>();
+
             var hubContext = new DotNetifyHubContext(httpCallerContext, nameof(Request_VM), vmId, vmArg, BuildHeaders(), httpCallerContext.User);
             vmController.RequestVMFilter = CreateVMFilter(hubContext, hubPipeline);
 
             hubPipeline.RunMiddlewares(hubContext, ctx =>
             {
-               vmController.OnRequestVM(connectionId, ctx.VMId, ctx.Data);
-               vmController.Dispose();
+               async Task requestVM()
+               {
+                  await vmController.OnRequestVMAsync(connectionId, ctx.VMId, ctx.Data);
+                  vmController.Dispose();
+               }
+
+               requestTaskCompletionSource.SetResult(requestVM());
                return Task.CompletedTask;
             });
+
+            var task = await requestTaskCompletionSource.Task;
+            if (task.Exception != null)
+               throw task.Exception;
          }
          catch (Exception ex)
          {
+            ex = ex is AggregateException ? ex.InnerException : ex;
             var finalEx = hubPipeline.RunExceptionMiddleware(httpCallerContext, ex);
             if (finalEx is OperationCanceledException == false)
                taskCompletionSource.TrySetResult(DotNetifyHub.SerializeException(finalEx));
@@ -145,17 +157,32 @@ namespace DotNetify.WebApi
 
          try
          {
+            var requestTaskCompletionSource = new TaskCompletionSource<Task>();
+
             var hubContext = new DotNetifyHubContext(httpCallerContext, nameof(Request_VM), vmId, vmArg, BuildHeaders(), httpCallerContext.User);
             vmController.RequestVMFilter = CreateVMFilter(hubContext, hubPipeline);
 
-            hubPipeline.RunMiddlewares(hubContext, ctx =>
+            hubPipeline.RunMiddlewares(hubContext, async ctx =>
             {
-               vmController.OnRequestVM(connectionId, ctx.VMId, ctx.Data);
-               return Task.CompletedTask;
+               try
+               {
+                  await vmController.OnRequestVMAsync(connectionId, ctx.VMId, ctx.Data);
+
+                  requestTaskCompletionSource.TrySetResult(Task.CompletedTask);
+               }
+               catch (Exception ex)
+               {
+                  requestTaskCompletionSource.TrySetResult(Task.FromException(ex));
+               }
             });
+
+            var task = await requestTaskCompletionSource.Task;
+            if (task.Exception != null)
+               throw task.Exception;
          }
          catch (Exception ex)
          {
+            ex = ex is AggregateException ? ex.InnerException : ex;
             var finalEx = hubPipeline.RunExceptionMiddleware(httpCallerContext, ex);
             if (finalEx is OperationCanceledException == false)
                taskCompletionSource1.TrySetResult(DotNetifyHub.SerializeException(finalEx));
@@ -165,18 +192,33 @@ namespace DotNetify.WebApi
 
          try
          {
+            var updateTaskCompletionSource = new TaskCompletionSource<Task>();
+
             var hubContext = new DotNetifyHubContext(httpCallerContext, nameof(Update_VM), vmId, vmData, BuildHeaders(), httpCallerContext.User);
             vmController.UpdateVMFilter = CreateVMFilter(hubContext, hubPipeline);
 
-            hubPipeline.RunMiddlewares(hubContext, ctx =>
+            hubPipeline.RunMiddlewares(hubContext, async ctx =>
             {
-               vmController.OnUpdateVM(connectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
-               vmController.Dispose();
-               return Task.CompletedTask;
+               try
+               {
+                  await vmController.OnUpdateVMAsync(connectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
+                  vmController.Dispose();
+
+                  updateTaskCompletionSource.TrySetResult(Task.CompletedTask);
+               }
+               catch (Exception ex)
+               {
+                  updateTaskCompletionSource.TrySetResult(Task.FromException(ex));
+               }
             });
+
+            var task = await updateTaskCompletionSource.Task;
+            if (task.Exception != null)
+               throw task.Exception;
          }
          catch (Exception ex)
          {
+            ex = ex is AggregateException ? ex.InnerException : ex;
             var finalEx = hubPipeline.RunExceptionMiddleware(httpCallerContext, ex);
             if (finalEx is OperationCanceledException == false)
                taskCompletionSource2.TrySetResult(DotNetifyHub.SerializeException(finalEx));

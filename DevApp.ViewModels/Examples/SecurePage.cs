@@ -51,16 +51,22 @@ namespace DotNetify.DevApp
 
       public void SetAccessToken(SecurityToken accessToken)
       {
-         _accessToken = accessToken;
-         SecureCaption = $"Authenticated user: \"{_principalAccessor.Principal?.Identity.Name}\"";
-         Changed(nameof(SecureCaption));
-
-         _timer = _timer ?? new Timer(state =>
+         if (_accessToken?.ValidTo != accessToken.ValidTo)
          {
-            SecureData = _accessToken != null ? $"Access token will expire in {AccessExpireTime} seconds" : null;
-            Changed(nameof(SecureData));
-            PushUpdates();
-         }, null, 0, 1000);
+            _accessToken = accessToken;
+            SecureCaption = $"Authenticated user: \"{_principalAccessor.Principal?.Identity.Name}\"";
+            Changed(nameof(SecureCaption));
+
+            // IMPORTANT: Create new timer if access token changes to make sure the timer thread uses
+            // the new hub caller context with the updated claims principal from the new token.
+            _timer?.Dispose();
+            _timer = new Timer(state =>
+            {
+               SecureData = _accessToken != null ? $"Access token will expire in {AccessExpireTime} seconds" : null;
+               Changed(nameof(SecureData));
+               PushUpdates();
+            }, null, 0, 1000);
+         }
       }
    }
 

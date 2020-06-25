@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DotNetify;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -78,10 +79,10 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void VMController_OnRequestVM()
+      public async Task VMController_OnRequestVM()
       {
          var vmController = new VMController(TestResponse, _vmFactory);
-         vmController.OnRequestVM("conn1", typeof(UnitTestVM).Name);
+         await vmController.OnRequestVMAsync("conn1", typeof(UnitTestVM).Name);
 
          Assert.AreEqual("conn1", _connectionId);
          Assert.AreEqual(typeof(UnitTestVM).Name, _vmId);
@@ -96,19 +97,19 @@ namespace UnitTests
       }
 
       [TestMethod]
-      public void VMController_OnUpdateVM()
+      public async Task VMController_OnUpdateVM()
       {
          var vmController = new VMController(TestResponse, _vmFactory);
-         vmController.OnRequestVM("conn1", typeof(UnitTestVM).Name);
+         await vmController.OnRequestVMAsync("conn1", typeof(UnitTestVM).Name);
 
-         vmController.OnUpdateVM("conn1", typeof(UnitTestVM).Name, new Dictionary<string, object>() { { "LastName", "Doe" }, { "Age", 42 } });
+         await vmController.OnUpdateVMAsync("conn1", typeof(UnitTestVM).Name, new Dictionary<string, object>() { { "LastName", "Doe" }, { "Age", 42 } });
 
          Assert.AreEqual("conn1", _connectionId);
          Assert.AreEqual(typeof(UnitTestVM).Name, _vmId);
          var vmData = (JObject) JsonConvert.DeserializeObject(_vmData);
          Assert.AreEqual("John Doe", vmData["FullName"]);
 
-         vmController.OnRequestVM("conn1", typeof(UnitTestVM).Name);
+         await vmController.OnRequestVMAsync("conn1", typeof(UnitTestVM).Name);
          Assert.AreEqual("conn1", _connectionId);
          Assert.AreEqual(typeof(UnitTestVM).Name, _vmId);
          vmData = (JObject) JsonConvert.DeserializeObject(_vmData);
