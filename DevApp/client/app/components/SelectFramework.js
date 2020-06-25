@@ -17,7 +17,7 @@ const Select = styled.select`
 
 export const frameworkSelectEvent = utils.createEventEmitter();
 export const getCurrentFramework = () =>
-  window.localStorage["framework"] || React;
+  window.localStorage["framework"] || "React";
 export let currentFramework = getCurrentFramework();
 
 frameworkSelectEvent.subscribe(framework => {
