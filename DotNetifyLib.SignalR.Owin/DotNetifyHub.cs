@@ -24,6 +24,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DotNetify.Security;
 using System.Linq;
+using static DotNetify.VMController;
 
 namespace DotNetify
 {
@@ -203,7 +204,7 @@ namespace DotNetify
       /// <param name="connectionId">Identifies the browser client making prior request.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data in serialized JSON.</param>
-      internal void Response_VM(string connectionId, string vmId, string vmData)
+      internal Task Response_VM(string connectionId, string vmId, string vmData)
       {
          if (connectionId.StartsWith(VMController.MULTICAST))
             HandleMulticastMessage(connectionId, vmId, vmData);
@@ -212,6 +213,8 @@ namespace DotNetify
             if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
                Clients.Client(connectionId).Response_VM(vmId, vmData);
          }
+
+         return Task.CompletedTask;
       }
 
       /// <summary>
@@ -284,7 +287,7 @@ namespace DotNetify
       /// <param name="vm">View model instance.</param>
       /// <param name="data">View model data.</param>
       /// <param name="vmArg">Optional view model argument.</param>
-      private void RunVMFilters(BaseVM vm, object data, Action<object> vmAction)
+      private Task RunVMFilters(BaseVM vm, object data, VMActionDelegate vmAction)
       {
          try
          {
@@ -292,29 +295,30 @@ namespace DotNetify
             _hubPipeline.RunVMFilters(_hubContext, vm, ctx =>
             {
                vmAction(ctx.HubContext.Data);
-               return Task.FromResult(0);
+               return Task.CompletedTask;
             });
          }
          catch (TargetInvocationException ex)
          {
             throw ex.InnerException;
          }
+         return Task.CompletedTask;
       }
 
       /// <summary>
       /// Runs the filter before the view model is requested.
       /// </summary>
-      private void RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => RunVMFilters(vm, vmArg, vmAction);
+      private Task RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, VMActionDelegate vmAction) => RunVMFilters(vm, vmArg, vmAction);
 
       /// <summary>
       /// Runs the filter before the view model is updated.
       /// </summary>
-      private void RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction) => RunVMFilters(vm, vmData, vmAction);
+      private Task RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => RunVMFilters(vm, vmData, vmAction);
 
       /// <summary>
       /// Runs the filter before the view model respond to something.
       /// </summary>
-      private void RunRespondingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction)
+      private Task RunRespondingVMFilters(string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction)
       {
          try
          {
@@ -323,7 +327,7 @@ namespace DotNetify
             {
                Principal = ctx.Principal;
                RunVMFilters(vm, ctx.Data, vmAction);
-               return Task.FromResult(0);
+               return Task.CompletedTask;
             });
          }
          catch (Exception ex)
@@ -332,6 +336,8 @@ namespace DotNetify
             if (finalEx is OperationCanceledException == false)
                Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
+
+         return Task.CompletedTask;
       }
 
       /// <summary>

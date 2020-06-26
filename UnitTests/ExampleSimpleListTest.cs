@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DotNetify.DevApp;
 using DotNetify.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,15 +35,33 @@ namespace UnitTests
          };
 
          var employeeRepositoryStub = Stubber.Create<IEmployeeRepository>()
-            .Setup(x => x.GetAll(It.IsAny<int>())).Returns(_mockData)
-            .Setup(x => x.Get(It.IsAny<int>())).Returns((int id) => _mockData.FirstOrDefault(x => x.Id == id))
-            .Setup(x => x.Update(It.IsAny<Employee>())).Calls((Employee update) =>
+            .Setup(x => x.GetAllAsync(It.IsAny<int>())).Returns(async () =>
             {
+               await Task.Delay(10);
+               return _mockData.AsEnumerable();
+            })
+            .Setup(x => x.GetAsync(It.IsAny<int>())).Returns(async (int id) =>
+            {
+               await Task.Delay(10);
+               return _mockData.FirstOrDefault(x => x.Id == id);
+            })
+            .Setup(x => x.AddAsync(It.IsAny<Employee>())).Returns(async () =>
+            {
+               await Task.Delay(10);
+               return 3;
+            })
+            .Setup(x => x.UpdateAsync(It.IsAny<Employee>())).Returns(async (Employee update) =>
+            {
+               await Task.Delay(10);
                var data = _mockData.First(x => x.Id == update.Id);
                data.FirstName = update.FirstName;
                data.LastName = update.LastName;
             })
-            .Setup(x => x.Remove(It.IsAny<int>())).Calls((int id) => _mockData.Remove(_mockData.First(x => x.Id == id)))
+            .Setup(x => x.RemoveAsync(It.IsAny<int>())).Returns(async (int id) =>
+            {
+               await Task.Delay(10);
+               _mockData.Remove(_mockData.First(x => x.Id == id));
+            })
             .Object;
 
          _hubEmulator = new HubEmulatorBuilder()

@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace DotNetify.Routing
@@ -31,7 +32,7 @@ namespace DotNetify.Routing
 
          try
          {
-            using (var vmController = new VMController((arg1, arg2, arg3) => { }, vmFactory))
+            using (var vmController = new VMController((arg1, arg2, arg3) => Task.CompletedTask, vmFactory))
             {
                // Traverse the routing path to get initial states of all the view models involved.
                var vmStates = new List<string>();

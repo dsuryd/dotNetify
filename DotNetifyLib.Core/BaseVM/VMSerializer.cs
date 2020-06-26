@@ -147,7 +147,7 @@ namespace DotNetify
                   else if (delegateReturnType == typeof(Task))
                   {
                      var cmdType = argTypes.Length > 1 ? typeof(Command<>).MakeGenericType(argTypes[0]) : typeof(Command);
-                     var task = (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommandAsync)?.ExecuteAsync(newValue);
+                     var task = (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as IAsyncCommand)?.ExecuteAsync(newValue);
                      if (viewModel is BaseVM)
                         (viewModel as BaseVM).AsyncCommands.Add(task);
                   }

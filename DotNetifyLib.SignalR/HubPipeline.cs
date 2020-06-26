@@ -1,5 +1,5 @@
-﻿/* 
-Copyright 2016-2017 Dicky Suryadi
+﻿/*
+Copyright 2016-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,11 +31,19 @@ namespace DotNetify
    {
       void RunMiddlewares(DotNetifyHubContext hubContext, NextDelegate finalAction);
 
+      Task RunMiddlewaresAsync(DotNetifyHubContext hubContext, NextDelegate finalAction);
+
       void RunDisconnectionMiddlewares(HubCallerContext context);
+
+      Task RunDisconnectionMiddlewaresAsync(HubCallerContext context);
 
       void RunVMFilters(DotNetifyHubContext hubContext, BaseVM vm, NextFilterDelegate finalFilter);
 
+      Task RunVMFiltersAsync(DotNetifyHubContext hubContext, BaseVM vm, NextFilterDelegate finalFilter);
+
       Exception RunExceptionMiddleware(HubCallerContext context, Exception exception);
+
+      Task<Exception> RunExceptionMiddlewareAsync(HubCallerContext context, Exception exception);
    }
 
    public class HubPipeline : IHubPipeline
@@ -67,7 +75,18 @@ namespace DotNetify
       /// </summary>
       /// <param name="hubContext">Hub context.</param>
       /// <param name="finalAction">The last action to do after running all the middlewares.</param>
+      [Obsolete]
       public void RunMiddlewares(DotNetifyHubContext hubContext, NextDelegate finalAction)
+      {
+         _ = RunMiddlewaresAsync(hubContext, finalAction);
+      }
+
+      /// <summary>
+      /// Run the middlewares on the data.
+      /// </summary>
+      /// <param name="hubContext">Hub context.</param>
+      /// <param name="finalAction">The last action to do after running all the middlewares.</param>
+      public async Task RunMiddlewaresAsync(DotNetifyHubContext hubContext, NextDelegate finalAction)
       {
          var nextMiddlewares = new Stack<NextDelegate>();
          nextMiddlewares.Push(finalAction);
@@ -75,18 +94,29 @@ namespace DotNetify
             nextMiddlewares.Push(ctx => middleware.Invoke(ctx, nextMiddlewares.Pop()));
 
          if (nextMiddlewares.Count > 0)
-            nextMiddlewares.Pop()(hubContext);
+            await nextMiddlewares.Pop()(hubContext);
       }
 
       /// <summary>
       /// Runs the middlewares that hook to client disconnected event.
       /// </summary>
       /// <param name="context">SignalR hub context.</param>
+      [Obsolete]
       public void RunDisconnectionMiddlewares(HubCallerContext context)
+      {
+         _ = RunDisconnectionMiddlewaresAsync(context);
+      }
+
+      /// <summary>
+      /// Runs the middlewares that hook to client disconnected event.
+      /// </summary>
+      /// <param name="context">SignalR hub context.</param>
+      public async Task RunDisconnectionMiddlewaresAsync(HubCallerContext context)
       {
          try
          {
-            GetMiddlewares<IDisconnectionMiddleware>().ToList().ForEach(middleware => (middleware as IDisconnectionMiddleware).OnDisconnected(context));
+            foreach (IDisconnectionMiddleware middleware in GetMiddlewares<IDisconnectionMiddleware>())
+               await middleware.OnDisconnected(context);
          }
          catch (Exception ex)
          {
@@ -98,13 +128,23 @@ namespace DotNetify
       /// Runs the middlewares that hook to exception thrown event.
       /// </summary>
       /// <param name="context">SignalR hub context.</param>
+      [Obsolete]
       public Exception RunExceptionMiddleware(HubCallerContext context, Exception exception)
+      {
+         return RunExceptionMiddlewareAsync(context, exception).ConfigureAwait(true).GetAwaiter().GetResult();
+      }
+
+      /// <summary>
+      /// Runs the middlewares that hook to exception thrown event.
+      /// </summary>
+      /// <param name="context">SignalR hub context.</param>
+      public async Task<Exception> RunExceptionMiddlewareAsync(HubCallerContext context, Exception exception)
       {
          Exception finalException = exception;
          try
          {
             foreach (IExceptionMiddleware middleware in GetMiddlewares<IExceptionMiddleware>())
-               finalException = middleware.OnException(context, finalException).Result;
+               finalException = await middleware.OnException(context, finalException);
          }
          catch (Exception ex)
          {
@@ -118,7 +158,18 @@ namespace DotNetify
       /// </summary>
       /// <param name="hubContext">Hub context.</param>
       /// <param name="vm">View model instance.</param>
+      [Obsolete]
       public void RunVMFilters(DotNetifyHubContext hubContext, BaseVM vm, NextFilterDelegate finalFilter)
+      {
+         _ = RunVMFiltersAsync(hubContext, vm, finalFilter);
+      }
+
+      /// <summary>
+      /// Runs the view model filter.
+      /// </summary>
+      /// <param name="hubContext">Hub context.</param>
+      /// <param name="vm">View model instance.</param>
+      public async Task RunVMFiltersAsync(DotNetifyHubContext hubContext, BaseVM vm, NextFilterDelegate finalFilter)
       {
          var nextFilters = new Stack<NextFilterDelegate>();
          nextFilters.Push(finalFilter);
@@ -132,13 +183,13 @@ namespace DotNetify
                var vmFilter = _vmFilterFactories.FirstOrDefault(kvp => vmFilterType.GetTypeInfo().IsAssignableFrom(kvp.Key)).Value();
                var vmFilterInvokeMethod = vmFilterType.GetTypeInfo().GetMethod(nameof(IVMFilter<Attribute>.Invoke));
                if (vmFilterInvokeMethod != null)
-                  nextFilters.Push(ctx => (Task)vmFilterInvokeMethod.Invoke(vmFilter, new object[] { attr, ctx, nextFilters.Pop() }));
+                  nextFilters.Push(ctx => (Task) vmFilterInvokeMethod.Invoke(vmFilter, new object[] { attr, ctx, nextFilters.Pop() }));
             }
          }
 
          var vmContext = new VMContext(hubContext, vm);
          if (nextFilters.Count > 0)
-            nextFilters.Pop()(vmContext);
+            await nextFilters.Pop()(vmContext);
       }
    }
 }

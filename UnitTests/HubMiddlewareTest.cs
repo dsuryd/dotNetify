@@ -82,6 +82,14 @@ namespace UnitTests
          }
       }
 
+      private class RequestStoppedMiddleware : IMiddleware
+      {
+         public Task Invoke(DotNetifyHubContext context, NextDelegate next)
+         {
+            return Task.CompletedTask;
+         }
+      }
+
       private TokenValidationParameters _tokenValidationParameters;
       private VMConnectOptions _vmConnectOptions;
 
@@ -320,6 +328,20 @@ namespace UnitTests
 
          var response = client.Dispatch(new Dictionary<string, object> { { "TriggerProperty", true } }).As<dynamic>();
          Assert.AreEqual("TRIGGERED", (string) response.ResponseProperty);
+      }
+
+      [TestMethod]
+      public void Middleware_RequestStopped()
+      {
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register<MiddlewareTestVM>()
+            .UseMiddleware<RequestStoppedMiddleware>()
+            .Build();
+
+         var client = hubEmulator.CreateClient();
+
+         var request = client.Connect(nameof(MiddlewareTestVM), _vmConnectOptions);
+         Assert.IsTrue(request.Count == 0);
       }
    }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Bogus;
 
 namespace DotNetify.DevApp
@@ -15,27 +16,37 @@ namespace DotNetify.DevApp
 
    public interface IEmployeeRepository
    {
-      IEnumerable<Employee> GetAll(int count);
+      Task<IEnumerable<Employee>> GetAllAsync(int count);
 
-      Employee Get(int id);
+      Task<Employee> GetAsync(int id);
 
-      int Add(Employee model);
+      Task<int> AddAsync(Employee model);
 
-      void Update(Employee model);
+      Task UpdateAsync(Employee model);
 
-      void Remove(int id);
+      Task RemoveAsync(int id);
    }
 
    public class EmployeeRepository : IEmployeeRepository
    {
       private IList<Employee> _mockData;
 
-      public IEnumerable<Employee> GetAll(int count) => _mockData ?? GenerateMockData(count);
-
-      public Employee Get(int id) => _mockData.FirstOrDefault(x => x.Id == id);
-
-      public int Add(Employee model)
+      public async Task<IEnumerable<Employee>> GetAllAsync(int count)
       {
+         await Task.Delay(10);
+         return _mockData ?? GenerateMockData(count);
+      }
+
+      public async Task<Employee> GetAsync(int id)
+      {
+         await Task.Delay(10);
+         return _mockData.FirstOrDefault(x => x.Id == id);
+      }
+
+      public async Task<int> AddAsync(Employee model)
+      {
+         await Task.Delay(10);
+
          var employee = new Employee
          {
             Id = _mockData.Count > 0 ? _mockData.Max(x => x.Id) + 1 : 1,
@@ -49,9 +60,11 @@ namespace DotNetify.DevApp
          return employee.Id;
       }
 
-      public void Update(Employee model)
+      public async Task UpdateAsync(Employee model)
       {
-         var employee = Get(model.Id);
+         await Task.Delay(10);
+
+         var employee = await GetAsync(model.Id);
 
          employee.FirstName = model.FirstName;
          employee.LastName = model.LastName;
@@ -59,9 +72,11 @@ namespace DotNetify.DevApp
          employee.Phone = model.Phone;
       }
 
-      public void Remove(int id)
+      public async Task RemoveAsync(int id)
       {
-         var employee = Get(id);
+         await Task.Delay(10);
+
+         var employee = await GetAsync(id);
          _mockData.Remove(employee);
       }
 

@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotNetify;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace UnitTests
 {
@@ -20,7 +21,7 @@ namespace UnitTests
 
          public bool TryGetValue<T>(string key, out T cachedValue) where T : class
          {
-            cachedValue = (T)Get(key);
+            cachedValue = (T) Get(key);
             return cachedValue != null;
          }
       }
@@ -37,7 +38,7 @@ namespace UnitTests
          var id2 = "2";
          var memoryCache = new MemoryCache();
          var factory = new VMControllerFactory(memoryCache, new VMFactory(memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
-         factory.ResponseDelegate = (string connectionId, string vmId, string vmData) => { };
+         factory.ResponseDelegate = (string connectionId, string vmId, string vmData) => Task.CompletedTask;
 
          Assert.IsNotNull(factory as IVMControllerFactory);
 

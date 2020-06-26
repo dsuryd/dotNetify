@@ -93,7 +93,11 @@ namespace DotNetify.DevApp
 
          app.UseStaticFiles();
          app.UseRouting();
-         app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
+         app.UseEndpoints(endpoints =>
+         {
+            endpoints.MapHub<DotNetifyHub>("/dotnetify");
+            endpoints.MapControllers();
+         });
 
          //app.UseSsr(typeof(App), (string[] args) => StaticNodeJSService.InvokeFromFileAsync<string>("wwwroot/ssr", null, args), DefaultRequestHandler);
          app.Run(DefaultRequestHandler);

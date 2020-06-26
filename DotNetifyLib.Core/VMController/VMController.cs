@@ -61,7 +61,7 @@ namespace DotNetify
       /// <param name="connectionId">Identifies the connection.</param>
       /// <param name="vmId">Identifies the view model providing the response.</param>
       /// <param name="vmData">Response data.</param>
-      public delegate void VMResponseDelegate(string connectionId, string vmId, string vmData);
+      public delegate Task VMResponseDelegate(string connectionId, string vmId, string vmData);
 
       /// <summary>
       /// Delegate to create view models.
@@ -72,12 +72,19 @@ namespace DotNetify
       public delegate object CreateInstanceDelegate(Type type, object[] args);
 
       /// <summary>
+      /// Delegate for a view model action.
+      /// </summary>
+      /// <param name="data">Context data.</param>
+      /// <returns></returns>
+      public delegate Task VMActionDelegate(object data);
+
+      /// <summary>
       /// Delegate to provide interception hook for a view model action.
       /// </summary>
       /// <param name="vm">View model.</param>
       /// <param name="data">Data being passed to the view model.</param>
       /// <param name="vmAction">View model action.</param>
-      public delegate void FilterDelegate(string vmId, BaseVM vm, object data, Action<object> vmAction);
+      public delegate Task FilterDelegate(string vmId, BaseVM vm, object data, VMActionDelegate vmAction);
 
       #endregion Delegates
 
@@ -165,9 +172,9 @@ namespace DotNetify
       // Default constructor.
       internal VMController()
       {
-         RequestVMFilter = (string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => vmAction(vmArg);
-         UpdateVMFilter = (string vmId, BaseVM vm, object vmData, Action<object> vmAction) => vmAction(vmData);
-         ResponseVMFilter = (string vmId, BaseVM vm, object vmData, Action<object> vmAction) => vmAction(vmData);
+         RequestVMFilter = (string vmId, BaseVM vm, object vmArg, VMActionDelegate vmAction) => vmAction(vmArg);
+         UpdateVMFilter = (string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
+         ResponseVMFilter = (string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
       }
 
       /// <summary>
@@ -236,12 +243,12 @@ namespace DotNetify
             await vmInstance.OnCreatedAsync();
          }
 
-         RequestVMFilter.Invoke(vmId, vmInstance, vmArg, data =>
+         await RequestVMFilter.Invoke(vmId, vmInstance, vmArg, async data =>
          {
             var vmData = vmInstance.Serialize();
 
             // Send the view model data back to the browser client.
-            ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => _vmResponse(connectionId, vmId, (string) filteredData));
+            await ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => _vmResponse(connectionId, vmId, (string) filteredData));
 
             // Reset the changed property states.
             vmInstance.AcceptChangedProperties();
@@ -304,33 +311,26 @@ namespace DotNetify
          // Update the new values from the client to the server view model.
          var vmInstance = _activeVMs[vmId].Instance;
 
-         var taskCompletionSource = new TaskCompletionSource<Task>();
-
          // Invoke the interception delegate.
-         UpdateVMFilter.Invoke(vmId, vmInstance, data, async filteredData =>
+         await UpdateVMFilter.Invoke(vmId, vmInstance, data, async filteredData =>
          {
-            try
+            List<Task> asyncCommands = null;
+
+            lock (vmInstance)
             {
-               lock (vmInstance)
-               {
-                  foreach (var kvp in filteredData as Dictionary<string, object>)
-                     UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
-               }
+               foreach (var kvp in filteredData as Dictionary<string, object>)
+                  UpdateVM(vmInstance, kvp.Key, kvp.Value != null ? kvp.Value.ToString() : "");
 
-               /// Await for any asynchronous command executed during deserialization.
                if (vmInstance.AsyncCommands.Count > 0)
-                  await Task.WhenAll(vmInstance.AsyncCommands);
-
-               lock (vmInstance)
                {
+                  asyncCommands = new List<Task>(vmInstance.AsyncCommands);
                   vmInstance.AsyncCommands.Clear();
                }
             }
-            catch (Exception ex)
-            {
-               taskCompletionSource.TrySetResult(Task.FromException(ex is TargetInvocationException ? ex.InnerException : ex));
-               return;
-            }
+
+            /// Await for any asynchronous command executed during deserialization.
+            if (asyncCommands != null)
+               await Task.WhenAll(asyncCommands);
 
             // If the updates cause some properties of this and other view models to change, push those new values back to the client.
             lock (vmInstance)
@@ -361,13 +361,7 @@ namespace DotNetify
             // Push updates on other view model instances in case they too change.
             foreach (var vmInfo in _activeVMs.Values.Where(vm => vm.Instance != vmInstance))
                PushUpdates(vmInfo);
-
-            taskCompletionSource.TrySetResult(Task.CompletedTask);
          });
-
-         var task = await taskCompletionSource.Task;
-         if (task.Exception != null)
-            throw task.Exception is AggregateException ? task.Exception.InnerException : task.Exception;
       }
 
       /// <summary>
@@ -444,7 +438,7 @@ namespace DotNetify
          }
 
          BaseVM vmInstance = null;
-         void createVMAction(object data)
+         Task createVMAction(object data)
          {
             // Get the view model instance from the master view model, and if not, create it ourselves here.
             vmInstance = masterVM?.GetSubVM(vmTypeName, vmInstanceId) ?? _vmFactory.GetInstance(vmTypeName, vmInstanceId, vmNamespace);
@@ -458,6 +452,7 @@ namespace DotNetify
                // Pass the view model instance to the master view model.
                masterVM?.OnSubVMCreated(vmInstance);
             }
+            return Task.CompletedTask;
          }
 
          // If there's a master view model, run it through the view model filter.
@@ -554,6 +549,7 @@ namespace DotNetify
          ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, vmData, filteredData =>
          {
             _vmResponse(vmInfo.ConnectionId, vmInfo.Id, (string) filteredData);
+            return Task.CompletedTask;
          });
       }
 
@@ -583,6 +579,7 @@ namespace DotNetify
          ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, args.Data, filteredData =>
          {
             _vmResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(args));
+            return Task.CompletedTask;
          });
       }
 

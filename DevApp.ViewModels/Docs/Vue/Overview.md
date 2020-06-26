@@ -235,6 +235,7 @@ To get started, you only need these essential APIs to add to your Vue component:
       ```
    - __headers__: object, pass request headers, e.g. for authentication purpose.
    - __exceptionHandler__: function, handler for server exceptions.
+   - __webApi__: use HTTP Web API endpoint instead of SignalR hub.
 
 
 - _vm_.__$dispatch__(_state_)

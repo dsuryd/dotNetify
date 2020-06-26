@@ -61,11 +61,12 @@ namespace UnitTests
          VMController.RegisterAssembly<BaseVM>(typeof(UnitTestVM).Assembly);
       }
 
-      public void TestResponse(string connectionId, string vmId, string vmData)
+      public Task TestResponse(string connectionId, string vmId, string vmData)
       {
          _connectionId = connectionId;
          _vmId = vmId;
          _vmData = vmData;
+         return Task.CompletedTask;
       }
 
       [TestInitialize]

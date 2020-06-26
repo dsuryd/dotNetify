@@ -19,13 +19,13 @@ namespace UnitTests
 
          public override async Task OnCreatedAsync()
          {
-            await Task.Delay(500);
+            await Task.Delay(100);
             Value = 2;
          }
 
          private async Task PowerAsync(int exponent)
          {
-            await Task.Delay(500);
+            await Task.Delay(100);
             Value = Math.Pow(Value, exponent);
             Changed(nameof(Value));
          }

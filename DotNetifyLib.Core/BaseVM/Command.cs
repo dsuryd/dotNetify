@@ -26,7 +26,7 @@ namespace DotNetify
    /// <summary>
    /// Defines a command that needs to execute asynchronously.
    /// </summary>
-   public interface ICommandAsync
+   public interface IAsyncCommand
    {
       Task ExecuteAsync(object parameter);
    }
@@ -85,7 +85,7 @@ namespace DotNetify
    /// Basic implementation of ICommand that accepts parameter.
    /// </summary>
    /// <typeparam name="T">Parameter type.</typeparam>
-   public class Command<T> : ICommand, ICommandAsync
+   public class Command<T> : ICommand, IAsyncCommand
    {
       private readonly Action<T> _executeAction;
       private readonly Func<T, Task> _executeAsyncAction;

@@ -112,6 +112,7 @@ To get started, you only need these essential APIs to add to your React componen
       ```
    - __headers__: object, pass request headers, e.g. for authentication purpose.
    - __exceptionHandler__: function, handler for server exceptions.
+   - __webApi__: use HTTP Web API endpoint instead of SignalR hub.
 
 - _vm_.__$dispatch__(_state_)
 - _vm_.__$destroy__()
@@ -123,6 +124,9 @@ To get started, you only need these essential APIs to add to your React componen
 On the back-end, inherit from __BaseVM__ and use:
 - __Changed__(_propName_)
 - __PushUpdates__(): for real-time push.
+
+To asynchronously initialize view model properties, override __OnCreateAsync__.<br>
+To provide an asynchronous view model action that can be awaited, use the return type `Func<some_type, Task>`.
 
 Not essential, but these property accessor/mutator helper __Get/Set__ can make your code more concise:
 

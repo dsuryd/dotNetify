@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2016-2017 Dicky Suryadi
+Copyright 2016-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,6 +41,17 @@ namespace DotNetify
       private IHubContext<DotNetifyHub> _globalHubContext;
       private HubCallerContext _callerContext;
       private IPrincipal _principal;
+
+      private interface IDotNetifyHubMethod
+      {
+         void Request_VM();
+
+         void Update_VM();
+
+         void Dispose_VM();
+
+         void Response_VM();
+      }
 
       /// <summary>
       /// Identity principal of the hub connection.
@@ -88,7 +99,7 @@ namespace DotNetify
          IHubContext<DotNetifyHub> globalHubContext)
       {
          _vmControllerFactory = vmControllerFactory;
-         _vmControllerFactory.ResponseDelegate = Response_VM;
+         _vmControllerFactory.ResponseDelegate = ResponseVMAsync;
          _serviceProvider = serviceProvider;
          _principalAccessor = principalAccessor;
          _hubPipeline = hubPipeline;
@@ -101,18 +112,18 @@ namespace DotNetify
       /// <param name="stopCalled">True, if stop was called on the client closing the connection gracefully;
       /// false, if the connection has been lost for longer than the timeout.</param>
       /// <returns></returns>
-      public override Task OnDisconnectedAsync(Exception exception)
+      public override async Task OnDisconnectedAsync(Exception exception)
       {
          // Access VMController to set the ambient context.
-         var controller = VMController;
+         VMController _ = VMController;
 
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(Context.ConnectionId);
 
          // Allow middlewares to hook to the event.
-         _hubPipeline.RunDisconnectionMiddlewares(Context);
+         await _hubPipeline.RunDisconnectionMiddlewaresAsync(Context);
 
-         return base.OnDisconnectedAsync(exception);
+         await base.OnDisconnectedAsync(exception);
       }
 
       #region Client Requests
@@ -122,45 +133,30 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
-      [HubMethodName(nameof(Request_VM))]
+      [HubMethodName(nameof(IDotNetifyHubMethod.Request_VM))]
       public async Task RequestVMAsync(string vmId, object vmArg)
       {
          object data = NormalizeType(vmArg);
 
          try
          {
-            var taskCompletionSource = new TaskCompletionSource<Task>();
-
             _callerContext = Context;
-            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Request_VM), vmId, data, null, Principal);
-            _hubPipeline.RunMiddlewares(_hubContext, async ctx =>
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Request_VM), vmId, data, null, Principal);
+            await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
-               try
-               {
-                  Principal = ctx.Principal;
-                  string groupName = await VMController.OnRequestVMAsync(Context.ConnectionId, ctx.VMId, ctx.Data);
+               Principal = ctx.Principal;
+               string groupName = await VMController.OnRequestVMAsync(Context.ConnectionId, ctx.VMId, ctx.Data);
 
-                  // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
-                  if (!string.IsNullOrEmpty(groupName))
-                     await _globalHubContext.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-
-                  taskCompletionSource.TrySetResult(Task.CompletedTask);
-               }
-               catch (Exception ex)
-               {
-                  taskCompletionSource.TrySetResult(Task.FromException(ex));
-               }
+               // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
+               if (!string.IsNullOrEmpty(groupName))
+                  await _globalHubContext.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
             });
-
-            var task = await taskCompletionSource.Task;
-            if (task.Exception != null)
-               throw task.Exception is AggregateException ? task.Exception.InnerException : task.Exception;
          }
          catch (Exception ex)
          {
-            var finalEx = _hubPipeline.RunExceptionMiddleware(Context, ex);
+            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(Context, ex);
             if (finalEx is OperationCanceledException == false)
-               Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
+               await ResponseVMAsync(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
 
@@ -173,41 +169,26 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
-      [HubMethodName(nameof(Update_VM))]
+      [HubMethodName(nameof(IDotNetifyHubMethod.Update_VM))]
       public async Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData)
       {
          var data = vmData?.ToDictionary(x => x.Key, x => NormalizeType(x.Value));
 
          try
          {
-            var taskCompletionSource = new TaskCompletionSource<Task>();
-
             _callerContext = Context;
-            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Update_VM), vmId, data, null, Principal);
-            _hubPipeline.RunMiddlewares(_hubContext, async ctx =>
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Update_VM), vmId, data, null, Principal);
+            await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
-               try
-               {
-                  Principal = ctx.Principal;
-                  await VMController.OnUpdateVMAsync(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
-
-                  taskCompletionSource.TrySetResult(Task.CompletedTask);
-               }
-               catch (Exception ex)
-               {
-                  taskCompletionSource.TrySetResult(Task.FromException(ex));
-               }
+               Principal = ctx.Principal;
+               await VMController.OnUpdateVMAsync(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
             });
-
-            var task = await taskCompletionSource.Task;
-            if (task.Exception != null)
-               throw task.Exception is AggregateException ? task.Exception.InnerException : task.Exception;
          }
          catch (Exception ex)
          {
-            var finalEx = _hubPipeline.RunExceptionMiddleware(Context, ex);
+            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(Context, ex);
             if (finalEx is OperationCanceledException == false)
-               Response_VM(Context.ConnectionId, vmId, SerializeException(finalEx));
+               await ResponseVMAsync(Context.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
 
@@ -219,13 +200,14 @@ namespace DotNetify
       /// This method is called by browser clients to remove its view model as it's no longer used.
       /// </summary>
       /// <param name="vmId">Identifies the view model.  By convention, this should match a view model class name.</param>
-      public void Dispose_VM(string vmId)
+      [HubMethodName(nameof(IDotNetifyHubMethod.Dispose_VM))]
+      public async Task DisposeVMAsyc(string vmId)
       {
          try
          {
             _callerContext = Context;
-            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Dispose_VM), vmId, null, null, Principal);
-            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Dispose_VM), vmId, null, null, Principal);
+            await _hubPipeline.RunMiddlewaresAsync(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
                VMController.OnDisposeVM(Context.ConnectionId, ctx.VMId);
@@ -234,9 +216,13 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            _hubPipeline.RunExceptionMiddleware(Context, ex);
+            await _hubPipeline.RunExceptionMiddlewareAsync(Context, ex);
          }
       }
+
+      [Obsolete]
+      [HubMethodName("Dispose_VM_Obsolete")]
+      public void Dispose_VM(string vmId) => _ = DisposeVMAsyc(vmId);
 
       #endregion Client Requests
 
@@ -249,15 +235,16 @@ namespace DotNetify
       /// <param name="connectionId">Identifies the browser client making prior request.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data in serialized JSON.</param>
-      internal void Response_VM(string connectionId, string vmId, string vmData)
+      internal Task ResponseVMAsync(string connectionId, string vmId, string vmData)
       {
          if (connectionId.StartsWith(VMController.MULTICAST))
             HandleMulticastMessage(connectionId, vmId, vmData);
          else
          {
             if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
-               _globalHubContext.Clients.Client(connectionId).SendAsync(nameof(Response_VM), new object[] { vmId, vmData });
+               _globalHubContext.Clients.Client(connectionId).SendAsync(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, vmData });
          }
+         return Task.CompletedTask;
       }
 
       /// <summary>
@@ -271,7 +258,7 @@ namespace DotNetify
          if (messageType.EndsWith(nameof(VMController.GroupSend)))
          {
             var message = JsonConvert.DeserializeObject<VMController.GroupSend>(serializedMessage);
-            var method = nameof(Response_VM);
+            var method = nameof(IDotNetifyHubMethod.Response_VM);
             var payload = new object[] { vmId, message.Data };
 
             if (!string.IsNullOrEmpty(message.GroupName))
@@ -338,16 +325,15 @@ namespace DotNetify
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vm">View model instance.</param>
       /// <param name="data">View model data.</param>
-      /// <param name="vmArg">Optional view model argument.</param>
-      private void RunVMFilters(BaseVM vm, object data, Action<object> vmAction)
+      /// <param name="vmAction">Filter action.</param>
+      private async Task RunVMFilters(BaseVM vm, object data, VMController.VMActionDelegate vmAction)
       {
          try
          {
             _hubContext.Data = data;
-            _hubPipeline.RunVMFilters(_hubContext, vm, ctx =>
+            await _hubPipeline.RunVMFiltersAsync(_hubContext, vm, async ctx =>
             {
-               vmAction(ctx.HubContext.Data);
-               return Task.CompletedTask;
+               await vmAction(ctx.HubContext.Data);
             });
          }
          catch (TargetInvocationException ex)
@@ -359,33 +345,32 @@ namespace DotNetify
       /// <summary>
       /// Runs the filter before the view model is requested.
       /// </summary>
-      private void RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, Action<object> vmAction) => RunVMFilters(vm, vmArg, vmAction);
+      private Task RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmArg, vmAction);
 
       /// <summary>
       /// Runs the filter before the view model is updated.
       /// </summary>
-      private void RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction) => RunVMFilters(vm, vmData, vmAction);
+      private Task RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmData, vmAction);
 
       /// <summary>
       /// Runs the filter before the view model respond to something.
       /// </summary>
-      private void RunRespondingVMFilters(string vmId, BaseVM vm, object vmData, Action<object> vmAction)
+      private async Task RunRespondingVMFilters(string vmId, BaseVM vm, object vmData, VMController.VMActionDelegate vmAction)
       {
          try
          {
-            _hubContext = new DotNetifyHubContext(_callerContext, nameof(Response_VM), vmId, vmData, null, Principal);
-            _hubPipeline.RunMiddlewares(_hubContext, ctx =>
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, Principal);
+            await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
-               RunVMFilters(vm, ctx.Data, vmAction);
-               return Task.CompletedTask;
+               await RunVMFilters(vm, ctx.Data, vmAction);
             });
          }
          catch (Exception ex)
          {
-            var finalEx = _hubPipeline.RunExceptionMiddleware(_callerContext, ex);
+            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(_callerContext, ex);
             if (finalEx is OperationCanceledException == false && _callerContext != null)
-               Response_VM(_callerContext.ConnectionId, vmId, SerializeException(finalEx));
+               await ResponseVMAsync(_callerContext.ConnectionId, vmId, SerializeException(finalEx));
          }
       }
 
