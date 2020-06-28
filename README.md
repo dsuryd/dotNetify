@@ -22,7 +22,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 ## Features
 
 - Simple and lightweight - no heavy client-side framework, no REST APIs.
-- Reactive back-end MVVM architecture on either .NET Core or .NET Framework.
+- Reactive back-end MVVM architecture on ASP.NET server.
 - Built-in real-time across WebSocket with SignalR.
 - Support local (client-side only) and Web API modes.
 - Full support for single-page apps, including deep-linked, nested routing and token-based authentication.

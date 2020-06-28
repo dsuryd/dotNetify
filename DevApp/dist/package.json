@@ -1,6 +1,6 @@
 {
   "name": "dotnetify",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Simple, lightweight, yet powerful way to build realtime .NET web apps.",
   "main": "index.js",
   "types": "dist/typings/index.d.ts",
