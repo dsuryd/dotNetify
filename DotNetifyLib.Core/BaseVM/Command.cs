@@ -79,6 +79,27 @@ namespace DotNetify
       {
          _canExecuteAction = canExecuteAction;
       }
+
+      /// <summary>
+      /// Convert the parameter to the expected type.
+      /// </summary>
+      /// <param name="parameter">Parameter to convert.</param>
+      /// <param name="type">Type to convert to.</param>
+      internal static object ConvertParameter(object parameter, Type type)
+      {
+         if (parameter != null)
+         {
+            if (type.GetTypeInfo().IsClass && type != typeof(string))
+               parameter = JsonConvert.DeserializeObject(parameter.ToString(), type);
+            else
+            {
+               var typeConverter = TypeDescriptor.GetConverter(type);
+               if (typeConverter != null)
+                  parameter = typeConverter.ConvertFromString(parameter.ToString());
+            }
+         }
+         return parameter;
+      }
    }
 
    /// <summary>
@@ -152,18 +173,7 @@ namespace DotNetify
       /// <param name="parameter">Parameter to convert.</param>
       private T ConvertParameter(object parameter)
       {
-         if (parameter != null)
-         {
-            if (typeof(T).GetTypeInfo().IsClass && typeof(T) != typeof(string))
-               parameter = JsonConvert.DeserializeObject<T>(parameter.ToString());
-            else
-            {
-               var typeConverter = TypeDescriptor.GetConverter(typeof(T));
-               if (typeConverter != null)
-                  parameter = typeConverter.ConvertFromString(parameter.ToString());
-            }
-         }
-         return (T) parameter;
+         return (T) Command.ConvertParameter(parameter, typeof(T));
       }
    }
 }

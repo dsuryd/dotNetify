@@ -215,7 +215,13 @@ public class SimpleListVM : MulticastVM
     // by defining a string property that starts with that list's prop name, followed by "_itemKey".
     public string Employees_itemKey => nameof(Employee.Id);
 
-    public Action<string> Add => fullName =>
+    public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
+    {
+        _repository = repository;
+        _connectionContext = connectionContext;
+    }
+
+    public void Add(string fullName)
     {
         var names = fullName.Split(new char[] { ' ' }, 2);
         var employee = new Employee
@@ -231,9 +237,9 @@ public class SimpleListVM : MulticastVM
             FirstName = employee.FirstName,
             LastName = employee.LastName
         });
-    };
+    }
 
-    public Action<EmployeeInfo> Update => employeeInfo =>
+    public void Update(EmployeeInfo employeeInfo)
     {
         var employee = _repository.Get(employeeInfo.Id);
         if (employee != null)
@@ -249,23 +255,17 @@ public class SimpleListVM : MulticastVM
               LastName = employee.LastName
             });
         }
-    };
+    }
 
-    public Action<int> Remove => id =>
+    public void Remove(int id)
     {
         _repository.Remove(id);
 
         // Use CRUD base method to remove the list item on the client.
         this.RemoveList(nameof(Employees), id);
-    };
+    }
 
     // Clients from the same IP address will share the same VM instance.
     public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();
-
-    public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
-    {
-        _repository = repository;
-        _connectionContext = connectionContext;
-    }
 }
 ```

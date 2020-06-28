@@ -23,6 +23,11 @@ namespace UnitTests
             Value = 2;
          }
 
+         public async Task SetPowerAsync(int exponent)
+         {
+            await PowerAsync(exponent);
+         }
+
          private async Task PowerAsync(int exponent)
          {
             await Task.Delay(100);
@@ -60,6 +65,16 @@ namespace UnitTests
          var response = client.Dispatch(update).As<dynamic>();
 
          Assert.AreEqual(4, (double) response.Value);
+      }
+
+      [TestMethod]
+      public void AsyncVM_InvokeMethod()
+      {
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(AsyncVM)).As<dynamic>();
+
+         var response = client.Dispatch(new { SetPowerAsync = 3 }).As<dynamic>();
+         Assert.AreEqual(8, (double) response.Value);
       }
    }
 }

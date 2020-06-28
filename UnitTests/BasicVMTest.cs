@@ -10,6 +10,11 @@ namespace UnitTests
    [TestClass]
    public class BasicVMTest
    {
+      private class TestClass
+      {
+         public string String { get; set; }
+      }
+
       private class BasicVM : BaseVM
       {
          public string FirstName
@@ -38,10 +43,32 @@ namespace UnitTests
             set => Set(value);
          }
 
+         public TestClass Object
+         {
+            get => Get<TestClass>();
+            set => Set(value);
+         }
+
          public string FullName => $"{FirstName} {LastName}";
 
          public BasicVM()
          { }
+
+         public void SetFirstName(string value)
+         {
+            FirstName = value;
+         }
+
+         public void SetObject(TestClass value)
+         {
+            Object = value;
+         }
+
+         public void SetNoArgument()
+         {
+            FirstName = "John";
+            LastName = "Doe";
+         }
       }
 
       private class BasicVMLive : BasicVM
@@ -120,6 +147,22 @@ namespace UnitTests
 
          var responses = client.Listen(1000);
          Assert.IsTrue(responses.Count >= 3, $"{responses.Count}");
+      }
+
+      [TestMethod]
+      public void BasicVM_InvokeMethod()
+      {
+         var client = _hubEmulator.CreateClient();
+         client.Connect(nameof(BasicVM)).As<dynamic>();
+
+         var response = client.Dispatch(new { SetFirstName = "Tom" }).As<dynamic>();
+         Assert.AreEqual("Tom World", (string) response.FullName);
+
+         response = client.Dispatch(new { SetObject = new { String = "Hello World" } }).As<dynamic>();
+         Assert.AreEqual("Hello World", (string) response.Object.String);
+
+         response = client.Dispatch(new { SetNoArgument = "" }).As<dynamic>();
+         Assert.AreEqual("John Doe", (string) response.FullName);
       }
    }
 }

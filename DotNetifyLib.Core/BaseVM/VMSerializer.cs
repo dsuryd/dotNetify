@@ -94,8 +94,15 @@ namespace DotNetify
             {
                var propName = path[i];
                var propInfo = viewModel != null ? PropertyInfoHelper.Find(viewModel, propName) : null;
+
                if (propInfo == null)
-                  return false;
+               {
+                  // If not a property, maybe it's a method with 0 or 1 argument.
+                  if (InvokeIfMethod(viewModel, propName, newValue))
+                     continue;
+                  else
+                     return false;
+               }
 
                var propType = propInfo.PropertyType.GetTypeInfo();
 
@@ -136,21 +143,8 @@ namespace DotNetify
                }
                else if (propType.IsSubclassOf(typeof(MulticastDelegate)))
                {
-                  // If the property type is a delegate, wrap the action in a Command object and execute it.
-                  var argTypes = propType.GetGenericArguments();
-                  Type delegateReturnType = propType.GetMethod(nameof(Action.Invoke)).ReturnType;
-                  if (delegateReturnType == typeof(void))
-                  {
-                     var cmdType = argTypes.Length > 0 ? typeof(Command<>).MakeGenericType(argTypes) : typeof(Command);
-                     (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommand)?.Execute(newValue);
-                  }
-                  else if (delegateReturnType == typeof(Task))
-                  {
-                     var cmdType = argTypes.Length > 1 ? typeof(Command<>).MakeGenericType(argTypes[0]) : typeof(Command);
-                     var task = (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as IAsyncCommand)?.ExecuteAsync(newValue);
-                     if (viewModel is BaseVM)
-                        (viewModel as BaseVM).AsyncCommands.Add(task);
-                  }
+                  // If the property type is a delegate, wrap the action in a Command object and invoke it.
+                  InvokeDelegate(viewModel, propInfo, newValue);
                }
                else if (typeof(IReactiveProperty).GetTypeInfo().IsAssignableFrom(propInfo.PropertyType))
                {
@@ -172,6 +166,66 @@ namespace DotNetify
          }
 
          return true;
+      }
+
+      /// <summary>
+      /// If a deserialized property matches the view model's method name, invoke the method.
+      /// </summary>
+      /// <param name="viewModel">View model object.</param>
+      /// <param name="name">Deserialized property name.</param>
+      /// <param name="newValue">Argument to pass to the method.</param>
+      /// <returns>True if the method was invoked.</returns>
+      private bool InvokeIfMethod(object viewModel, string name, string newValue)
+      {
+         var methodInfo = viewModel.GetType().GetTypeInfo().GetMethods().FirstOrDefault(x => x.Name == name && x.GetParameters().Length <= 1);
+         if (methodInfo != null)
+         {
+            object result = null;
+            if (methodInfo.GetParameters().Length == 0)
+               result = methodInfo.Invoke(viewModel, new object[] { });
+            else
+            {
+               var arg = Command.ConvertParameter(newValue, methodInfo.GetParameters().First().ParameterType);
+               result = methodInfo.Invoke(viewModel, new object[] { arg });
+            }
+
+            if (result is Task && viewModel is BaseVM)
+               (viewModel as BaseVM).AsyncCommands.Add(result as Task);
+
+            return true;
+         }
+         return false;
+      }
+
+      /// <summary>
+      /// If a view model's property is a delegate, wrap the action in a Command object and invoke it.
+      /// </summary>
+      /// <param name="viewModel">View model object.</param>
+      /// <param name="propInfo">Delegate property type info.</param>
+      /// <param name="newValue">Delegate argument.</param>
+      /// <returns>Whether the delegate was invoked.</returns>
+      private bool InvokeDelegate(object viewModel, PropertyInfoHelper propInfo, string newValue)
+      {
+         var propType = propInfo.PropertyType.GetTypeInfo();
+         var argTypes = propType.GetGenericArguments();
+
+         Type delegateReturnType = propType.GetMethod(nameof(Action.Invoke)).ReturnType;
+         if (delegateReturnType == typeof(void))
+         {
+            var cmdType = argTypes.Length > 0 ? typeof(Command<>).MakeGenericType(argTypes) : typeof(Command);
+            (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as ICommand)?.Execute(newValue);
+            return true;
+         }
+         else if (delegateReturnType == typeof(Task))
+         {
+            var cmdType = argTypes.Length > 1 ? typeof(Command<>).MakeGenericType(argTypes[0]) : typeof(Command);
+            var task = (Activator.CreateInstance(cmdType, new object[] { propInfo.GetValue(viewModel) }) as IAsyncCommand)?.ExecuteAsync(newValue);
+            if (viewModel is BaseVM)
+               (viewModel as BaseVM).AsyncCommands.Add(task);
+            return true;
+         }
+
+         return false;
       }
 
       /// <summary>

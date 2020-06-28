@@ -53,7 +53,16 @@ namespace DotNetify.DevApp
       // by defining a string property that starts with that list's prop name, followed by "_itemKey".
       public string Employees_itemKey => nameof(Employee.Id);
 
-      public Func<string, Task> Add => async fullName =>
+      // Clients from the same IP address will share the same VM instance.
+      public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();
+
+      public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
+      {
+         _repository = repository;
+         _connectionContext = connectionContext;
+      }
+
+      public async Task Add(string fullName)
       {
          var names = fullName.Split(new char[] { ' ' }, 2);
          var employee = new Employee
@@ -69,9 +78,9 @@ namespace DotNetify.DevApp
             FirstName = employee.FirstName,
             LastName = employee.LastName
          });
-      };
+      }
 
-      public Func<EmployeeInfo, Task> Update => async employeeInfo =>
+      public async Task Update(EmployeeInfo employeeInfo)
       {
          var employee = await _repository.GetAsync(employeeInfo.Id);
          if (employee != null)
@@ -87,23 +96,14 @@ namespace DotNetify.DevApp
                LastName = employee.LastName
             });
          }
-      };
+      }
 
-      public Func<int, Task> Remove => async id =>
+      public async Task Remove(int id)
       {
          await _repository.RemoveAsync(id);
 
          // Use CRUD base method to remove the list item on the client.
          this.RemoveList(nameof(Employees), id);
-      };
-
-      // Clients from the same IP address will share the same VM instance.
-      public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();
-
-      public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
-      {
-         _repository = repository;
-         _connectionContext = connectionContext;
       }
    }
 }
