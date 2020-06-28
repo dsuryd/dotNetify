@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetifyLib.SignalR.Owin", "DotNetifyLib.SignalR.Owin\DotNetifyLib.SignalR.Owin.csproj", "{329F210E-0721-462C-A368-14121DCEE135}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Core", "DotNetifyLib.Core\DotNetifyLib.Core.csproj", "{BAD3F752-EC12-452C-A569-01F3F150290D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.SignalR", "DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj", "{97C031E6-BD91-45A7-B8C0-037A3CB9FD3E}"
@@ -37,42 +35,6 @@ Global
 		Release|Windows-x86 = Release|Windows-x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Android.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Android.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|iOS.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|iOS.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows Phone (Universal).ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows Phone (Universal).Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows Phone 8.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows Phone 8.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-AnyCPU.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-AnyCPU.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-ARM.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-ARM.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-x64.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-x64.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-x86.ActiveCfg = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Debug|Windows-x86.Build.0 = Debug|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Android.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Android.Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Any CPU.Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|iOS.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|iOS.Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows Phone (Universal).ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows Phone (Universal).Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows Phone 8.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows Phone 8.Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-AnyCPU.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-AnyCPU.Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-ARM.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-ARM.Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-x64.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-x64.Build.0 = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-x86.ActiveCfg = Release|Any CPU
-		{329F210E-0721-462C-A368-14121DCEE135}.Release|Windows-x86.Build.0 = Release|Any CPU
 		{BAD3F752-EC12-452C-A569-01F3F150290D}.Debug|Android.ActiveCfg = Debug|Any CPU
 		{BAD3F752-EC12-452C-A569-01F3F150290D}.Debug|Android.Build.0 = Debug|Any CPU
 		{BAD3F752-EC12-452C-A569-01F3F150290D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
