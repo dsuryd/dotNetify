@@ -1,8 +1,23 @@
 <template>
   <div>
+    <d-alert info="true">
+      <i class="material-icons">info_outlined</i>
+      This is a multicast list. Your edits will appear on all other browser
+      views in real-time.
+    </d-alert>
     <header>
-      <input type="text" class="form-control" placeholder="First name" v-model="firstName">
-      <input type="text" class="form-control" placeholder="Last name" v-model="lastName">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="First name"
+        v-model="firstName"
+      />
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Last name"
+        v-model="lastName"
+      />
       <button type="button" class="btn btn-primary" @click="add">Add</button>
     </header>
     <table>
@@ -39,13 +54,13 @@
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
-import InlineEdit from './SimpleList.InlineEdit.vue';
+import dotnetify from "dotnetify/vue";
+import InlineEdit from "./SimpleList.InlineEdit.vue";
 
 export default {
-  name: 'SimpleList',
+  name: "SimpleList",
   components: {
-    'InlineEdit': InlineEdit
+    InlineEdit: InlineEdit
   },
   created() {
     this.vm = dotnetify.vue.connect("SimpleListVM", this);
@@ -55,18 +70,18 @@ export default {
   },
   data() {
     return {
-      firstName: '',
-      lastName: '',
+      firstName: "",
+      lastName: "",
       Employees: []
-    }
+    };
   },
   methods: {
     add: function () {
       let fullName = `${this.firstName} ${this.lastName}`;
-      if (fullName.trim() !== '') {
+      if (fullName.trim() !== "") {
         this.vm.$dispatch({ Add: fullName });
-        this.firstName = '';
-        this.lastName = '';
+        this.firstName = "";
+        this.lastName = "";
       }
     },
     onUpdate(employee, prop, value) {
@@ -77,5 +92,5 @@ export default {
       this.vm.$dispatch({ Remove: id });
     }
   }
-}
+};
 </script>

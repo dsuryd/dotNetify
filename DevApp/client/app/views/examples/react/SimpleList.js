@@ -28,6 +28,11 @@ export default class SimpleList extends React.Component {
   render() {
     return (
       <SimpleListCss>
+        <d-alert info="true">
+          <i class="material-icons">info_outlined</i>
+          This is a multicast list. Your edits will appear on all other browser
+          views in real-time.
+        </d-alert>
         <header>
           <span>Add:</span>
           <TextBox

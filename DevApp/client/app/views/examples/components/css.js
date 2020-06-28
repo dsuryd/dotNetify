@@ -82,6 +82,15 @@ export const ControlTypesCss = styled.div`
 
 export const SimpleListCss = styled.div`
   padding: 0 1rem;
+  .alert {
+    display: flex;
+    align-items: center;
+    max-width: 1268px;
+    .material-icons {
+      font-size: 24px;
+      width: 2rem;
+    }
+  }
   header {
     display: flex;
     align-items: center;
@@ -118,15 +127,21 @@ export const SimpleListCss = styled.div`
     }
     tr:hover {
       background: #efefef;
+      .editable {
+        &:after {
+          font-family: "Material Icons";
+          content: "edit";
+          color: #ccc;
+        }
+      }
+      .editable:hover {
+        &:after {
+          color: black;
+        }
+      }
     }
     i.material-icons {
       font-size: 1.2rem;
-    }
-    span.editable:hover {
-      &:after {
-        font-family: "Material Icons";
-        content: "edit";
-      }
     }
   }
 `;

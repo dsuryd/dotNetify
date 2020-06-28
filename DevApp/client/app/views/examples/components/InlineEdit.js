@@ -54,7 +54,9 @@ class InlineEdit extends React.Component {
       );
 
     return (
-      <EditableText onClick={this.handleClick}>{this.state.value}</EditableText>
+      <EditableText className="editable" onClick={this.handleClick}>
+        {this.state.value}
+      </EditableText>
     );
   }
 }
