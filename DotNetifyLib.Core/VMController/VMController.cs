@@ -287,7 +287,7 @@ namespace DotNetify
       [Obsolete]
       public void OnUpdateVM(string connectionId, string vmId, Dictionary<string, object> data)
       {
-         _ = OnUpdateVMAsync(connectionId, vmId, data);
+         OnUpdateVMAsync(connectionId, vmId, data).ConfigureAwait(false).GetAwaiter().GetResult();
       }
 
       /// <summary>
