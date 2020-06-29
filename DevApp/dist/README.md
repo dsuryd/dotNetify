@@ -8,10 +8,9 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-- 4.0: Typescript support - [release notes](https://github.com/dsuryd/dotNetify/releases)
+- 4.1: Async view model - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1)
+- 4.0: Typescript support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0)
 - v3.7: Routing enhancements: lazy-loading, server-side rendering, 404 error handling - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7)
-- v3.6: [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.6)
-- v3.5: Multi-hub support, web API + local modes - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.5).
 
 <div/>
 
@@ -22,7 +21,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 ## Features
 
 - Simple and lightweight - no heavy client-side framework, no REST APIs.
-- Reactive back-end MVVM architecture on either .NET Core or .NET Framework.
+- Reactive back-end MVVM architecture on ASP.NET server.
 - Built-in real-time across WebSocket with SignalR.
 - Support local (client-side only) and Web API modes.
 - Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
