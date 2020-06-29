@@ -47,11 +47,9 @@ namespace DotNetify.DevApp
             .Select(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName });
       }
 
+      // If you use CRUD methods on a list, you must set the item key prop name of that list with ItemKey attribute.
+      [ItemKey(nameof(Employee.Id))]
       public IEnumerable<EmployeeInfo> Employees { get; private set; }
-
-      // If you use CRUD methods on a list, you must set the item key prop name of that list
-      // by defining a string property that starts with that list's prop name, followed by "_itemKey".
-      public string Employees_itemKey => nameof(Employee.Id);
 
       // Clients from the same IP address will share the same VM instance.
       public override string GroupName => _connectionContext.HttpConnection.RemoteIpAddress.ToString();

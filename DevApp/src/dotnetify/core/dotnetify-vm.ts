@@ -146,7 +146,7 @@ export default class DotnetifyVM implements IDotnetifyVM {
       const key = this.$itemKey[listName];
       if (!key) {
         console.error(
-          `[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`
+          `[${this.$vmId}] missing item key for '${listName}'; decorate '${listName}' with an [ItemKey] attribute.`
         );
         return;
       }
@@ -227,7 +227,7 @@ export default class DotnetifyVM implements IDotnetifyVM {
             else vm.$removeList(listName, i => i[key] == iVMUpdate[prop]);
           } else
             console.error(
-              `[${this.$vmId}] missing item key for '${listName}'; add ${listName}_itemKey property to the view model.`
+              `[${this.$vmId}] missing item key for '${listName}'; decorate '${listName}' with an [ItemKey] attribute.`
             );
         } else
           console.error(

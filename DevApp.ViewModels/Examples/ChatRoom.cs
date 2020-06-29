@@ -64,13 +64,11 @@ namespace DotNetify.DevApp
    {
       private readonly IConnectionContext _connectionContext;
 
+      [ItemKey(nameof(ChatMessage.Id))]
       public List<ChatMessage> Messages { get; } = new List<ChatMessage>();
 
-      public string Messages_itemKey => nameof(ChatMessage.Id);
-
+      [ItemKey(nameof(ChatUser.Id))]
       public List<ChatUser> Users { get; } = new List<ChatUser>();
-
-      public string Users_itemKey => nameof(ChatUser.Id);
 
       public Action<ChatMessage> SendMessage => chat =>
       {

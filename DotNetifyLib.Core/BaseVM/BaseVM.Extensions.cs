@@ -23,6 +23,19 @@ using System.Threading.Tasks;
 
 namespace DotNetify
 {
+   /// <summary>
+   /// Attribute to specify CRUD item key.
+   /// </summary>
+   public class ItemKeyAttribute : Attribute
+   {
+      public string ItemKey { get; }
+
+      public ItemKeyAttribute(string itemKey)
+      {
+         ItemKey = itemKey;
+      }
+   }
+
    public static class BaseVMExtensions
    {
       #region CRUD
@@ -35,7 +48,7 @@ namespace DotNetify
       /// <param name="item">List item to be added.</param>
       public static void AddList<T>(this BaseVM vm, Expression<Func<T>> expression, object item)
       {
-         var propName = ((MemberExpression)expression.Body).Member.Name;
+         var propName = ((MemberExpression) expression.Body).Member.Name;
          vm.AddList(propName, item);
       }
 
@@ -49,7 +62,7 @@ namespace DotNetify
       /// <param name="item">List item to be updated.</param>
       public static void UpdateList<T>(this BaseVM vm, Expression<Func<T>> expression, object item)
       {
-         var propName = ((MemberExpression)expression.Body).Member.Name;
+         var propName = ((MemberExpression) expression.Body).Member.Name;
          vm.UpdateList(propName, item);
       }
 
@@ -63,7 +76,7 @@ namespace DotNetify
       /// <param name="itemKey">Identifies the list item to be removed.</param>
       public static void RemoveList<T>(this BaseVM vm, Expression<Func<T>> expression, object itemKey)
       {
-         var propName = ((MemberExpression)expression.Body).Member.Name;
+         var propName = ((MemberExpression) expression.Body).Member.Name;
          vm.RemoveList(propName, itemKey);
       }
 
@@ -100,7 +113,7 @@ namespace DotNetify
          while (type.GetTypeInfo().GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic) == null && type.GetTypeInfo().BaseType != null)
             type = type.GetTypeInfo().BaseType;
 
-         var eventDelegate = (MulticastDelegate)type.GetTypeInfo()
+         var eventDelegate = (MulticastDelegate) type.GetTypeInfo()
             .GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic)?
             .GetValue(source);
 

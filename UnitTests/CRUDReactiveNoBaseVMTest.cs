@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using DotNetify;
+using DotNetify.Elements;
 using DotNetify.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -89,18 +90,20 @@ namespace UnitTests
                RemoveList = (propName, value) => baseVM.RemoveList(propName, value);
             };
 
-            this.AddProperty<IEnumerable<EmployeeInfo>>("Employees").SubscribeTo(
-               Observable.Return(_employeeService
-                  .GetAll()
-                  .Select(i => new EmployeeInfo
-                  {
-                     Id = i.Id,
-                     FirstName = i.FirstName,
-                     LastName = i.LastName
-                  }))
+            this.AddProperty<IEnumerable<EmployeeInfo>>("Employees")
+               .WithItemKey(nameof(EmployeeInfo.Id))
+               .SubscribeTo(
+                  Observable.Return(_employeeService
+                     .GetAll()
+                     .Select(i => new EmployeeInfo
+                     {
+                        Id = i.Id,
+                        FirstName = i.FirstName,
+                        LastName = i.LastName
+                     }
+                  )
+               )
             );
-
-            this.AddProperty<string>("Employees_itemKey").SubscribeTo(Observable.Return(nameof(EmployeeInfo.Id)));
 
             this.AddProperty<string>("Add").Subscribe(fullName =>
             {

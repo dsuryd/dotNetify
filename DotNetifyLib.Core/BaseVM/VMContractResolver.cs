@@ -29,6 +29,7 @@ namespace DotNetify
    public class VMContractResolver : DefaultContractResolver
    {
       internal List<string> IgnoredPropertyNames { get; set; }
+      private Dictionary<string, string> _itemKeyProps;
 
       /// <summary>
       /// Converter for properties of ICommand type which simply serializes the value to null.
@@ -73,7 +74,25 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overrides this method to exclude properties with [Ignore] attribute or those that are in the given list.
+      /// Default value provider for serialized properties.
+      /// </summary>
+      protected class DefaultValueProvider : IValueProvider
+      {
+         private readonly object _defaultValue;
+
+         public DefaultValueProvider(object defaultValue)
+         {
+            _defaultValue = defaultValue;
+         }
+
+         public object GetValue(object target) => _defaultValue;
+
+         public void SetValue(object target, object value) => throw new NotImplementedException();
+      }
+
+      /// <summary>
+      /// Overrides this method to exclude properties with [Ignore] attribute or those that are in the given list,
+      /// and to handle [ItemKey] attribute.
       /// </summary>
       protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
       {
@@ -84,8 +103,38 @@ namespace DotNetify
             property.Ignored = true;
          else if (IgnoredPropertyNames != null && IgnoredPropertyNames.Contains(property.PropertyName))
             property.Ignored = true;
+         // Add item key property for properties decorated with [ItemKey].
+         else if (member.GetCustomAttribute(typeof(ItemKeyAttribute)) != null)
+         {
+            var itemKeyAttr = member.GetCustomAttribute<ItemKeyAttribute>();
+            _itemKeyProps = _itemKeyProps ?? new Dictionary<string, string>();
+            _itemKeyProps.Add($"{member.Name}_itemKey", itemKeyAttr.ItemKey);
+         }
 
          return property;
+      }
+
+      /// <summary>
+      /// Overrides this method to add item key properties when [ItemKey] attributes are present.
+      /// </summary>
+      protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+      {
+         var result = base.CreateProperties(type, memberSerialization);
+         if (_itemKeyProps != null)
+         {
+            foreach (var prop in _itemKeyProps)
+               result.Add(new JsonProperty
+               {
+                  PropertyType = typeof(string),
+                  DeclaringType = type,
+                  PropertyName = prop.Key,
+                  ValueProvider = new DefaultValueProvider(prop.Value),
+                  Readable = true,
+                  Writable = false
+               });
+            _itemKeyProps = null;
+         }
+         return result;
       }
 
       /// <summary>

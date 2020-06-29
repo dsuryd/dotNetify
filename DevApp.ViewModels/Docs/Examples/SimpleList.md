@@ -207,13 +207,10 @@ public class SimpleListVM : MulticastVM
         public string LastName { get; set; }
     }
 
+    [ItemKey(nameof(Employee.Id))]
     public IEnumerable<EmployeeInfo> Employees => _repository
         .GetAll()
         .Select(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName });
-
-    // If you use CRUD methods on a list, you must set the item key prop name of that list
-    // by defining a string property that starts with that list's prop name, followed by "_itemKey".
-    public string Employees_itemKey => nameof(Employee.Id);
 
     public SimpleListVM(IEmployeeRepository repository, IConnectionContext connectionContext)
     {

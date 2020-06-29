@@ -114,7 +114,7 @@ namespace DotNetify.Client
       public virtual T Get<T>(string name)
       {
          var propInfo = PropertyInfoHelper.Find(_view, name);
-         return (T)propInfo?.GetValue(_view);
+         return (T) propInfo?.GetValue(_view);
       }
 
       /// <summary>
@@ -159,7 +159,7 @@ namespace DotNetify.Client
                   throw new Exception($"couldn't add item to '{listName}' due to missing property '{itemKeyName}'.");
 
                var key = itemKeyProp.GetValue(newItem);
-               foreach (var x in (IList)list)
+               foreach (var x in (IList) list)
                   if (itemKeyProp.GetValue(x).Equals(key))
                      throw new Exception($"couldn't add item to '{listName}' because the key already exists.");
             }
@@ -206,7 +206,7 @@ namespace DotNetify.Client
                throw new Exception($"couldn't update item to '{listName}' because the key '{key}' doesn't exist.");
             }
             else
-               throw new Exception($"missing item key for '{listName}'; add '{listName}_itemKey' property to the view model.");
+               throw new Exception($"missing item key for '{listName}'; decorate '{listName}' with an [ItemKey] attribute.");
          }
       }
 
@@ -243,7 +243,7 @@ namespace DotNetify.Client
                throw new Exception($"couldn't remove item to '{listName}' because the key '{key}' doesn't exist.");
             }
             else
-               throw new Exception($"missing item key for '{listName}'; add '{listName}_itemKey' property to the view model.");
+               throw new Exception($"missing item key for '{listName}'; decorate '{listName}' with an [ItemKey] attribute.");
          }
       }
 
@@ -305,7 +305,7 @@ namespace DotNetify.Client
             Type viewType = _view.GetType();
             while (_propChangedEvent == null && viewType != null)
             {
-               _propChangedEvent = (MulticastDelegate)viewType
+               _propChangedEvent = (MulticastDelegate) viewType
                  .GetTypeInfo()
                  .GetField(nameof(INotifyPropertyChanged.PropertyChanged), BindingFlags.Instance | BindingFlags.NonPublic)?
                  .GetValue(_view);

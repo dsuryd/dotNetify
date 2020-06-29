@@ -64,6 +64,7 @@ namespace UnitTests
             public string LastName { get; set; }
          }
 
+         [ItemKey(nameof(EmployeeInfo.Id))]
          public IEnumerable<EmployeeInfo> Employees => _employeeService.GetAll().Select(i => new EmployeeInfo
          {
             Id = i.Id,
@@ -71,9 +72,7 @@ namespace UnitTests
             LastName = i.LastName
          });
 
-         public string Employees_itemKey => nameof(EmployeeInfo.Id);
-
-         public Action<string> Add => fullName =>
+         public void Add(string fullName)
          {
             var names = fullName.Split(new char[] { ' ' }, 2);
             var newRecord = new EmployeeRecord
@@ -88,9 +87,9 @@ namespace UnitTests
                FirstName = newRecord.FirstName,
                LastName = newRecord.LastName
             });
-         };
+         }
 
-         public Action<EmployeeInfo> Update => changes =>
+         public void Update(EmployeeInfo changes)
          {
             var record = _employeeService.GetById(changes.Id);
             if (record != null)
@@ -99,7 +98,7 @@ namespace UnitTests
                record.LastName = changes.LastName ?? record.LastName;
                _employeeService.Update(record);
             }
-         };
+         }
 
          public Action<int> Remove => id =>
          {
