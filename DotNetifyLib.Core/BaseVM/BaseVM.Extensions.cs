@@ -26,6 +26,7 @@ namespace DotNetify
    /// <summary>
    /// Attribute to specify CRUD item key.
    /// </summary>
+   [AttributeUsage(AttributeTargets.Property)]
    public class ItemKeyAttribute : Attribute
    {
       public string ItemKey { get; }

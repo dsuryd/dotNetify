@@ -32,6 +32,7 @@ namespace DotNetify
    /// <summary>
    /// Attribute to prevent a property from being sent to the client.
    /// </summary>
+   [AttributeUsage(AttributeTargets.Property)]
    public class IgnoreAttribute : Attribute { }
 
    /// <summary>

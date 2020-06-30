@@ -24,6 +24,12 @@ using Newtonsoft.Json;
 namespace DotNetify
 {
    /// <summary>
+   /// Attribute to identify a method as a command to be included in serialization.
+   /// </summary>
+   [AttributeUsage(AttributeTargets.Method)]
+   public class CommandAttribute : Attribute { }
+
+   /// <summary>
    /// Defines a command that needs to execute asynchronously.
    /// </summary>
    public interface IAsyncCommand

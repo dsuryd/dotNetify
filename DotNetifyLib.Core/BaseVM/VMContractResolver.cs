@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using Newtonsoft.Json;
@@ -115,14 +116,17 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Overrides this method to add item key properties when [ItemKey] attributes are present.
+      /// Overrides this method to add new properties when certain attributes are present.
       /// </summary>
       protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
       {
          var result = base.CreateProperties(type, memberSerialization);
+
+         // Add [ItemKey] properties.
          if (_itemKeyProps != null)
          {
             foreach (var prop in _itemKeyProps)
+            {
                result.Add(new JsonProperty
                {
                   PropertyType = typeof(string),
@@ -132,8 +136,25 @@ namespace DotNetify
                   Readable = true,
                   Writable = false
                });
+            }
             _itemKeyProps = null;
          }
+
+         // Add properties from [Command] methods (only for Knockout binding).
+         var commands = type.GetMethods().Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
+         foreach (var command in commands)
+         {
+            result.Add(new JsonProperty
+            {
+               PropertyType = typeof(string),
+               DeclaringType = type,
+               PropertyName = command.Name,
+               ValueProvider = new DefaultValueProvider(string.Empty),
+               Readable = true,
+               Writable = false
+            });
+         }
+
          return result;
       }
 
