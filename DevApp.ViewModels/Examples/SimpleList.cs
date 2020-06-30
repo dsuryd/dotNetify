@@ -41,12 +41,6 @@ namespace DotNetify.DevApp
          public string LastName { get; set; }
       }
 
-      public override async Task OnCreatedAsync()
-      {
-         Employees = (await _repository.GetAllAsync(7))
-            .Select(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName });
-      }
-
       // If you use CRUD methods on a list, you must set the item key prop name of that list with ItemKey attribute.
       [ItemKey(nameof(Employee.Id))]
       public IEnumerable<EmployeeInfo> Employees { get; private set; }
@@ -58,9 +52,13 @@ namespace DotNetify.DevApp
       {
          _repository = repository;
          _connectionContext = connectionContext;
+
+         Employees = _repository.GetAll(7)
+            .Select(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName });
       }
 
-      public async Task Add(string fullName)
+      [Command] /* only for Knockout client */
+      public void Add(string fullName)
       {
          var names = fullName.Split(new char[] { ' ' }, 2);
          var employee = new Employee
@@ -72,20 +70,21 @@ namespace DotNetify.DevApp
          // Use CRUD base method to add the list item on the client.
          this.AddList("Employees", new EmployeeInfo
          {
-            Id = await _repository.AddAsync(employee),
+            Id = _repository.Add(employee),
             FirstName = employee.FirstName,
             LastName = employee.LastName
          });
       }
 
-      public async Task Update(EmployeeInfo employeeInfo)
+      [Command] /* only for Knockout client */
+      public void Update(EmployeeInfo employeeInfo)
       {
-         var employee = await _repository.GetAsync(employeeInfo.Id);
+         var employee = _repository.Get(employeeInfo.Id);
          if (employee != null)
          {
             employee.FirstName = employeeInfo.FirstName ?? employee.FirstName;
             employee.LastName = employeeInfo.LastName ?? employee.LastName;
-            await _repository.UpdateAsync(employee);
+            _repository.Update(employee);
 
             this.UpdateList(nameof(Employees), new EmployeeInfo
             {
@@ -96,9 +95,10 @@ namespace DotNetify.DevApp
          }
       }
 
-      public async Task Remove(int id)
+      [Command] /* only for Knockout client */
+      public void Remove(int id)
       {
-         await _repository.RemoveAsync(id);
+         _repository.Remove(id);
 
          // Use CRUD base method to remove the list item on the client.
          this.RemoveList(nameof(Employees), id);
