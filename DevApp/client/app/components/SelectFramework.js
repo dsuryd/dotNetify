@@ -37,8 +37,7 @@ frameworkSelectEvent.subscribe(framework => {
 
 export default class SelectFramework extends Element {
   handleChange = value => {
-    if (value === "Blazor")
-      window.location.href = "https://dotnetify-blazor.herokuapp.com";
+    if (value === "Blazor") window.location.href = "/blazor";
     frameworkSelectEvent.emit(value);
     this.dispatch(value);
     this.props.onChange(value);
