@@ -4,7 +4,7 @@
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 [![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/)
 
-DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org) or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket (SignalR).
+DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org), [Knockout](http://knockoutjs.com) or [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) front-end on C# .NET back-end via WebSocket (SignalR).
 
 ## What's New
 
@@ -14,7 +14,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 <div/>
 
-- [**DotNetify-Blazor**](https://github.com/dsuryd/dotNetify-Blazor) (in development).
+- [**DotNetify-Blazor**](https://github.com/dsuryd/dotNetify-Blazor): client library for Blazor web assembly.
 - [DotNetify-Pulse](https://github.com/dsuryd/dotnetify-pulse): customizable realtime monitoring for .NET Core services.
 - [DotNetify-Elements](https://dotnetify.net/elements"): React + web component library for dotNetify apps.
 - [React SPA template for ASP.NET Core 3.x](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
