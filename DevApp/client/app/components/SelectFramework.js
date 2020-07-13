@@ -16,8 +16,16 @@ const Select = styled.select`
 `;
 
 export const frameworkSelectEvent = utils.createEventEmitter();
-export const getCurrentFramework = () =>
-  window.localStorage["framework"] || "React";
+export const getCurrentFramework = () => {
+  const params = Array.from(
+    new URLSearchParams(window.location.search).keys()
+  ).map(x => x.toLowerCase());
+  if (params.includes("react")) return "React";
+  else if (params.includes("vue")) return "Vue";
+  else if (params.includes("knockout")) return "Knockout";
+  else if (params.includes("blazor")) return "Blazor";
+  return window.localStorage["framework"] || "React";
+};
 export let currentFramework = getCurrentFramework();
 
 frameworkSelectEvent.subscribe(framework => {
@@ -29,13 +37,15 @@ frameworkSelectEvent.subscribe(framework => {
 
 export default class SelectFramework extends Element {
   handleChange = value => {
+    if (value === "Blazor")
+      window.location.href = "https://dotnetify-blazor.herokuapp.com";
     frameworkSelectEvent.emit(value);
     this.dispatch(value);
     this.props.onChange(value);
   };
 
   componentDidMount() {
-    if (this.value !== currentFramework) this.dispatch(currentFramework);
+    if (this.value !== currentFramework) this.handleChange(currentFramework);
   }
 
   render() {
@@ -48,6 +58,7 @@ export default class SelectFramework extends Element {
         <option>React</option>
         <option>Vue</option>
         <option>Knockout</option>
+        <option>Blazor</option>
       </Select>
     );
   }
