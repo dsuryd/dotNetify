@@ -19,7 +19,7 @@ If using script tags, include _vue_, _signalR_, and _dotNetify_ from their respe
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-vue.min.js"></script>
 ```
 
-### Typescript Support
+##### Typescript Support
 
 DotNetify's typed definition for React can be used in Vue projects with minimal steps:
 
