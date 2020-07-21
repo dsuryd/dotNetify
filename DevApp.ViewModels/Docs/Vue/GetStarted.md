@@ -18,3 +18,10 @@ If using script tags, include _vue_, _signalR_, and _dotNetify_ from their respe
 <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-vue.min.js"></script>
 ```
+
+### Typescript Support
+
+DotNetify's typed definition for React can be used in Vue projects with minimal steps:
+
+- Add React's type definition to _devDependencies_: `npm i -D @types/react`.
+- Include `"skipLibCheck": true` to _tsconfig.json_.
