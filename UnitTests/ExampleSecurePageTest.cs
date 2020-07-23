@@ -181,10 +181,7 @@ namespace UnitTests
          var vmConnectOptions = new VMConnectOptions();
          vmConnectOptions.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
 
-         var serializedString = ((JObject) vmConnectOptions).ToString();
-         object options = JsonSerializer.Deserialize<object>(serializedString);
-
-         client.Connect(nameof(SecurePageVM), options);
+         client.Connect(nameof(SecurePageVM), vmConnectOptions);
 
          var responses = client.Listen(expireSeconds * 1000);
 
@@ -203,9 +200,7 @@ namespace UnitTests
          var vmConnectOptions = new VMConnectOptions();
          vmConnectOptions.Headers.Set("Authorization", "Bearer " + CreateBearerToken("john", "guest", expireSeconds));
 
-         var options = ((JObject) vmConnectOptions).ToObject<Dictionary<object, object>>();
-
-         client.Connect(nameof(SecurePageVM), options);
+         client.Connect(nameof(SecurePageVM), vmConnectOptions);
 
          var responses = client.Listen(expireSeconds * 1000);
 
