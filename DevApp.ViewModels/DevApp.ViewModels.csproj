@@ -67,7 +67,6 @@
     <EmbeddedResource Include="Docs\APIs\Routing.md" />
     <EmbeddedResource Include="Docs\APIs\Security.md" />
     <EmbeddedResource Include="Docs\APIs\WebApiMode.md" />
-    <EmbeddedResource Include="Docs\Blazor\Overview.md" />
   </ItemGroup>
 
   <ItemGroup>
