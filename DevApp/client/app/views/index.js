@@ -31,7 +31,9 @@ const NotFound404 = () => (
   <div style={{ padding: "1.5rem" }}>
     <h2>Page not found (404)</h2>
     <p>Redirecting to home page...</p>
-    <script>setTimeout(function() {(window.location.href = "/")}, 2000)</script>
+    <script>
+      setTimeout(function() {(window.location.href = "/?react")}, 2000)
+    </script>
   </div>
 );
 
