@@ -39,6 +39,7 @@ namespace DotNetify.DevApp
          Routing,
          Security,
          WebApiMode,
+         DotNetifyTesting,
          NotFound404
       }
 
@@ -81,6 +82,8 @@ namespace DotNetify.DevApp
         new RouteTemplate (nameof (Route.FromScratchScriptTag)) { UrlPattern = "fromscratch-scripttag" },
         new RouteTemplate (nameof (Route.FromScratchCRA)) { UrlPattern = "fromscratch-cra" },
         new RouteTemplate (nameof (Route.FromScratchCLI)) { UrlPattern = "fromscratch-cli" },
+
+        new RouteTemplate (nameof (Route.DotNetifyTesting)) { UrlPattern = "dotnetify-testing" },
 
         new RouteTemplate (nameof (Route.NotFound404)) { UrlPattern = "*", ViewUrl = "NotFound404" },
       });
@@ -135,6 +138,14 @@ namespace DotNetify.DevApp
                  new NavRoute ("Web API Mode", this.GetRoute (nameof (Route.WebApiMode))),
               },
               IsExpanded = false
+           },
+           new NavGroup
+           {
+              Label = "Premium Feature",
+               Routes = new NavRoute[]
+              {
+                 new NavRoute ("DotNetify-Testing", this.GetRoute (nameof (Route.DotNetifyTesting))),
+              },
            }
          };
 
