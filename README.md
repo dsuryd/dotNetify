@@ -28,6 +28,10 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 - Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
 - Powerful back-end infrastructure, including dependency injection, WebSocket request/response pipelines, and modern tooling.
 
+## Premium Features
+
+- [**DotNetify-Testing**](https://www.dotnetify.net/core/dotnetify-testing): testing library for dotNetify apps.
+
 ## Documentation
 
 Documentation and live demo can be found at [https://dotnetify.net](https://dotnetify.net).
