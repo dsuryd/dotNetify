@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaClient", "Avalonia\AvaloniaClient.csproj", "{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfClient", "Wpf\WpfClient.csproj", "{6EB804D3-59F9-4DAA-B775-C7136DE47819}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCoreServer", "AspNetCoreServer", "{DF228D12-F214-4635-99F6-B7F983A8CE49}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "AspNetCoreServer\Server\Server.csproj", "{D0B05802-A427-4136-880E-1BD15E3DD5DE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModels", "AspNetCoreServer\ViewModels\ViewModels.csproj", "{39D7B560-9798-44E6-959F-87B049E6BCCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfClient", "Wpf\WpfClient.csproj", "{8E5C1CE6-DC5F-4512-A3A5-E022792D13B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8FFC0F3-0625-4835-ADC9-F10B14EE4D96}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6EB804D3-59F9-4DAA-B775-C7136DE47819}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D0B05802-A427-4136-880E-1BD15E3DD5DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0B05802-A427-4136-880E-1BD15E3DD5DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0B05802-A427-4136-880E-1BD15E3DD5DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,6 +31,10 @@ Global
 		{39D7B560-9798-44E6-959F-87B049E6BCCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39D7B560-9798-44E6-959F-87B049E6BCCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39D7B560-9798-44E6-959F-87B049E6BCCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E5C1CE6-DC5F-4512-A3A5-E022792D13B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E5C1CE6-DC5F-4512-A3A5-E022792D13B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E5C1CE6-DC5F-4512-A3A5-E022792D13B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E5C1CE6-DC5F-4512-A3A5-E022792D13B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

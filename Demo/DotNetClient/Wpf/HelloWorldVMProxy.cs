@@ -122,6 +122,6 @@ namespace HelloWorld
          );
       }
 
-      public void Dispose() => _dotnetify.Dispose();
+      public void Dispose() => _dotnetify.DisposeAsync();
    }
 }

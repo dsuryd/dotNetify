@@ -19,7 +19,6 @@ namespace Server
       public void Configure(IApplicationBuilder app)
       {
          app.UseWebSockets();
-         app.UseSignalR(routes => routes.MapDotNetifyHub());
          app.UseDotNetify(config =>
          {
             config.RegisterAssembly("ViewModels");
@@ -27,10 +26,11 @@ namespace Server
          });
 
          app.UseStaticFiles();
-         app.Run(async (context) =>
+         app.UseRouting();
+         app.UseEndpoints(endpoints =>
          {
-            using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
-               await context.Response.WriteAsync(reader.ReadToEnd());
+            endpoints.MapHub<DotNetifyHub>("/dotnetify");
+            endpoints.MapFallbackToFile("index.html");
          });
       }
    }
