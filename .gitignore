@@ -366,3 +366,4 @@ ASP.NET Demo/WebApplication.Knockout/Scripts/lib
 # End of https://www.gitignore.io/api/node,code,visualstudio
 
 
+/Demo/React/SPA/SPA.sln
