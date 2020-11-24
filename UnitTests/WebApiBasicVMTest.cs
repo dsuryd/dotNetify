@@ -38,6 +38,8 @@ namespace UnitTests
             }
          }
 
+         public string Metadata { get; set; }
+
          public string FullName => $"{FirstName} {LastName}";
       }
 
@@ -121,6 +123,24 @@ namespace UnitTests
 
          Assert.AreEqual("John World", (string) response1.FullName);
          Assert.AreEqual("John Doe", (string) response2.FullName);
+      }
+
+      [TestMethod]
+      public async Task WebApiBasicVM_UpdateNoResponse()
+      {
+         VMController.Register<BasicVM>();
+
+         var webApi = new DotNetifyWebApi();
+         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
+         var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var serviceScopeFactory = new ServiceScopeFactory();
+
+         var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+
+         var update = new Dictionary<string, object>() { { "Metadata", "Test" } };
+         var result = await webApi.Update_VM("BasicVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
+         Assert.IsNull(result);
       }
 
       [TestMethod]

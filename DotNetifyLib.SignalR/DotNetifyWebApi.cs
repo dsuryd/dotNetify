@@ -180,6 +180,9 @@ namespace DotNetify.WebApi
             {
                await vmController.OnUpdateVMAsync(connectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
                vmController.Dispose();
+
+               if (!taskCompletionSource2.Task.IsCompleted)
+                  taskCompletionSource2.TrySetResult(null);
             });
          }
          catch (Exception ex)
