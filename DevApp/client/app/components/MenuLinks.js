@@ -39,7 +39,7 @@ const CoreLink = ({ active }) => (
 );
 
 const ElementsLink = ({ active }) => (
-  <a href="/elements">
+  <a href="https://dotnetify.net/elements">
     <Label css={textLinkCss(active)}>Elements</Label>
   </a>
 );
