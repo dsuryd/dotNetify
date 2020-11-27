@@ -1,11 +1,11 @@
 @echo off
+echo -- Build client app
+call npm run build-prod --prefix ./DevApp
+
 if "%1"=="local" goto :local
 goto :heroku
 
 :local
-echo -- Build client app
-npm run build --prefix ./DevApp
-
 echo --- Remove any existing image
 docker rmi dotnetify -f
 

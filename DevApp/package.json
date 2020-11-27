@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "webpack",
+    "build-prod": "webpack -p",
     "prod": "webpack -p --progress && dotnet publish -c Release",
     "dist": "webpack --config ./webpack.dist.config.js",
     "pretty": "prettier --write \"./{src,client}/**/*.{ts,tsx,js,json,vue}\""
