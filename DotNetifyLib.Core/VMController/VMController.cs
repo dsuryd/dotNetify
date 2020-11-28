@@ -141,7 +141,7 @@ namespace DotNetify
       /// <summary>
       /// Function invoked by the view model to provide response back to the client.
       /// </summary>
-      protected internal readonly VMResponseDelegate _vmResponse;
+      protected internal VMResponseDelegate VMResponse { get; set; }
 
       #endregion Fields
 
@@ -184,7 +184,7 @@ namespace DotNetify
       /// <param name="serviceScope">Dependency injection service scope.</param>
       public VMController(VMResponseDelegate vmResponse, IVMFactory vmFactory, IVMServiceScope serviceScope = null) : this()
       {
-         _vmResponse = vmResponse ?? throw new ArgumentNullException(nameof(vmResponse));
+         VMResponse = vmResponse ?? throw new ArgumentNullException(nameof(vmResponse));
          _vmFactory = vmFactory;
          _serviceScope = serviceScope;
       }
@@ -248,7 +248,7 @@ namespace DotNetify
             var vmData = vmInstance.Serialize();
 
             // Send the view model data back to the browser client.
-            await ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => _vmResponse(connectionId, vmId, (string) filteredData));
+            await ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => VMResponse(connectionId, vmId, (string) filteredData));
 
             // Reset the changed property states.
             vmInstance.AcceptChangedProperties();
@@ -548,7 +548,7 @@ namespace DotNetify
 
          ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, vmData, filteredData =>
          {
-            _vmResponse(vmInfo.ConnectionId, vmInfo.Id, (string) filteredData);
+            VMResponse(vmInfo.ConnectionId, vmInfo.Id, (string) filteredData);
             return Task.CompletedTask;
          });
       }
@@ -566,7 +566,7 @@ namespace DotNetify
             GroupName = groupName,
             ConnectionId = connectionId
          };
-         _vmResponse(MULTICAST + nameof(GroupRemove), vmId, JsonConvert.SerializeObject(message));
+         VMResponse(MULTICAST + nameof(GroupRemove), vmId, JsonConvert.SerializeObject(message));
       }
 
       /// <summary>
@@ -578,7 +578,7 @@ namespace DotNetify
       {
          ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, args.Data, filteredData =>
          {
-            _vmResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(args));
+            VMResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(args));
             return Task.CompletedTask;
          });
       }
