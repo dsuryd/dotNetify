@@ -82,17 +82,22 @@ namespace UnitTests
       [TestMethod]
       public async Task WebApiBasicVM_Request()
       {
+         var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
-         var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
+         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var serviceProvider = new HubServiceProvider();
+         var principalAccessor = new HubPrincipalAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var serviceScopeFactory = new ServiceScopeFactory();
+         var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
-         var result = await webApi.Request_VM("BasicVM", null, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
+         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
          dynamic response = JsonConvert.DeserializeObject(result);
          Assert.AreEqual("Hello", (string) response.FirstName);
@@ -103,23 +108,31 @@ namespace UnitTests
       [TestMethod]
       public async Task WebApiBasicVM_Update()
       {
+         var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
-         var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
+         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var serviceProvider = new HubServiceProvider();
+         var principalAccessor = new HubPrincipalAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var serviceScopeFactory = new ServiceScopeFactory();
+         var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var result = await webApi.Update_VM("BasicVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
+         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
          dynamic response1 = JsonConvert.DeserializeObject(result);
 
-         update = new Dictionary<string, object>() { { "FirstName", "John" }, { "LastName", "Doe" } };
-         result = await webApi.Update_VM("BasicVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
+         webApi = new DotNetifyWebApi();
+         webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+
+         update = new Dictionary<string, object>() { { "LastName", "Doe" } };
+         result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
          dynamic response2 = JsonConvert.DeserializeObject(result);
+
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
          Assert.AreEqual("John World", (string) response1.FullName);
          Assert.AreEqual("John Doe", (string) response2.FullName);
@@ -128,37 +141,48 @@ namespace UnitTests
       [TestMethod]
       public async Task WebApiBasicVM_UpdateNoResponse()
       {
+         var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
-         var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
+         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var serviceProvider = new HubServiceProvider();
+         var principalAccessor = new HubPrincipalAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var serviceScopeFactory = new ServiceScopeFactory();
+         var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
          var update = new Dictionary<string, object>() { { "Metadata", "Test" } };
-         var result = await webApi.Update_VM("BasicVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
-         Assert.IsNull(result);
+         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+
+         Assert.IsNotNull(result);
       }
 
       [TestMethod]
       public async Task WebApiBasicVM_RequestMiddleware()
       {
+         var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
          _middlewareFactories.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(typeof(CustomMiddleware), () => new CustomMiddleware()));
 
-         var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
-         var serviceScopeFactory = new ServiceScopeFactory();
+         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var serviceProvider = new HubServiceProvider();
+         var principalAccessor = new HubPrincipalAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
-         var result = await webApi.Request_VM("BasicVM", null, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
+         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
          dynamic response = JsonConvert.DeserializeObject(result);
          Assert.AreEqual("John", (string) response.FirstName);
@@ -169,21 +193,26 @@ namespace UnitTests
       [TestMethod]
       public async Task WebApiBasicVM_UpdateMiddleware()
       {
+         var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
          _middlewareFactories.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(typeof(CustomMiddleware), () => new CustomMiddleware()));
 
-         var webApi = new DotNetifyWebApi();
-         var vmFactory = new VMFactory(_memoryCache, new VMTypesAccessor());
-         var serviceScopeFactory = new ServiceScopeFactory();
+         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var serviceProvider = new HubServiceProvider();
+         var principalAccessor = new HubPrincipalAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var result = await webApi.Update_VM("BasicVM", null, update, vmFactory, null, serviceScopeFactory, hubPipeline, new HubPrincipalAccessor());
+         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
          dynamic response = JsonConvert.DeserializeObject(result);
+
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
          Assert.AreEqual("JOHN World", (string) response.FullName);
       }
