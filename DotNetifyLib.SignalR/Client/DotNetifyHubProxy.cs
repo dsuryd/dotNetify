@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2018 Dicky Suryadi
+Copyright 2018-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ namespace DotNetify.Client
              .Build();
          _connection.Closed += OnConnectionClosed;
 
-         _subs.Add(_connection.On<object>("Response_VM", OnResponse_VM));
+         _subs.Add(_connection.On<object>(nameof(IDotNetifyHubMethod.Response_VM), OnResponse_VM));
       }
 
       /// <summary>
@@ -123,20 +123,20 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
       /// <param name="options">DotNetify connection options.</param>
-      public async Task Request_VM(string vmId, Dictionary<string, object> options) => await _connection?.SendCoreAsync("Request_VM", new object[] { vmId, options });
+      public async Task Request_VM(string vmId, Dictionary<string, object> options) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, options });
 
       /// <summary>
       /// Sends an Update_VM message to the server.
       /// </summary>
       /// <param name="vmId">Identifies the view model to send the update to.</param>
       /// <param name="propertyValues">Dictionary of property names and updated values.</param>
-      public async Task Update_VM(string vmId, Dictionary<string, object> propertyValues) => await _connection?.SendCoreAsync("Update_VM", new object[] { vmId, propertyValues });
+      public async Task Update_VM(string vmId, Dictionary<string, object> propertyValues) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Update_VM), new object[] { vmId, propertyValues });
 
       /// <summary>
       /// Sends a Dispose_VM message to the server.
       /// </summary>
       /// <param name="vmId">Identifies the view model to dispose.</param>
-      public async Task Dispose_VM(string vmId) => await _connection?.SendCoreAsync("Dispose_VM", new object[] { vmId });
+      public async Task Dispose_VM(string vmId) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Dispose_VM), new object[] { vmId });
 
       /// <summary>
       /// Builds SignalR hub protocol.
@@ -188,7 +188,7 @@ namespace DotNetify.Client
          // whose view no longer existed.  So, tell the server to dispose the view model.
          if (!eventArgs.Handled)
          {
-            var task = Dispose_VM(vmId);
+            _ = Dispose_VM(vmId);
          }
       }
 
