@@ -41,6 +41,11 @@ namespace DotNetify
       private IPrincipal _principal;
 
       /// <summary>
+      /// Context for the hub connection.
+      /// </summary>
+      internal HubCallerContext CallerContext { get; set; }
+
+      /// <summary>
       /// Identity principal of the hub connection.
       /// </summary>
       private IPrincipal Principal
@@ -49,7 +54,10 @@ namespace DotNetify
          set => _principal = value;
       }
 
-      internal HubCallerContext CallerContext { get; set; }
+      /// <summary>
+      /// Identifies the hub connection.
+      /// </summary>
+      private string ConnectionId => CallerContext.ConnectionId;
 
       /// <summary>
       /// View model controller associated with the current connection.
@@ -60,7 +68,7 @@ namespace DotNetify
          {
             SetHubPrincipalAccessor();
 
-            var vmController = _vmControllerFactory.GetInstance(CallerContext.ConnectionId);
+            var vmController = _vmControllerFactory.GetInstance(ConnectionId);
             vmController.RequestVMFilter = RunRequestingVMFilters;
             vmController.UpdateVMFilter = RunUpdatingVMFilters;
             vmController.ResponseVMFilter = RunRespondingVMFilters;
@@ -105,7 +113,7 @@ namespace DotNetify
          VMController _ = VMController;
 
          // Remove the controller on disconnection.
-         _vmControllerFactory.Remove(CallerContext.ConnectionId);
+         _vmControllerFactory.Remove(ConnectionId);
 
          // Allow middlewares to hook to the event.
          await _hubPipeline.RunDisconnectionMiddlewaresAsync(CallerContext);
@@ -129,18 +137,18 @@ namespace DotNetify
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
-               string groupName = await VMController.OnRequestVMAsync(CallerContext.ConnectionId, ctx.VMId, ctx.Data);
+               string groupName = await VMController.OnRequestVMAsync(ConnectionId, ctx.VMId, ctx.Data);
 
                // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
                if (!string.IsNullOrEmpty(groupName))
-                  await _hubResponse.AddToGroupAsync(CallerContext.ConnectionId, groupName);
+                  await _hubResponse.AddToGroupAsync(ConnectionId, groupName);
             });
          }
          catch (Exception ex)
          {
             var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
             if (finalEx is OperationCanceledException == false)
-               await ResponseVMAsync(CallerContext.ConnectionId, vmId, finalEx.Serialize());
+               await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
          }
       }
 
@@ -159,14 +167,14 @@ namespace DotNetify
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
-               await VMController.OnUpdateVMAsync(ctx.CallerContext.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
+               await VMController.OnUpdateVMAsync(ctx.ConnectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
             });
          }
          catch (Exception ex)
          {
             var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
             if (finalEx is OperationCanceledException == false)
-               await ResponseVMAsync(CallerContext.ConnectionId, vmId, finalEx.Serialize());
+               await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
          }
       }
 
@@ -182,7 +190,7 @@ namespace DotNetify
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
-               VMController.OnDisposeVM(CallerContext.ConnectionId, ctx.VMId);
+               VMController.OnDisposeVM(ConnectionId, ctx.VMId);
                return Task.CompletedTask;
             });
          }
@@ -312,7 +320,7 @@ namespace DotNetify
          {
             var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
             if (finalEx is OperationCanceledException == false && CallerContext != null)
-               await ResponseVMAsync(CallerContext.ConnectionId, vmId, finalEx.Serialize());
+               await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
          }
       }
 
