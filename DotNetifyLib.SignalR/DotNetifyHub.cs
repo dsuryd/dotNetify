@@ -68,6 +68,7 @@ namespace DotNetify
       /// <returns></returns>
       public override async Task OnDisconnectedAsync(Exception exception)
       {
+         _hubHandler.CallerContext = Context;
          await _hubHandler.OnDisconnectedAsync(exception);
          await base.OnDisconnectedAsync(exception);
       }
@@ -84,10 +85,6 @@ namespace DotNetify
          await _hubHandler.RequestVMAsync(vmId, vmArg);
       }
 
-      [Obsolete]
-      [HubMethodName("Request_VM_Obsolete")]
-      public void Request_VM(string vmId, object vmArg) => _ = RequestVMAsync(vmId, vmArg);
-
       /// <summary>
       /// This method is called by browser clients to update a view model's value.
       /// </summary>
@@ -100,10 +97,6 @@ namespace DotNetify
          await _hubHandler.UpdateVMAsync(vmId, vmData);
       }
 
-      [Obsolete]
-      [HubMethodName("Update_VM_Obsolete")]
-      public void Update_VM(string vmId, Dictionary<string, object> vmData) => _ = UpdateVMAsync(vmId, vmData);
-
       /// <summary>
       /// This method is called by browser clients to remove its view model as it's no longer used.
       /// </summary>
@@ -115,8 +108,20 @@ namespace DotNetify
          await _hubHandler.DisposeVMAsyc(vmId);
       }
 
+      #region Obsolete Methods
+
+      [Obsolete]
+      [HubMethodName("Request_VM_Obsolete")]
+      public void Request_VM(string vmId, object vmArg) => _ = RequestVMAsync(vmId, vmArg);
+
+      [Obsolete]
+      [HubMethodName("Update_VM_Obsolete")]
+      public void Update_VM(string vmId, Dictionary<string, object> vmData) => _ = UpdateVMAsync(vmId, vmData);
+
       [Obsolete]
       [HubMethodName("Dispose_VM_Obsolete")]
       public void Dispose_VM(string vmId) => _ = DisposeVMAsyc(vmId);
+
+      #endregion Obsolete Methods
    }
 }
