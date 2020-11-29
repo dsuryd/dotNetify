@@ -17,17 +17,16 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetify.Security;
+using DotNetify.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json.Linq;
 
 namespace DotNetify.WebApi
 {
@@ -108,7 +107,7 @@ namespace DotNetify.WebApi
          }
          catch (Exception ex)
          {
-            _taskCompletionSource.TrySetResult(DotNetifyHub.SerializeException(ex));
+            _taskCompletionSource.TrySetResult(ex.Serialize());
          }
 
          return await _taskCompletionSource.Task;
@@ -144,7 +143,7 @@ namespace DotNetify.WebApi
          }
          catch (Exception ex)
          {
-            _taskCompletionSource.TrySetResult(DotNetifyHub.SerializeException(ex));
+            _taskCompletionSource.TrySetResult(ex.Serialize());
          }
 
          return await _taskCompletionSource.Task;
