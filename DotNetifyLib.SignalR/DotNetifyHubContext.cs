@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,7 @@ namespace DotNetify
       private Lazy<Dictionary<string, object>> _pipelineData = new Lazy<Dictionary<string, object>>();
 
       public HubCallerContext CallerContext { get; }
+      public string ConnectionId { get; }
       public string CallType { get; }
       public string VMId { get; }
       public object Data { get; set; }
@@ -44,6 +45,8 @@ namespace DotNetify
          Data = data;
          Headers = headers;
          Principal = principal;
+
+         ConnectionId = CallerContext.ConnectionId;
       }
    }
 }

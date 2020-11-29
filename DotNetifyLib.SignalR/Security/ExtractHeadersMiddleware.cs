@@ -53,14 +53,14 @@ namespace DotNetify.Security
 
          // Set initial headers from previously cached headers.
          if (context.CallerContext != null)
-            context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
+            context.Headers = _headersCache.Get(_headersKey(context.ConnectionId));
 
          var tuple = ExtractHeaders(context.Data);
          if (tuple.Item1 != null)
          {
             context.Headers = tuple.Item1;
             if (context.CallerContext != null)
-               _headersCache.Set(_headersKey(context.CallerContext.ConnectionId), context.Headers);
+               _headersCache.Set(_headersKey(context.ConnectionId), context.Headers);
          }
          context.Data = tuple.Item2;
 
