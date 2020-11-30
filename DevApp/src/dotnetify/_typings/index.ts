@@ -15,6 +15,7 @@ export interface IDotnetify {
   hubOptions: HubOptionsType;
   hubPath: string;
   hubLib: any;
+  hubServerUrl: string;
 
   // Debug mode.
   debug: boolean;
