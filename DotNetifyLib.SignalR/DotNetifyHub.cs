@@ -59,13 +59,11 @@ namespace DotNetify
          IHubContext<DotNetifyHub> globalHubContext)
       {
          _hubHandler = new DotNetifyHubHandler(vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, new DotNetifyHubResponse(globalHubContext));
-         _hubHandler.CallerContext = Context;
       }
 
       /// <summary>
       /// Handles when a client gets disconnected.
       /// </summary>
-      /// <returns></returns>
       public override async Task OnDisconnectedAsync(Exception exception)
       {
          _hubHandler.CallerContext = Context;
