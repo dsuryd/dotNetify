@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
+using DotNetify.Util;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Protocol;
@@ -21,17 +26,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DotNetify.Client
 {
    /// <summary>
    /// Class that serves as a proxy of the dotNetify server hub.
    /// </summary>
-   public class DotNetifyHubProxy : IDotNetifyHubProxy, IDisposable
+   public class DotNetifyHubProxy : IDotNetifyHubProxy
    {
       private string _hubPath;
       private string _serverUrl;
@@ -48,6 +49,11 @@ namespace DotNetify.Client
       /// DotNetify hub server URL.
       /// </summary>
       public static string ServerUrl { get; set; } = "http://localhost:5000";
+
+      /// <summary>
+      /// Current connection state.
+      /// </summary>
+      public HubConnectionState ConnectionState => _connectionState;
 
       /// <summary>
       /// Occurs when the connection is disconnected.
@@ -122,8 +128,8 @@ namespace DotNetify.Client
       /// Sends a Request_VM message to the server.
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
-      /// <param name="options">DotNetify connection options.</param>
-      public async Task Request_VM(string vmId, Dictionary<string, object> options) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, options });
+      /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
+      public async Task Request_VM(string vmId, object vmArg) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg });
 
       /// <summary>
       /// Sends an Update_VM message to the server.
@@ -148,7 +154,7 @@ namespace DotNetify.Client
          return new JsonHubProtocol(Options.Create(
             new JsonHubProtocolOptions
             {
-               PayloadSerializerSettings = new JsonSerializerSettings { ContractResolver = new DefaultContractResolver() }
+               PayloadSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = null }
             }));
       }
 
@@ -166,6 +172,7 @@ namespace DotNetify.Client
       /// </summary>
       private void OnResponse_VM(object payload)
       {
+         payload = payload.NormalizeType();
          if (payload is JArray == false)
             return;
 
