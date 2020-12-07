@@ -15,7 +15,10 @@ limitations under the License.
  */
 
 using System;
+using System.ComponentModel;
+using System.Reflection;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -23,6 +26,27 @@ namespace DotNetify.Util
 {
    public static class UtilExtensions
    {
+      /// <summary>
+      /// Converts from string.
+      /// </summary>
+      public static object ConvertFromString(this string value, Type type)
+      {
+         if (type.GetTypeInfo().IsClass && type != typeof(string))
+            return System.Text.Json.JsonSerializer.Deserialize(value, type);
+         else
+            return TypeDescriptor.GetConverter(type)?.ConvertFromString(value);
+      }
+
+      /// <summary>
+      /// Invokes a reflection method asynchronously.
+      /// </summary>
+      public static async Task<object> InvokeAsync(this MethodInfo methodInfo, object obj, params object[] args)
+      {
+         var task = (Task) methodInfo.Invoke(obj, args);
+         await task.ConfigureAwait(false);
+         return task.GetType().GetProperty(nameof(Task<object>.Result));
+      }
+
       /// <summary>
       /// Normalizes the type of the object argument to JObject when possible.
       /// </summary>
@@ -44,6 +68,7 @@ namespace DotNetify.Util
          else if (!(data.GetType().IsPrimitive || data is string))
             // MessagePack protocol.
             return JObject.FromObject(data);
+
          return data;
       }
 

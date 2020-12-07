@@ -96,7 +96,7 @@ namespace DotNetify.WebApi
          )
       {
          var hub = new DotNetifyHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null);
-         hub.Context = InitializeHubCallerContext(principalAccessor);
+         hub.Context = InitializeHubCallerContext(principalAccessor, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
          vmControllerFactory.ResponseDelegate = ResponseVMCallback;
 
          try
@@ -132,7 +132,7 @@ namespace DotNetify.WebApi
          )
       {
          var hub = new DotNetifyHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null);
-         hub.Context = InitializeHubCallerContext(principalAccessor);
+         hub.Context = InitializeHubCallerContext(principalAccessor, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
          vmControllerFactory.ResponseDelegate = ResponseVMCallback;
 
          try
@@ -159,7 +159,7 @@ namespace DotNetify.WebApi
          )
       {
          var hub = new DotNetifyHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null);
-         hub.Context = InitializeHubCallerContext(principalAccessor);
+         hub.Context = InitializeHubCallerContext(principalAccessor, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
          vmControllerFactory.ResponseDelegate = (string arg1, string arg2, string arg3) => Task.CompletedTask;
 
          await hub.DisposeVMAsyc(vmId);
@@ -169,15 +169,18 @@ namespace DotNetify.WebApi
       /// Initializes the scoped context of the request.
       /// </summary>
       /// <param name="principalAccessor">Principal user context.</param>
+      /// <param name="callType">Hub method name.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
       /// <returns>HTTP caller context.</returns>
-      private HttpCallerContext InitializeHubCallerContext(IPrincipalAccessor principalAccessor)
+      private HttpCallerContext InitializeHubCallerContext(IPrincipalAccessor principalAccessor, string callType, string vmId, object vmData = null)
       {
          var httpCallerContext = new HttpCallerContext(HttpContext);
          if (principalAccessor is HubPrincipalAccessor)
          {
             var hubPrincipalAccessor = principalAccessor as HubPrincipalAccessor;
             hubPrincipalAccessor.Principal = HttpContext?.User;
-            hubPrincipalAccessor.CallerContext = httpCallerContext;
+            hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, vmData, null, hubPrincipalAccessor.Principal);
          }
          return httpCallerContext;
       }

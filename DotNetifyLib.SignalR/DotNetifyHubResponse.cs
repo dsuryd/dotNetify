@@ -44,7 +44,7 @@ namespace DotNetify
    public class DotNetifyHubResponse : IDotNetifyHubResponse
    {
       private readonly IHubContext<DotNetifyHub> _hubContext;
-      private static readonly string _responseVMMethod = nameof(IDotNetifyHubMethod.Response_VM);
+      private static readonly string RESPONSE_VM = nameof(IDotNetifyHubMethod.Response_VM);
 
       /// <summary>
       /// Constructor.
@@ -75,7 +75,7 @@ namespace DotNetify
       /// <param name="connectionId">SignalR connection.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data.</param>
-      public Task SendAsync(string connectionId, string vmId, string vmData) => _hubContext.Clients.Client(connectionId).SendAsync(_responseVMMethod, new object[] { vmId, vmData });
+      public Task SendAsync(string connectionId, string vmId, string vmData) => _hubContext.Clients.Client(connectionId).SendAsync(RESPONSE_VM, new object[] { vmId, vmData });
 
       /// <summary>
       /// Invokes Response_VM on a group.
@@ -83,7 +83,7 @@ namespace DotNetify
       /// <param name="groupName">SignalR group name.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data.</param>
-      public Task SendToGroupAsync(string groupName, string vmId, string vmData) => _hubContext.Clients.Group(groupName).SendAsync(_responseVMMethod, new object[] { vmId, vmData });
+      public Task SendToGroupAsync(string groupName, string vmId, string vmData) => _hubContext.Clients.Group(groupName).SendAsync(RESPONSE_VM, new object[] { vmId, vmData });
 
       /// <summary>
       /// Invokes Response_VM on a group but exclude some connections.
@@ -92,7 +92,7 @@ namespace DotNetify
       /// <param name="excludedConnectionIds">Excluded SignalR connections.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data.</param>
-      public Task SendToGroupExceptAsync(string groupName, IReadOnlyList<string> excludedConnectionIds, string vmId, string vmData) => _hubContext.Clients.GroupExcept(groupName, excludedConnectionIds).SendAsync(_responseVMMethod, new object[] { vmId, vmData });
+      public Task SendToGroupExceptAsync(string groupName, IReadOnlyList<string> excludedConnectionIds, string vmId, string vmData) => _hubContext.Clients.GroupExcept(groupName, excludedConnectionIds).SendAsync(RESPONSE_VM, new object[] { vmId, vmData });
 
       /// <summary>
       /// Invokes Response_VM on a set of users.
@@ -100,6 +100,6 @@ namespace DotNetify
       /// <param name="userIds">Identifies the users.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data.</param>
-      public Task SendToUsersAsync(IReadOnlyList<string> userIds, string vmId, string vmData) => _hubContext.Clients.Users(userIds).SendAsync(_responseVMMethod, new object[] { vmId, vmData });
+      public Task SendToUsersAsync(IReadOnlyList<string> userIds, string vmId, string vmData) => _hubContext.Clients.Users(userIds).SendAsync(RESPONSE_VM, new object[] { vmId, vmData });
    }
 }

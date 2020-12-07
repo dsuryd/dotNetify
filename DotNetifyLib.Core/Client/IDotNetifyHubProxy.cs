@@ -62,7 +62,7 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
-      Task Request_VM(string vmId, object vmArg);
+      Task Request_VM(string vmId, Dictionary<string, object> vmArg);
 
       /// <summary>
       /// Sends an Update_VM message to the server.
@@ -76,6 +76,14 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model to dispose.</param>
       Task Dispose_VM(string vmId);
+
+      /// <summary>
+      /// Invokes a hub method.
+      /// </summary>
+      /// <param name="methodName">Hub method name.</param>
+      /// <param name="methodArgs">Hub method arguments.</param>
+      /// <param name="metadata">Any metadata.</param>
+      Task Invoke(string methodName, object[] methodArgs, IDictionary<string, object> metadata);
    }
 
    /// <summary>
@@ -98,5 +106,15 @@ namespace DotNetify.Client
       public string VMId { get; set; }
       public Dictionary<string, object> Data { get; set; }
       public bool Handled { get; set; }
+   }
+
+   /// <summary>
+   /// Event arguments of the response of the Invoke message.
+   /// </summary>
+   public class InvokeResponseEventArgs : ResponseVMEventArgs
+   {
+      public string MethodName { get; set; }
+      public string[] MethodArgs { get; set; }
+      public IDictionary<string, string> Metadata { get; set; }
    }
 }

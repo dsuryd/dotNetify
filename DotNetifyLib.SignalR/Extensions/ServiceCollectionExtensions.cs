@@ -45,6 +45,7 @@ namespace DotNetify
 
          // Add service to get the hub principal and the associated connection context.
          services.AddSingleton<IPrincipalAccessor, HubPrincipalAccessor>();
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IDotNetifyHubContextAccessor);
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IHubCallerContextAccessor);
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IConnectionContext);
 

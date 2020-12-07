@@ -24,6 +24,7 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using DotNetify.Routing;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace DotNetify
 {
@@ -76,7 +77,8 @@ namespace DotNetify
             vmControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
 
          // Add middleware to extract headers from incoming requests.
-         _middlewareTypes.Insert(0, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
+         if (!_middlewareTypes.Exists(t => t.Item1 == typeof(ExtractHeadersMiddleware)))
+            _middlewareTypes.Insert(0, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
 
          // Add middleware factories to the hub.
          var middlewareFactories = provider.GetService<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>();
@@ -94,14 +96,22 @@ namespace DotNetify
       /// </summary>
       /// <param name="dotNetifyConfig">DotNetify configuration.</param>
       /// <param name="args">Middleware arguments.</param>
-      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline => _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline
+      {
+         if (!_middlewareTypes.Any(x => x.Item1 == typeof(T) && x.Item2 == args))
+            _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+      }
 
       /// <summary>
       /// Includes a view model filter to the dotNetify's pipeline.
       /// </summary>
       /// <param name="dotNetifyConfig">DotNetify configuration.</param>
       /// <param name="args">View model filter arguments.</param>
-      public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter => _filterTypes.Add(Tuple.Create(typeof(T), args));
+      public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter
+      {
+         if (!_filterTypes.Any(x => x.Item1 == typeof(T) && x.Item2 == args))
+            _filterTypes.Add(Tuple.Create(typeof(T), args));
+      }
 
       /// <summary>
       /// Includes server-side rendering in the application request pipeline.

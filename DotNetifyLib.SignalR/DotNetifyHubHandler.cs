@@ -20,6 +20,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using DotNetify.Forwarding;
 using DotNetify.Security;
 using DotNetify.Util;
 using Microsoft.AspNetCore.SignalR;
@@ -28,36 +29,46 @@ using Newtonsoft.Json;
 namespace DotNetify
 {
    /// <summary>
-   /// This class handles method invocations from the hub.
+   /// Handles hub method calls.
    /// </summary>
-   public class DotNetifyHubHandler
+   public interface IDotNetifyHubHandler
+   {
+      Task RequestVMAsync(string vmId, object vmArg);
+
+      Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData);
+
+      Task DisposeVMAsync(string vmId);
+
+      Task OnDisconnectedAsync(Exception exception);
+   }
+
+   /// <summary>
+   /// This class handles hub method calls for requesting, updating and disposing view models.
+   /// </summary>
+   public class DotNetifyHubHandler : IDotNetifyHubHandler
    {
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IHubServiceProvider _serviceProvider;
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IHubPipeline _hubPipeline;
-      private readonly IDotNetifyHubResponse _hubResponse;
+      private IDotNetifyHubResponse _hubResponse;
+      private HubCallerContext _callerContext;
       private DotNetifyHubContext _hubContext;
       private IPrincipal _principal;
-
-      /// <summary>
-      /// Context for the hub connection.
-      /// </summary>
-      internal HubCallerContext CallerContext { get; set; }
 
       /// <summary>
       /// Identity principal of the hub connection.
       /// </summary>
       private IPrincipal Principal
       {
-         get => _principal ?? CallerContext?.User;
+         get => _principal ?? _callerContext?.User;
          set => _principal = value;
       }
 
       /// <summary>
       /// Identifies the hub connection.
       /// </summary>
-      private string ConnectionId => CallerContext.ConnectionId;
+      private string ConnectionId => _callerContext.GetForwardConnectionId() ?? _callerContext.ConnectionId;
 
       /// <summary>
       /// View model controller associated with the current connection.
@@ -84,22 +95,25 @@ namespace DotNetify
       /// Constructor for dependency injection.
       /// </summary>
       /// <param name="vmControllerFactory">Factory of view model controllers.</param>
-      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
-      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="serviceProvider">Allows providing scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows passing the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
-      /// <param name="hubResponse">Provides access to send view model responses back to clients.</param>
+      /// <param name="hubResponse">Allows sending responses to the client.</param>
+      /// <param name="callerContext">Hub connection context.</param>
       public DotNetifyHubHandler(
          IVMControllerFactory vmControllerFactory,
          IHubServiceProvider serviceProvider,
          IPrincipalAccessor principalAccessor,
          IHubPipeline hubPipeline,
-         IDotNetifyHubResponse hubResponse)
+         IDotNetifyHubResponse hubResponse,
+         HubCallerContext callerContext)
       {
          _vmControllerFactory = vmControllerFactory;
          _serviceProvider = serviceProvider;
          _principalAccessor = principalAccessor;
          _hubPipeline = hubPipeline;
          _hubResponse = hubResponse;
+         _callerContext = callerContext;
 
          _vmControllerFactory.ResponseDelegate = ResponseVMAsync;
       }
@@ -116,7 +130,7 @@ namespace DotNetify
          _vmControllerFactory.Remove(ConnectionId);
 
          // Allow middlewares to hook to the event.
-         await _hubPipeline.RunDisconnectionMiddlewaresAsync(CallerContext);
+         await _hubPipeline.RunDisconnectionMiddlewaresAsync(_callerContext);
       }
 
       #region Client Requests
@@ -132,7 +146,7 @@ namespace DotNetify
 
          try
          {
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Request_VM), vmId, data, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Request_VM), vmId, data, null, Principal);
 
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
@@ -146,7 +160,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
+            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(_callerContext, ex);
             if (finalEx is OperationCanceledException == false)
                await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
          }
@@ -163,7 +177,7 @@ namespace DotNetify
 
          try
          {
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Update_VM), vmId, data, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Update_VM), vmId, data, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
@@ -172,7 +186,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
+            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(_callerContext, ex);
             if (finalEx is OperationCanceledException == false)
                await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
          }
@@ -182,11 +196,11 @@ namespace DotNetify
       /// This method is called by browser clients to remove its view model as it's no longer used.
       /// </summary>
       /// <param name="vmId">Identifies the view model.  By convention, this should match a view model class name.</param>
-      public async Task DisposeVMAsyc(string vmId)
+      public async Task DisposeVMAsync(string vmId)
       {
          try
          {
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Dispose_VM), vmId, null, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Dispose_VM), vmId, null, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, ctx =>
             {
                Principal = ctx.Principal;
@@ -196,7 +210,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
+            await _hubPipeline.RunExceptionMiddlewareAsync(_callerContext, ex);
          }
       }
 
@@ -309,7 +323,7 @@ namespace DotNetify
       {
          try
          {
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, Principal);
+            _hubContext = new DotNetifyHubContext(_callerContext, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
@@ -318,8 +332,8 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
-            if (finalEx is OperationCanceledException == false && CallerContext != null)
+            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(_callerContext, ex);
+            if (finalEx is OperationCanceledException == false && _callerContext != null)
                await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
          }
       }
@@ -333,7 +347,7 @@ namespace DotNetify
          {
             var hubPrincipalAccessor = _principalAccessor as HubPrincipalAccessor;
             hubPrincipalAccessor.Principal = Principal;
-            hubPrincipalAccessor.CallerContext = CallerContext;
+            hubPrincipalAccessor.Context = _hubContext;
          }
       }
    }
