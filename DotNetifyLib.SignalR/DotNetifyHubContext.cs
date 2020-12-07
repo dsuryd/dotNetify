@@ -17,10 +17,19 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Security.Principal;
+using DotNetify.Forwarding;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify
 {
+   /// <summary>
+   /// Provides access to request context.
+   /// </summary>
+   public interface IDotNetifyHubContextAccessor
+   {
+      DotNetifyHubContext Context { get; }
+   }
+
    /// <summary>
    /// Provides request context for a middleware.
    /// </summary>
@@ -46,7 +55,7 @@ namespace DotNetify
          Headers = headers;
          Principal = principal;
 
-         ConnectionId = CallerContext.ConnectionId;
+         ConnectionId = CallerContext.GetForwardConnectionId() ?? CallerContext.ConnectionId;
       }
    }
 }

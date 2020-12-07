@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2016-2018 Dicky Suryadi
+Copyright 2016-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,10 +28,10 @@ namespace DotNetify
    /// <summary>
    /// Implements ambient data store for the current principal and connection context of the SignalR hub.
    /// </summary>
-   internal class HubPrincipalAccessor : IPrincipalAccessor, IHubCallerContextAccessor, IConnectionContext
+   internal class HubPrincipalAccessor : IPrincipalAccessor, IHubCallerContextAccessor, IDotNetifyHubContextAccessor, IConnectionContext
    {
       private readonly static AsyncLocal<IPrincipal> _asyncLocalPrincipal = new AsyncLocal<IPrincipal>();
-      private readonly static AsyncLocal<HubCallerContext> _asyncLocalCallerContext = new AsyncLocal<HubCallerContext>();
+      private readonly static AsyncLocal<DotNetifyHubContext> _asyncLocalContext = new AsyncLocal<DotNetifyHubContext>();
 
       /// <summary>
       /// Current principal.
@@ -43,18 +43,23 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Hub context.
+      /// </summary>
+      public DotNetifyHubContext Context
+      {
+         get { return _asyncLocalContext.Value; }
+         set { _asyncLocalContext.Value = value; }
+      }
+
+      /// <summary>
       /// SignalR hub caller context.
       /// </summary>
-      public HubCallerContext CallerContext
-      {
-         get { return _asyncLocalCallerContext.Value; }
-         set { _asyncLocalCallerContext.Value = value; }
-      }
+      public HubCallerContext CallerContext => Context?.CallerContext;
 
       /// <summary>
       /// Identifies the SignalR connection.
       /// </summary>
-      public string ConnectionId => CallerContext?.ConnectionId;
+      public string ConnectionId => Context?.ConnectionId;
 
       /// <summary>
       /// HTTP request headers.

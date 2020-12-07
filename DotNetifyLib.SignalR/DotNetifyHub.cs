@@ -15,10 +15,13 @@ limitations under the License.
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetify.Security;
+using DotNetify.Util;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
@@ -34,6 +37,8 @@ namespace DotNetify
       void Dispose_VM();
 
       void Response_VM();
+
+      void Invoke();
    }
 
    /// <summary>
@@ -41,7 +46,25 @@ namespace DotNetify
    /// </summary>
    public class DotNetifyHub : Hub
    {
-      private readonly DotNetifyHubHandler _hubHandler;
+      private readonly IVMControllerFactory _vmControllerFactory;
+      private readonly IHubServiceProvider _serviceProvider;
+      private readonly IPrincipalAccessor _principalAccessor;
+      private readonly IHubPipeline _hubPipeline;
+      private readonly IHubContext<DotNetifyHub> _globalHubContext;
+      private IDotNetifyHubHandler _hubHandler;
+
+      /// <summary>
+      /// Handles hub methods.
+      /// </summary>
+      protected IDotNetifyHubHandler HubHandler
+      {
+         get
+         {
+            _hubHandler = _hubHandler ?? new DotNetifyHubHandler(_vmControllerFactory, _serviceProvider, _principalAccessor, _hubPipeline, new DotNetifyHubResponse(_globalHubContext), Context);
+            return _hubHandler;
+         }
+         set => _hubHandler = value;
+      }
 
       /// <summary>
       /// Constructor for dependency injection.
@@ -58,7 +81,11 @@ namespace DotNetify
          IHubPipeline hubPipeline,
          IHubContext<DotNetifyHub> globalHubContext)
       {
-         _hubHandler = new DotNetifyHubHandler(vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, new DotNetifyHubResponse(globalHubContext));
+         _vmControllerFactory = vmControllerFactory;
+         _serviceProvider = serviceProvider;
+         _principalAccessor = principalAccessor;
+         _hubPipeline = hubPipeline;
+         _globalHubContext = globalHubContext;
       }
 
       /// <summary>
@@ -66,8 +93,7 @@ namespace DotNetify
       /// </summary>
       public override async Task OnDisconnectedAsync(Exception exception)
       {
-         _hubHandler.CallerContext = Context;
-         await _hubHandler.OnDisconnectedAsync(exception);
+         await HubHandler.OnDisconnectedAsync(exception);
          await base.OnDisconnectedAsync(exception);
       }
 
@@ -79,8 +105,7 @@ namespace DotNetify
       [HubMethodName(nameof(IDotNetifyHubMethod.Request_VM))]
       public async Task RequestVMAsync(string vmId, object vmArg)
       {
-         _hubHandler.CallerContext = Context;
-         await _hubHandler.RequestVMAsync(vmId, vmArg);
+         await HubHandler.RequestVMAsync(vmId, vmArg);
       }
 
       /// <summary>
@@ -91,8 +116,7 @@ namespace DotNetify
       [HubMethodName(nameof(IDotNetifyHubMethod.Update_VM))]
       public async Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData)
       {
-         _hubHandler.CallerContext = Context;
-         await _hubHandler.UpdateVMAsync(vmId, vmData);
+         await HubHandler.UpdateVMAsync(vmId, vmData);
       }
 
       /// <summary>
@@ -102,8 +126,44 @@ namespace DotNetify
       [HubMethodName(nameof(IDotNetifyHubMethod.Dispose_VM))]
       public async Task DisposeVMAsyc(string vmId)
       {
-         _hubHandler.CallerContext = Context;
-         await _hubHandler.DisposeVMAsyc(vmId);
+         await HubHandler.DisposeVMAsync(vmId);
+      }
+
+      /// <summary>
+      /// This method is called by the hub server to forward messages to another server.
+      /// </summary>
+      /// <param name="methodName">Method name to invoke.</param>
+      /// <param name="methodArgs">Method arguments.</param>
+      /// <param name="metadata">Any metadata.</param>
+      [HubMethodName(nameof(IDotNetifyHubMethod.Invoke))]
+      public async Task InvokeASync(string methodName, object[] methodArgs, IDictionary<string, object> metadata)
+      {
+         foreach (var kvp in metadata)
+            Context.Items[kvp.Key] = kvp.Value;
+
+         switch (methodName)
+         {
+            case nameof(IDotNetifyHubMethod.Request_VM):
+               methodName = nameof(RequestVMAsync);
+               break;
+
+            case nameof(IDotNetifyHubMethod.Update_VM):
+               methodName = nameof(UpdateVMAsync);
+               break;
+
+            case nameof(IDotNetifyHubMethod.Dispose_VM):
+               methodName = nameof(DisposeVMAsyc);
+               break;
+         }
+
+         var methodInfo = GetType().GetMethod(methodName);
+         var methodParams = methodInfo.GetParameters();
+
+         for (int i = 0; i < methodArgs.Length; i++)
+            methodArgs[i] = methodArgs[i].ToString().ConvertFromString(methodParams[i].ParameterType);
+
+         HubHandler = new DotNetifyHubHandler(_vmControllerFactory, _serviceProvider, _principalAccessor, _hubPipeline, new DotNetifyHubForwardResponse(_globalHubContext, Context), Context);
+         await methodInfo.InvokeAsync(this, methodArgs);
       }
 
       #region Obsolete Methods

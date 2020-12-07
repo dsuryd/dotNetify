@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -24,7 +25,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DotNetify.Client
@@ -71,6 +71,20 @@ namespace DotNetify.Client
       public event EventHandler<HubConnectionState> StateChanged;
 
       /// <summary>
+      /// Default constructor.
+      /// </summary>
+      public DotNetifyHubProxy() { }
+
+      /// <summary>
+      /// Constructor that initializes the hub connection.
+      /// </summary>
+      /// <param name="serverUrl">Hub server URL.</param>
+      public DotNetifyHubProxy(string serverUrl) : this()
+      {
+         Init(null, serverUrl);
+      }
+
+      /// <summary>
       /// Disposes this proxy.
       /// </summary>
       public void Dispose()
@@ -104,7 +118,7 @@ namespace DotNetify.Client
              .Build();
          _connection.Closed += OnConnectionClosed;
 
-         _subs.Add(_connection.On<object>(nameof(IDotNetifyHubMethod.Response_VM), OnResponse_VM));
+         _subs.Add(_connection.On<object[]>(nameof(IDotNetifyHubMethod.Response_VM), OnResponse_VM));
       }
 
       /// <summary>
@@ -129,7 +143,7 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
-      public async Task Request_VM(string vmId, object vmArg) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg });
+      public async Task Request_VM(string vmId, Dictionary<string, object> vmArg) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg });
 
       /// <summary>
       /// Sends an Update_VM message to the server.
@@ -143,6 +157,14 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model to dispose.</param>
       public async Task Dispose_VM(string vmId) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Dispose_VM), new object[] { vmId });
+
+      /// <summary>
+      /// Invokes a hub method.
+      /// </summary>
+      /// <param name="methodName">Hub method name.</param>
+      /// <param name="methodArgs">Hub method arguments.</param>
+      /// <param name="metadata">Any metadata.</param>
+      public async Task Invoke(string methodName, object[] methodArgs, IDictionary<string, object> metadata) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Invoke), new object[] { methodName, methodArgs, metadata });
 
       /// <summary>
       /// Builds SignalR hub protocol.
@@ -170,18 +192,32 @@ namespace DotNetify.Client
       /// <summary>
       /// Handles incoming Response_VM message.
       /// </summary>
-      private void OnResponse_VM(object payload)
+      private void OnResponse_VM(object[] payload)
       {
-         payload = payload.NormalizeType();
-         if (payload is JArray == false)
-            return;
+         object[] payloadArray = payload;
+         ResponseVMEventArgs eventArgs;
+         string vmId = null;
 
-         // SignalR .NET Core is sending an array of arguments.
-         var vmId = $"{(payload as JArray)[0]}";
-         var rawData = (payload as JArray)[1].ToString();
-         var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(rawData);
+         // Payload with 3 arguments is the response to the Invoke message.
+         if (payloadArray.Length == 3)
+         {
+            eventArgs = new InvokeResponseEventArgs
+            {
+               MethodName = payloadArray[0].ToString(),
+               MethodArgs = JsonSerializer.Deserialize<string[]>(payloadArray[1].ToString()),
+               Metadata = JsonSerializer.Deserialize<IDictionary<string, string>>(payloadArray[2].ToString())
+            };
+         }
+         else
+         {
+            vmId = payloadArray[0].ToString();
+            eventArgs = new ResponseVMEventArgs
+            {
+               VMId = vmId,
+               Data = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadArray[1].ToString())
+            };
+         }
 
-         var eventArgs = new ResponseVMEventArgs { VMId = vmId, Data = data };
          var args = new object[] { this, eventArgs };
 
          foreach (Delegate d in Response_VM?.GetInvocationList())
@@ -193,7 +229,7 @@ namespace DotNetify.Client
 
          // If we get to this point, that means the server holds a view model instance
          // whose view no longer existed.  So, tell the server to dispose the view model.
-         if (!eventArgs.Handled)
+         if (!eventArgs.Handled && !string.IsNullOrWhiteSpace(vmId))
          {
             _ = Dispose_VM(vmId);
          }
