@@ -82,8 +82,10 @@ namespace DotNetify.WebApi
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
-      /// <param name="vmFactory">Factory object to create the view model instance.</param>
-      /// <param name="hubPipeline">Middleware/VM filter pipeline.</param>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
       /// <returns>View model state.</returns>
       [HttpGet("{vmId}")]
       public async Task<string> Request_VM(
@@ -95,9 +97,7 @@ namespace DotNetify.WebApi
          [FromServices] IHubPipeline hubPipeline
          )
       {
-         var hub = new DotNetifyHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null);
-         hub.Context = InitializeHubCallerContext(principalAccessor, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
-         vmControllerFactory.ResponseDelegate = ResponseVMCallback;
+         var hub = CreateHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
 
          try
          {
@@ -118,8 +118,10 @@ namespace DotNetify.WebApi
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
-      /// <param name="vmFactory">Factory object to create the view model instance.</param>
-      /// <param name="hubPipeline">Middleware/VM filter pipeline.</param>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
       /// <returns>View model state.</returns>
       [HttpPost("{vmId}")]
       public async Task<string> Update_VM(
@@ -131,9 +133,7 @@ namespace DotNetify.WebApi
          [FromServices] IHubPipeline hubPipeline
          )
       {
-         var hub = new DotNetifyHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null);
-         hub.Context = InitializeHubCallerContext(principalAccessor, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
-         vmControllerFactory.ResponseDelegate = ResponseVMCallback;
+         var hub = CreateHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
 
          try
          {
@@ -149,6 +149,15 @@ namespace DotNetify.WebApi
          return await _taskCompletionSource.Task;
       }
 
+      /// <summary>
+      /// This method is called by browser clients to dispose a view model.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
       [HttpDelete("{vmId}")]
       public async Task Dispose_VM(
          string vmId,
@@ -158,31 +167,46 @@ namespace DotNetify.WebApi
          [FromServices] IHubPipeline hubPipeline
          )
       {
-         var hub = new DotNetifyHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null);
-         hub.Context = InitializeHubCallerContext(principalAccessor, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
-         vmControllerFactory.ResponseDelegate = (string arg1, string arg2, string arg3) => Task.CompletedTask;
-
+         var hub = CreateHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
          await hub.DisposeVMAsyc(vmId);
       }
 
       /// <summary>
-      /// Initializes the scoped context of the request.
+      /// Creates a dotNetify hub that uses HTTP context for its hub context, and sets the response callback to a local function.
       /// </summary>
-      /// <param name="principalAccessor">Principal user context.</param>
-      /// <param name="callType">Hub method name.</param>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="callType">Hub call type.</param>
       /// <param name="vmId">Identifies the view model.</param>
-      /// <param name="vmData">View model data.</param>
-      /// <returns>HTTP caller context.</returns>
-      private HttpCallerContext InitializeHubCallerContext(IPrincipalAccessor principalAccessor, string callType, string vmId, object vmData = null)
+      /// <param name="data">View model data.</param>
+      /// <returns>Hub instance.</returns>
+      private DotNetifyHub CreateHub(
+         IVMControllerFactory vmControllerFactory,
+         IHubServiceProvider hubServiceProvider,
+         IPrincipalAccessor principalAccessor,
+         IHubPipeline hubPipeline,
+         string callType,
+         string vmId,
+         object data = null)
       {
          var httpCallerContext = new HttpCallerContext(HttpContext);
          if (principalAccessor is HubPrincipalAccessor)
          {
             var hubPrincipalAccessor = principalAccessor as HubPrincipalAccessor;
             hubPrincipalAccessor.Principal = HttpContext?.User;
-            hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, vmData, null, hubPrincipalAccessor.Principal);
+            hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, data, null, hubPrincipalAccessor.Principal);
          }
-         return httpCallerContext;
+
+         var hub = new DotNetifyHub(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null)
+         {
+            Context = httpCallerContext,
+            HubHandler = new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, new DotNetifyHubResponse(null), httpCallerContext)
+         };
+
+         vmControllerFactory.ResponseDelegate = ResponseVMCallback;
+         return hub;
       }
 
       /// <summary>

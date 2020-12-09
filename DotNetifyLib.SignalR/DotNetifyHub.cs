@@ -56,7 +56,7 @@ namespace DotNetify
       /// <summary>
       /// Handles hub methods.
       /// </summary>
-      protected IDotNetifyHubHandler HubHandler
+      protected internal IDotNetifyHubHandler HubHandler
       {
          get
          {
