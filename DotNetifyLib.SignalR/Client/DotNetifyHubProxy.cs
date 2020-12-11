@@ -15,17 +15,14 @@ limitations under the License.
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DotNetify.Util;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace DotNetify.Client
 {
@@ -69,20 +66,6 @@ namespace DotNetify.Client
       /// Occurs the when the connection state changed.
       /// </summary>
       public event EventHandler<HubConnectionState> StateChanged;
-
-      /// <summary>
-      /// Default constructor.
-      /// </summary>
-      public DotNetifyHubProxy() { }
-
-      /// <summary>
-      /// Constructor that initializes the hub connection.
-      /// </summary>
-      /// <param name="serverUrl">Hub server URL.</param>
-      public DotNetifyHubProxy(string serverUrl) : this()
-      {
-         Init(null, serverUrl);
-      }
 
       /// <summary>
       /// Disposes this proxy.
@@ -181,6 +164,36 @@ namespace DotNetify.Client
       }
 
       /// <summary>
+      /// Builds the event arguments from the incoming Response_VM payload.
+      /// </summary>
+      /// <param name="payload"></param>
+      /// <returns></returns>
+      internal static ResponseVMEventArgs BuildResponseVMEventArgs(object[] payload)
+      {
+         object[] payloadArray = payload;
+
+         // Payload with 3 arguments is the response to the Invoke message.
+         if (payloadArray.Length == 3)
+         {
+            return new InvokeResponseEventArgs
+            {
+               MethodName = payloadArray[0].ToString(),
+               MethodArgs = JsonSerializer.Deserialize<string[]>(payloadArray[1].ToString()),
+               Metadata = JsonSerializer.Deserialize<IDictionary<string, string>>(payloadArray[2].ToString())
+            };
+         }
+         else
+         {
+            var vmId = payloadArray[0].ToString();
+            return new ResponseVMEventArgs
+            {
+               VMId = vmId,
+               Data = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadArray[1].ToString())
+            };
+         }
+      }
+
+      /// <summary>
       /// Handles connection being closed.
       /// </summary>
       private Task OnConnectionClosed(Exception arg)
@@ -194,30 +207,7 @@ namespace DotNetify.Client
       /// </summary>
       private void OnResponse_VM(object[] payload)
       {
-         object[] payloadArray = payload;
-         ResponseVMEventArgs eventArgs;
-         string vmId = null;
-
-         // Payload with 3 arguments is the response to the Invoke message.
-         if (payloadArray.Length == 3)
-         {
-            eventArgs = new InvokeResponseEventArgs
-            {
-               MethodName = payloadArray[0].ToString(),
-               MethodArgs = JsonSerializer.Deserialize<string[]>(payloadArray[1].ToString()),
-               Metadata = JsonSerializer.Deserialize<IDictionary<string, string>>(payloadArray[2].ToString())
-            };
-         }
-         else
-         {
-            vmId = payloadArray[0].ToString();
-            eventArgs = new ResponseVMEventArgs
-            {
-               VMId = vmId,
-               Data = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadArray[1].ToString())
-            };
-         }
-
+         var eventArgs = BuildResponseVMEventArgs(payload);
          var args = new object[] { this, eventArgs };
 
          foreach (Delegate d in Response_VM?.GetInvocationList())
@@ -229,9 +219,9 @@ namespace DotNetify.Client
 
          // If we get to this point, that means the server holds a view model instance
          // whose view no longer existed.  So, tell the server to dispose the view model.
-         if (!eventArgs.Handled && !string.IsNullOrWhiteSpace(vmId))
+         if (!eventArgs.Handled && !string.IsNullOrWhiteSpace(eventArgs.VMId))
          {
-            _ = Dispose_VM(vmId);
+            _ = Dispose_VM(eventArgs.VMId);
          }
       }
 

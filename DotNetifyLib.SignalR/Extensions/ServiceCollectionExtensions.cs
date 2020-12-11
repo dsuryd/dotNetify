@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using DotNetify.Client;
+using DotNetify.Forwarding;
 using DotNetify.Security;
 using DotNetify.WebApi;
 
@@ -63,11 +64,16 @@ namespace DotNetify
          services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
          services.AddTransient<WebApiVMControllerFactory>();
 
+         // Add factories used for hub forwarding.
+         services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
+         services.AddSingleton<IDotNetifyHubForwarderFactory, DotNetifyHubForwarderFactory>();
+
          return services;
       }
 
       public static IServiceCollection AddDotNetifyClient(this IServiceCollection services)
       {
+         services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
          services.AddSingleton<IDotNetifyHubProxy, DotNetifyHubProxy>();
          services.AddTransient<IDotNetifyClient, DotNetifyClient>();
          services.AddSingleton<IUIThreadDispatcher, DefaultUIThreadDispatcher>();

@@ -16,25 +16,28 @@ limitations under the License.
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetify.Client;
 using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify.Forwarding
 {
+   /// <summary>
+   /// The middleware used for forwarding incoming hub messages to another server.
+   /// </summary>
    public class ForwardingMiddleware : IMiddleware
    {
-      private static readonly Dictionary<string, DotNetifyHubForwarder> _hubForwarders = new Dictionary<string, DotNetifyHubForwarder>();
-
       private readonly DotNetifyHubForwarder _hubForwarder;
       private readonly bool _haltPipeline;
 
-      public ForwardingMiddleware(IHubContext<DotNetifyHub> globalHubContext, string serverUrl, bool haltPipeline)
+      /// <summary>
+      /// Class constructor.
+      /// </summary>
+      /// <param name="hubForwarderFactory">Factory of hub message forwarder objects.</param>
+      /// <param name="serverUrl">URL of the server to forward messages to.</param>
+      /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
+      public ForwardingMiddleware(IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, bool haltPipeline)
       {
-         if (!_hubForwarders.ContainsKey(serverUrl))
-            _hubForwarders.Add(serverUrl, new DotNetifyHubForwarder(new DotNetifyHubProxy(serverUrl), new DotNetifyHubResponse(globalHubContext)));
-
-         _hubForwarder = _hubForwarders[serverUrl];
+         _hubForwarder = hubForwarderFactory.GetInstance(serverUrl);
          _haltPipeline = haltPipeline;
       }
 
@@ -59,6 +62,12 @@ namespace DotNetify.Forwarding
 
    public static class ForwardingMiddlewareExtensions
    {
+      /// <summary>
+      /// The middleware used for forwarding incoming hub messages to another server.
+      /// </summary>
+      /// <param name="config">DotNetify configuration.</param>
+      /// <param name="serverUrl">URL of the server to forward messages to.</param>
+      /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
       public static void UseForwarding(this IDotNetifyConfiguration config, string serverUrl, bool haltPipeline = true)
       {
          config.UseMiddleware<ForwardingMiddleware>(serverUrl, haltPipeline);
@@ -67,6 +76,26 @@ namespace DotNetify.Forwarding
          config.UseMiddleware<ExtractHeadersMiddleware>();
       }
 
+      /// <summary>
+      /// The middleware used for forwarding incoming hub messages to other servers.
+      /// </summary>
+      /// <param name="config">DotNetify configuration.</param>
+      /// <param name="serverUrls">Array of URLs of the servers to forward messages to.</param>
+      /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
+      public static void UseForwarding(this IDotNetifyConfiguration config, string[] serverUrls, bool haltPipeline = true)
+      {
+         for (int i = 0; i < serverUrls.Length; i++)
+            config.UseMiddleware<ForwardingMiddleware>(serverUrls[i], i == serverUrls.Length - 1 && haltPipeline);
+
+         // Add the extract headers middleware to prevent this same middleware get automatically inserted at the top.
+         config.UseMiddleware<ExtractHeadersMiddleware>();
+      }
+
+      /// <summary>
+      /// Returns the origin connection ID if the hub message was forwarded from a server.
+      /// </summary>
+      /// <param name="callerContext">Hub caller context.</param>
+      /// <returns>Hub connection ID.</returns>
       public static string GetForwardConnectionId(this HubCallerContext callerContext)
       {
          if (callerContext.Items.ContainsKey(DotNetifyHubForwarder.CONNECTION_ID_TOKEN))
