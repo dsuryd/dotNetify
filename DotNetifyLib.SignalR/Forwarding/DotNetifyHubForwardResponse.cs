@@ -119,7 +119,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="connectionId">Identifies the origin connection.</param>
       /// <returns>Metadata.</returns>
-      private Dictionary<string, object> BuildMetadata(string connectionId)
+      internal static Dictionary<string, object> BuildMetadata(string connectionId)
       {
          return new Dictionary<string, object> { { DotNetifyHubForwarder.CONNECTION_ID_TOKEN, connectionId } };
       }
