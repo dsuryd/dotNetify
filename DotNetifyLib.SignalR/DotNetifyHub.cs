@@ -60,7 +60,7 @@ namespace DotNetify
       {
          get
          {
-            _hubHandler = _hubHandler ?? new DotNetifyHubHandler(_vmControllerFactory, _serviceProvider, _principalAccessor, _hubPipeline, new DotNetifyHubResponse(_globalHubContext), Context);
+            _hubHandler = _hubHandler ?? GetHubHandler(new DotNetifyHubResponse(_globalHubContext));
             return _hubHandler;
          }
          set => _hubHandler = value;
@@ -136,7 +136,7 @@ namespace DotNetify
       /// <param name="methodArgs">Method arguments.</param>
       /// <param name="metadata">Any metadata.</param>
       [HubMethodName(nameof(IDotNetifyHubMethod.Invoke))]
-      public async Task InvokeASync(string methodName, object[] methodArgs, IDictionary<string, object> metadata)
+      public async Task InvokeAsync(string methodName, object[] methodArgs, IDictionary<string, object> metadata)
       {
          foreach (var kvp in metadata)
             Context.Items[kvp.Key] = kvp.Value;
@@ -162,8 +162,17 @@ namespace DotNetify
          for (int i = 0; i < methodArgs.Length; i++)
             methodArgs[i] = methodArgs[i].ToString().ConvertFromString(methodParams[i].ParameterType);
 
-         HubHandler = new DotNetifyHubHandler(_vmControllerFactory, _serviceProvider, _principalAccessor, _hubPipeline, new DotNetifyHubForwardResponse(_globalHubContext, Context), Context);
+         HubHandler = GetHubHandler(new DotNetifyHubForwardResponse(_globalHubContext, Context));
          await methodInfo.InvokeAsync(this, methodArgs);
+      }
+
+      /// <summary>
+      /// Returns handler to hub messages.
+      /// </summary>
+      /// <param name="hubResponse">Handles the message response.</param>
+      private IDotNetifyHubHandler GetHubHandler(IDotNetifyHubResponse hubResponse)
+      {
+         return new DotNetifyHubHandler(_vmControllerFactory, _serviceProvider, _principalAccessor, _hubPipeline, hubResponse, Context);
       }
 
       #region Obsolete Methods

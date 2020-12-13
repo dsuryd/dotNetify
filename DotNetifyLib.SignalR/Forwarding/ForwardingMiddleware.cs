@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
@@ -92,15 +93,13 @@ namespace DotNetify.Forwarding
       }
 
       /// <summary>
-      /// Returns the origin connection ID if the hub message was forwarded from a server.
+      /// Returns the origin connection context if the hub message was forwarded from a server.
       /// </summary>
       /// <param name="callerContext">Hub caller context.</param>
-      /// <returns>Hub connection ID.</returns>
-      public static string GetForwardConnectionId(this HubCallerContext callerContext)
+      /// <returns>Hub connection context.</returns>
+      public static IConnectionContext GetOriginConnectionContext(this HubCallerContext callerContext)
       {
-         if (callerContext.Items.ContainsKey(DotNetifyHubForwarder.CONNECTION_ID_TOKEN))
-            return callerContext.Items[DotNetifyHubForwarder.CONNECTION_ID_TOKEN].ToString();
-         return null;
+         return DotNetifyHubForwarder.GetOriginConnectionContext(callerContext);
       }
    }
 }

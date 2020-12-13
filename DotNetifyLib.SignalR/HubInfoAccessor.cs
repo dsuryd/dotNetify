@@ -14,21 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-using DotNetify.Security;
-using Microsoft.AspNetCore.Http.Connections.Features;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Security.Principal;
 using System.Threading;
+using DotNetify.Forwarding;
+using DotNetify.Security;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify
 {
    /// <summary>
    /// Implements ambient data store for the current principal and connection context of the SignalR hub.
    /// </summary>
-   internal class HubPrincipalAccessor : IPrincipalAccessor, IHubCallerContextAccessor, IDotNetifyHubContextAccessor, IConnectionContext
+   internal class HubInfoAccessor : IPrincipalAccessor, IHubCallerContextAccessor, IDotNetifyHubContextAccessor, IConnectionContext
    {
       private readonly static AsyncLocal<IPrincipal> _asyncLocalPrincipal = new AsyncLocal<IPrincipal>();
       private readonly static AsyncLocal<DotNetifyHubContext> _asyncLocalContext = new AsyncLocal<DotNetifyHubContext>();
@@ -64,34 +61,11 @@ namespace DotNetify
       /// <summary>
       /// HTTP request headers.
       /// </summary>
-      public HttpRequestHeaders HttpRequestHeaders
-      {
-         get
-         {
-            var httpContext = CallerContext?.Features.Get<IHttpContextFeature>();
-            return httpContext != null ? new HttpRequestHeaders(
-               allHeaders: JObject.Parse(JsonConvert.SerializeObject(httpContext.HttpContext?.Request?.Headers)),
-               userAgent: httpContext.HttpContext?.Request?.Headers["User-Agent"]
-               ) : null;
-         }
-      }
+      public HttpRequestHeaders HttpRequestHeaders => CallerContext.GetOriginConnectionContext()?.HttpRequestHeaders ?? CallerContext.GetHttpRequestHeaders();
 
       /// <summary>
       /// HTTP connection info.
       /// </summary>
-      public HttpConnection HttpConnection
-      {
-         get
-         {
-            var feature = CallerContext?.Features.Get<IHttpConnectionFeature>();
-            return feature != null ? new HttpConnection(
-               connectionId: feature.ConnectionId,
-               localIpAddress: feature.LocalIpAddress,
-               remoteIpAddress: feature.RemoteIpAddress,
-               localPort: feature.LocalPort,
-               remotePort: feature.RemotePort
-               ) : null;
-         }
-      }
+      public HttpConnection HttpConnection => CallerContext.GetOriginConnectionContext()?.HttpConnection ?? CallerContext.GetHttpConnection();
    }
 }
