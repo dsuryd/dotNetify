@@ -55,7 +55,7 @@ namespace DotNetify
          Headers = headers;
          Principal = principal;
 
-         ConnectionId = CallerContext.GetForwardConnectionId() ?? CallerContext.ConnectionId;
+         ConnectionId = CallerContext.GetOriginConnectionContext()?.ConnectionId ?? CallerContext.ConnectionId;
       }
    }
 }

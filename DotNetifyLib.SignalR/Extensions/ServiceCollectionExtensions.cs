@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2017-2019 Dicky Suryadi
+Copyright 2017-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace DotNetify
          services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
 
          // Add service to get the hub principal and the associated connection context.
-         services.AddSingleton<IPrincipalAccessor, HubPrincipalAccessor>();
+         services.AddSingleton<IPrincipalAccessor, HubInfoAccessor>();
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IDotNetifyHubContextAccessor);
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IHubCallerContextAccessor);
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IConnectionContext);

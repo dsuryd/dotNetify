@@ -68,7 +68,7 @@ namespace DotNetify
       /// <summary>
       /// Identifies the hub connection.
       /// </summary>
-      private string ConnectionId => _callerContext.GetForwardConnectionId() ?? _callerContext.ConnectionId;
+      private string ConnectionId => _callerContext.GetOriginConnectionContext()?.ConnectionId ?? _callerContext.ConnectionId;
 
       /// <summary>
       /// View model controller associated with the current connection.
@@ -228,7 +228,12 @@ namespace DotNetify
       internal Task ResponseVMAsync(string connectionId, string vmId, string vmData)
       {
          if (connectionId.StartsWith(VMController.MULTICAST))
-            HandleMulticastMessage(connectionId, vmId, vmData);
+         {
+            var connectionIds = HandleMulticastMessage(_hubResponse, connectionId, vmId, vmData);
+
+            // Touch the factory to push the timeout.
+            connectionIds?.ForEach(id => _vmControllerFactory.GetInstance(id));
+         }
          else
          {
             if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
@@ -243,7 +248,7 @@ namespace DotNetify
       /// <param name="messageType">Message type.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="serializedMessage">Serialized message.</param>
-      internal void HandleMulticastMessage(string messageType, string vmId, string serializedMessage)
+      static internal List<string> HandleMulticastMessage(IDotNetifyHubResponse hubResponse, string messageType, string vmId, string serializedMessage)
       {
          if (messageType.EndsWith(nameof(VMController.GroupSend)))
          {
@@ -252,33 +257,33 @@ namespace DotNetify
             if (!string.IsNullOrEmpty(message.GroupName))
             {
                if (message.ExcludedConnectionIds?.Count == 0)
-                  _hubResponse.SendToGroupAsync(message.GroupName, vmId, message.Data);
+                  hubResponse.SendToGroupAsync(message.GroupName, vmId, message.Data);
                else
                {
                   var excludedIds = new List<string>(message.ExcludedConnectionIds);
-                  _hubResponse.SendToGroupExceptAsync(message.GroupName, excludedIds, vmId, message.Data);
+                  hubResponse.SendToGroupExceptAsync(message.GroupName, excludedIds, vmId, message.Data);
                }
             }
             else if (message.UserIds?.Count > 0)
             {
                var userIds = new List<string>(message.UserIds);
-               _hubResponse.SendToUsersAsync(userIds, vmId, message.Data);
+               hubResponse.SendToUsersAsync(userIds, vmId, message.Data);
             }
             else if (message.ConnectionIds?.Count > 0)
             {
                foreach (var connectionId in message.ConnectionIds)
-                  _hubResponse.SendAsync(connectionId, vmId, message.Data);
+                  hubResponse.SendAsync(connectionId, vmId, message.Data);
             }
 
-            // Touch the factory to push the timeout.
-            foreach (var connectionId in message.ConnectionIds)
-               _vmControllerFactory.GetInstance(connectionId);
+            return message.ConnectionIds.ToList();
          }
          else if (messageType.EndsWith(nameof(VMController.GroupRemove)))
          {
             var message = JsonConvert.DeserializeObject<VMController.GroupRemove>(serializedMessage);
-            _hubResponse.RemoveFromGroupAsync(message.ConnectionId, message.GroupName);
+            hubResponse.RemoveFromGroupAsync(message.ConnectionId, message.GroupName);
          }
+
+         return null;
       }
 
       #endregion Server Responses
@@ -343,9 +348,9 @@ namespace DotNetify
       /// </summary>
       private void SetHubPrincipalAccessor()
       {
-         if (_principalAccessor is HubPrincipalAccessor)
+         if (_principalAccessor is HubInfoAccessor)
          {
-            var hubPrincipalAccessor = _principalAccessor as HubPrincipalAccessor;
+            var hubPrincipalAccessor = _principalAccessor as HubInfoAccessor;
             hubPrincipalAccessor.Principal = Principal;
             hubPrincipalAccessor.Context = _hubContext;
          }

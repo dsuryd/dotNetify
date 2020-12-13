@@ -74,7 +74,7 @@ namespace DotNetify
       public Task SendAsync(string connectionId, string vmId, string vmData)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, vmData }, BuildMetadata(connectionId) });
+            new object[] { nameof(SendAsync), new object[] { vmId, vmData }, BuildMetadata(connectionId) });
       }
 
       /// <summary>

@@ -192,9 +192,9 @@ namespace DotNetify.WebApi
          object data = null)
       {
          var httpCallerContext = new HttpCallerContext(HttpContext);
-         if (principalAccessor is HubPrincipalAccessor)
+         if (principalAccessor is HubInfoAccessor)
          {
-            var hubPrincipalAccessor = principalAccessor as HubPrincipalAccessor;
+            var hubPrincipalAccessor = principalAccessor as HubInfoAccessor;
             hubPrincipalAccessor.Principal = HttpContext?.User;
             hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, data, null, hubPrincipalAccessor.Principal);
          }

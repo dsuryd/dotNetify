@@ -87,7 +87,7 @@ namespace UnitTests
 
          var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
-         var principalAccessor = new HubPrincipalAccessor();
+         var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
          var webApi = new DotNetifyWebApi();
 
@@ -113,7 +113,7 @@ namespace UnitTests
 
          var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
-         var principalAccessor = new HubPrincipalAccessor();
+         var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
          var webApi = new DotNetifyWebApi();
 
@@ -146,7 +146,7 @@ namespace UnitTests
 
          var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
-         var principalAccessor = new HubPrincipalAccessor();
+         var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
          var webApi = new DotNetifyWebApi();
 
@@ -172,7 +172,7 @@ namespace UnitTests
 
          var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
-         var principalAccessor = new HubPrincipalAccessor();
+         var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
          var webApi = new DotNetifyWebApi();
 
@@ -200,7 +200,7 @@ namespace UnitTests
 
          var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
-         var principalAccessor = new HubPrincipalAccessor();
+         var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
          var webApi = new DotNetifyWebApi();
 

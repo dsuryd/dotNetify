@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System.Net;
+using System.Text.Json.Serialization;
 
 namespace DotNetify
 {
@@ -37,6 +38,18 @@ namespace DotNetify
       /// HTTP request headers.
       /// </summary>
       HttpRequestHeaders HttpRequestHeaders { get; }
+   }
+
+   /// <summary>
+   /// Provides connection information of the connecting client.
+   /// </summary>
+   public class ConnectionContext : IConnectionContext
+   {
+      public string ConnectionId { get; set; }
+
+      public HttpConnection HttpConnection { get; set; }
+
+      public HttpRequestHeaders HttpRequestHeaders { get; set; }
    }
 
    /// <summary>
@@ -64,18 +77,38 @@ namespace DotNetify
    public class HttpConnection
    {
       public string ConnectionId { get; }
+
+      [JsonIgnore]
       public IPAddress LocalIpAddress { get; }
+
+      [JsonIgnore]
       public IPAddress RemoteIpAddress { get; }
+
+      public string LocalIpAddressString { get; }
+      public string RemoteIpAddressString { get; }
+
       public int LocalPort { get; }
       public int RemotePort { get; }
 
+      public HttpConnection()
+      {
+      }
+
       public HttpConnection(string connectionId, IPAddress localIpAddress, int localPort, IPAddress remoteIpAddress, int remotePort)
+         : this(connectionId, localIpAddress, localPort, remoteIpAddress, remotePort, null, null)
+      {
+      }
+
+      public HttpConnection(string connectionId, IPAddress localIpAddress, int localPort, IPAddress remoteIpAddress, int remotePort, string localIpAddressString, string remoteIpAddressString)
       {
          ConnectionId = connectionId;
          LocalIpAddress = localIpAddress;
          RemoteIpAddress = remoteIpAddress;
          LocalPort = localPort;
          RemotePort = remotePort;
+
+         LocalIpAddressString = localIpAddressString ?? localIpAddress?.ToString();
+         RemoteIpAddressString = remoteIpAddressString ?? remoteIpAddress?.ToString();
       }
    }
 }

@@ -13,6 +13,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Threading;
+using Microsoft.AspNetCore.Http.Connections.Features;
+using Microsoft.AspNetCore.Http.Features;
+using Newtonsoft.Json.Linq;
 
 namespace UnitTests
 {
@@ -26,9 +30,35 @@ namespace UnitTests
          public string FullName { get; set; }
       }
 
-      static ForwardingMiddlewareTest()
+      private struct UserInfo
       {
-         VMController.Register<HelloWorldVM>();
+         public string Id { get; set; }
+         public string CorrelationId { get; set; }
+      }
+
+      private struct MessageInfo
+      {
+         public string UserName { get; set; }
+         public string Text { get; set; }
+      }
+
+      private struct ChatRoomState
+      {
+         public List<UserInfo> Users { get; set; }
+         public List<MessageInfo> Messages { get; set; }
+      }
+
+      private IClientEmulator _forwardingClient;
+
+      [TestInitialize]
+      public void Initialize()
+      {
+         var hubEmulator = new HubEmulatorBuilder()
+          .Register<HelloWorldVM>()
+          .Register<ChatRoomVM>()
+          .Build();
+
+         _forwardingClient = hubEmulator.CreateClient("forwarder-conn-id");
       }
 
       [TestMethod]
@@ -42,7 +72,7 @@ namespace UnitTests
                   .Build();
 
          var client = hubEmulator.CreateClient();
-         Setup(hubForwarderFactory, client as IClientProxy);
+         Setup(hubForwarderFactory, client);
 
          var response = client.Connect(nameof(HelloWorldVM)).As<HelloWorldState>();
 
@@ -62,11 +92,11 @@ namespace UnitTests
                   .Build();
 
          var client = hubEmulator.CreateClient();
-         Setup(hubForwarderFactory, client as IClientProxy);
+         Setup(hubForwarderFactory, client);
 
          client.Connect(nameof(HelloWorldVM));
 
-         var response = client.Dispatch(new { FirstName = "John" }).As<dynamic>();
+         var response = client.Dispatch(new { FirstName = "John" }).As<HelloWorldState>();
          Assert.AreEqual("John World", (string) response.FullName);
 
          client.Dispatch(new { LastName = "Doe" });
@@ -85,7 +115,7 @@ namespace UnitTests
                   .Build();
 
          var client = hubEmulator.CreateClient();
-         Setup(hubForwarderFactory, client as IClientProxy, (callType, vmId) =>
+         Setup(hubForwarderFactory, client, (callType, vmId) =>
          {
             dispose = callType == nameof(IDotNetifyHubMethod.Dispose_VM) && vmId == nameof(HelloWorldVM);
          });
@@ -96,78 +126,214 @@ namespace UnitTests
          Assert.IsTrue(dispose);
       }
 
-      #region Test Setup
-
-      private VMController MockVMController(VMController.VMResponseDelegate response)
+      [TestMethod]
+      public void ForwardingMiddleware_Multicast_UserConnects_OtherUserIsNotified()
       {
-         var options = Substitute.For<IOptions<MemoryCacheOptions>>();
-         options.Value.Returns(new MemoryCacheOptions());
+         var expectedClient1CorrelationId = "0.123";
+         var expectedClient2CorrelationId = "0.456";
 
-         var memoryCache = new MemoryCacheAdapter(new MemoryCache(options));
-         var vmFactory = new VMFactory(memoryCache, new VMTypesAccessor());
-         return new VMController(response, vmFactory);
+         var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
+         var hubEmulator = new HubEmulatorBuilder()
+                  .Register<ChatRoomVM>()
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", true)
+                  .Build();
+
+         var client1 = hubEmulator.CreateClient("client1-conn-id");
+         var client2 = hubEmulator.CreateClient("client2-conn-id");
+
+         Setup(hubForwarderFactory, new[] { client1, client2 });
+
+         client1.Connect(nameof(ChatRoomVM));
+         client1.Dispatch(new { AddUser = expectedClient1CorrelationId });
+
+         var client2Response = client2.Connect(nameof(ChatRoomVM)).As<ChatRoomState>();
+
+         Assert.AreEqual(1, client2Response.Users.Count);
+         Assert.AreEqual(expectedClient1CorrelationId, client2Response.Users[0].CorrelationId);
+
+         var client1Responses = client1.Listen(() =>
+         {
+            client2.Dispatch(new { AddUser = expectedClient2CorrelationId });
+         });
+
+         Assert.AreEqual(1, client1Responses.Count);
+         Assert.AreEqual("client2-conn-id", (string) client1Responses.As<dynamic>().Users_add.Id);
+         Assert.AreEqual(expectedClient2CorrelationId, (string) client1Responses.As<dynamic>().Users_add.CorrelationId);
+         Assert.IsTrue(client1.GetState<ChatRoomState>().Users.Any(x => x.CorrelationId == expectedClient2CorrelationId));
       }
 
-      private void Setup(IDotNetifyHubForwarderFactory hubForwarderFactory, IClientProxy client, Action<string, string> callback = null)
+      [TestMethod]
+      public void ForwardingMiddleware_Multicast_UserLeaves_OtherUserIsNotified()
       {
-         var hubProxy = Substitute.For<IDotNetifyHubProxy>();
+         var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
+         var hubEmulator = new HubEmulatorBuilder()
+                  .Register<ChatRoomVM>()
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", true)
+                  .Build();
 
-         Task TestResponse(string connectionId, string vmId, string vmData)
+         var client1 = hubEmulator.CreateClient("client1-conn-id");
+         var client2 = hubEmulator.CreateClient("client2-conn-id");
+
+         Setup(hubForwarderFactory, new[] { client1, client2 });
+
+         client1.Connect(nameof(ChatRoomVM));
+         var response = client1.Dispatch(new { AddUser = "0.123" }).As<dynamic>();
+         string expectedClient1Id = response.Users_add.Id;
+
+         client2.Connect(nameof(ChatRoomVM));
+         client2.Dispatch("{AddUser: '0.456'}");
+
+         var client2Responses = client2.Listen(() =>
          {
-            hubProxy.Response_VM += Raise.EventWith(this, (ResponseVMEventArgs) new InvokeResponseEventArgs
+            client1.Destroy();
+         });
+
+         Assert.AreEqual(1, client2Responses.Count);
+         Assert.AreEqual(expectedClient1Id, (string) client2Responses.As<dynamic>().Users_remove);
+         Assert.IsFalse(client2.GetState<ChatRoomState>().Users.Any(x => x.Id == expectedClient1Id));
+      }
+
+      [TestMethod]
+      public async Task ForwardingMiddleware_Multicast_UserSendsMessage_OtherUserReceivesMessage()
+      {
+         string expectedClient1Text = "Hi there!";
+         string expectedClient1UserName = "Rick";
+
+         string expectedClient2Text = "What's up, Rick?";
+         string expectedClient2UserName = "Carol";
+
+         var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
+         var hubEmulator = new HubEmulatorBuilder()
+                  .Register<ChatRoomVM>()
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", true)
+                  .Build();
+
+         var client1 = hubEmulator.CreateClient("client1-conn-id");
+         var client2 = hubEmulator.CreateClient("client2-conn-id");
+         var client3 = hubEmulator.CreateClient("client3-conn-id");
+
+         Setup(hubForwarderFactory, new[] { client1, client2, client3 });
+
+         client1.Connect(nameof(ChatRoomVM));
+         client1.Dispatch(new { AddUser = "0.123" });
+
+         client2.Connect(nameof(ChatRoomVM));
+         client2.Dispatch(new { AddUser = "0.456" });
+
+         client3.Connect(nameof(ChatRoomVM));
+         client3.Dispatch(new { AddUser = "0.789" });
+
+         var client3AsyncResponses = client3.ListenAsync();
+         var client2AsyncResponses = client2.ListenAsync();
+
+         client1.Dispatch(new
+         {
+            SendMessage = new
             {
-               MethodArgs = new string[] { vmId, vmData },
-               Metadata = DotNetifyHubForwardResponse.BuildMetadata(connectionId).ToDictionary(x => x.Key, x => x.Value.ToString())
-            });
-            return Task.CompletedTask;
-         }
+               Text = expectedClient1Text,
+               Date = DateTime.Now,
+               UserName = expectedClient1UserName
+            }
+         });
 
-         using (var vmController = MockVMController(TestResponse))
+         var client2Responses = await client2AsyncResponses;
+         var client3Responses = await client3AsyncResponses;
+
+         Assert.AreEqual(1, client2Responses.Count);
+         Assert.AreEqual(expectedClient1Text, (string) client2Responses.As<dynamic>().Messages_add.Text);
+         Assert.AreEqual(expectedClient1UserName, (string) client2Responses.As<dynamic>().Messages_add.UserName);
+         Assert.IsTrue(client2.GetState<ChatRoomState>().Messages.Any(x => x.Text == expectedClient1Text && x.UserName == expectedClient1UserName));
+
+         Assert.AreEqual(1, client3Responses.Count);
+         Assert.AreEqual(expectedClient1Text, (string) client3Responses.As<dynamic>().Messages_add.Text);
+         Assert.AreEqual(expectedClient1UserName, (string) client3Responses.As<dynamic>().Messages_add.UserName);
+         Assert.IsTrue(client3.GetState<ChatRoomState>().Messages.Any(x => x.Text == expectedClient1Text && x.UserName == expectedClient1UserName));
+
+         var client1Responses = client1.Listen(() =>
          {
-            hubProxy.StartAsync().Returns(Task.CompletedTask);
-            hubProxy.Invoke(Arg.Any<string>(), Arg.Any<object[]>(), Arg.Any<IDictionary<string, object>>())
-               .Returns(arg =>
+            client2.Dispatch(new
+            {
+               SendMessage = new
                {
-                  var methodArgs = (object[]) arg[1];
-                  var metadata = (IDictionary<string, object>) arg[2];
+                  Text = expectedClient2Text,
+                  Date = DateTime.Now,
+                  UserName = expectedClient2UserName
+               }
+            });
+         });
 
-                  if (arg[0].ToString() == nameof(IDotNetifyHubMethod.Request_VM))
-                  {
-                     vmController.OnRequestVMAsync(
-                        metadata[DotNetifyHubForwarder.CONNECTION_ID_TOKEN].ToString(),
-                        methodArgs[0].ToString(),
-                        methodArgs[1]
-                     ).GetAwaiter().GetResult();
-                  }
-                  else if (arg[0].ToString() == nameof(IDotNetifyHubMethod.Update_VM))
-                  {
-                     vmController.OnUpdateVMAsync(
-                        metadata[DotNetifyHubForwarder.CONNECTION_ID_TOKEN].ToString(),
-                        methodArgs[0].ToString(),
-                        methodArgs[1] as Dictionary<string, object>
-                     ).GetAwaiter().GetResult();
-                  }
-                  else if (arg[0].ToString() == nameof(IDotNetifyHubMethod.Dispose_VM))
-                  {
-                     vmController.OnDisposeVM(metadata[DotNetifyHubForwarder.CONNECTION_ID_TOKEN].ToString(), methodArgs[0].ToString());
-                  }
+         Assert.AreEqual(1, client1Responses.Count);
+         Assert.AreEqual(expectedClient2Text, (string) client1Responses.As<dynamic>().Messages_add.Text);
+         Assert.AreEqual(expectedClient2UserName, (string) client1Responses.As<dynamic>().Messages_add.UserName);
+         Assert.IsTrue(client1.GetState<ChatRoomState>().Messages.Any(x => x.Text == expectedClient2Text && x.UserName == expectedClient2UserName));
+      }
 
-                  callback?.Invoke(arg[0].ToString(), methodArgs[0].ToString());
+      #region Test Setup
 
-                  return Task.CompletedTask;
-               });
+      private void Setup(IDotNetifyHubForwarderFactory hubForwarderFactory, IClientEmulator client, Action<string, string> callback = null)
+      {
+         Setup(hubForwarderFactory, new IClientEmulator[] { client }, callback);
+      }
 
-            var hubResponse = Substitute.For<IDotNetifyHubResponse>();
-            hubResponse.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
-               .Returns(arg =>
+      private void Setup(IDotNetifyHubForwarderFactory hubForwarderFactory, IClientEmulator[] clients, Action<string, string> callback = null)
+      {
+         // Build a mock hub proxy that will be used to forward messages.  This proxy will be set to communicate to another hub emulator.
+         var hubProxy = Substitute.For<IDotNetifyHubProxy>();
+         hubProxy.StartAsync().Returns(Task.CompletedTask);
+
+         // When the hub proxy's Invoke method is called, call the other hub emulator's Invoke method,
+         // then get the response through the client emulator connecting with that hub, and finally
+         // raise the hub proxy's own Response_VM event with the response.
+         hubProxy.Invoke(Arg.Any<string>(), Arg.Any<object[]>(), Arg.Any<IDictionary<string, object>>())
+            .Returns(arg =>
+            {
+               var callType = arg[0].ToString();
+               var methodArgs = (arg[1] as object[]).Select(x => x is string ? x : JObject.FromObject(x)).ToArray();
+
+               var metadataString = JsonSerializer.Serialize((IDictionary<string, object>) arg[2]);
+               var metadata = Newtonsoft.Json.JsonConvert.DeserializeObject<IDictionary<string, object>>(metadataString);
+               foreach (var kvp in metadata.ToList())
+                  metadata[kvp.Key] = kvp.Value is string ? kvp.Value : JObject.FromObject(kvp.Value);
+
+               _forwardingClient.Hub.InvokeAsync(callType, methodArgs, metadata).GetAwaiter().GetResult();
+
+               var responses = _forwardingClient.ResponseHistory.Select(x => x.Payload).ToArray();
+               _forwardingClient.ResponseHistory.Clear();
+               foreach (var response in responses)
                {
-                  client.SendCoreAsync(nameof(IDotNetifyHubMethod.Response_VM), new object[] { new object[] { arg[1], arg[2] } });
-                  return Task.CompletedTask;
-               });
+                  hubProxy.Response_VM += Raise.EventWith(this,
+                     (ResponseVMEventArgs) new InvokeResponseEventArgs
+                     {
+                        MethodName = response[0].ToString(),
+                        MethodArgs = (response[1] as object[]).Select(x => x.ToString()).ToArray(),
+                        Metadata = (response[2] as Dictionary<string, object>).ToDictionary(x => x.Key, x => x.Value.ToString())
+                     });
+               }
+               callback?.Invoke(callType, methodArgs[0].ToString());
 
-            var hubForwarder = new DotNetifyHubForwarder(hubProxy, hubResponse);
-            hubForwarderFactory.GetInstance(Arg.Any<string>()).Returns(hubForwarder);
-         }
+               return Task.CompletedTask;
+            });
+
+         // Build a mock hub response that will receive response back to the above hub proxy.
+         var hubResponse = Stubber.Create<IDotNetifyHubResponse>()
+            .Setup(x => x.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+               .Returns((string connectionId, string vmId, string data) =>
+               {
+                  var client = clients.First(x => x.ConnectionId == connectionId);
+                  return (client as IClientProxy).SendCoreAsync(nameof(IDotNetifyHubMethod.Response_VM), new object[] { new object[] { vmId, data } });
+               })
+            .Object;
+         //var hubResponse = Substitute.For<IDotNetifyHubResponse>();
+         //hubResponse.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+         //   .Returns(arg =>
+         //   {
+         //      var connectionId = (string) arg[0];
+         //      var client = clients.First(x => x.ConnectionId == connectionId);
+         //      return (client as IClientProxy).SendCoreAsync(nameof(IDotNetifyHubMethod.Response_VM), new object[] { new object[] { arg[1], arg[2] } });
+         //   });
+
+         var hubForwarder = new DotNetifyHubForwarder(hubProxy, hubResponse);
+         hubForwarderFactory.GetInstance(Arg.Any<string>()).Returns(hubForwarder);
       }
 
       #endregion Test Setup

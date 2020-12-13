@@ -15,26 +15,36 @@ limitations under the License.
  */
 
 using System;
-using System.Text.Json;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetify.Client;
 using Microsoft.AspNetCore.SignalR;
-using DotNetify.Util;
 
 namespace DotNetify.Forwarding
 {
+   /// <summary>
+   /// Forwards hub messages to another hub server.
+   /// </summary>
    public class DotNetifyHubForwarder : IDotNetifyHubHandler
    {
-      public const string CONNECTION_ID_TOKEN = "$fwdConnId";
+      internal const string CONNECTION_ID_TOKEN = "$fwdConnId";
+      private const string CONNECTION_CONTEXT_TOKEN = "$fwdConnContext";
 
       private readonly IDotNetifyHubProxy _hubProxy;
       private HubCallerContext _context;
       private IDotNetifyHubResponse _hubResponse;
 
+      /// <summary>
+      /// Sets the current caller context.
+      /// </summary>
       public HubCallerContext CallerContext { set => _context = value; }
-      public IDotNetifyHubResponse HubResponse { set => _hubResponse = value; }
 
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="hubProxy">Provides connection to the other hub server.</param>
+      /// <param name="hubResponse">Provides methods to send responses back to the client.</param>
       public DotNetifyHubForwarder(IDotNetifyHubProxy hubProxy, IDotNetifyHubResponse hubResponse)
       {
          _hubProxy = hubProxy;
@@ -44,6 +54,9 @@ namespace DotNetify.Forwarding
          _hubProxy.StartAsync();
       }
 
+      /// <summary>
+      /// Forwards Dispose_VM message through the Invoke method.
+      /// </summary>
       public async Task DisposeVMAsync(string vmId)
       {
          await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Dispose_VM), new object[] { vmId }, BuildMetadata());
@@ -54,6 +67,9 @@ namespace DotNetify.Forwarding
          return Task.CompletedTask;
       }
 
+      /// <summary>
+      /// Forwards Request_VM message through the Invoke method.
+      /// </summary>
       public async Task RequestVMAsync(string vmId, object vmArg)
       {
          // Need to do this because nested JObject values get lost by converted to JsonElement.
@@ -62,12 +78,18 @@ namespace DotNetify.Forwarding
          await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg }, BuildMetadata());
       }
 
+      /// <summary>
+      /// Forwards Update_VM message through the Invoke method.
+      /// </summary>
       public async Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData)
       {
          await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Update_VM), new object[] { vmId, vmData }, BuildMetadata());
       }
 
-      private void OnResponse_VM(object sender, ResponseVMEventArgs e)
+      /// <summary>
+      /// Handles Invoke method responses received from the other hub server.
+      /// </summary>
+      protected void OnResponse_VM(object sender, ResponseVMEventArgs e)
       {
          var eventArgs = e as InvokeResponseEventArgs;
          if (eventArgs != null)
@@ -75,15 +97,33 @@ namespace DotNetify.Forwarding
             var args = new List<object> { eventArgs.Metadata[CONNECTION_ID_TOKEN] };
             args.AddRange(eventArgs.MethodArgs);
 
-            _hubResponse.GetType().GetMethod(nameof(IDotNetifyHubResponse.SendAsync)).Invoke(_hubResponse, args.ToArray());
+            _hubResponse.GetType().GetMethod(eventArgs.MethodName).Invoke(_hubResponse, args.ToArray());
 
             e.Handled = true;
          }
       }
 
+      /// <summary>
+      /// Builds metadata to forward to the other hub server.
+      /// </summary>
+      /// <returns></returns>
       private Dictionary<string, object> BuildMetadata()
       {
-         return new Dictionary<string, object> { { CONNECTION_ID_TOKEN, _context.ConnectionId } };
+         return new Dictionary<string, object> {
+            { CONNECTION_CONTEXT_TOKEN, _context.GetConnectionContext() }
+         };
+      }
+
+      /// <summary>
+      /// Parses the connection context from the hub caller context items.
+      /// </summary>
+      /// <param name="callerContext">Hub caller context.</param>
+      /// <returns>Connection context.</returns>
+      static internal IConnectionContext GetOriginConnectionContext(HubCallerContext callerContext)
+      {
+         if (callerContext.Items.ContainsKey(CONNECTION_CONTEXT_TOKEN))
+            return JsonSerializer.Deserialize<ConnectionContext>(callerContext.Items[CONNECTION_CONTEXT_TOKEN].ToString());
+         return null;
       }
    }
 }
