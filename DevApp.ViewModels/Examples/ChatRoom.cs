@@ -52,11 +52,15 @@ namespace DotNetify.DevApp
          Id = connectionContext.ConnectionId;
          CorrelationId = correlationId;
          Name = $"user{Interlocked.Increment(ref _counter)}";
-         IpAddress = connectionContext.HttpConnection.RemoteIpAddress.ToString();
+         IpAddress = connectionContext.HttpConnection.RemoteIpAddress?.ToString();
 
-         var browserInfo = Parser.GetDefault().Parse(connectionContext.HttpRequestHeaders.UserAgent);
-         if (browserInfo != null)
-            Browser = $"{browserInfo.UserAgent.Family}/{browserInfo.OS.Family} {browserInfo.OS.Major}";
+         var userAgent = connectionContext.HttpRequestHeaders?.UserAgent;
+         if (userAgent != null)
+         {
+            var browserInfo = Parser.GetDefault().Parse(userAgent);
+            if (browserInfo != null)
+               Browser = $"{browserInfo.UserAgent.Family}/{browserInfo.OS.Family} {browserInfo.OS.Major}";
+         }
       }
    }
 
