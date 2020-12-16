@@ -90,25 +90,24 @@ namespace DotNetify
       public int LocalPort { get; }
       public int RemotePort { get; }
 
-      public HttpConnection()
+      [JsonConstructor]
+      public HttpConnection(string connectionId, string localIpAddressString, string remoteIpAddressString, int localPort, int remotePort)
+         : this(connectionId, null, null, localIpAddressString, remoteIpAddressString, localPort, remotePort)
       {
       }
 
-      public HttpConnection(string connectionId, IPAddress localIpAddress, int localPort, IPAddress remoteIpAddress, int remotePort)
-         : this(connectionId, localIpAddress, localPort, remoteIpAddress, remotePort, null, null)
+      public HttpConnection(string connectionId, IPAddress localIpAddress, IPAddress remoteIpAddress, int localPort, int remotePort)
+         : this(connectionId, localIpAddress, remoteIpAddress, localIpAddress?.ToString(), remoteIpAddress?.ToString(), localPort, remotePort)
       {
       }
 
-      public HttpConnection(string connectionId, IPAddress localIpAddress, int localPort, IPAddress remoteIpAddress, int remotePort, string localIpAddressString, string remoteIpAddressString)
+      public HttpConnection(string connectionId, IPAddress localIpAddress, IPAddress remoteIpAddress, string localIpAddressString, string remoteIpAddressString, int localPort, int remotePort)
       {
          ConnectionId = connectionId;
          LocalIpAddress = localIpAddress;
          RemoteIpAddress = remoteIpAddress;
          LocalPort = localPort;
          RemotePort = remotePort;
-
-         LocalIpAddressString = localIpAddressString ?? localIpAddress?.ToString();
-         RemoteIpAddressString = remoteIpAddressString ?? remoteIpAddress?.ToString();
       }
    }
 }
