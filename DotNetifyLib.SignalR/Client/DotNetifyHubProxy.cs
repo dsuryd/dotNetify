@@ -75,9 +75,12 @@ namespace DotNetify.Client
          _subs.ForEach(sub => sub.Dispose());
          _subs.Clear();
 
-         _connection?.DisposeAsync();
-         _connection.Closed -= OnConnectionClosed;
-         _connection = null;
+         if (_connection != null)
+         {
+            _connection.Closed -= OnConnectionClosed;
+            _connection.DisposeAsync();
+            _connection = null;
+         }
       }
 
       /// <summary>
@@ -98,6 +101,7 @@ namespace DotNetify.Client
 
          _connection = hubConnectionBuilder
              .WithUrl(_serverUrl)
+             .WithAutomaticReconnect()
              .Build();
          _connection.Closed += OnConnectionClosed;
 
@@ -126,20 +130,29 @@ namespace DotNetify.Client
       /// </summary>
       /// <param name="vmId">Identifies the view model being requested.</param>
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
-      public async Task Request_VM(string vmId, Dictionary<string, object> vmArg) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg });
+      public async Task Request_VM(string vmId, Dictionary<string, object> vmArg)
+      {
+         await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg });
+      }
 
       /// <summary>
       /// Sends an Update_VM message to the server.
       /// </summary>
       /// <param name="vmId">Identifies the view model to send the update to.</param>
       /// <param name="propertyValues">Dictionary of property names and updated values.</param>
-      public async Task Update_VM(string vmId, Dictionary<string, object> propertyValues) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Update_VM), new object[] { vmId, propertyValues });
+      public async Task Update_VM(string vmId, Dictionary<string, object> propertyValues)
+      {
+         await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Update_VM), new object[] { vmId, propertyValues });
+      }
 
       /// <summary>
       /// Sends a Dispose_VM message to the server.
       /// </summary>
       /// <param name="vmId">Identifies the view model to dispose.</param>
-      public async Task Dispose_VM(string vmId) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Dispose_VM), new object[] { vmId });
+      public async Task Dispose_VM(string vmId)
+      {
+         await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Dispose_VM), new object[] { vmId });
+      }
 
       /// <summary>
       /// Invokes a hub method.
@@ -147,7 +160,10 @@ namespace DotNetify.Client
       /// <param name="methodName">Hub method name.</param>
       /// <param name="methodArgs">Hub method arguments.</param>
       /// <param name="metadata">Any metadata.</param>
-      public async Task Invoke(string methodName, object[] methodArgs, IDictionary<string, object> metadata) => await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Invoke), new object[] { methodName, methodArgs, metadata });
+      public async Task Invoke(string methodName, object[] methodArgs, IDictionary<string, object> metadata)
+      {
+         await _connection?.SendCoreAsync(nameof(IDotNetifyHubMethod.Invoke), new object[] { methodName, methodArgs, metadata });
+      }
 
       /// <summary>
       /// Builds SignalR hub protocol.
