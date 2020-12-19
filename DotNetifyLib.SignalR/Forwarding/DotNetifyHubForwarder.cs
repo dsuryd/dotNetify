@@ -28,8 +28,8 @@ namespace DotNetify.Forwarding
    /// </summary>
    public class DotNetifyHubForwarder : IDotNetifyHubHandler
    {
-      private const string CONNECTION_ID_TOKEN = "$originConnId";
-      private const string CONNECTION_CONTEXT_TOKEN = "$originConnContext";
+      private const string CONNECTION_ID_TOKEN = "$fwdConnId";
+      private const string CONNECTION_CONTEXT_TOKEN = "$fwdConnContext";
 
       private readonly IDotNetifyHubProxy _hubProxy;
       private HubCallerContext _context;
