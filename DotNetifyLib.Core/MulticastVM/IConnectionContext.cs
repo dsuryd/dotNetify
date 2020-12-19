@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System.Collections.Generic;
 using System.Net;
 using System.Text.Json.Serialization;
 
@@ -50,6 +51,8 @@ namespace DotNetify
       public HttpConnection HttpConnection { get; set; }
 
       public HttpRequestHeaders HttpRequestHeaders { get; set; }
+
+      public IDictionary<string, object> Items { get; set; }
    }
 
    /// <summary>
@@ -96,7 +99,7 @@ namespace DotNetify
       {
       }
 
-      public HttpConnection(string connectionId, IPAddress localIpAddress, IPAddress remoteIpAddress, int localPort, int remotePort)
+      public HttpConnection(string connectionId, IPAddress localIpAddress, int localPort, IPAddress remoteIpAddress, int remotePort)
          : this(connectionId, localIpAddress, remoteIpAddress, localIpAddress?.ToString(), remoteIpAddress?.ToString(), localPort, remotePort)
       {
       }
@@ -106,6 +109,8 @@ namespace DotNetify
          ConnectionId = connectionId;
          LocalIpAddress = localIpAddress;
          RemoteIpAddress = remoteIpAddress;
+         LocalIpAddressString = localIpAddressString;
+         RemoteIpAddressString = remoteIpAddressString;
          LocalPort = localPort;
          RemotePort = remotePort;
       }

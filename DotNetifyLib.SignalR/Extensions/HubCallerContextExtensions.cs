@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System.Linq;
 using Microsoft.AspNetCore.Http.Connections.Features;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
@@ -28,7 +27,7 @@ namespace DotNetify
       {
          var httpContext = context?.Features.Get<IHttpContextFeature>();
          return httpContext != null ? new HttpRequestHeaders(
-            allHeaders: JObject.Parse(JsonConvert.SerializeObject(httpContext.HttpContext?.Request?.Headers)),
+            allHeaders: httpContext.HttpContext?.Request?.Headers,
             userAgent: httpContext.HttpContext?.Request?.Headers["User-Agent"]
             ) : null;
       }
@@ -51,7 +50,8 @@ namespace DotNetify
          {
             ConnectionId = context.ConnectionId,
             HttpConnection = context.GetHttpConnection(),
-            HttpRequestHeaders = context.GetHttpRequestHeaders()
+            HttpRequestHeaders = context.GetHttpRequestHeaders(),
+            Items = context.Items.ToDictionary(x => x.Key.ToString(), x => x.Value)
          };
       }
    }

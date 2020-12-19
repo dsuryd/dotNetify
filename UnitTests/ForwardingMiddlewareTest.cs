@@ -323,14 +323,6 @@ namespace UnitTests
                   return (client as IClientProxy).SendCoreAsync(nameof(IDotNetifyHubMethod.Response_VM), new object[] { new object[] { vmId, data } });
                })
             .Object;
-         //var hubResponse = Substitute.For<IDotNetifyHubResponse>();
-         //hubResponse.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
-         //   .Returns(arg =>
-         //   {
-         //      var connectionId = (string) arg[0];
-         //      var client = clients.First(x => x.ConnectionId == connectionId);
-         //      return (client as IClientProxy).SendCoreAsync(nameof(IDotNetifyHubMethod.Response_VM), new object[] { new object[] { arg[1], arg[2] } });
-         //   });
 
          var hubForwarder = new DotNetifyHubForwarder(hubProxy, hubResponse);
          hubForwarderFactory.GetInstance(Arg.Any<string>()).Returns(hubForwarder);
