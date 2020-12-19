@@ -28,8 +28,8 @@ namespace DotNetify.Forwarding
    /// </summary>
    public class DotNetifyHubForwarder : IDotNetifyHubHandler
    {
-      internal const string CONNECTION_ID_TOKEN = "$fwdConnId";
-      private const string CONNECTION_CONTEXT_TOKEN = "$fwdConnContext";
+      private const string CONNECTION_ID_TOKEN = "$originConnId";
+      private const string CONNECTION_CONTEXT_TOKEN = "$originConnContext";
 
       private readonly IDotNetifyHubProxy _hubProxy;
       private HubCallerContext _context;
@@ -109,21 +109,30 @@ namespace DotNetify.Forwarding
       /// <returns></returns>
       private Dictionary<string, object> BuildMetadata()
       {
-         return new Dictionary<string, object> {
+         return new Dictionary<string, object>
+         {
             { CONNECTION_CONTEXT_TOKEN, _context.GetConnectionContext() }
          };
       }
 
       /// <summary>
-      /// Parses the connection context from the hub caller context items.
+      /// Returns the origin connection context from a dictionary.
       /// </summary>
-      /// <param name="callerContext">Hub caller context.</param>
+      /// <param name="items">Dictionary.</param>
       /// <returns>Connection context.</returns>
-      static internal IConnectionContext GetOriginConnectionContext(HubCallerContext callerContext)
+      static public ConnectionContext GetOriginConnectionContext(IDictionary<string, object> items)
       {
-         if (callerContext.Items.ContainsKey(CONNECTION_CONTEXT_TOKEN))
-            return JsonSerializer.Deserialize<ConnectionContext>(callerContext.Items[CONNECTION_CONTEXT_TOKEN].ToString());
-         return null;
+         return items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString()) : null;
+      }
+
+      /// <summary>
+      /// Builds metadata to be included in the response to the forwarded messages.
+      /// </summary>
+      /// <param name="connectionId">Identifies the origin connection.</param>
+      /// <returns>Metadata.</returns>
+      internal static Dictionary<string, object> BuildResponseMetadata(string connectionId)
+      {
+         return new Dictionary<string, object> { { CONNECTION_ID_TOKEN, connectionId } };
       }
    }
 }

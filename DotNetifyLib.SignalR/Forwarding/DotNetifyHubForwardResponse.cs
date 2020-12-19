@@ -16,7 +16,6 @@ limitations under the License.
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetify.Client;
 using DotNetify.Forwarding;
 using Microsoft.AspNetCore.SignalR;
 
@@ -51,7 +50,7 @@ namespace DotNetify
       public Task AddToGroupAsync(string connectionId, string groupName)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(AddToGroupAsync), new object[] { connectionId, groupName }, BuildMetadata(connectionId) });
+            new object[] { nameof(AddToGroupAsync), new object[] { connectionId, groupName }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
       }
 
       /// <summary>
@@ -62,7 +61,7 @@ namespace DotNetify
       public Task RemoveFromGroupAsync(string connectionId, string groupName)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(RemoveFromGroupAsync), new object[] { connectionId, groupName }, BuildMetadata(connectionId) });
+            new object[] { nameof(RemoveFromGroupAsync), new object[] { connectionId, groupName }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
       }
 
       /// <summary>
@@ -74,7 +73,7 @@ namespace DotNetify
       public Task SendAsync(string connectionId, string vmId, string vmData)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(SendAsync), new object[] { vmId, vmData }, BuildMetadata(connectionId) });
+            new object[] { nameof(SendAsync), new object[] { vmId, vmData }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
       }
 
       /// <summary>
@@ -112,16 +111,6 @@ namespace DotNetify
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
             new object[] { nameof(SendToUsersAsync), new object[] { userIds, vmId, vmData } });
-      }
-
-      /// <summary>
-      /// Builds metadata to be included in the forwarded messages.
-      /// </summary>
-      /// <param name="connectionId">Identifies the origin connection.</param>
-      /// <returns>Metadata.</returns>
-      internal static Dictionary<string, object> BuildMetadata(string connectionId)
-      {
-         return new Dictionary<string, object> { { DotNetifyHubForwarder.CONNECTION_ID_TOKEN, connectionId } };
       }
    }
 }

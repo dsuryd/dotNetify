@@ -14,20 +14,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text.Json;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify.Forwarding
 {
+   public class ForwardingException : Exception
+   {
+      public ForwardingException(string message, Exception innerException) : base(message, innerException)
+      {
+      }
+   }
+
    /// <summary>
    /// The middleware used for forwarding incoming hub messages to another server.
    /// </summary>
    public class ForwardingMiddleware : IMiddleware
    {
-      private readonly DotNetifyHubForwarder _hubForwarder;
+      private static readonly ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim> _semaphores = new ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim>();
+      private readonly IDotNetifyHubForwarderFactory _hubForwarderFactory;
+      private readonly string _serverUrl;
       private readonly bool _haltPipeline;
 
       /// <summary>
@@ -38,23 +50,40 @@ namespace DotNetify.Forwarding
       /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
       public ForwardingMiddleware(IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, bool haltPipeline)
       {
-         _hubForwarder = hubForwarderFactory.GetInstance(serverUrl);
+         _hubForwarderFactory = hubForwarderFactory;
+         _serverUrl = serverUrl;
          _haltPipeline = haltPipeline;
       }
 
       public async Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
-         _hubForwarder.CallerContext = context.CallerContext;
+         var hubForwarder = _hubForwarderFactory.GetInstance(_serverUrl);
+         var semaphore = _semaphores.GetOrAdd(hubForwarder, key => new SemaphoreSlim(1));
 
-         if (context.CallType == nameof(IDotNetifyHubMethod.Request_VM))
-            await _hubForwarder.RequestVMAsync(context.VMId, context.Data);
-         else if (context.CallType == nameof(IDotNetifyHubMethod.Update_VM))
+         await semaphore.WaitAsync();
+
+         try
          {
-            var data = (Dictionary<string, object>) context.Data;
-            await _hubForwarder.UpdateVMAsync(context.VMId, data);
+            hubForwarder.CallerContext = context.CallerContext;
+
+            if (context.CallType == nameof(IDotNetifyHubMethod.Request_VM))
+               await hubForwarder.RequestVMAsync(context.VMId, context.Data);
+            else if (context.CallType == nameof(IDotNetifyHubMethod.Update_VM))
+            {
+               var data = (Dictionary<string, object>) context.Data;
+               await hubForwarder.UpdateVMAsync(context.VMId, data);
+            }
+            else if (context.CallType == nameof(IDotNetifyHubMethod.Dispose_VM))
+               await hubForwarder.DisposeVMAsync(context.VMId);
          }
-         else if (context.CallType == nameof(IDotNetifyHubMethod.Dispose_VM))
-            await _hubForwarder.DisposeVMAsync(context.VMId);
+         catch (Exception ex)
+         {
+            throw new ForwardingException(ex.Message, ex);
+         }
+         finally
+         {
+            semaphore.Release();
+         }
 
          if (!_haltPipeline)
             await next(context);
@@ -69,12 +98,13 @@ namespace DotNetify.Forwarding
       /// <param name="config">DotNetify configuration.</param>
       /// <param name="serverUrl">URL of the server to forward messages to.</param>
       /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
-      public static void UseForwarding(this IDotNetifyConfiguration config, string serverUrl, bool haltPipeline = true)
+      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string serverUrl, bool haltPipeline = true)
       {
          config.UseMiddleware<ForwardingMiddleware>(serverUrl, haltPipeline);
 
          // Add the extract headers middleware to prevent this same middleware get automatically inserted at the top.
          config.UseMiddleware<ExtractHeadersMiddleware>();
+         return config;
       }
 
       /// <summary>
@@ -83,13 +113,14 @@ namespace DotNetify.Forwarding
       /// <param name="config">DotNetify configuration.</param>
       /// <param name="serverUrls">Array of URLs of the servers to forward messages to.</param>
       /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
-      public static void UseForwarding(this IDotNetifyConfiguration config, string[] serverUrls, bool haltPipeline = true)
+      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string[] serverUrls, bool haltPipeline = true)
       {
          for (int i = 0; i < serverUrls.Length; i++)
             config.UseMiddleware<ForwardingMiddleware>(serverUrls[i], i == serverUrls.Length - 1 && haltPipeline);
 
          // Add the extract headers middleware to prevent this same middleware get automatically inserted at the top.
          config.UseMiddleware<ExtractHeadersMiddleware>();
+         return config;
       }
 
       /// <summary>
@@ -99,7 +130,7 @@ namespace DotNetify.Forwarding
       /// <returns>Hub connection context.</returns>
       public static IConnectionContext GetOriginConnectionContext(this HubCallerContext callerContext)
       {
-         return DotNetifyHubForwarder.GetOriginConnectionContext(callerContext);
+         return DotNetifyHubForwarder.GetOriginConnectionContext(callerContext.Items.ToDictionary(x => x.Key.ToString(), x => x.Value));
       }
    }
 }
