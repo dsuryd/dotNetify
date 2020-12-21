@@ -15,13 +15,10 @@ limitations under the License.
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetify.Security;
 using DotNetify.Util;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
@@ -46,46 +43,27 @@ namespace DotNetify
    /// </summary>
    public class DotNetifyHub : Hub
    {
-      private readonly IVMControllerFactory _vmControllerFactory;
-      private readonly IHubServiceProvider _serviceProvider;
-      private readonly IPrincipalAccessor _principalAccessor;
-      private readonly IHubPipeline _hubPipeline;
-      private readonly IHubContext<DotNetifyHub> _globalHubContext;
-      private IDotNetifyHubHandler _hubHandler;
+      private readonly IDotNetifyHubHandler _hubHandler;
 
       /// <summary>
-      /// Handles hub methods.
+      /// Handles hub method invocation.
       /// </summary>
       protected internal IDotNetifyHubHandler HubHandler
       {
          get
          {
-            _hubHandler = _hubHandler ?? GetHubHandler(new DotNetifyHubResponse(_globalHubContext));
+            _hubHandler.CallerContext = Context;
             return _hubHandler;
          }
-         set => _hubHandler = value;
       }
 
       /// <summary>
       /// Constructor for dependency injection.
       /// </summary>
-      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
-      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
-      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
-      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
-      /// <param name="globalHubContext">Provides access to hubs.</param>
-      public DotNetifyHub(
-         IVMControllerFactory vmControllerFactory,
-         IHubServiceProvider serviceProvider,
-         IPrincipalAccessor principalAccessor,
-         IHubPipeline hubPipeline,
-         IHubContext<DotNetifyHub> globalHubContext)
+      /// <param name="hubHandler">Handles hub method invocation.</param>
+      public DotNetifyHub(IDotNetifyHubHandler hubHandler)
       {
-         _vmControllerFactory = vmControllerFactory;
-         _serviceProvider = serviceProvider;
-         _principalAccessor = principalAccessor;
-         _hubPipeline = hubPipeline;
-         _globalHubContext = globalHubContext;
+         _hubHandler = hubHandler;
       }
 
       /// <summary>
@@ -160,19 +138,9 @@ namespace DotNetify
          var methodParams = methodInfo.GetParameters();
 
          for (int i = 0; i < methodArgs.Length; i++)
-            methodArgs[i] = methodArgs[i].ToString().ConvertFromString(methodParams[i].ParameterType);
+            methodArgs[i] = methodArgs[i]?.ToString().ConvertFromString(methodParams[i].ParameterType);
 
-         HubHandler = GetHubHandler(new DotNetifyHubForwardResponse(_globalHubContext, Context));
          await methodInfo.InvokeAsync(this, methodArgs);
-      }
-
-      /// <summary>
-      /// Returns handler to hub messages.
-      /// </summary>
-      /// <param name="hubResponse">Handles the message response.</param>
-      private IDotNetifyHubHandler GetHubHandler(IDotNetifyHubResponse hubResponse)
-      {
-         return new DotNetifyHubHandler(_vmControllerFactory, _serviceProvider, _principalAccessor, _hubPipeline, hubResponse, Context);
       }
 
       #region Obsolete Methods

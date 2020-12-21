@@ -44,6 +44,9 @@ namespace DotNetify
          // Add the dependency injection service scope factory for view model controllers.
          services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
 
+         // Add service to handle hub messages.
+         services.AddTransient<IDotNetifyHubHandler, DotNetifyHubHandler>();
+
          // Add service to get the hub principal and the associated connection context.
          services.AddSingleton<IPrincipalAccessor, HubInfoAccessor>();
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IDotNetifyHubContextAccessor);

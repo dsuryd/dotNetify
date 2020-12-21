@@ -32,13 +32,12 @@ namespace DotNetify.Forwarding
       private const string CONNECTION_CONTEXT_TOKEN = "$fwdConnContext";
 
       private readonly IDotNetifyHubProxy _hubProxy;
-      private HubCallerContext _context;
       private IDotNetifyHubResponse _hubResponse;
 
       /// <summary>
       /// Sets the current caller context.
       /// </summary>
-      public HubCallerContext CallerContext { set => _context = value; }
+      public HubCallerContext CallerContext { get; set; }
 
       /// <summary>
       /// Constructor.
@@ -62,9 +61,12 @@ namespace DotNetify.Forwarding
          await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Dispose_VM), new object[] { vmId }, BuildMetadata());
       }
 
-      public Task OnDisconnectedAsync(Exception _)
+      /// <summary>
+      /// Forwards disconnection.
+      /// </summary>
+      public async Task OnDisconnectedAsync(Exception ex)
       {
-         return Task.CompletedTask;
+         await _hubProxy.Invoke(nameof(DotNetifyHub.OnDisconnectedAsync), new object[] { ex }, BuildMetadata());
       }
 
       /// <summary>
@@ -111,7 +113,7 @@ namespace DotNetify.Forwarding
       {
          return new Dictionary<string, object>
          {
-            { CONNECTION_CONTEXT_TOKEN, _context.GetConnectionContext() }
+            { CONNECTION_CONTEXT_TOKEN, CallerContext.GetConnectionContext() }
          };
       }
 
