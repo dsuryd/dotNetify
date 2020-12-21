@@ -35,11 +35,11 @@ namespace DotNetify
       /// Constructor.
       /// </summary>
       /// <param name="hubContext">DotNetify hub context for sending messages.</param>
-      /// <param name="callerContext">Hub connection context.</param>
-      public DotNetifyHubForwardResponse(IHubContext<DotNetifyHub> hubContext, HubCallerContext callerContext)
+      /// <param name="connectionId">Identifies the connection to send message to.</param>
+      public DotNetifyHubForwardResponse(IHubContext<DotNetifyHub> hubContext, string connectionId)
       {
          _hubContext = hubContext;
-         _connectionId = callerContext.ConnectionId;
+         _connectionId = connectionId;
       }
 
       /// <summary>

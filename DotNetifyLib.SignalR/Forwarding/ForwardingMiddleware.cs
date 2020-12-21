@@ -35,7 +35,7 @@ namespace DotNetify.Forwarding
    /// <summary>
    /// The middleware used for forwarding incoming hub messages to another server.
    /// </summary>
-   public class ForwardingMiddleware : IMiddleware
+   public class ForwardingMiddleware : IMiddleware, IDisconnectionMiddleware
    {
       private static readonly ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim> _semaphores = new ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim>();
       private readonly IDotNetifyHubForwarderFactory _hubForwarderFactory;
@@ -87,6 +87,23 @@ namespace DotNetify.Forwarding
 
          if (!_haltPipeline)
             await next(context);
+      }
+
+      public async Task OnDisconnected(HubCallerContext context)
+      {
+         var hubForwarder = _hubForwarderFactory.GetInstance(_serverUrl);
+         var semaphore = _semaphores.GetOrAdd(hubForwarder, key => new SemaphoreSlim(1));
+
+         await semaphore.WaitAsync();
+
+         try
+         {
+            await hubForwarder.OnDisconnectedAsync(null);
+         }
+         finally
+         {
+            semaphore.Release();
+         }
       }
    }
 
