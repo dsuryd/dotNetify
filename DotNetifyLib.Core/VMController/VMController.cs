@@ -141,7 +141,7 @@ namespace DotNetify
       /// <summary>
       /// Function invoked by the view model to provide response back to the client.
       /// </summary>
-      protected internal VMResponseDelegate VMResponse { get; set; }
+      public VMResponseDelegate VMResponse { get; set; }
 
       #endregion Fields
 
