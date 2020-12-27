@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http.Connections.Features;
 using Microsoft.AspNetCore.Http.Features;
@@ -25,23 +26,37 @@ namespace DotNetify
    {
       public static HttpRequestHeaders GetHttpRequestHeaders(this HubCallerContext context)
       {
-         var httpContext = context?.Features.Get<IHttpContextFeature>();
-         return httpContext != null ? new HttpRequestHeaders(
-            allHeaders: httpContext.HttpContext?.Request?.Headers,
-            userAgent: httpContext.HttpContext?.Request?.Headers["User-Agent"]
-            ) : null;
+         try
+         {
+            var httpContext = context?.Features.Get<IHttpContextFeature>();
+            return httpContext != null ? new HttpRequestHeaders(
+               allHeaders: httpContext.HttpContext?.Request?.Headers,
+               userAgent: httpContext.HttpContext?.Request?.Headers["User-Agent"]
+               ) : null;
+         }
+         catch (Exception)
+         {
+            return null;
+         }
       }
 
       public static HttpConnection GetHttpConnection(this HubCallerContext context)
       {
-         var feature = context?.Features.Get<IHttpConnectionFeature>();
-         return feature != null ? new HttpConnection(
-            connectionId: feature.ConnectionId,
-            localIpAddress: feature.LocalIpAddress,
-            remoteIpAddress: feature.RemoteIpAddress,
-            localPort: feature.LocalPort,
-            remotePort: feature.RemotePort
-            ) : null;
+         try
+         {
+            var feature = context?.Features.Get<IHttpConnectionFeature>();
+            return feature != null ? new HttpConnection(
+               connectionId: feature.ConnectionId,
+               localIpAddress: feature.LocalIpAddress,
+               remoteIpAddress: feature.RemoteIpAddress,
+               localPort: feature.LocalPort,
+               remotePort: feature.RemotePort
+               ) : null;
+         }
+         catch (Exception)
+         {
+            return null;
+         }
       }
 
       public static IConnectionContext GetConnectionContext(this HubCallerContext context)
