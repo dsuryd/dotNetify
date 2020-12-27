@@ -59,7 +59,6 @@ namespace DotNetify
       private readonly IDotNetifyHubResponse _hubResponse;
       private readonly IHubPipeline _hubPipeline;
       private readonly IDotNetifyHubForwardResponseFactory _hubForwardResponseFactory;
-      private readonly IHubContext<DotNetifyHub> _globalHubContext;
 
       private DotNetifyHubContext _hubContext;
       private HubCallerContext _callerContext;
