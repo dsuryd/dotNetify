@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using DotNetify.Util;
 using Microsoft.AspNetCore.SignalR;
@@ -44,6 +45,7 @@ namespace DotNetify
    public class DotNetifyHub : Hub
    {
       private readonly IDotNetifyHubHandler _hubHandler;
+      private readonly IHubPipeline _hubPipeline;
 
       /// <summary>
       /// Handles hub method invocation.
@@ -61,9 +63,11 @@ namespace DotNetify
       /// Constructor for dependency injection.
       /// </summary>
       /// <param name="hubHandler">Handles hub method invocation.</param>
-      public DotNetifyHub(IDotNetifyHubHandler hubHandler)
+      /// <param name="hubPipeline">Middleware pipeline.</param>
+      public DotNetifyHub(IDotNetifyHubHandler hubHandler, IHubPipeline hubPipeline)
       {
          _hubHandler = hubHandler;
+         _hubPipeline = hubPipeline;
       }
 
       /// <summary>
@@ -132,15 +136,32 @@ namespace DotNetify
             case nameof(IDotNetifyHubMethod.Dispose_VM):
                methodName = nameof(DisposeVMAsyc);
                break;
+
+            case nameof(IDotNetifyHubMethod.Response_VM):
+               methodName = nameof(OnHubForwardResponseAsync);
+               break;
          }
 
-         var methodInfo = GetType().GetMethod(methodName);
+         var methodInfo = GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
          var methodParams = methodInfo.GetParameters();
 
          for (int i = 0; i < methodArgs.Length; i++)
             methodArgs[i] = methodArgs[i]?.ToString().ConvertFromString(methodParams[i].ParameterType);
 
          await methodInfo.InvokeAsync(this, methodArgs);
+      }
+
+      /// <summary>
+      /// Handles responses back to the hub forwarder by running it through the middleware pipeline
+      /// to give opportunity for any middleware to take action on it.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model response data.</param>
+      /// <returns></returns>
+      private async Task OnHubForwardResponseAsync(string vmId, string vmData)
+      {
+         var hubContext = new DotNetifyHubContext(Context, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, null);
+         await _hubPipeline.RunMiddlewaresAsync(hubContext, ctx => Task.CompletedTask);
       }
 
       #region Obsolete Methods

@@ -81,10 +81,19 @@ namespace DotNetify
       /// <summary>
       /// Delegate to provide interception hook for a view model action.
       /// </summary>
-      /// <param name="vm">View model.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vm">View model instance.</param>
       /// <param name="data">Data being passed to the view model.</param>
       /// <param name="vmAction">View model action.</param>
       public delegate Task FilterDelegate(string vmId, BaseVM vm, object data, VMActionDelegate vmAction);
+
+      /// <summary>
+      /// Delegate to provide interception hook for a view model response action.
+      /// </summary>
+      /// <param name="vm">View model info.</param>
+      /// <param name="data">Data being passed to the view model.</param>
+      /// <param name="vmAction">View model action.</param>
+      public delegate Task ResponseFilterDelegate(VMInfo vm, object data, VMActionDelegate vmAction);
 
       #endregion Delegates
 
@@ -103,7 +112,7 @@ namespace DotNetify
       /// <summary>
       /// This class encapsulates a view model information.
       /// </summary>
-      protected internal class VMInfo
+      public class VMInfo
       {
          /// <summary>
          /// Identifies the view model.
@@ -160,7 +169,7 @@ namespace DotNetify
       /// <summary>
       /// Interception hook for outgoing response from view models.
       /// </summary>
-      public FilterDelegate ResponseVMFilter { get; set; }
+      public ResponseFilterDelegate ResponseVMFilter { get; set; }
 
       #endregion Filters
 
@@ -174,7 +183,7 @@ namespace DotNetify
       {
          RequestVMFilter = (string vmId, BaseVM vm, object vmArg, VMActionDelegate vmAction) => vmAction(vmArg);
          UpdateVMFilter = (string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
-         ResponseVMFilter = (string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
+         ResponseVMFilter = (VMInfo vmInfo, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
       }
 
       /// <summary>
@@ -248,7 +257,7 @@ namespace DotNetify
             var vmData = vmInstance.Serialize();
 
             // Send the view model data back to the browser client.
-            await ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => VMResponse(connectionId, vmId, (string) filteredData));
+            await ResponseVMFilter.Invoke(new VMInfo(vmId, vmInstance, connectionId), vmData, filteredData => VMResponse(connectionId, vmId, (string) filteredData));
 
             // Reset the changed property states.
             vmInstance.AcceptChangedProperties();
@@ -546,7 +555,7 @@ namespace DotNetify
          if (string.IsNullOrEmpty(vmData))
             return;
 
-         ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, vmData, filteredData =>
+         ResponseVMFilter.Invoke(vmInfo, vmData, filteredData =>
          {
             VMResponse(vmInfo.ConnectionId, vmInfo.Id, (string) filteredData);
             return Task.CompletedTask;
@@ -576,7 +585,7 @@ namespace DotNetify
       /// <param name="args">Arguments containing information on clients to send to.</param>
       private void Send(VMInfo vmInfo, GroupSend args)
       {
-         ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, args.Data, filteredData =>
+         ResponseVMFilter.Invoke(vmInfo, args.Data, filteredData =>
          {
             VMResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(args));
             return Task.CompletedTask;

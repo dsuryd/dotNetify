@@ -75,6 +75,8 @@ namespace DotNetify.Forwarding
             }
             else if (context.CallType == nameof(IDotNetifyHubMethod.Dispose_VM))
                await hubForwarder.DisposeVMAsync(context.VMId);
+            else if (context.CallType == nameof(IDotNetifyHubMethod.Response_VM))
+               await hubForwarder.ResponseVMAsync(context.VMId, context.Data);
          }
          catch (Exception ex)
          {
@@ -98,6 +100,7 @@ namespace DotNetify.Forwarding
 
          try
          {
+            hubForwarder.CallerContext = context;
             await hubForwarder.OnDisconnectedAsync(null);
          }
          finally
