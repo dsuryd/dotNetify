@@ -81,6 +81,14 @@ namespace DotNetify.Forwarding
       }
 
       /// <summary>
+      /// Forwards Response_VM message through the Invoke method.
+      /// </summary>
+      public async Task ResponseVMAsync(string vmId, object vmData)
+      {
+         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, vmData }, BuildReponseMetadata());
+      }
+
+      /// <summary>
       /// Forwards Update_VM message through the Invoke method.
       /// </summary>
       public async Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData)
@@ -114,6 +122,18 @@ namespace DotNetify.Forwarding
          return new Dictionary<string, object>
          {
             { CONNECTION_CONTEXT_TOKEN, CallerContext.GetConnectionContext() }
+         };
+      }
+
+      /// <summary>
+      /// Builds response metadata to forward to the other hub server.
+      /// </summary>
+      /// <returns></returns>
+      private Dictionary<string, object> BuildReponseMetadata()
+      {
+         return new Dictionary<string, object>
+         {
+            { CONNECTION_CONTEXT_TOKEN, CallerContext.GetOriginConnectionContext() ?? CallerContext.GetConnectionContext() }
          };
       }
 

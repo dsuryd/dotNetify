@@ -46,6 +46,7 @@ namespace DotNetify
 
          // Add service to handle hub messages.
          services.AddTransient<IDotNetifyHubHandler, DotNetifyHubHandler>();
+         services.AddTransient<IDotNetifyHubResponse, DotNetifyHubResponse>();
 
          // Add service to get the hub principal and the associated connection context.
          services.AddSingleton<IPrincipalAccessor, HubInfoAccessor>();
@@ -70,6 +71,7 @@ namespace DotNetify
          // Add factories used for hub forwarding.
          services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
          services.AddSingleton<IDotNetifyHubForwarderFactory, DotNetifyHubForwarderFactory>();
+         services.AddSingleton<IDotNetifyHubForwardResponseFactory, DotNetifyHubForwardResponseFactory>();
 
          return services;
       }

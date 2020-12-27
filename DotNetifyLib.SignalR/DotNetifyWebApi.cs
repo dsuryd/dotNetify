@@ -200,7 +200,7 @@ namespace DotNetify.WebApi
             hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, data, null, hubPrincipalAccessor.Principal);
          }
 
-         return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null)
+         return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null, null)
          {
             CallerContext = httpCallerContext,
             ResponseVM = ResponseVMCallback

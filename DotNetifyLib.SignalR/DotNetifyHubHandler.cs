@@ -51,33 +51,43 @@ namespace DotNetify
    /// </summary>
    public class DotNetifyHubHandler : IDotNetifyHubHandler
    {
+      private static readonly ConcurrentDictionary<string, IDictionary<object, object>> _callerContextItems = new ConcurrentDictionary<string, IDictionary<object, object>>();
+
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IHubServiceProvider _serviceProvider;
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IDotNetifyHubResponse _hubResponse;
       private readonly IHubPipeline _hubPipeline;
+      private readonly IDotNetifyHubForwardResponseFactory _hubForwardResponseFactory;
       private readonly IHubContext<DotNetifyHub> _globalHubContext;
-      private IDotNetifyHubResponse _hubForwarderResponse;
+
       private DotNetifyHubContext _hubContext;
+      private HubCallerContext _callerContext;
       private IPrincipal _principal;
 
       /// <summary>
       /// Hub caller context.
       /// </summary>
-      public HubCallerContext CallerContext { get; set; }
+      public HubCallerContext CallerContext
+      {
+         get => _callerContext;
+         set
+         {
+            _callerContext = value;
+
+            // Cache caller context items so we can restore the one associated with the origin connection on sending response.
+            var originContext = value.GetOriginConnectionContext();
+            if (originContext != null && !_callerContextItems.ContainsKey(originContext.ConnectionId))
+               _callerContextItems.TryAdd(originContext.ConnectionId, new Dictionary<object, object>(value.Items));
+         }
+      }
 
       /// <summary>
       /// Returns object to send responses to the client.
       /// </summary>
       private IDotNetifyHubResponse HubResponse
       {
-         get
-         {
-            if (CallerContext.GetOriginConnectionContext() != null)
-               return _hubForwarderResponse ?? (_hubForwarderResponse = new DotNetifyHubForwardResponse(_globalHubContext, CallerContext.ConnectionId));
-
-            return _hubResponse;
-         }
+         get => CallerContext.GetOriginConnectionContext() != null ? _hubForwardResponseFactory.GetInstance(CallerContext.ConnectionId) : _hubResponse;
       }
 
       internal VMResponseDelegate ResponseVM { get; set; }
@@ -125,21 +135,23 @@ namespace DotNetify
       /// <param name="serviceProvider">Allows providing scoped service provider for the view models.</param>
       /// <param name="principalAccessor">Allows passing the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
-      /// <param name="globalHubContext">Provides access to hubs.</param>
+      /// <param name="hubResponse">Sends responses back to hub clients.</param>
+      /// <param name="hubForwardResponseFactory">Send responses back to hub forwarder.</param>
       public DotNetifyHubHandler(
             IVMControllerFactory vmControllerFactory,
             IHubServiceProvider serviceProvider,
             IPrincipalAccessor principalAccessor,
             IHubPipeline hubPipeline,
-            IHubContext<DotNetifyHub> globalHubContext)
+            IDotNetifyHubResponse hubResponse,
+            IDotNetifyHubForwardResponseFactory hubForwardResponseFactory)
       {
          _vmControllerFactory = vmControllerFactory;
          _serviceProvider = serviceProvider;
          _principalAccessor = principalAccessor;
          _hubPipeline = hubPipeline;
-         _globalHubContext = globalHubContext;
+         _hubForwardResponseFactory = hubForwardResponseFactory;
+         _hubResponse = hubResponse;
 
-         _hubResponse = new DotNetifyHubResponse(_globalHubContext);
          _vmControllerFactory.ResponseDelegate = ResponseVMAsync;
       }
 
@@ -153,6 +165,9 @@ namespace DotNetify
 
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(ConnectionId);
+
+         // Clean up origin context items.
+         _callerContextItems.TryRemove(ConnectionId, out IDictionary<object, object> _);
 
          // Allow middlewares to hook to the event.
          await _hubPipeline.RunDisconnectionMiddlewaresAsync(CallerContext);
@@ -349,22 +364,30 @@ namespace DotNetify
       /// <summary>
       /// Runs the filter before the view model respond to something.
       /// </summary>
-      private async Task RunRespondingVMFilters(string vmId, BaseVM vm, object vmData, VMController.VMActionDelegate vmAction)
+      private async Task RunRespondingVMFilters(VMInfo vm, object vmData, VMController.VMActionDelegate vmAction)
       {
          try
          {
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, Principal);
+            // Restore the caller context items that are associated with the origin connection.
+            if (_callerContextItems.TryGetValue(vm.ConnectionId, out IDictionary<object, object> items))
+            {
+               CallerContext.Items.Clear();
+               foreach (var kvp in items)
+                  CallerContext.Items[kvp.Key] = kvp.Value;
+            }
+
+            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
-               await RunVMFilters(vm, ctx.Data, vmAction);
+               await RunVMFilters(vm.Instance, ctx.Data, vmAction);
             });
          }
          catch (Exception ex)
          {
             var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
             if (finalEx is OperationCanceledException == false && CallerContext != null)
-               await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
+               await ResponseVMAsync(ConnectionId, vm.Id, finalEx.Serialize());
          }
       }
 
