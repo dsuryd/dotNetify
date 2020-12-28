@@ -81,6 +81,29 @@ Invoking the **\$dispatch** Submit on the front-end will cause the view model me
 
 Notice that we don't need to use **PushUpdates** to get the new greetings sent. That's because dotNetify employs something similar to the request-response cycle, but in this case it's _action-reaction cycle_: the front-end initiates an action that mutates the state, the back-end processes the action and then sends back to the front-end any other states that mutate as the reaction to that action.
 
+### Asynchronous Methods
+
+The _Submit_ method can be awaited by returning the _Task_ type:
+```csharp
+   public async Task Submit(Person person)
+   {
+      await SomeAsyncMethod(person);
+   }
+```
+
+And if you need to call asynchronous methods to initialize your view model, override the **OnCreatedAsync** method:
+```csharp
+public class HelloWorld: BaseVM
+{
+   public string Greetings { get; set; }
+
+   public override async Task OnCreatedAsync()
+   {
+      Greetings = await BuildGreetingsAsync();
+   }
+}
+```
+
 #### Object Lifetime
 
 You probably think of those back-end classes as models, but in dotNetify's scheme of things, they are considered view models. Whereas a model represents your app's business domain, a view model is an abstraction of a view, which embodies data and behavior necessary for the view to fulfill its use case.
