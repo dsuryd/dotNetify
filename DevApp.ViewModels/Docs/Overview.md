@@ -81,17 +81,10 @@ Invoking the **\$dispatch** Submit on the front-end will cause the view model me
 
 Notice that we don't need to use **PushUpdates** to get the new greetings sent. That's because dotNetify employs something similar to the request-response cycle, but in this case it's _action-reaction cycle_: the front-end initiates an action that mutates the state, the back-end processes the action and then sends back to the front-end any other states that mutate as the reaction to that action.
 
-### Asynchronous Methods
+#### Asynchronous Methods
 
-The _Submit_ method can be awaited by returning the _Task_ type:
-```csharp
-   public async Task Submit(Person person)
-   {
-      await SomeAsyncMethod(person);
-   }
-```
+If you need to do an asynchronous method call in order to initialize the view model, override the **OnCreatedAsync** method and await the call there:
 
-And if you need to call asynchronous methods to initialize your view model, override the **OnCreatedAsync** method:
 ```csharp
 public class HelloWorld: BaseVM
 {
@@ -102,6 +95,15 @@ public class HelloWorld: BaseVM
       Greetings = await BuildGreetingsAsync();
    }
 }
+```
+
+Action methods like the _Submit_ method in the previous example can also be made awaitable by changing the return type to _Task_:
+
+```csharp
+   public async Task Submit(Person person)
+   {
+      await SomeAsyncMethod(person);
+   }
 ```
 
 #### Object Lifetime
@@ -138,8 +140,8 @@ To get started, you only need these essential APIs to add to your React componen
   - **vmArg**: object, initialize view model properties.
     For example:
     ```jsx
-    let initialState = { Person: { FirstName: 'John', LastName: 'Hancock' } };
-    dotnetify.react.connect('HelloWorld', this, { vmArg: initialState });
+    let initialState = { Person: { FirstName: "John", LastName: "Hancock" } };
+    dotnetify.react.connect("HelloWorld", this, { vmArg: initialState });
     ```
   - **headers**: object, pass request headers, e.g. for authentication purpose.
   - **exceptionHandler**: function, handler for server exceptions.
