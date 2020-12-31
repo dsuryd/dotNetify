@@ -19,11 +19,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 using DotNetify.Forwarding;
 using DotNetify.Security;
 using DotNetify.Util;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using static DotNetify.VMController;
@@ -51,7 +54,7 @@ namespace DotNetify
    /// </summary>
    public class DotNetifyHubHandler : IDotNetifyHubHandler
    {
-      private static readonly ConcurrentDictionary<string, IDictionary<object, object>> _callerContextItems = new ConcurrentDictionary<string, IDictionary<object, object>>();
+      private static readonly ConcurrentDictionary<string, ResponseHubCallerContext> _responseCallerContexts = new ConcurrentDictionary<string, ResponseHubCallerContext>();
 
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IHubServiceProvider _serviceProvider;
@@ -63,6 +66,27 @@ namespace DotNetify
       private DotNetifyHubContext _hubContext;
       private HubCallerContext _callerContext;
       private IPrincipal _principal;
+
+      public class ResponseHubCallerContext : HubCallerContext
+      {
+         private readonly HubCallerContext _context;
+         private readonly Dictionary<object, object> _items;
+
+         public override string ConnectionId => _context.ConnectionId;
+         public override string UserIdentifier => _context.UserIdentifier;
+         public override ClaimsPrincipal User => _context.User;
+         public override IDictionary<object, object> Items => _items;
+         public override IFeatureCollection Features => _context.Features;
+         public override CancellationToken ConnectionAborted => _context.ConnectionAborted;
+
+         public override void Abort() => _context.Abort();
+
+         public ResponseHubCallerContext(HubCallerContext context)
+         {
+            _context = context;
+            _items = new Dictionary<object, object>(context.Items);
+         }
+      }
 
       /// <summary>
       /// Hub caller context.
@@ -76,8 +100,8 @@ namespace DotNetify
 
             // Cache caller context items so we can restore the one associated with the origin connection on sending response.
             var originContext = value.GetOriginConnectionContext();
-            if (originContext != null && !_callerContextItems.ContainsKey(originContext.ConnectionId))
-               _callerContextItems.TryAdd(originContext.ConnectionId, new Dictionary<object, object>(value.Items));
+            if (originContext != null && !_responseCallerContexts.ContainsKey(originContext.ConnectionId))
+               _responseCallerContexts.TryAdd(originContext.ConnectionId, new ResponseHubCallerContext(value));
          }
       }
 
@@ -166,7 +190,7 @@ namespace DotNetify
          _vmControllerFactory.Remove(ConnectionId);
 
          // Clean up origin context items.
-         _callerContextItems.TryRemove(ConnectionId, out IDictionary<object, object> _);
+         _responseCallerContexts.TryRemove(ConnectionId, out ResponseHubCallerContext _);
 
          // Allow middlewares to hook to the event.
          await _hubPipeline.RunDisconnectionMiddlewaresAsync(CallerContext);
@@ -368,14 +392,9 @@ namespace DotNetify
          try
          {
             // Restore the caller context items that are associated with the origin connection.
-            if (_callerContextItems.TryGetValue(vm.ConnectionId, out IDictionary<object, object> items))
-            {
-               CallerContext.Items.Clear();
-               foreach (var kvp in items)
-                  CallerContext.Items[kvp.Key] = kvp.Value;
-            }
+            _responseCallerContexts.TryGetValue(vm.ConnectionId, out ResponseHubCallerContext context);
 
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
+            _hubContext = new DotNetifyHubContext(context ?? CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
