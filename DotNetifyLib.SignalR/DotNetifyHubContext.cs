@@ -46,7 +46,7 @@ namespace DotNetify
       public IPrincipal Principal { get; set; }
       public IDictionary<string, object> PipelineData => _pipelineData.Value;
 
-      internal DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers, IPrincipal principal)
+      public DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers, IPrincipal principal)
       {
          CallerContext = callerContext;
          CallType = callType;
