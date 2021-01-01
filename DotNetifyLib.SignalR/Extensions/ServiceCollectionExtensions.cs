@@ -52,7 +52,7 @@ namespace DotNetify
          services.AddSingleton<IPrincipalAccessor, HubInfoAccessor>();
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IDotNetifyHubContextAccessor);
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IHubCallerContextAccessor);
-         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IConnectionContext);
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as ConnectionContext);
 
          // Add service to get the service provider for the view models.
          services.AddSingleton<IHubServiceProvider, HubServiceProvider>();

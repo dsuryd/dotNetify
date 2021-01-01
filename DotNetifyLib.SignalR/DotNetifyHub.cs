@@ -17,9 +17,11 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetify.Util;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json.Linq;
 
 namespace DotNetify
 {
@@ -146,7 +148,10 @@ namespace DotNetify
          var methodParams = methodInfo.GetParameters();
 
          for (int i = 0; i < methodArgs.Length; i++)
-            methodArgs[i] = methodArgs[i]?.ToString().ConvertFromString(methodParams[i].ParameterType);
+         {
+            if (methodArgs[i] is JsonElement || methodArgs[i] is JObject)
+               methodArgs[i] = methodArgs[i].ToString().ConvertFromString(methodParams[i].ParameterType);
+         }
 
          await methodInfo.InvokeAsync(this, methodArgs);
       }

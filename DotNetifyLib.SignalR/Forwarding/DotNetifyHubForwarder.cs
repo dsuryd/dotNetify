@@ -121,7 +121,7 @@ namespace DotNetify.Forwarding
       {
          return new Dictionary<string, object>
          {
-            { CONNECTION_CONTEXT_TOKEN, CallerContext.GetConnectionContext() }
+            { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize(CallerContext.GetConnectionContext()) }
          };
       }
 
@@ -133,7 +133,7 @@ namespace DotNetify.Forwarding
       {
          return new Dictionary<string, object>
          {
-            { CONNECTION_CONTEXT_TOKEN, CallerContext.GetOriginConnectionContext() ?? CallerContext.GetConnectionContext() }
+            { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize((CallerContext.GetOriginConnectionContext() ?? CallerContext.GetConnectionContext())) }
          };
       }
 
@@ -144,7 +144,11 @@ namespace DotNetify.Forwarding
       /// <returns>Connection context.</returns>
       static public ConnectionContext GetOriginConnectionContext(IDictionary<string, object> items)
       {
-         return items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString()) : null;
+         if (items.ContainsKey(CONNECTION_CONTEXT_TOKEN))
+         {
+            return JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString());
+         }
+         return null;
       }
 
       /// <summary>
