@@ -19,7 +19,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Http.Connections.Features;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
-using DotNetify.Client;
 
 namespace DotNetify
 {
