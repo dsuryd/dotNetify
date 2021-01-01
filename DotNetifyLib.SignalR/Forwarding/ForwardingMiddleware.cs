@@ -40,7 +40,7 @@ namespace DotNetify.Forwarding
       private static readonly ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim> _semaphores = new ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim>();
       private readonly IDotNetifyHubForwarderFactory _hubForwarderFactory;
       private readonly string _serverUrl;
-      private readonly ForwardingConfiguration _config;
+      private readonly ForwardingOptions _config;
 
       /// <summary>
       /// Class constructor.
@@ -48,7 +48,7 @@ namespace DotNetify.Forwarding
       /// <param name="hubForwarderFactory">Factory of hub message forwarder objects.</param>
       /// <param name="serverUrl">URL of the server to forward messages to.</param>
       /// <param name="config">Forwarding configuration.</param>
-      public ForwardingMiddleware(IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, ForwardingConfiguration config)
+      public ForwardingMiddleware(IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, ForwardingOptions config)
       {
          _hubForwarderFactory = hubForwarderFactory;
          _serverUrl = serverUrl;
@@ -118,7 +118,7 @@ namespace DotNetify.Forwarding
       /// <param name="config">DotNetify configuration.</param>
       /// <param name="serverUrl">URL of the server to forward messages to.</param>
       /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
-      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string serverUrl, Action<ForwardingConfiguration> options = null)
+      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string serverUrl, Action<ForwardingOptions> options = null)
       {
          return config.UseForwarding(new string[] { serverUrl }, options);
       }
@@ -129,11 +129,11 @@ namespace DotNetify.Forwarding
       /// <param name="config">DotNetify configuration.</param>
       /// <param name="serverUrls">Array of URLs of the servers to forward messages to.</param>
       /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
-      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string[] serverUrls, Action<ForwardingConfiguration> options = null)
+      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string[] serverUrls, Action<ForwardingOptions> options = null)
       {
          for (int i = 0; i < serverUrls.Length; i++)
          {
-            var forwardingConfig = new ForwardingConfiguration();
+            var forwardingConfig = new ForwardingOptions();
             options?.Invoke(forwardingConfig);
 
             if (i < serverUrls.Length - 1)
@@ -145,6 +145,15 @@ namespace DotNetify.Forwarding
          // Add the extract headers middleware to prevent this same middleware get automatically inserted at the top.
          config.UseMiddleware<ExtractHeadersMiddleware>();
          return config;
+      }
+
+      /// <summary>
+      /// Enables message pack in the forwarding options.
+      /// </summary>
+      public static ForwardingOptions UseMessagePack(this ForwardingOptions options)
+      {
+         options.UseMessagePack = true;
+         return options;
       }
 
       /// <summary>

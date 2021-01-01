@@ -30,7 +30,7 @@ namespace DotNetify
          {
             var httpContext = context?.Features.Get<IHttpContextFeature>();
             return httpContext != null ? new HttpRequestHeaders(
-               allHeaders: httpContext.HttpContext?.Request?.Headers.ToDictionary(x => x.Key, x => (object) x.Value.ToArray()),
+               allHeaders: httpContext.HttpContext?.Request?.Headers.ToDictionary(x => x.Key, x => x.Value.ToArray()),
                userAgent: httpContext.HttpContext?.Request?.Headers["User-Agent"]
                ) : null;
          }
