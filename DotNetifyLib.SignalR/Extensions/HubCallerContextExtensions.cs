@@ -19,6 +19,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http.Connections.Features;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
+using DotNetify.Client;
 
 namespace DotNetify
 {
@@ -30,7 +31,7 @@ namespace DotNetify
          {
             var httpContext = context?.Features.Get<IHttpContextFeature>();
             return httpContext != null ? new HttpRequestHeaders(
-               allHeaders: httpContext.HttpContext?.Request?.Headers,
+               allHeaders: httpContext.HttpContext?.Request?.Headers.ToDictionary(x => x.Key, x => (object) x.Value.ToArray()),
                userAgent: httpContext.HttpContext?.Request?.Headers["User-Agent"]
                ) : null;
          }
@@ -59,7 +60,7 @@ namespace DotNetify
          }
       }
 
-      public static IConnectionContext GetConnectionContext(this HubCallerContext context)
+      public static ConnectionContext GetConnectionContext(this HubCallerContext context)
       {
          return new ConnectionContext
          {

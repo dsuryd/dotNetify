@@ -17,12 +17,14 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 
 namespace DotNetify.Client
 {
@@ -51,6 +53,11 @@ namespace DotNetify.Client
       /// Current connection state.
       /// </summary>
       public HubConnectionState ConnectionState => _connectionState;
+
+      /// <summary>
+      /// Allows for custom configuration of the hub connection builder.
+      /// </summary>
+      public Func<HubConnectionBuilder, HubConnectionBuilder> ConnectionBuilder { get; set; }
 
       /// <summary>
       /// Occurs when the connection is disconnected.
@@ -99,10 +106,14 @@ namespace DotNetify.Client
          var hubConnectionBuilder = new HubConnectionBuilder();
          hubConnectionBuilder.Services.AddSingleton(BuildHubProtocol());
 
-         _connection = hubConnectionBuilder
+         hubConnectionBuilder
              .WithUrl(_serverUrl)
-             .WithAutomaticReconnect()
-             .Build();
+             .WithAutomaticReconnect();
+
+         if (ConnectionBuilder != null)
+            hubConnectionBuilder = ConnectionBuilder.Invoke(hubConnectionBuilder);
+
+         _connection = hubConnectionBuilder.Build();
          _connection.Closed += OnConnectionClosed;
 
          _subs.Add(_connection.On<object[]>(nameof(IDotNetifyHubMethod.Response_VM), OnResponse_VM));
@@ -191,20 +202,39 @@ namespace DotNetify.Client
          // Payload with 3 arguments is the response to the Invoke message.
          if (payloadArray.Length == 3)
          {
+            string[] methodArgs = null;
+            if (payloadArray[1] is JsonElement || payloadArray[1] is JObject)
+               methodArgs = JsonSerializer.Deserialize<string[]>(payloadArray[1].ToString());
+            else if (payloadArray[1] is object[])
+               methodArgs = (payloadArray[1] as object[]).Select(x => (string) x).ToArray();
+
+            IDictionary<string, string> metadata = null;
+            if (payloadArray[2] is JsonElement || payloadArray[2] is JObject)
+               metadata = JsonSerializer.Deserialize<IDictionary<string, string>>(payloadArray[2].ToString());
+            else if (payloadArray[2] is Dictionary<object, object>)  // MessagePack
+               metadata = (payloadArray[2] as Dictionary<object, object>).ToDictionary(x => (string) x.Key, x => (string) x.Value);
+
             return new InvokeResponseEventArgs
             {
                MethodName = payloadArray[0].ToString(),
-               MethodArgs = JsonSerializer.Deserialize<string[]>(payloadArray[1].ToString()),
-               Metadata = JsonSerializer.Deserialize<IDictionary<string, string>>(payloadArray[2].ToString())
+               MethodArgs = methodArgs,
+               Metadata = metadata
             };
          }
          else
          {
             var vmId = payloadArray[0].ToString();
+
+            Dictionary<string, object> data = null;
+            if (payloadArray[1] is JsonElement || payloadArray[1] is JObject)
+               data = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadArray[1].ToString());
+            else if (payloadArray[1] is Dictionary<object, object>) // MessagePack
+               data = (payloadArray[1] as Dictionary<object, object>).ToDictionary(x => (string) x.Key, x => x.Value);
+
             return new ResponseVMEventArgs
             {
                VMId = vmId,
-               Data = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadArray[1].ToString())
+               Data = data
             };
          }
       }

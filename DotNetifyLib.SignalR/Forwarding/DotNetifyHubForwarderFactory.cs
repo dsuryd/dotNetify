@@ -17,6 +17,7 @@ limitations under the License.
 using System.Collections.Concurrent;
 using DotNetify.Client;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetify.Forwarding
 {
@@ -25,7 +26,7 @@ namespace DotNetify.Forwarding
    /// </summary>
    public interface IDotNetifyHubForwarderFactory
    {
-      DotNetifyHubForwarder GetInstance(string key);
+      DotNetifyHubForwarder GetInstance(string key, ForwardingConfiguration config);
    }
 
    /// <summary>
@@ -43,11 +44,15 @@ namespace DotNetify.Forwarding
          _hubProxyFactory = hubProxyFactory;
       }
 
-      public DotNetifyHubForwarder GetInstance(string key)
+      public DotNetifyHubForwarder GetInstance(string key, ForwardingConfiguration config)
       {
          return _hubForwarders.GetOrAdd(key, serverUrl =>
          {
             var hubProxy = _hubProxyFactory.GetInstance();
+
+            if (config.UseMessagePack)
+               (hubProxy as DotNetifyHubProxy).ConnectionBuilder = builder => builder.AddMessagePackProtocol();
+
             hubProxy.Init(null, serverUrl);
             return new DotNetifyHubForwarder(hubProxy, new DotNetifyHubResponse(_globalHubContext));
          });
