@@ -60,7 +60,7 @@ namespace DotNetify
    /// </summary>
    public class HttpRequestHeaders
    {
-      public dynamic AllHeaders { get; }
+      public IDictionary<string, string[]> AllHeaders { get; }
 
       /// <summary>
       /// Browser's user agent.
@@ -68,6 +68,13 @@ namespace DotNetify
       public string UserAgent { get; }
 
       public HttpRequestHeaders(dynamic allHeaders, string userAgent)
+      {
+         AllHeaders = allHeaders is IDictionary<string, string[]> ? allHeaders : null;
+         UserAgent = userAgent;
+      }
+
+      [JsonConstructor]
+      public HttpRequestHeaders(IDictionary<string, string[]> allHeaders, string userAgent)
       {
          AllHeaders = allHeaders;
          UserAgent = userAgent;

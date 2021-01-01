@@ -63,7 +63,7 @@ namespace UnitTests
 
          var hubEmulator = new HubEmulatorBuilder()
                   .Register<HelloWorldVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingConfiguration())
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
 
          var client = hubEmulator.CreateClient();
@@ -83,7 +83,7 @@ namespace UnitTests
 
          var hubEmulator = new HubEmulatorBuilder()
                   .Register<HelloWorldVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingConfiguration())
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
 
          var client = hubEmulator.CreateClient();
@@ -106,7 +106,7 @@ namespace UnitTests
 
          var hubEmulator = new HubEmulatorBuilder()
                   .Register<HelloWorldVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingConfiguration())
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
 
          var client = hubEmulator.CreateClient();
@@ -130,7 +130,7 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
                   .Register<ChatRoomVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingConfiguration())
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
 
          var client1 = hubEmulator.CreateClient("client1-conn-id");
@@ -163,7 +163,7 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
                   .Register<ChatRoomVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingConfiguration())
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
 
          var client1 = hubEmulator.CreateClient("client1-conn-id");
@@ -200,7 +200,7 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
                   .Register<ChatRoomVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingConfiguration())
+                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
 
          var client1 = hubEmulator.CreateClient("client1-conn-id");
@@ -320,7 +320,7 @@ namespace UnitTests
             .Object;
 
          var hubForwarder = new DotNetifyHubForwarder(hubProxy, hubResponse);
-         hubForwarderFactory.GetInstance(Arg.Any<string>(), Arg.Any<ForwardingConfiguration>()).Returns(hubForwarder);
+         hubForwarderFactory.GetInstance(Arg.Any<string>(), Arg.Any<ForwardingOptions>()).Returns(hubForwarder);
       }
 
       #endregion Test Setup

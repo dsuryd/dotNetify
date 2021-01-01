@@ -26,7 +26,7 @@ namespace DotNetify.Forwarding
    /// </summary>
    public interface IDotNetifyHubForwarderFactory
    {
-      DotNetifyHubForwarder GetInstance(string key, ForwardingConfiguration config);
+      DotNetifyHubForwarder GetInstance(string key, ForwardingOptions config);
    }
 
    /// <summary>
@@ -44,7 +44,7 @@ namespace DotNetify.Forwarding
          _hubProxyFactory = hubProxyFactory;
       }
 
-      public DotNetifyHubForwarder GetInstance(string key, ForwardingConfiguration config)
+      public DotNetifyHubForwarder GetInstance(string key, ForwardingOptions config)
       {
          return _hubForwarders.GetOrAdd(key, serverUrl =>
          {

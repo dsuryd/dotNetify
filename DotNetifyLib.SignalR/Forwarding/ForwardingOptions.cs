@@ -16,7 +16,7 @@ limitations under the License.
 
 namespace DotNetify.Forwarding
 {
-   public class ForwardingConfiguration
+   public class ForwardingOptions
    {
       /// <summary>
       /// Prevent further processing in this server after forwarding messages.
