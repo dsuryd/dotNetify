@@ -15,10 +15,8 @@ limitations under the License.
  */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
@@ -37,7 +35,6 @@ namespace DotNetify.Forwarding
    /// </summary>
    public class ForwardingMiddleware : IMiddleware, IDisconnectionMiddleware
    {
-      private static readonly ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim> _semaphores = new ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim>();
       private readonly IDotNetifyHubForwarderFactory _hubForwarderFactory;
       private readonly string _serverUrl;
       private readonly ForwardingOptions _config;
@@ -57,12 +54,7 @@ namespace DotNetify.Forwarding
 
       public async Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
-         var hubForwarder = _hubForwarderFactory.GetInstance(_serverUrl, _config);
-         var semaphore = _semaphores.GetOrAdd(hubForwarder, key => new SemaphoreSlim(1));
-
-         await semaphore.WaitAsync();
-
-         try
+         await _hubForwarderFactory.InvokeInstanceAsync(_serverUrl, _config, async hubForwarder =>
          {
             hubForwarder.CallerContext = context.CallerContext;
 
@@ -77,15 +69,7 @@ namespace DotNetify.Forwarding
                await hubForwarder.DisposeVMAsync(context.VMId);
             else if (context.CallType == nameof(IDotNetifyHubMethod.Response_VM))
                await hubForwarder.ResponseVMAsync(context.VMId, context.Data);
-         }
-         catch (Exception ex)
-         {
-            throw new ForwardingException(ex.Message, ex);
-         }
-         finally
-         {
-            semaphore.Release();
-         }
+         });
 
          if (!_config.HaltPipeline)
             await next(context);
@@ -93,20 +77,11 @@ namespace DotNetify.Forwarding
 
       public async Task OnDisconnected(HubCallerContext context)
       {
-         var hubForwarder = _hubForwarderFactory.GetInstance(_serverUrl, _config);
-         var semaphore = _semaphores.GetOrAdd(hubForwarder, key => new SemaphoreSlim(1));
-
-         await semaphore.WaitAsync();
-
-         try
+         await _hubForwarderFactory.InvokeInstanceAsync(_serverUrl, _config, async hubForwarder =>
          {
             hubForwarder.CallerContext = context;
             await hubForwarder.OnDisconnectedAsync(null);
-         }
-         finally
-         {
-            semaphore.Release();
-         }
+         });
       }
    }
 
@@ -118,9 +93,9 @@ namespace DotNetify.Forwarding
       /// <param name="config">DotNetify configuration.</param>
       /// <param name="serverUrl">URL of the server to forward messages to.</param>
       /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
-      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string serverUrl, Action<ForwardingOptions> options = null)
+      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string serverUrl, Action<ForwardingOptions> optionsAccessor = null)
       {
-         return config.UseForwarding(new string[] { serverUrl }, options);
+         return config.UseForwarding(new string[] { serverUrl }, optionsAccessor);
       }
 
       /// <summary>
@@ -129,31 +104,22 @@ namespace DotNetify.Forwarding
       /// <param name="config">DotNetify configuration.</param>
       /// <param name="serverUrls">Array of URLs of the servers to forward messages to.</param>
       /// <param name="haltPipeline">Whether to prevent further processing in this server after forwarding messages.</param>
-      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string[] serverUrls, Action<ForwardingOptions> options = null)
+      public static IDotNetifyConfiguration UseForwarding(this IDotNetifyConfiguration config, string[] serverUrls, Action<ForwardingOptions> optionsAccessor = null)
       {
          for (int i = 0; i < serverUrls.Length; i++)
          {
-            var forwardingConfig = new ForwardingOptions();
-            options?.Invoke(forwardingConfig);
+            var forwardingOptions = new ForwardingOptions();
+            optionsAccessor?.Invoke(forwardingOptions);
 
             if (i < serverUrls.Length - 1)
-               forwardingConfig.HaltPipeline = false;
+               forwardingOptions.HaltPipeline = false;
 
-            config.UseMiddleware<ForwardingMiddleware>(serverUrls[i], forwardingConfig);
+            config.UseMiddleware<ForwardingMiddleware>(serverUrls[i], forwardingOptions);
          }
 
          // Add the extract headers middleware to prevent this same middleware get automatically inserted at the top.
          config.UseMiddleware<ExtractHeadersMiddleware>();
          return config;
-      }
-
-      /// <summary>
-      /// Enables message pack in the forwarding options.
-      /// </summary>
-      public static ForwardingOptions UseMessagePack(this ForwardingOptions options)
-      {
-         options.UseMessagePack = true;
-         return options;
       }
 
       /// <summary>

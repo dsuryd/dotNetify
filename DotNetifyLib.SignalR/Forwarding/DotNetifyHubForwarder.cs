@@ -97,6 +97,17 @@ namespace DotNetify.Forwarding
       }
 
       /// <summary>
+      /// Forwards a message through the Invoke method.
+      /// </summary>
+      /// <param name="methodName">Hub method name.</param>
+      /// <param name="methodArgs">Method arguments.</param>
+      /// <param name="metadata">Message metadata.</param>
+      public async Task InvokeAsync(string methodName, object[] methodArgs, IDictionary<string, object> metadata)
+      {
+         await _hubProxy.Invoke(methodName, methodArgs, metadata);
+      }
+
+      /// <summary>
       /// Handles Invoke method responses received from the other hub server.
       /// </summary>
       protected void OnResponse_VM(object sender, ResponseVMEventArgs e)

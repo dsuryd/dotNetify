@@ -19,13 +19,18 @@ namespace DotNetify.Forwarding
    public class ForwardingOptions
    {
       /// <summary>
-      /// Prevent further processing in this server after forwarding messages.
+      /// Prevent further message processing in this server after being forwarded.
       /// </summary>
       public bool HaltPipeline { get; set; } = true;
 
       /// <summary>
-      /// Use message pack protocol.
+      /// Use message pack protocol to connect to the target server.
       /// </summary>
       public bool UseMessagePack { get; set; }
+
+      /// <summary>
+      /// Number of connections to the target server. Default to 5.
+      /// </summary>
+      public int ConnectionPoolSize { get; set; } = 5;
    }
 }
