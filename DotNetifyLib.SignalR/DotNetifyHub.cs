@@ -122,8 +122,12 @@ namespace DotNetify
       [HubMethodName(nameof(IDotNetifyHubMethod.Invoke))]
       public async Task InvokeAsync(string methodName, object[] methodArgs, IDictionary<string, object> metadata)
       {
-         foreach (var kvp in metadata)
-            Context.Items[kvp.Key] = kvp.Value;
+         Context.Items.Clear();
+         if (metadata != null)
+         {
+            foreach (var kvp in metadata)
+               Context.Items[kvp.Key] = kvp.Value;
+         }
 
          switch (methodName)
          {
@@ -145,27 +149,33 @@ namespace DotNetify
          }
 
          var methodInfo = GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-         var methodParams = methodInfo.GetParameters();
-
-         for (int i = 0; i < methodArgs.Length; i++)
+         if (methodInfo != null)
          {
-            if (methodArgs[i] is JsonElement || methodArgs[i] is JObject)
-               methodArgs[i] = methodArgs[i].ToString().ConvertFromString(methodParams[i].ParameterType);
-         }
+            var methodParams = methodInfo.GetParameters();
+            for (int i = 0; i < methodArgs.Length; i++)
+            {
+               if (methodArgs[i] is JsonElement || methodArgs[i] is JObject)
+                  methodArgs[i] = methodArgs[i].ToString().ConvertFromString(methodParams[i].ParameterType);
+            }
 
-         await methodInfo.InvokeAsync(this, methodArgs);
+            await methodInfo.InvokeAsync(this, methodArgs);
+         }
+         else
+         {
+            // Unknown method.  Run it through the middleware pipeline in case one wants to take action on it.
+            var hubContext = new DotNetifyHubContext(Context, methodName, null, methodArgs, null, Context.User);
+            await _hubPipeline.RunMiddlewaresAsync(hubContext, ctx => Task.CompletedTask);
+         }
       }
 
       /// <summary>
-      /// Handles responses back to the hub forwarder by running it through the middleware pipeline
-      /// to give opportunity for any middleware to take action on it.
+      /// Handles responses back to the hub forwarder by running it through the middleware pipeline.
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model response data.</param>
-      /// <returns></returns>
       private async Task OnHubForwardResponseAsync(string vmId, string vmData)
       {
-         var hubContext = new DotNetifyHubContext(Context, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, null);
+         var hubContext = new DotNetifyHubContext(Context, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, Context.User);
          await _hubPipeline.RunMiddlewaresAsync(hubContext, ctx => Task.CompletedTask);
       }
 
