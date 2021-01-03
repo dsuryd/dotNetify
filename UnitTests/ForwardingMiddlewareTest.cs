@@ -320,7 +320,8 @@ namespace UnitTests
             .Object;
 
          var hubForwarder = new DotNetifyHubForwarder(hubProxy, hubResponse);
-         hubForwarderFactory.GetInstance(Arg.Any<string>(), Arg.Any<ForwardingOptions>()).Returns(hubForwarder);
+         hubForwarderFactory.InvokeInstanceAsync(Arg.Any<string>(), Arg.Any<ForwardingOptions>(), Arg.Any<Func<DotNetifyHubForwarder, Task>>())
+            .Returns((callInfo) => callInfo.Arg<Func<DotNetifyHubForwarder, Task>>().Invoke(hubForwarder));
       }
 
       #endregion Test Setup
