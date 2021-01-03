@@ -14,10 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNetify.Client;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Nito.AsyncEx;
 
 namespace DotNetify.Forwarding
 {
@@ -26,7 +31,7 @@ namespace DotNetify.Forwarding
    /// </summary>
    public interface IDotNetifyHubForwarderFactory
    {
-      DotNetifyHubForwarder GetInstance(string key, ForwardingOptions config);
+      Task InvokeInstanceAsync(string serverUrl, ForwardingOptions config, Func<DotNetifyHubForwarder, Task> invoke);
    }
 
    /// <summary>
@@ -34,7 +39,8 @@ namespace DotNetify.Forwarding
    /// </summary>
    public class DotNetifyHubForwarderFactory : IDotNetifyHubForwarderFactory
    {
-      private static readonly ConcurrentDictionary<string, DotNetifyHubForwarder> _hubForwarders = new ConcurrentDictionary<string, DotNetifyHubForwarder>();
+      private readonly ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim> _semaphores = new ConcurrentDictionary<DotNetifyHubForwarder, SemaphoreSlim>();
+      private readonly ConcurrentDictionary<string, AsyncCollection<DotNetifyHubForwarder>> _hubForwarders = new ConcurrentDictionary<string, AsyncCollection<DotNetifyHubForwarder>>();
       private readonly IHubContext<DotNetifyHub> _globalHubContext;
       private readonly IDotNetifyHubProxyFactory _hubProxyFactory;
 
@@ -44,18 +50,47 @@ namespace DotNetify.Forwarding
          _hubProxyFactory = hubProxyFactory;
       }
 
-      public DotNetifyHubForwarder GetInstance(string key, ForwardingOptions config)
+      public async Task InvokeInstanceAsync(string serverUrl, ForwardingOptions config, Func<DotNetifyHubForwarder, Task> invoke)
       {
-         return _hubForwarders.GetOrAdd(key, serverUrl =>
+         var pool = GetConnectionPool(serverUrl, config);
+         var hubForwarder = await pool.TakeAsync();
+
+         var semaphore = _semaphores.GetOrAdd(hubForwarder, _ => new SemaphoreSlim(1));
+         await semaphore.WaitAsync();
+
+         try
          {
-            var hubProxy = _hubProxyFactory.GetInstance();
+            await invoke(hubForwarder);
+         }
+         catch (Exception ex)
+         {
+            throw new ForwardingException(ex.Message, ex);
+         }
+         finally
+         {
+            semaphore.Release();
+            _ = pool.AddAsync(hubForwarder);
+         }
+      }
 
-            if (config.UseMessagePack)
-               (hubProxy as DotNetifyHubProxy).ConnectionBuilder = builder => builder.AddMessagePackProtocol();
-
-            hubProxy.Init(null, serverUrl);
-            return new DotNetifyHubForwarder(hubProxy, new DotNetifyHubResponse(_globalHubContext));
+      private AsyncCollection<DotNetifyHubForwarder> GetConnectionPool(string serverUrl, ForwardingOptions config)
+      {
+         return _hubForwarders.GetOrAdd(serverUrl, url =>
+         {
+            var newForwarders = Enumerable.Range(1, config.ConnectionPoolSize).Select(x => CreateInstance(serverUrl, config));
+            return new AsyncCollection<DotNetifyHubForwarder>(new ConcurrentQueue<DotNetifyHubForwarder>(newForwarders));
          });
+      }
+
+      private DotNetifyHubForwarder CreateInstance(string serverUrl, ForwardingOptions config)
+      {
+         var hubProxy = _hubProxyFactory.GetInstance();
+
+         if (config.UseMessagePack)
+            (hubProxy as DotNetifyHubProxy).ConnectionBuilder = builder => builder.AddMessagePackProtocol();
+
+         hubProxy.Init(null, serverUrl);
+         return new DotNetifyHubForwarder(hubProxy, new DotNetifyHubResponse(_globalHubContext));
       }
    }
 }
