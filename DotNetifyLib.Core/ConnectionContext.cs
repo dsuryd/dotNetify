@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.Json.Serialization;
@@ -53,6 +54,8 @@ namespace DotNetify
       public HttpRequestHeaders HttpRequestHeaders { get; set; }
 
       public IDictionary<string, object> Items { get; set; }
+
+      public DateTimeOffset TimeStamp { get; } = DateTimeOffset.UtcNow;
    }
 
    /// <summary>
