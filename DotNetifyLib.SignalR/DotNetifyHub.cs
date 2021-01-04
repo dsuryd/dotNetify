@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -154,8 +155,11 @@ namespace DotNetify
             var methodParams = methodInfo.GetParameters();
             for (int i = 0; i < methodArgs.Length; i++)
             {
+               var paramType = methodParams[i].ParameterType;
                if (methodArgs[i] is JsonElement || methodArgs[i] is JObject)
-                  methodArgs[i] = methodArgs[i].ToString().ConvertFromString(methodParams[i].ParameterType);
+                  methodArgs[i] = methodArgs[i].ToString().ConvertFromString(paramType);
+               else if (methodArgs[i] is Dictionary<object, object> && paramType == typeof(Dictionary<string, object>))
+                  methodArgs[i] = (methodArgs[i] as Dictionary<object, object>).ToDictionary(x => (string) x.Key, x => x.Value);
             }
 
             await methodInfo.InvokeAsync(this, methodArgs);
