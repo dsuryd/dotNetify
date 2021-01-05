@@ -30,6 +30,7 @@ namespace DotNetify.Forwarding
    {
       private const string CONNECTION_ID_TOKEN = "$fwdConnId";
       private const string CONNECTION_CONTEXT_TOKEN = "$fwdConnContext";
+      private const string GROUP_SEND_TOKEN = "$fwdGroupSend";
 
       private readonly IDotNetifyHubProxy _hubProxy;
       private IDotNetifyHubResponse _hubResponse;
@@ -85,7 +86,8 @@ namespace DotNetify.Forwarding
       /// </summary>
       public async Task ResponseVMAsync(string vmId, object vmData)
       {
-         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, vmData }, BuildReponseMetadata());
+         var groupSend = vmData as VMController.GroupSend;
+         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, groupSend?.Data ?? vmData }, BuildResponseMetadata(groupSend));
       }
 
       /// <summary>
@@ -139,27 +141,36 @@ namespace DotNetify.Forwarding
       /// <summary>
       /// Builds response metadata to forward to the other hub server.
       /// </summary>
-      /// <returns></returns>
-      private Dictionary<string, object> BuildReponseMetadata()
+      private Dictionary<string, object> BuildResponseMetadata(VMController.GroupSend groupSend)
       {
-         return new Dictionary<string, object>
+         var metadata = new Dictionary<string, object>
          {
             { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize((CallerContext.GetOriginConnectionContext() ?? CallerContext.GetConnectionContext())) }
          };
+
+         // If multicast message, include the metadata.
+         if (groupSend != null)
+            metadata.Add(GROUP_SEND_TOKEN, JsonSerializer.Serialize(groupSend));
+
+         return metadata;
       }
 
       /// <summary>
       /// Returns the origin connection context from a dictionary.
       /// </summary>
       /// <param name="items">Dictionary.</param>
-      /// <returns>Connection context.</returns>
-      static public ConnectionContext GetOriginConnectionContext(IDictionary<string, object> items)
+      static public ConnectionContext GetOriginConnectionContext(IDictionary<object, object> items)
       {
-         if (items.ContainsKey(CONNECTION_CONTEXT_TOKEN))
-         {
-            return JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString());
-         }
-         return null;
+         return items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString()) : null;
+      }
+
+      /// <summary>
+      /// Returns the multicast group send info from a dictionary.
+      /// </summary>
+      /// <param name="items">Dictonary</param>
+      static public VMController.GroupSend GetGroupSend(IDictionary<object, object> items)
+      {
+         return items.ContainsKey(GROUP_SEND_TOKEN) ? JsonSerializer.Deserialize<VMController.GroupSend>(items[GROUP_SEND_TOKEN].ToString()) : null;
       }
 
       /// <summary>
