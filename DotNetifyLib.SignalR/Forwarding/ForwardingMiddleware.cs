@@ -16,7 +16,6 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
@@ -129,7 +128,17 @@ namespace DotNetify.Forwarding
       /// <returns>Hub connection context.</returns>
       public static ConnectionContext GetOriginConnectionContext(this HubCallerContext callerContext)
       {
-         return DotNetifyHubForwarder.GetOriginConnectionContext(callerContext.Items.ToDictionary(x => x.Key.ToString(), x => x.Value));
+         return DotNetifyHubForwarder.GetOriginConnectionContext(callerContext.Items);
+      }
+
+      /// <summary>
+      /// Returns the multicast group send info if the hub multicast message was forwarded from a server.
+      /// </summary>
+      /// <param name="callerContext">Hub caller context.</param>
+      /// <returns>Hub connection context.</returns>
+      public static VMController.GroupSend GetGroupSend(this HubCallerContext callerContext)
+      {
+         return DotNetifyHubForwarder.GetGroupSend(callerContext.Items);
       }
    }
 }

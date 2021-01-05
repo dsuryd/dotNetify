@@ -19,8 +19,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DotNetify
@@ -557,7 +557,8 @@ namespace DotNetify
 
          ResponseVMFilter.Invoke(vmInfo, vmData, filteredData =>
          {
-            VMResponse(vmInfo.ConnectionId, vmInfo.Id, (string) filteredData);
+            var vmDataToSend = filteredData is GroupSend ? (filteredData as GroupSend).Data : (string) filteredData;
+            VMResponse(vmInfo.ConnectionId, vmInfo.Id, vmDataToSend);
             return Task.CompletedTask;
          });
       }
@@ -575,7 +576,7 @@ namespace DotNetify
             GroupName = groupName,
             ConnectionId = connectionId
          };
-         VMResponse(MULTICAST + nameof(GroupRemove), vmId, JsonConvert.SerializeObject(message));
+         VMResponse(MULTICAST + nameof(GroupRemove), vmId, JsonSerializer.Serialize(message));
       }
 
       /// <summary>
@@ -585,9 +586,9 @@ namespace DotNetify
       /// <param name="args">Arguments containing information on clients to send to.</param>
       private void Send(VMInfo vmInfo, GroupSend args)
       {
-         ResponseVMFilter.Invoke(vmInfo, args.Data, filteredData =>
+         ResponseVMFilter.Invoke(vmInfo, args, filteredData =>
          {
-            VMResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(args));
+            VMResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonSerializer.Serialize(args));
             return Task.CompletedTask;
          });
       }

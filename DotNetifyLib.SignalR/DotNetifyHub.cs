@@ -177,7 +177,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model response data.</param>
-      private async Task OnHubForwardResponseAsync(string vmId, string vmData)
+      private async Task OnHubForwardResponseAsync(string vmId, object vmData)
       {
          var hubContext = new DotNetifyHubContext(Context, nameof(IDotNetifyHubMethod.Response_VM), vmId, vmData, null, Context.User);
          await _hubPipeline.RunMiddlewaresAsync(hubContext, ctx => Task.CompletedTask);
