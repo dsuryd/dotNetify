@@ -113,7 +113,10 @@ namespace DotNetify
          get => CallerContext.GetOriginConnectionContext() != null ? _hubForwardResponseFactory.GetInstance(CallerContext.ConnectionId) : _hubResponse;
       }
 
-      internal VMResponseDelegate ResponseVM { get; set; }
+      /// <summary>
+      /// Handles view model responses.
+      /// </summary>
+      internal VMResponseDelegate OnVMResponse { get; set; }
 
       /// <summary>
       /// Identity principal of the hub connection.
@@ -142,7 +145,7 @@ namespace DotNetify
             vmController.RequestVMFilter = RunRequestingVMFilters;
             vmController.UpdateVMFilter = RunUpdatingVMFilters;
             vmController.ResponseVMFilter = RunRespondingVMFilters;
-            vmController.VMResponse = ResponseVM ?? ResponseVMAsync;
+            vmController.VMResponse = OnVMResponse ?? ResponseVMAsync;
 
             if (_serviceProvider is HubServiceProvider)
                (_serviceProvider as HubServiceProvider).ServiceProvider = vmController.ServiceProvider;
@@ -175,7 +178,7 @@ namespace DotNetify
          _hubForwardResponseFactory = hubForwardResponseFactory;
          _hubResponse = hubResponse;
 
-         _vmControllerFactory.ResponseDelegate = ResponseVMAsync;
+         _vmControllerFactory.ResponseDelegate = OnVMResponse ?? ResponseVMAsync;
       }
 
       /// <summary>
@@ -223,9 +226,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
-            if (finalEx is OperationCanceledException == false)
-               await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
+            await HandleExceptionAsync(vmId, ex);
          }
       }
 
@@ -249,9 +250,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
-            if (finalEx is OperationCanceledException == false)
-               await ResponseVMAsync(ConnectionId, vmId, finalEx.Serialize());
+            await HandleExceptionAsync(vmId, ex);
          }
       }
 
@@ -403,9 +402,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
-            if (finalEx is OperationCanceledException == false && CallerContext != null)
-               await ResponseVMAsync(ConnectionId, vm.Id, finalEx.Serialize());
+            await HandleExceptionAsync(vm.Id, ex);
          }
       }
 
@@ -419,6 +416,20 @@ namespace DotNetify
             var hubPrincipalAccessor = _principalAccessor as HubInfoAccessor;
             hubPrincipalAccessor.Principal = Principal;
             hubPrincipalAccessor.Context = _hubContext;
+         }
+      }
+
+      /// <summary>
+      /// Handles exception encountered during hub method invocation by running the exception through the exception middleware
+      /// and sends the serialized exception message back to the client.
+      /// </summary>
+      private async Task HandleExceptionAsync(string vmId, Exception ex)
+      {
+         var finalEx = await _hubPipeline.RunExceptionMiddlewareAsync(CallerContext, ex);
+         if (finalEx is OperationCanceledException == false && CallerContext != null)
+         {
+            var onVMResponse = OnVMResponse ?? ResponseVMAsync;
+            await onVMResponse(ConnectionId, vmId, finalEx.Serialize());
          }
       }
    }

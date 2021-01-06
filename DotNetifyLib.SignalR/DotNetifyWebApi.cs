@@ -203,7 +203,7 @@ namespace DotNetify.WebApi
          return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null, null)
          {
             CallerContext = httpCallerContext,
-            ResponseVM = ResponseVMCallback
+            OnVMResponse = ResponseVMCallback
          };
       }
 
