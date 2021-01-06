@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetify;
 using DotNetify.WebApi;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
-using Mvc = Microsoft.AspNetCore.Http;
 using ms = Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using System;
+using Mvc = Microsoft.AspNetCore.Http;
 
 namespace UnitTests
 {
@@ -41,6 +41,14 @@ namespace UnitTests
          public string Metadata { get; set; }
 
          public string FullName => $"{FirstName} {LastName}";
+      }
+
+      private class ThrowExceptionVM : BaseVM
+      {
+         public override Task OnCreatedAsync()
+         {
+            throw new InvalidOperationException("Cannot do this");
+         }
       }
 
       private class ServiceScopeFactory : IVMServiceScopeFactory
@@ -215,6 +223,30 @@ namespace UnitTests
          await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
          Assert.AreEqual("JOHN World", (string) response.FullName);
+      }
+
+      [TestMethod]
+      public async Task WebApiBasicVM_ThrowsException_ExceptionHandled()
+      {
+         var vmId = nameof(ThrowExceptionVM);
+         VMController.Register<ThrowExceptionVM>();
+
+         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var serviceProvider = new HubServiceProvider();
+         var principalAccessor = new HubInfoAccessor();
+         var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var webApi = new DotNetifyWebApi();
+
+         var mockHttpContext = Substitute.For<Mvc.HttpContext>();
+         mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
+         webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+
+         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+
+         dynamic response = JsonConvert.DeserializeObject(result);
+
+         Assert.AreEqual("InvalidOperationException", (string) response.ExceptionType);
+         Assert.AreEqual("Cannot do this", (string) response.Message);
       }
    }
 }
