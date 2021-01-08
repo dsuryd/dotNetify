@@ -6,9 +6,9 @@ export default dotnetify;
 
 export interface IDotnetify {
   // Supported JS framework.
-  react?: IDotnetifyReact;
-  vue?: IDotnetifyVue;
-  ko?: any;
+  react: IDotnetifyReact;
+  vue: IDotnetifyVue;
+  ko: any;
 
   // SignalR hub options.
   hub: IDotnetifyHub;
@@ -29,7 +29,7 @@ export interface IDotnetify {
   ) => void;
 
   // Use this intercept a view model prior to establishing connection.
-  connectHandler: (args: VMConnectArgsType) => VMConnectArgsType;
+  connectHandler: (args: VMConnectArgsType) => VMConnectArgsType | void;
 
   // Connect to server. Use it for non-supported frameworks.
   connect: (vmId: string, options?: IConnectOptions) => IDotnetifyVM;
@@ -37,8 +37,8 @@ export interface IDotnetify {
   // Creates a SignalR hub client.
   createHub: (
     iHubServerUrl: string,
-    iHubPath: string,
-    iHubLib: any
+    iHubPath?: string,
+    iHubLib?: any
   ) => IDotnetifyHub;
 
   // Creates a Web API hub client.
@@ -116,8 +116,8 @@ export interface IEventEmitter {
 }
 
 export type HubOptionsType = {
-  transport: string[];
-  connectionBuilder: (builder: HubConnectionBuilder) => HubConnectionBuilder;
+  transport?: string[];
+  connectionBuilder?: (builder: HubConnectionBuilder) => HubConnectionBuilder;
 };
 
 export type RequestPayloadType = {
