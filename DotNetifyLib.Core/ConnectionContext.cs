@@ -47,7 +47,7 @@ namespace DotNetify
    /// </summary>
    public class ConnectionContext : IConnectionContext
    {
-      private static readonly string _hubId = Guid.NewGuid().ToString();
+      private static readonly string _hubId = ShortGuid();
 
       /// <summary>
       /// Unique ID for the hub instance for correlation purpose.
@@ -63,6 +63,17 @@ namespace DotNetify
       public HttpRequestHeaders HttpRequestHeaders { get; set; }
 
       public IDictionary<string, object> Items { get; set; }
+
+      /// <summary>
+      /// Shortens a GUID.
+      /// </summary>
+      private static string ShortGuid()
+      {
+         return Convert.ToBase64String(Guid.NewGuid().ToByteArray())
+            .Replace("/", "_")
+            .Replace("+", "-")
+            .Substring(0, 22);
+      }
    }
 
    /// <summary>
