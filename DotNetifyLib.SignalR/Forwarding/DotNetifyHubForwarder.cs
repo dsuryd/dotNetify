@@ -127,6 +127,34 @@ namespace DotNetify.Forwarding
       }
 
       /// <summary>
+      /// Returns the origin connection context from a dictionary.
+      /// </summary>
+      /// <param name="items">Dictionary.</param>
+      public static ConnectionContext GetOriginConnectionContext(IDictionary<object, object> items)
+      {
+         return items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString()) : null;
+      }
+
+      /// <summary>
+      /// Returns the multicast group send info from a dictionary.
+      /// </summary>
+      /// <param name="items">Dictonary</param>
+      public static VMController.GroupSend GetGroupSend(IDictionary<object, object> items)
+      {
+         return items.ContainsKey(GROUP_SEND_TOKEN) ? JsonSerializer.Deserialize<VMController.GroupSend>(items[GROUP_SEND_TOKEN].ToString()) : null;
+      }
+
+      /// <summary>
+      /// Builds metadata to be included in the response to the forwarded messages.
+      /// </summary>
+      /// <param name="connectionId">Identifies the origin connection.</param>
+      /// <returns>Metadata.</returns>
+      internal static Dictionary<string, object> BuildResponseMetadata(string connectionId)
+      {
+         return new Dictionary<string, object> { { CONNECTION_ID_TOKEN, connectionId } };
+      }
+
+      /// <summary>
       /// Builds metadata to forward to the other hub server.
       /// </summary>
       /// <returns></returns>
@@ -143,9 +171,13 @@ namespace DotNetify.Forwarding
       /// </summary>
       private Dictionary<string, object> BuildResponseMetadata(VMController.GroupSend groupSend)
       {
+         var originContext = CallerContext.GetOriginConnectionContext();
+         if (originContext != null)
+            originContext.TimeStamp = DateTimeOffset.UtcNow;
+
          var metadata = new Dictionary<string, object>
          {
-            { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize((CallerContext.GetOriginConnectionContext() ?? CallerContext.GetConnectionContext())) }
+            { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize(originContext ?? CallerContext.GetConnectionContext()) }
          };
 
          // If multicast message, include the metadata.
@@ -153,34 +185,6 @@ namespace DotNetify.Forwarding
             metadata.Add(GROUP_SEND_TOKEN, JsonSerializer.Serialize(groupSend));
 
          return metadata;
-      }
-
-      /// <summary>
-      /// Returns the origin connection context from a dictionary.
-      /// </summary>
-      /// <param name="items">Dictionary.</param>
-      static public ConnectionContext GetOriginConnectionContext(IDictionary<object, object> items)
-      {
-         return items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString()) : null;
-      }
-
-      /// <summary>
-      /// Returns the multicast group send info from a dictionary.
-      /// </summary>
-      /// <param name="items">Dictonary</param>
-      static public VMController.GroupSend GetGroupSend(IDictionary<object, object> items)
-      {
-         return items.ContainsKey(GROUP_SEND_TOKEN) ? JsonSerializer.Deserialize<VMController.GroupSend>(items[GROUP_SEND_TOKEN].ToString()) : null;
-      }
-
-      /// <summary>
-      /// Builds metadata to be included in the response to the forwarded messages.
-      /// </summary>
-      /// <param name="connectionId">Identifies the origin connection.</param>
-      /// <returns>Metadata.</returns>
-      internal static Dictionary<string, object> BuildResponseMetadata(string connectionId)
-      {
-         return new Dictionary<string, object> { { CONNECTION_ID_TOKEN, connectionId } };
       }
    }
 }

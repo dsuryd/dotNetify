@@ -47,6 +47,15 @@ namespace DotNetify
    /// </summary>
    public class ConnectionContext : IConnectionContext
    {
+      private static readonly string _hubId = Guid.NewGuid().ToString();
+
+      /// <summary>
+      /// Unique ID for the hub instance for correlation purpose.
+      /// </summary>
+      public string HubId { get; set; } = _hubId;
+
+      public DateTimeOffset TimeStamp { get; set; } = DateTimeOffset.UtcNow;
+
       public string ConnectionId { get; set; }
 
       public HttpConnection HttpConnection { get; set; }
@@ -54,8 +63,6 @@ namespace DotNetify
       public HttpRequestHeaders HttpRequestHeaders { get; set; }
 
       public IDictionary<string, object> Items { get; set; }
-
-      public DateTimeOffset TimeStamp { get; } = DateTimeOffset.UtcNow;
    }
 
    /// <summary>
