@@ -42,6 +42,8 @@ namespace DotNetify
          public IList<string> ConnectionIds { get; set; }
          public IList<string> ExcludedConnectionIds { get; set; }
          public string Data { get; set; }
+
+         public bool IsEmpty => string.IsNullOrEmpty(GroupName) && UserIds?.Count == 0 && ConnectionIds?.Count == 0;
       }
 
       /// <summary>

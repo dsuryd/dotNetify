@@ -75,7 +75,7 @@ namespace DotNetify.Forwarding
       /// </summary>
       public async Task RequestVMAsync(string vmId, object vmArg)
       {
-         // Need to do this because nested JObject values get lost by converted to JsonElement.
+         // Need to do this because nested JObject values get lost when converted to JsonElement.
          vmArg = vmArg != null ? JsonSerializer.Deserialize<Dictionary<string, object>>(vmArg.ToString()) : new Dictionary<string, object>();
 
          await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg }, BuildMetadata());
@@ -87,6 +87,9 @@ namespace DotNetify.Forwarding
       public async Task ResponseVMAsync(string vmId, object vmData)
       {
          var groupSend = vmData as VMController.GroupSend;
+         if (groupSend != null && groupSend.IsEmpty)
+            return;
+
          await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, groupSend?.Data ?? vmData }, BuildResponseMetadata(groupSend));
       }
 
@@ -171,13 +174,9 @@ namespace DotNetify.Forwarding
       /// </summary>
       private Dictionary<string, object> BuildResponseMetadata(VMController.GroupSend groupSend)
       {
-         var originContext = CallerContext.GetOriginConnectionContext();
-         if (originContext != null)
-            originContext.TimeStamp = DateTimeOffset.UtcNow;
-
          var metadata = new Dictionary<string, object>
          {
-            { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize(originContext ?? CallerContext.GetConnectionContext()) }
+            { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize( CallerContext.GetConnectionContext()) }
          };
 
          // If multicast message, include the metadata.
