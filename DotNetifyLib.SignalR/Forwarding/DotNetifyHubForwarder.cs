@@ -87,7 +87,7 @@ namespace DotNetify.Forwarding
       public async Task ResponseVMAsync(string vmId, object vmData)
       {
          var groupSend = vmData as VMController.GroupSend;
-         if (groupSend != null && groupSend.IsEmpty)
+         if (groupSend?.IsEmpty() == true)
             return;
 
          await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, groupSend?.Data ?? vmData }, BuildResponseMetadata(groupSend));
