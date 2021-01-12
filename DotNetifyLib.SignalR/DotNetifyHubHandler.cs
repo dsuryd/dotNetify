@@ -357,12 +357,13 @@ namespace DotNetify
       /// <param name="vm">View model instance.</param>
       /// <param name="data">View model data.</param>
       /// <param name="vmAction">Filter action.</param>
-      private async Task RunVMFilters(BaseVM vm, object data, VMController.VMActionDelegate vmAction)
+      /// <param name="hubContext">Hub context.</param>
+      private async Task RunVMFilters(BaseVM vm, object data, VMActionDelegate vmAction, DotNetifyHubContext hubContext)
       {
          try
          {
-            _hubContext.Data = data;
-            await _hubPipeline.RunVMFiltersAsync(_hubContext, vm, async ctx =>
+            hubContext.Data = data;
+            await _hubPipeline.RunVMFiltersAsync(hubContext, vm, async ctx =>
             {
                await vmAction(ctx.HubContext.Data);
             });
@@ -376,12 +377,12 @@ namespace DotNetify
       /// <summary>
       /// Runs the filter before the view model is requested.
       /// </summary>
-      private Task RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmArg, vmAction);
+      private Task RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmArg, vmAction, _hubContext);
 
       /// <summary>
       /// Runs the filter before the view model is updated.
       /// </summary>
-      private Task RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmData, vmAction);
+      private Task RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmData, vmAction, _hubContext);
 
       /// <summary>
       /// Runs the filter before the view model respond to something.
@@ -393,11 +394,11 @@ namespace DotNetify
             // Restore the caller context items that are associated with the origin connection.
             _responseCallerContexts.TryGetValue(vm.ConnectionId, out ResponseHubCallerContext context);
 
-            _hubContext = new DotNetifyHubContext(context ?? CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
-            await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
+            var hubContext = new DotNetifyHubContext(context ?? CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
+            await _hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
             {
                Principal = ctx.Principal;
-               await RunVMFilters(vm.Instance, ctx.Data, vmAction);
+               await RunVMFilters(vm.Instance, ctx.Data, vmAction, hubContext);
             });
          }
          catch (Exception ex)
