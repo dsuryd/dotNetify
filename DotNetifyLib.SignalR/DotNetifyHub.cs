@@ -156,10 +156,8 @@ namespace DotNetify
             for (int i = 0; i < methodArgs.Length; i++)
             {
                var paramType = methodParams[i].ParameterType;
-               if (methodArgs[i] is JsonElement || methodArgs[i] is JObject)
+               if (methodArgs[i] is string || methodArgs[i] is JsonElement || methodArgs[i] is JObject)
                   methodArgs[i] = methodArgs[i].ToString().ConvertFromString(paramType);
-               else if (methodArgs[i] is Dictionary<object, object> && paramType == typeof(Dictionary<string, object>))
-                  methodArgs[i] = (methodArgs[i] as Dictionary<object, object>).ToDictionary(x => (string) x.Key, x => x.Value);
             }
 
             await methodInfo.InvokeAsync(this, methodArgs);

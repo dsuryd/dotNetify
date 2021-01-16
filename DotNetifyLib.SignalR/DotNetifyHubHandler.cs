@@ -208,11 +208,9 @@ namespace DotNetify
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
       public async Task RequestVMAsync(string vmId, object vmArg)
       {
-         object data = vmArg.NormalizeType();
-
          try
          {
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Request_VM), vmId, data, null, Principal);
+            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg, null, Principal);
 
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
@@ -237,11 +235,9 @@ namespace DotNetify
       /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
       public async Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData)
       {
-         var data = vmData?.ToDictionary(x => x.Key, x => x.Value.NormalizeType());
-
          try
          {
-            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Update_VM), vmId, data, null, Principal);
+            _hubContext = new DotNetifyHubContext(CallerContext, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(_hubContext, async ctx =>
             {
                Principal = ctx.Principal;
