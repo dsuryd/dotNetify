@@ -9,6 +9,7 @@ using DotNetify.DevApp;
 using DotNetify.Forwarding;
 using DotNetify.Testing;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
@@ -49,6 +50,7 @@ namespace UnitTests
       public void Initialize()
       {
          var hubEmulator = new HubEmulatorBuilder()
+          .AddServices(x => x.AddLogging())
           .Register<HelloWorldVM>()
           .Register<ChatRoomVM>()
           .Build();
@@ -62,9 +64,10 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
 
          var hubEmulator = new HubEmulatorBuilder()
-                  .Register<HelloWorldVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
-                  .Build();
+            .AddServices(x => x.AddLogging())
+            .Register<HelloWorldVM>()
+            .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
+            .Build();
 
          var client = hubEmulator.CreateClient();
          Setup(hubForwarderFactory, client);
@@ -82,9 +85,10 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
 
          var hubEmulator = new HubEmulatorBuilder()
-                  .Register<HelloWorldVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
-                  .Build();
+            .AddServices(x => x.AddLogging())
+            .Register<HelloWorldVM>()
+            .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
+            .Build();
 
          var client = hubEmulator.CreateClient();
          Setup(hubForwarderFactory, client);
@@ -105,9 +109,10 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
 
          var hubEmulator = new HubEmulatorBuilder()
-                  .Register<HelloWorldVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
-                  .Build();
+            .AddServices(x => x.AddLogging())
+            .Register<HelloWorldVM>()
+            .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
+            .Build();
 
          var client = hubEmulator.CreateClient();
          Setup(hubForwarderFactory, client, (callType, vmId) =>
@@ -129,6 +134,7 @@ namespace UnitTests
 
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
+                  .AddServices(x => x.AddLogging())
                   .Register<ChatRoomVM>()
                   .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
@@ -162,9 +168,10 @@ namespace UnitTests
       {
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
-                  .Register<ChatRoomVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
-                  .Build();
+            .AddServices(x => x.AddLogging())
+            .Register<ChatRoomVM>()
+            .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
+            .Build();
 
          var client1 = hubEmulator.CreateClient("client1-conn-id");
          var client2 = hubEmulator.CreateClient("client2-conn-id");
@@ -176,7 +183,7 @@ namespace UnitTests
          string expectedClient1Id = response.Users_add.Id;
 
          client2.Connect(nameof(ChatRoomVM));
-         client2.Dispatch("{AddUser: '0.456'}");
+         client2.Dispatch(new { AddUser = "0.456" });
 
          var client2Responses = client2.Listen(() =>
          {
@@ -199,9 +206,10 @@ namespace UnitTests
 
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
-                  .Register<ChatRoomVM>()
-                  .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
-                  .Build();
+            .AddServices(x => x.AddLogging())
+            .Register<ChatRoomVM>()
+            .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
+            .Build();
 
          var client1 = hubEmulator.CreateClient("client1-conn-id");
          var client2 = hubEmulator.CreateClient("client2-conn-id");
@@ -275,6 +283,7 @@ namespace UnitTests
          // Build a mock hub proxy that will be used to forward messages.  This proxy will be set to communicate to another hub emulator.
          var hubProxy = Substitute.For<IDotNetifyHubProxy>();
          hubProxy.StartAsync().Returns(Task.CompletedTask);
+         hubProxy.ConnectionState.Returns(HubConnectionState.Connected);
 
          // When the hub proxy's Invoke method is called, call the other hub emulator's Invoke method,
          // then get the response through the client emulator connecting with that hub, and finally
@@ -283,7 +292,14 @@ namespace UnitTests
             .Returns(arg =>
             {
                var callType = arg[0].ToString();
-               var methodArgs = (arg[1] as object[]).Select(x => x is string ? x : JObject.FromObject(x)).ToArray();
+               var methodArgs = (arg[1] as object[]).Select(x =>
+               {
+                  if (x is string)
+                     return x;
+                  if (x != null)
+                     return JObject.FromObject(x);
+                  return null;
+               }).ToArray();
 
                var metadataString = JsonSerializer.Serialize((IDictionary<string, object>) arg[2]);
                var metadata = Newtonsoft.Json.JsonConvert.DeserializeObject<IDictionary<string, object>>(metadataString);
