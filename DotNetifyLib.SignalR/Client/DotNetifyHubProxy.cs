@@ -36,8 +36,8 @@ namespace DotNetify.Client
       private string _hubPath;
       private string _serverUrl;
       private HubConnection _connection;
-      private HubConnectionState _connectionState;
-      private List<IDisposable> _subs = new List<IDisposable>();
+      private HubConnectionState _connectionState = HubConnectionState.Disconnected;
+      private readonly List<IDisposable> _subs = new List<IDisposable>();
 
       /// <summary>
       /// DotNetify hub path.

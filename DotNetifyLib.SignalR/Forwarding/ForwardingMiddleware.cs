@@ -17,8 +17,8 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetify.Security;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace DotNetify.Forwarding
 {
@@ -34,6 +34,7 @@ namespace DotNetify.Forwarding
    /// </summary>
    public class ForwardingMiddleware : IMiddleware, IDisconnectionMiddleware
    {
+      private readonly ILogger _logger;
       private readonly IDotNetifyHubForwarderFactory _hubForwarderFactory;
       private readonly string _serverUrl;
       private readonly ForwardingOptions _config;
@@ -44,8 +45,9 @@ namespace DotNetify.Forwarding
       /// <param name="hubForwarderFactory">Factory of hub message forwarder objects.</param>
       /// <param name="serverUrl">URL of the server to forward messages to.</param>
       /// <param name="config">Forwarding configuration.</param>
-      public ForwardingMiddleware(IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, ForwardingOptions config)
+      public ForwardingMiddleware(ILogger<ForwardingMiddleware> logger, IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, ForwardingOptions config)
       {
+         _logger = logger;
          _hubForwarderFactory = hubForwarderFactory;
          _serverUrl = serverUrl;
          _config = config;
@@ -55,19 +57,24 @@ namespace DotNetify.Forwarding
       {
          await _hubForwarderFactory.InvokeInstanceAsync(_serverUrl, _config, async hubForwarder =>
          {
-            hubForwarder.CallerContext = context.CallerContext;
-
-            if (context.CallType == nameof(IDotNetifyHubMethod.Request_VM))
-               await hubForwarder.RequestVMAsync(context.VMId, context.Data);
-            else if (context.CallType == nameof(IDotNetifyHubMethod.Update_VM))
+            if (hubForwarder.IsConnected)
             {
-               var data = (Dictionary<string, object>) context.Data;
-               await hubForwarder.UpdateVMAsync(context.VMId, data);
+               hubForwarder.CallerContext = context.CallerContext;
+
+               if (context.CallType == nameof(IDotNetifyHubMethod.Request_VM))
+                  await hubForwarder.RequestVMAsync(context.VMId, context.Data);
+               else if (context.CallType == nameof(IDotNetifyHubMethod.Update_VM))
+               {
+                  var data = (Dictionary<string, object>) context.Data;
+                  await hubForwarder.UpdateVMAsync(context.VMId, data);
+               }
+               else if (context.CallType == nameof(IDotNetifyHubMethod.Dispose_VM))
+                  await hubForwarder.DisposeVMAsync(context.VMId);
+               else if (context.CallType == nameof(IDotNetifyHubMethod.Response_VM))
+                  await hubForwarder.ResponseVMAsync(context.VMId, context.Data);
             }
-            else if (context.CallType == nameof(IDotNetifyHubMethod.Dispose_VM))
-               await hubForwarder.DisposeVMAsync(context.VMId);
-            else if (context.CallType == nameof(IDotNetifyHubMethod.Response_VM))
-               await hubForwarder.ResponseVMAsync(context.VMId, context.Data);
+            else
+               _logger.LogError($"Failed to forward {context.CallType} message to {_serverUrl}: server is not connected.");
          });
 
          if (!_config.HaltPipeline)
@@ -78,8 +85,13 @@ namespace DotNetify.Forwarding
       {
          await _hubForwarderFactory.InvokeInstanceAsync(_serverUrl, _config, async hubForwarder =>
          {
-            hubForwarder.CallerContext = context;
-            await hubForwarder.OnDisconnectedAsync(null);
+            if (hubForwarder.IsConnected)
+            {
+               hubForwarder.CallerContext = context;
+               await hubForwarder.OnDisconnectedAsync(null);
+            }
+            else
+               _logger.LogError($"Failed to forward OnDisconnected message to {_serverUrl}: server is not connected.");
          });
       }
    }
@@ -115,9 +127,6 @@ namespace DotNetify.Forwarding
 
             config.UseMiddleware<ForwardingMiddleware>(serverUrls[i], forwardingOptions);
          }
-
-         // Add the extract headers middleware to prevent this same middleware get automatically inserted at the top.
-         config.UseMiddleware<ExtractHeadersMiddleware>();
          return config;
       }
 

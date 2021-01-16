@@ -41,6 +41,11 @@ namespace DotNetify.Forwarding
       public HubCallerContext CallerContext { get; set; }
 
       /// <summary>
+      /// Whether the target server is connected.
+      /// </summary>
+      public bool IsConnected => _hubProxy.ConnectionState == HubConnectionState.Connected;
+
+      /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="hubProxy">Provides connection to the other hub server.</param>
@@ -51,7 +56,15 @@ namespace DotNetify.Forwarding
          _hubResponse = hubResponse;
 
          _hubProxy.Response_VM += OnResponse_VM;
-         _hubProxy.StartAsync();
+      }
+
+      /// <summary>
+      /// Starts the connection to the target server.
+      /// </summary>
+      public async Task StartAsync()
+      {
+         if (_hubProxy.ConnectionState == HubConnectionState.Disconnected)
+            await _hubProxy.StartAsync();
       }
 
       /// <summary>
@@ -75,10 +88,8 @@ namespace DotNetify.Forwarding
       /// </summary>
       public async Task RequestVMAsync(string vmId, object vmArg)
       {
-         // Need to do this because nested JObject values get lost when converted to JsonElement.
-         vmArg = vmArg != null ? JsonSerializer.Deserialize<Dictionary<string, object>>(vmArg.ToString()) : new Dictionary<string, object>();
-
-         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, vmArg }, BuildMetadata());
+         string data = vmArg?.ToString();
+         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Request_VM), new object[] { vmId, data }, BuildMetadata());
       }
 
       /// <summary>
@@ -98,7 +109,8 @@ namespace DotNetify.Forwarding
       /// </summary>
       public async Task UpdateVMAsync(string vmId, Dictionary<string, object> vmData)
       {
-         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Update_VM), new object[] { vmId, vmData }, BuildMetadata());
+         string data = JsonSerializer.Serialize(vmData);
+         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Update_VM), new object[] { vmId, data }, BuildMetadata());
       }
 
       /// <summary>

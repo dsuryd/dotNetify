@@ -57,6 +57,7 @@ namespace DotNetify.Forwarding
 
          var semaphore = _semaphores.GetOrAdd(hubForwarder, _ => new SemaphoreSlim(1));
          await semaphore.WaitAsync();
+         await hubForwarder.StartAsync();
 
          try
          {
@@ -88,6 +89,8 @@ namespace DotNetify.Forwarding
 
          if (config.UseMessagePack)
             (hubProxy as DotNetifyHubProxy).ConnectionBuilder = builder => builder.AddMessagePackProtocol();
+         else
+            (hubProxy as DotNetifyHubProxy).ConnectionBuilder = builder => builder.AddJsonProtocol();
 
          hubProxy.Init(null, serverUrl);
          return new DotNetifyHubForwarder(hubProxy, new DotNetifyHubResponse(_globalHubContext));
