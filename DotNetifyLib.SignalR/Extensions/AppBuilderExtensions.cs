@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Http;
 using DotNetify.Routing;
 using System.Threading.Tasks;
 using System.Linq;
+using DotNetify.Forwarding;
 
 namespace DotNetify
 {
@@ -78,7 +79,11 @@ namespace DotNetify
 
          // Add middleware to extract headers from incoming requests.
          if (!_middlewareTypes.Exists(t => t.Item1 == typeof(ExtractHeadersMiddleware)))
-            _middlewareTypes.Insert(0, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
+         {
+            // Place the middleware after any forwarding middleware to ensure it forwards unprocessed data.
+            int pos = _middlewareTypes.FindLastIndex(x => x.Item1 == typeof(ForwardingMiddleware)) + 1;
+            _middlewareTypes.Insert(pos, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
+         }
 
          // Add middleware factories to the hub.
          var middlewareFactories = provider.GetService<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>();
