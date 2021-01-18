@@ -373,24 +373,28 @@ namespace DotNetify
       /// <summary>
       /// Runs the filter before the view model is requested.
       /// </summary>
-      private Task RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmArg, vmAction, _hubContext);
+      private Task RunRequestingVMFilters(string vmId, BaseVM vm, object vmArg, VMActionDelegate vmAction) => RunVMFilters(vm, vmArg, vmAction, _hubContext);
 
       /// <summary>
       /// Runs the filter before the view model is updated.
       /// </summary>
-      private Task RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, VMController.VMActionDelegate vmAction) => RunVMFilters(vm, vmData, vmAction, _hubContext);
+      private Task RunUpdatingVMFilters(string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => RunVMFilters(vm, vmData, vmAction, _hubContext);
 
       /// <summary>
       /// Runs the filter before the view model respond to something.
       /// </summary>
-      private async Task RunRespondingVMFilters(VMInfo vm, object vmData, VMController.VMActionDelegate vmAction)
+      private async Task RunRespondingVMFilters(VMInfo vm, object vmData, VMActionDelegate vmAction)
       {
          try
          {
             // Restore the caller context items that are associated with the origin connection.
-            _responseCallerContexts.TryGetValue(vm.ConnectionId, out ResponseHubCallerContext context);
+            if (!_responseCallerContexts.TryGetValue(vm.ConnectionId, out ResponseHubCallerContext context))
+            {
+               context = new ResponseHubCallerContext(CallerContext);
+               _responseCallerContexts.TryAdd(vm.ConnectionId, context);
+            }
 
-            var hubContext = new DotNetifyHubContext(context ?? CallerContext, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
+            var hubContext = new DotNetifyHubContext(context, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
             {
                Principal = ctx.Principal;

@@ -147,7 +147,8 @@ namespace DotNetify.Forwarding
       /// <param name="items">Dictionary.</param>
       public static ConnectionContext GetOriginConnectionContext(IDictionary<object, object> items)
       {
-         return items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? JsonSerializer.Deserialize<ConnectionContext>(items[CONNECTION_CONTEXT_TOKEN].ToString()) : null;
+         var connectionContext = items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? items[CONNECTION_CONTEXT_TOKEN] : null;
+         return connectionContext != null ? JsonSerializer.Deserialize<ConnectionContext>(connectionContext.ToString()) : null;
       }
 
       /// <summary>
