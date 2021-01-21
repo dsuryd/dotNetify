@@ -129,6 +129,10 @@ namespace UnitTests
          mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
+         var requestWebApi = new DotNetifyWebApi();
+         requestWebApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
          var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
          dynamic response1 = JsonConvert.DeserializeObject(result);
@@ -162,12 +166,16 @@ namespace UnitTests
          mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
+         var requestWebApi = new DotNetifyWebApi();
+         requestWebApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+
          var update = new Dictionary<string, object>() { { "Metadata", "Test" } };
          var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
          await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
-         Assert.IsNotNull(result);
+         Assert.IsNull(result);
       }
 
       [TestMethod]
@@ -215,6 +223,10 @@ namespace UnitTests
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
          mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+
+         var requestWebApi = new DotNetifyWebApi();
+         requestWebApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
+         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
          var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
