@@ -79,7 +79,7 @@ namespace DotNetify.Forwarding
          return _hubForwarders.GetOrAdd(serverUrl, url =>
          {
             var newForwarders = Enumerable.Range(1, config.ConnectionPoolSize).Select(x => CreateInstance(serverUrl, config));
-            return new AsyncCollection<DotNetifyHubForwarder>(new ConcurrentStack<DotNetifyHubForwarder>(newForwarders));
+            return new AsyncCollection<DotNetifyHubForwarder>(new ConcurrentQueue<DotNetifyHubForwarder>(newForwarders));
          });
       }
 
