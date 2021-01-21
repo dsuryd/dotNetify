@@ -309,15 +309,8 @@ namespace DotNetify
       /// <param name="iData">View model update.</param>
       public async Task OnUpdateVMAsync(string connectionId, string vmId, Dictionary<string, object> data)
       {
-         bool isRecreated = false;
          if (!_activeVMs.ContainsKey(vmId))
-         {
-            // No view model found; it must have expired and needs to be recreated.
-            isRecreated = true;
-            await OnRequestVMAsync(connectionId, vmId);
-            if (!_activeVMs.ContainsKey(vmId))
-               return;
-         }
+            return;
 
          // Update the new values from the client to the server view model.
          var vmInstance = _activeVMs[vmId].Instance;
@@ -347,26 +340,26 @@ namespace DotNetify
             lock (vmInstance)
             {
                var vmInfo = _activeVMs.Values.FirstOrDefault(vm => vm.Instance == vmInstance);
-               var changedProperties = new Dictionary<string, object>(vmInstance.ChangedProperties);
-
-               // Unless the view model was recreated, exclude the changes that trigger this update if their values don't change.
-               if (!isRecreated)
+               if (vmInfo != null)
                {
+                  var changedProperties = new Dictionary<string, object>(vmInstance.ChangedProperties);
+
+                  // Exclude the changes that trigger this update if their values don't change.
                   foreach (var kvp in data)
                      if (vmInstance.IsEqualToChangedPropertyValue(kvp.Key, kvp.Value))
                         changedProperties.Remove(kvp.Key);
-               }
 
-               if (changedProperties.Count > 0)
-               {
-                  var vmData = vmInstance.Serialize(changedProperties);
-                  PushUpdates(vmInfo, vmData);
-               }
+                  if (changedProperties.Count > 0)
+                  {
+                     var vmData = vmInstance.Serialize(changedProperties);
+                     PushUpdates(vmInfo, vmData);
+                  }
 
-               if (vmInstance is MulticastVM)
-                  (vmInstance as MulticastVM).PushUpdatesExcept(vmInfo.ConnectionId);
-               else
-                  vmInstance.AcceptChangedProperties();
+                  if (vmInstance is MulticastVM)
+                     (vmInstance as MulticastVM).PushUpdatesExcept(vmInfo.ConnectionId);
+                  else
+                     vmInstance.AcceptChangedProperties();
+               }
             }
 
             // Push updates on other view model instances in case they too change.
