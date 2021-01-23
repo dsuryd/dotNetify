@@ -15,18 +15,14 @@ limitations under the License.
  */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Claims;
 using System.Security.Principal;
-using System.Threading;
 using System.Threading.Tasks;
 using DotNetify.Forwarding;
 using DotNetify.Security;
 using DotNetify.Util;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using static DotNetify.VMController;
@@ -54,39 +50,16 @@ namespace DotNetify
    /// </summary>
    public class DotNetifyHubHandler : IDotNetifyHubHandler
    {
-      private static readonly ConcurrentDictionary<string, ResponseHubCallerContext> _responseCallerContexts = new ConcurrentDictionary<string, ResponseHubCallerContext>();
-
       private readonly IVMControllerFactory _vmControllerFactory;
       private readonly IHubServiceProvider _serviceProvider;
       private readonly IPrincipalAccessor _principalAccessor;
       private readonly IDotNetifyHubResponse _hubResponse;
       private readonly IHubPipeline _hubPipeline;
-      private readonly IDotNetifyHubForwardResponseFactory _hubForwardResponseFactory;
+      private readonly IDotNetifyHubResponseFactory _hubResponseFactory;
 
       private DotNetifyHubContext _hubContext;
       private HubCallerContext _callerContext;
       private IPrincipal _principal;
-
-      public class ResponseHubCallerContext : HubCallerContext
-      {
-         private readonly HubCallerContext _context;
-         private readonly Dictionary<object, object> _items;
-
-         public override string ConnectionId => _context.ConnectionId;
-         public override string UserIdentifier => _context.UserIdentifier;
-         public override ClaimsPrincipal User => _context.User;
-         public override IDictionary<object, object> Items => _items;
-         public override IFeatureCollection Features => _context.Features;
-         public override CancellationToken ConnectionAborted => _context.ConnectionAborted;
-
-         public override void Abort() => _context.Abort();
-
-         public ResponseHubCallerContext(HubCallerContext context)
-         {
-            _context = context;
-            _items = new Dictionary<object, object>(context.Items);
-         }
-      }
 
       /// <summary>
       /// Hub caller context.
@@ -97,20 +70,8 @@ namespace DotNetify
          set
          {
             _callerContext = value;
-
-            // Cache caller context items so we can restore the one associated with the origin connection on sending response.
-            var originContext = value.GetOriginConnectionContext();
-            if (originContext != null && !_responseCallerContexts.ContainsKey(originContext.ConnectionId))
-               _responseCallerContexts.TryAdd(originContext.ConnectionId, new ResponseHubCallerContext(value));
+            _hubResponseFactory.CreateInstance(value);
          }
-      }
-
-      /// <summary>
-      /// Returns object to send responses to the client.
-      /// </summary>
-      private IDotNetifyHubResponse HubResponse
-      {
-         get => CallerContext.GetOriginConnectionContext() != null ? _hubForwardResponseFactory.GetInstance(CallerContext.ConnectionId) : _hubResponse;
       }
 
       /// <summary>
@@ -161,22 +122,19 @@ namespace DotNetify
       /// <param name="serviceProvider">Allows providing scoped service provider for the view models.</param>
       /// <param name="principalAccessor">Allows passing the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
-      /// <param name="hubResponse">Sends responses back to hub clients.</param>
-      /// <param name="hubForwardResponseFactory">Send responses back to hub forwarder.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       public DotNetifyHubHandler(
             IVMControllerFactory vmControllerFactory,
             IHubServiceProvider serviceProvider,
             IPrincipalAccessor principalAccessor,
             IHubPipeline hubPipeline,
-            IDotNetifyHubResponse hubResponse,
-            IDotNetifyHubForwardResponseFactory hubForwardResponseFactory)
+            IDotNetifyHubResponseFactory hubResponseFactory)
       {
          _vmControllerFactory = vmControllerFactory;
          _serviceProvider = serviceProvider;
          _principalAccessor = principalAccessor;
          _hubPipeline = hubPipeline;
-         _hubForwardResponseFactory = hubForwardResponseFactory;
-         _hubResponse = hubResponse;
+         _hubResponseFactory = hubResponseFactory;
 
          _vmControllerFactory.ResponseDelegate = OnVMResponse ?? ResponseVMAsync;
       }
@@ -192,8 +150,8 @@ namespace DotNetify
          // Remove the controller on disconnection.
          _vmControllerFactory.Remove(ConnectionId);
 
-         // Clean up origin context items.
-         _responseCallerContexts.TryRemove(ConnectionId, out ResponseHubCallerContext _);
+         // Remove associated hub response object.
+         _hubResponseFactory.RemoveInstance(ConnectionId);
 
          // Allow middlewares to hook to the event.
          await _hubPipeline.RunDisconnectionMiddlewaresAsync(CallerContext);
@@ -219,7 +177,7 @@ namespace DotNetify
 
                // A multicast view model may be assigned to a SignalR group. If so, add the connection to the group.
                if (!string.IsNullOrEmpty(groupName))
-                  await HubResponse.AddToGroupAsync(ConnectionId, groupName);
+                  await _hubResponseFactory.GetInstance(ConnectionId).AddToGroupAsync(ConnectionId, groupName);
             });
          }
          catch (Exception ex)
@@ -287,7 +245,7 @@ namespace DotNetify
       {
          if (connectionId.StartsWith(VMController.MULTICAST))
          {
-            var connectionIds = HandleMulticastMessage(HubResponse, connectionId, vmId, vmData);
+            var connectionIds = HandleMulticastMessage(connectionId, vmId, vmData);
 
             // Touch the factory to push the timeout.
             connectionIds?.ForEach(id => _vmControllerFactory.GetInstance(id));
@@ -295,7 +253,7 @@ namespace DotNetify
          else
          {
             if (_vmControllerFactory.GetInstance(connectionId) != null) // Touch the factory to push the timeout.
-               HubResponse.SendAsync(connectionId, vmId, vmData);
+               _hubResponseFactory.GetInstance(connectionId).SendAsync(connectionId, vmId, vmData);
          }
          return Task.CompletedTask;
       }
@@ -306,39 +264,39 @@ namespace DotNetify
       /// <param name="messageType">Message type.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="serializedMessage">Serialized message.</param>
-      static internal List<string> HandleMulticastMessage(IDotNetifyHubResponse hubResponse, string messageType, string vmId, string serializedMessage)
+      internal List<string> HandleMulticastMessage(string messageType, string vmId, string serializedMessage)
       {
-         if (messageType.EndsWith(nameof(VMController.GroupSend)))
+         if (messageType.EndsWith(nameof(GroupSend)))
          {
-            var message = JsonConvert.DeserializeObject<VMController.GroupSend>(serializedMessage);
+            var message = JsonConvert.DeserializeObject<GroupSend>(serializedMessage);
 
             if (!string.IsNullOrEmpty(message.GroupName))
             {
                if (message.ExcludedConnectionIds?.Count == 0)
-                  hubResponse.SendToGroupAsync(message.GroupName, vmId, message.Data);
+                  _hubResponseFactory.InvokeGroupInstances(hubResponse => hubResponse.SendToGroupAsync(message.GroupName, vmId, message.Data));
                else
                {
                   var excludedIds = new List<string>(message.ExcludedConnectionIds);
-                  hubResponse.SendToGroupExceptAsync(message.GroupName, excludedIds, vmId, message.Data);
+                  _hubResponseFactory.InvokeGroupInstances(hubResponse => hubResponse.SendToGroupExceptAsync(message.GroupName, excludedIds, vmId, message.Data));
                }
             }
             else if (message.UserIds?.Count > 0)
             {
                var userIds = new List<string>(message.UserIds);
-               hubResponse.SendToUsersAsync(userIds, vmId, message.Data);
+               _hubResponseFactory.InvokeGroupInstances(hubResponse => hubResponse.SendToUsersAsync(userIds, vmId, message.Data));
             }
             else if (message.ConnectionIds?.Count > 0)
             {
                foreach (var connectionId in message.ConnectionIds)
-                  hubResponse.SendAsync(connectionId, vmId, message.Data);
+                  _hubResponseFactory.GetInstance(connectionId).SendAsync(connectionId, vmId, message.Data);
             }
 
             return message.ConnectionIds.ToList();
          }
-         else if (messageType.EndsWith(nameof(VMController.GroupRemove)))
+         else if (messageType.EndsWith(nameof(GroupRemove)))
          {
-            var message = JsonConvert.DeserializeObject<VMController.GroupRemove>(serializedMessage);
-            hubResponse.RemoveFromGroupAsync(message.ConnectionId, message.GroupName);
+            var message = JsonConvert.DeserializeObject<GroupRemove>(serializedMessage);
+            _hubResponseFactory.GetInstance(message.ConnectionId).RemoveFromGroupAsync(message.ConnectionId, message.GroupName);
          }
 
          return null;
@@ -387,13 +345,7 @@ namespace DotNetify
       {
          try
          {
-            // Restore the caller context items that are associated with the origin connection.
-            if (!_responseCallerContexts.TryGetValue(vm.ConnectionId, out ResponseHubCallerContext context))
-            {
-               context = new ResponseHubCallerContext(CallerContext);
-               _responseCallerContexts.TryAdd(vm.ConnectionId, context);
-            }
-
+            var context = _hubResponseFactory.GetCallerContext(vm.ConnectionId) ?? CallerContext;
             var hubContext = new DotNetifyHubContext(context, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
             await _hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
             {

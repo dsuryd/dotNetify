@@ -97,15 +97,16 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
          mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
-         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
-         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          dynamic response = JsonConvert.DeserializeObject(result);
          Assert.AreEqual("Hello", (string) response.FirstName);
@@ -123,6 +124,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -131,20 +133,20 @@ namespace UnitTests
 
          var requestWebApi = new DotNetifyWebApi();
          requestWebApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
-         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
          dynamic response1 = JsonConvert.DeserializeObject(result);
 
          webApi = new DotNetifyWebApi();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
          update = new Dictionary<string, object>() { { "LastName", "Doe" } };
-         result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
          dynamic response2 = JsonConvert.DeserializeObject(result);
 
-         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          Assert.AreEqual("John World", (string) response1.FullName);
          Assert.AreEqual("John Doe", (string) response2.FullName);
@@ -160,6 +162,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -168,12 +171,12 @@ namespace UnitTests
 
          var requestWebApi = new DotNetifyWebApi();
          requestWebApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
-         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          var update = new Dictionary<string, object>() { { "Metadata", "Test" } };
-         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
-         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          Assert.IsNull(result);
       }
@@ -190,15 +193,16 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
          mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
-         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
-         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          dynamic response = JsonConvert.DeserializeObject(result);
          Assert.AreEqual("John", (string) response.FirstName);
@@ -218,6 +222,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -226,13 +231,13 @@ namespace UnitTests
 
          var requestWebApi = new DotNetifyWebApi();
          requestWebApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
-         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await requestWebApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          var update = new Dictionary<string, object>() { { "FirstName", "John" } };
-         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         var result = await webApi.Update_VM(vmId, update, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
          dynamic response = JsonConvert.DeserializeObject(result);
 
-         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         await webApi.Dispose_VM(vmId, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          Assert.AreEqual("JOHN World", (string) response.FullName);
       }
@@ -247,13 +252,14 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
+         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
          mockHttpContext.Connection.Id = Guid.NewGuid().ToString();
          webApi.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext { HttpContext = mockHttpContext };
 
-         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline);
+         var result = await webApi.Request_VM(vmId, null, vmControllerFactory, serviceProvider, principalAccessor, hubPipeline, hubResponseFactory);
 
          dynamic response = JsonConvert.DeserializeObject(result);
 

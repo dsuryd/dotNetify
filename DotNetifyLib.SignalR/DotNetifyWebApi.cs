@@ -86,6 +86,7 @@ namespace DotNetify.WebApi
       /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
       /// <param name="principalAccessor">Allows to pass the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       /// <returns>View model state.</returns>
       [HttpGet("{vmId}")]
       public async Task<string> Request_VM(
@@ -94,10 +95,12 @@ namespace DotNetify.WebApi
          [FromServices] WebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
-         [FromServices] IHubPipeline hubPipeline
+         [FromServices] IHubPipeline hubPipeline,
+         [FromServices] IDotNetifyHubResponseFactory hubResponseFactory
+
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
 
          try
          {
@@ -122,6 +125,7 @@ namespace DotNetify.WebApi
       /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
       /// <param name="principalAccessor">Allows to pass the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       /// <returns>View model state.</returns>
       [HttpPost("{vmId}")]
       public async Task<string> Update_VM(
@@ -130,10 +134,11 @@ namespace DotNetify.WebApi
          [FromServices] WebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
-         [FromServices] IHubPipeline hubPipeline
+         [FromServices] IHubPipeline hubPipeline,
+         [FromServices] IDotNetifyHubResponseFactory hubResponseFactory
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
 
          try
          {
@@ -158,16 +163,18 @@ namespace DotNetify.WebApi
       /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
       /// <param name="principalAccessor">Allows to pass the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       [HttpDelete("{vmId}")]
       public async Task Dispose_VM(
          string vmId,
          [FromServices] WebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
-         [FromServices] IHubPipeline hubPipeline
+         [FromServices] IHubPipeline hubPipeline,
+         [FromServices] IDotNetifyHubResponseFactory hubResponseFactory
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
          await hub.DisposeVMAsync(vmId);
       }
 
@@ -178,6 +185,7 @@ namespace DotNetify.WebApi
       /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
       /// <param name="principalAccessor">Allows to pass the hub principal.</param>
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       /// <param name="callType">Hub call type.</param>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="data">View model data.</param>
@@ -187,6 +195,7 @@ namespace DotNetify.WebApi
          IHubServiceProvider hubServiceProvider,
          IPrincipalAccessor principalAccessor,
          IHubPipeline hubPipeline,
+         IDotNetifyHubResponseFactory hubResponseFactory,
          string callType,
          string vmId,
          object data = null)
@@ -200,7 +209,7 @@ namespace DotNetify.WebApi
             hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, data, null, hubPrincipalAccessor.Principal);
          }
 
-         return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, null, null)
+         return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory)
          {
             CallerContext = httpCallerContext,
             OnVMResponse = ResponseVMCallback
