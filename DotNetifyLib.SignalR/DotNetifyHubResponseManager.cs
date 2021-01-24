@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
+using System.Threading.Tasks;
 using DotNetify.Forwarding;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
@@ -29,25 +30,19 @@ namespace DotNetify
    /// <summary>
    /// Provides objects to send responses back to hub clients.
    /// </summary>
-   public interface IDotNetifyHubResponseFactory
+   public interface IDotNetifyHubResponseManager : IDotNetifyHubResponse
    {
       void CreateInstance(HubCallerContext context);
 
-      HubCallerContext GetCallerContext(string connectionId);
-
-      IDotNetifyHubResponse GetInstance();
-
-      IDotNetifyHubResponse GetInstance(string connectionId);
-
-      void InvokeGroupInstances(Action<IDotNetifyHubResponse> invokeDelegate);
-
       void RemoveInstance(string connectionId);
+
+      HubCallerContext GetCallerContext(string connectionId);
    }
 
    /// <summary>
    /// This class produces objects to send responses back to hub clients.
    /// </summary>
-   public class DotNetifyHubResponseFactory : IDotNetifyHubResponseFactory
+   public class DotNetifyHubResponseManager : IDotNetifyHubResponseManager
    {
       private readonly IDotNetifyHubResponse _hubResponse;
       private readonly IDotNetifyHubForwardResponseFactory _hubForwardResponseFactory;
@@ -83,7 +78,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="hubResponse">Hub response object.</param>
       /// <param name="hubForwardResponseFactory">Factory to create response objects of forwarded connections.</param>
-      public DotNetifyHubResponseFactory(IDotNetifyHubResponse hubResponse, IDotNetifyHubForwardResponseFactory hubForwardResponseFactory)
+      public DotNetifyHubResponseManager(IDotNetifyHubResponse hubResponse, IDotNetifyHubForwardResponseFactory hubForwardResponseFactory)
       {
          _hubResponse = hubResponse;
          _hubForwardResponseFactory = hubForwardResponseFactory;
@@ -112,26 +107,6 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Returns the hub response object of this hub.
-      /// </summary>
-      public IDotNetifyHubResponse GetInstance()
-      {
-         return _hubResponse;
-      }
-
-      /// <summary>
-      /// Returns the hub response object of a connection, which could be associated with a forwarding hub.
-      /// </summary>
-      /// <param name="connectionId">Identifies the connection.</param>
-      public IDotNetifyHubResponse GetInstance(string connectionId)
-      {
-         if (_responseHubCallerContexts.TryGetValue(connectionId, out HubCallerContext context))
-            return _hubForwardResponseFactory.GetInstance(context.ConnectionId);
-
-         return _hubResponse;
-      }
-
-      /// <summary>
       /// Runs action on the hub response objects of every forwarding hub connected this hub.
       /// </summary>
       /// <param name="invokeDelegate">Delegate that will be passed the hub response objects.</param>
@@ -154,6 +129,83 @@ namespace DotNetify
       public void RemoveInstance(string connectionId)
       {
          _responseHubCallerContexts.TryRemove(connectionId, out HubCallerContext _);
+      }
+
+      public Task AddToGroupAsync(string connectionId, string groupName)
+      {
+         return GetInstance(connectionId).AddToGroupAsync(connectionId, groupName);
+      }
+
+      public Task RemoveFromGroupAsync(string connectionId, string groupName)
+      {
+         return GetInstance(connectionId).RemoveFromGroupAsync(connectionId, groupName);
+      }
+
+      public Task SendAsync(string connectionId, string vmId, string vmData)
+      {
+         return GetInstance(connectionId).SendAsync(connectionId, vmId, vmData);
+      }
+
+      public Task SendToManyAsync(IReadOnlyList<string> connectionIds, string vmId, string vmData)
+      {
+         // Map connections to associated hubs.
+         var hubs = new List<Tuple<string, string>>();
+         foreach (var connectionId in connectionIds)
+         {
+            string hubId = null;
+            if (_responseHubCallerContexts.TryGetValue(connectionId, out HubCallerContext context))
+               hubId = context.GetOriginConnectionContext().HubId;
+            hubs.Add(Tuple.Create(hubId, connectionId));
+         }
+
+         // Group connections by hub.
+         foreach (var group in hubs.GroupBy(x => x.Item1))
+         {
+            string hubId = group.Key;
+            List<string> hubConnectionIds = group.Select(x => x.Item2).ToList();
+
+            // Use any connection of the hub to send message.
+            var hubResponse = hubId == null ? _hubResponse : GetInstance(_responseHubCallerContexts.FirstOrDefault(x => x.Value.GetOriginConnectionContext().HubId == hubId).Key);
+            hubResponse.SendToManyAsync(hubConnectionIds, vmId, vmData);
+         }
+
+         return Task.CompletedTask;
+      }
+
+      public Task SendToGroupAsync(string groupName, string vmId, string vmData)
+      {
+         GetAllHubInstances().ForEach(x => x.SendToGroupAsync(groupName, vmId, vmData));
+         return Task.CompletedTask;
+      }
+
+      public Task SendToGroupExceptAsync(string groupName, IReadOnlyList<string> excludedIds, string vmId, string vmData)
+      {
+         GetAllHubInstances().ForEach(x => x.SendToGroupExceptAsync(groupName, excludedIds, vmId, vmData));
+         return Task.CompletedTask;
+      }
+
+      public Task SendToUsersAsync(IReadOnlyList<string> userIds, string vmId, string vmData)
+      {
+         GetAllHubInstances().ForEach(x => x.SendToUsersAsync(userIds, vmId, vmData));
+         return Task.CompletedTask;
+      }
+
+      /// <summary>
+      /// Returns the hub response object of a connection, which could be associated with a forwarding hub.
+      /// </summary>
+      /// <param name="connectionId">Identifies the connection.</param>
+      private IDotNetifyHubResponse GetInstance(string connectionId)
+      {
+         return _responseHubCallerContexts.TryGetValue(connectionId, out HubCallerContext context) ? _hubForwardResponseFactory.GetInstance(context.ConnectionId) : _hubResponse;
+      }
+
+      private List<IDotNetifyHubResponse> GetAllHubInstances()
+      {
+         return _responseHubCallerContexts
+            .GroupBy(x => x.Value.GetOriginConnectionContext().HubId)
+            .Select(x => GetInstance(x.First().Value.ConnectionId))
+            .Concat(new[] { _hubResponse })  // Add this hub's own response object.
+            .ToList();
       }
    }
 }

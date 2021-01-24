@@ -97,7 +97,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
+         var hubResponseFactory = new DotNetifyHubResponseManager(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -124,7 +124,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
+         var hubResponseFactory = new DotNetifyHubResponseManager(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -162,7 +162,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
+         var hubResponseFactory = new DotNetifyHubResponseManager(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -193,7 +193,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
+         var hubResponseFactory = new DotNetifyHubResponseManager(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -222,7 +222,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
+         var hubResponseFactory = new DotNetifyHubResponseManager(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();
@@ -252,7 +252,7 @@ namespace UnitTests
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
-         var hubResponseFactory = new DotNetifyHubResponseFactory(null, null);
+         var hubResponseFactory = new DotNetifyHubResponseManager(null, null);
          var webApi = new DotNetifyWebApi();
 
          var mockHttpContext = Substitute.For<Mvc.HttpContext>();

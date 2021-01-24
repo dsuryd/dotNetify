@@ -96,11 +96,11 @@ namespace DotNetify.WebApi
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IDotNetifyHubResponseFactory hubResponseFactory
+         [FromServices] IDotNetifyHubResponseManager hubResponseManager
 
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
 
          try
          {
@@ -135,10 +135,10 @@ namespace DotNetify.WebApi
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IDotNetifyHubResponseFactory hubResponseFactory
+         [FromServices] IDotNetifyHubResponseManager hubResponseManager
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
 
          try
          {
@@ -171,10 +171,10 @@ namespace DotNetify.WebApi
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IDotNetifyHubResponseFactory hubResponseFactory
+         [FromServices] IDotNetifyHubResponseManager hubResponseManager
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
          await hub.DisposeVMAsync(vmId);
       }
 
@@ -195,7 +195,7 @@ namespace DotNetify.WebApi
          IHubServiceProvider hubServiceProvider,
          IPrincipalAccessor principalAccessor,
          IHubPipeline hubPipeline,
-         IDotNetifyHubResponseFactory hubResponseFactory,
+         IDotNetifyHubResponseManager hubResponseManager,
          string callType,
          string vmId,
          object data = null)
@@ -209,7 +209,7 @@ namespace DotNetify.WebApi
             hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, data, null, hubPrincipalAccessor.Principal);
          }
 
-         return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseFactory)
+         return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager)
          {
             CallerContext = httpCallerContext,
             OnVMResponse = ResponseVMCallback
