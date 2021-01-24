@@ -35,6 +35,8 @@ namespace DotNetify
       /// </summary>
       private string _groupName;
 
+      private int _createdEventFlag;
+
       /// <summary>
       /// Occurs when the view model wants to push updates to all associated clients.
       /// This event is handled by the VMController.
@@ -62,6 +64,11 @@ namespace DotNetify
       /// Determine whether the view model can be shared with the calling VMController.
       /// </summary>
       internal virtual bool IsMember => _groupName == GroupName;
+
+      /// <summary>
+      /// Used by VMController to determine whether to invoke OnCreatedAsync.
+      /// </summary>
+      internal bool RaiseCreatedEvent => Interlocked.Exchange(ref _createdEventFlag, 1) == 0 ? true : false;
 
       /// <summary>
       /// Increment reference count.

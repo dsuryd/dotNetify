@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
@@ -251,7 +252,9 @@ namespace DotNetify
          {
             // Create a new view model instance whose class name is matching the given VMId.
             vmInstance = CreateVM(vmId, vmArg);
-            await vmInstance.OnCreatedAsync();
+
+            if ((vmInstance as MulticastVM)?.RaiseCreatedEvent != false)
+               await vmInstance.OnCreatedAsync();
          }
 
          await RequestVMFilter.Invoke(vmId, vmInstance, vmArg, async data =>
