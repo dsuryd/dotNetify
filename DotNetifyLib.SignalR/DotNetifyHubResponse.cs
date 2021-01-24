@@ -31,6 +31,8 @@ namespace DotNetify
 
       Task SendAsync(string connectionId, string vmId, string vmData);
 
+      Task SendToManyAsync(IReadOnlyList<string> connectionIds, string vmId, string vmData);
+
       Task SendToGroupAsync(string groupName, string vmId, string vmData);
 
       Task SendToGroupExceptAsync(string groupName, IReadOnlyList<string> excludedIds, string vmId, string vmData);
@@ -76,6 +78,17 @@ namespace DotNetify
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model data.</param>
       public Task SendAsync(string connectionId, string vmId, string vmData) => _hubContext.Clients.Client(connectionId).SendAsync(RESPONSE_VM, new object[] { vmId, vmData });
+
+      /// <summary>
+      /// Invokes Response_VM on many connections.
+      /// </summary>
+      /// <param name="connectionIds">List of SignalR connections.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
+      public Task SendToManyAsync(IReadOnlyList<string> connectionIds, string vmId, string vmData)
+      {
+         return _hubContext.Clients.Clients(connectionIds).SendAsync(RESPONSE_VM, new object[] { vmId, vmData });
+      }
 
       /// <summary>
       /// Invokes Response_VM on a group.

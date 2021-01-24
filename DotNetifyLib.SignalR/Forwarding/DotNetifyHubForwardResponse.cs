@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DotNetify.Forwarding;
 using Microsoft.AspNetCore.SignalR;
@@ -74,6 +75,18 @@ namespace DotNetify
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
             new object[] { nameof(SendAsync), new object[] { vmId, vmData }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
+      }
+
+      /// <summary>
+      /// Invokes Response_VM on multple connections.
+      /// </summary>
+      /// <param name="connectionId">SignalR connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
+      public Task SendToManyAsync(IReadOnlyList<string> connectionIds, string vmId, string vmData)
+      {
+         return _hubContext.Clients.Clients(_connectionId).SendAsync(RESPONSE_VM,
+            new object[] { nameof(SendToManyAsync), new object[] { vmId, vmData }, DotNetifyHubForwarder.BuildResponseMetadata(connectionIds.ToArray()) });
       }
 
       /// <summary>

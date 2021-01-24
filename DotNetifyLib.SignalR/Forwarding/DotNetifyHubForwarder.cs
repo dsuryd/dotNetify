@@ -132,7 +132,10 @@ namespace DotNetify.Forwarding
          var eventArgs = e as InvokeResponseEventArgs;
          if (eventArgs != null)
          {
-            var args = new List<object> { eventArgs.Metadata[CONNECTION_ID_TOKEN] };
+            object connectionId = eventArgs.MethodName == nameof(IDotNetifyHubResponse.SendToManyAsync) ?
+               (object) JsonSerializer.Deserialize<List<string>>(eventArgs.Metadata[CONNECTION_ID_TOKEN]) : eventArgs.Metadata[CONNECTION_ID_TOKEN];
+
+            var args = new List<object> { connectionId };
             args.AddRange(eventArgs.MethodArgs);
 
             _hubResponse.GetType().GetMethod(eventArgs.MethodName).Invoke(_hubResponse, args.ToArray());
@@ -168,6 +171,16 @@ namespace DotNetify.Forwarding
       internal static Dictionary<string, object> BuildResponseMetadata(string connectionId)
       {
          return new Dictionary<string, object> { { CONNECTION_ID_TOKEN, connectionId } };
+      }
+
+      /// <summary>
+      /// Builds metadata to be included in the response to the forwarded messages.
+      /// </summary>
+      /// <param name="connectionId">Identifies the origin connection.</param>
+      /// <returns>Metadata.</returns>
+      internal static Dictionary<string, object> BuildResponseMetadata(IReadOnlyList<string> connectionIds)
+      {
+         return new Dictionary<string, object> { { CONNECTION_ID_TOKEN, JsonSerializer.Serialize(connectionIds) } };
       }
 
       /// <summary>
