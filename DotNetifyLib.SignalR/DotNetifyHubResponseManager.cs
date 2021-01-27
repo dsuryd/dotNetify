@@ -107,45 +107,39 @@ namespace DotNetify
       }
 
       /// <summary>
-      /// Runs action on the hub response objects of every forwarding hub connected this hub.
-      /// </summary>
-      /// <param name="invokeDelegate">Delegate that will be passed the hub response objects.</param>
-      public void InvokeGroupInstances(Action<IDotNetifyHubResponse> invokeDelegate)
-      {
-         // Find a hub response object associated with a connection from every connected forwarding hub.
-         var responses = _responseHubCallerContexts
-            .GroupBy(x => x.Value.GetOriginConnectionContext().HubId)
-            .Select(x => GetInstance(x.First().Value.ConnectionId))
-            .Concat(new[] { _hubResponse })  // Add this hub's own response object.
-            .ToList();
-
-         responses.ForEach(x => invokeDelegate(x));
-      }
-
-      /// <summary>
       /// Remove the hub response object of a connection.
       /// </summary>
       /// <param name="connectionId">Identifies the connection.</param>
-      public void RemoveInstance(string connectionId)
-      {
-         _responseHubCallerContexts.TryRemove(connectionId, out HubCallerContext _);
-      }
+      public void RemoveInstance(string connectionId) => _responseHubCallerContexts.TryRemove(connectionId, out HubCallerContext _);
 
-      public Task AddToGroupAsync(string connectionId, string groupName)
-      {
-         return GetInstance(connectionId).AddToGroupAsync(connectionId, groupName);
-      }
+      /// <summary>
+      /// Add a connection to a group.
+      /// </summary>
+      /// <param name="connectionId">SignalR connection.</param>
+      /// <param name="groupName">SignalR group name.</param>
+      public Task AddToGroupAsync(string connectionId, string groupName) => GetInstance(connectionId).AddToGroupAsync(connectionId, groupName);
 
-      public Task RemoveFromGroupAsync(string connectionId, string groupName)
-      {
-         return GetInstance(connectionId).RemoveFromGroupAsync(connectionId, groupName);
-      }
+      /// <summary>
+      /// Removes a connection from a group.
+      /// </summary>
+      /// <param name="connectionId">SignalR connection.</param>
+      /// <param name="groupName">SignalR group name.</param>
+      public Task RemoveFromGroupAsync(string connectionId, string groupName) => GetInstance(connectionId).RemoveFromGroupAsync(connectionId, groupName);
 
-      public Task SendAsync(string connectionId, string vmId, string vmData)
-      {
-         return GetInstance(connectionId).SendAsync(connectionId, vmId, vmData);
-      }
+      /// <summary>
+      /// Invokes Response_VM on a connection.
+      /// </summary>
+      /// <param name="connectionId">SignalR connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
+      public Task SendAsync(string connectionId, string vmId, string vmData) => GetInstance(connectionId).SendAsync(connectionId, vmId, vmData);
 
+      /// <summary>
+      /// Invokes Response_VM on many connections.
+      /// </summary>
+      /// <param name="connectionIds">List of SignalR connections.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
       public Task SendToManyAsync(IReadOnlyList<string> connectionIds, string vmId, string vmData)
       {
          // Map connections to associated hubs.
@@ -172,18 +166,37 @@ namespace DotNetify
          return Task.CompletedTask;
       }
 
+      /// <summary>
+      /// Invokes Response_VM on a group.
+      /// </summary>
+      /// <param name="groupName">SignalR group name.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
       public Task SendToGroupAsync(string groupName, string vmId, string vmData)
       {
          GetAllHubInstances().ForEach(x => x.SendToGroupAsync(groupName, vmId, vmData));
          return Task.CompletedTask;
       }
 
+      /// <summary>
+      /// Invokes Response_VM on a group but exclude some connections.
+      /// </summary>
+      /// <param name="groupName">SignalR group name.</param>
+      /// <param name="excludedConnectionIds">Excluded SignalR connections.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
       public Task SendToGroupExceptAsync(string groupName, IReadOnlyList<string> excludedIds, string vmId, string vmData)
       {
          GetAllHubInstances().ForEach(x => x.SendToGroupExceptAsync(groupName, excludedIds, vmId, vmData));
          return Task.CompletedTask;
       }
 
+      /// <summary>
+      /// Invokes Response_VM on a set of users.
+      /// </summary>
+      /// <param name="userIds">Identifies the users.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
       public Task SendToUsersAsync(IReadOnlyList<string> userIds, string vmId, string vmData)
       {
          GetAllHubInstances().ForEach(x => x.SendToUsersAsync(userIds, vmId, vmData));
@@ -199,11 +212,15 @@ namespace DotNetify
          return _responseHubCallerContexts.TryGetValue(connectionId, out HubCallerContext context) ? _hubForwardResponseFactory.GetInstance(context.ConnectionId) : _hubResponse;
       }
 
+      /// <summary>
+      /// Returns a response object from every forwarding hubs.
+      /// </summary>
+      /// <returns></returns>
       private List<IDotNetifyHubResponse> GetAllHubInstances()
       {
          return _responseHubCallerContexts
             .GroupBy(x => x.Value.GetOriginConnectionContext().HubId)
-            .Select(x => GetInstance(x.First().Value.ConnectionId))
+            .Select(x => GetInstance(x.First().Key))
             .Concat(new[] { _hubResponse })  // Add this hub's own response object.
             .ToList();
       }

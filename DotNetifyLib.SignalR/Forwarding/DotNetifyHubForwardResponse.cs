@@ -51,7 +51,7 @@ namespace DotNetify
       public Task AddToGroupAsync(string connectionId, string groupName)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(AddToGroupAsync), new object[] { connectionId, groupName }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
+            new object[] { nameof(AddToGroupAsync), new object[] { groupName }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
       }
 
       /// <summary>
@@ -62,7 +62,7 @@ namespace DotNetify
       public Task RemoveFromGroupAsync(string connectionId, string groupName)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(RemoveFromGroupAsync), new object[] { connectionId, groupName }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
+            new object[] { nameof(RemoveFromGroupAsync), new object[] { groupName }, DotNetifyHubForwarder.BuildResponseMetadata(connectionId) });
       }
 
       /// <summary>
@@ -98,7 +98,7 @@ namespace DotNetify
       public Task SendToGroupAsync(string groupName, string vmId, string vmData)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(SendToGroupAsync), new object[] { groupName, vmId, vmData } });
+            new object[] { nameof(SendToGroupAsync), new object[] { groupName, vmId, vmData }, null });
       }
 
       /// <summary>
@@ -111,7 +111,7 @@ namespace DotNetify
       public Task SendToGroupExceptAsync(string groupName, IReadOnlyList<string> excludedConnectionIds, string vmId, string vmData)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(SendToGroupExceptAsync), new object[] { groupName, excludedConnectionIds, vmId, vmData } });
+            new object[] { nameof(SendToGroupExceptAsync), new object[] { groupName, vmId, vmData }, DotNetifyHubForwarder.BuildResponseMetadata(excludedConnectionIds.ToArray()) });
       }
 
       /// <summary>
@@ -123,7 +123,7 @@ namespace DotNetify
       public Task SendToUsersAsync(IReadOnlyList<string> userIds, string vmId, string vmData)
       {
          return _hubContext.Clients.Client(_connectionId).SendAsync(RESPONSE_VM,
-            new object[] { nameof(SendToUsersAsync), new object[] { userIds, vmId, vmData } });
+            new object[] { nameof(SendToUsersAsync), new object[] { userIds, vmId, vmData }, DotNetifyHubForwarder.BuildResponseMetadata(userIds.ToArray()) });
       }
    }
 }

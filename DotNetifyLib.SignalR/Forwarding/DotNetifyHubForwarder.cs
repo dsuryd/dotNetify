@@ -132,14 +132,20 @@ namespace DotNetify.Forwarding
          var eventArgs = e as InvokeResponseEventArgs;
          if (eventArgs != null)
          {
-            object connectionId = eventArgs.MethodName == nameof(IDotNetifyHubResponse.SendToManyAsync) ?
-               (object) JsonSerializer.Deserialize<List<string>>(eventArgs.Metadata[CONNECTION_ID_TOKEN]) : eventArgs.Metadata[CONNECTION_ID_TOKEN];
+            var args = new List<object>(eventArgs.MethodArgs);
 
-            var args = new List<object> { connectionId };
-            args.AddRange(eventArgs.MethodArgs);
+            if (eventArgs.Metadata?.ContainsKey(CONNECTION_ID_TOKEN) == true)
+            {
+               var connectionData = eventArgs.Metadata[CONNECTION_ID_TOKEN];
+               object connectionId = connectionData.StartsWith("[") ? (object) JsonSerializer.Deserialize<List<string>>(connectionData) : connectionData;
+
+               if (eventArgs.MethodName == nameof(IDotNetifyHubResponse.SendToGroupExceptAsync))
+                  args.Insert(1, connectionId);
+               else
+                  args.Insert(0, connectionId);
+            };
 
             _hubResponse.GetType().GetMethod(eventArgs.MethodName).Invoke(_hubResponse, args.ToArray());
-
             e.Handled = true;
          }
       }
