@@ -108,7 +108,7 @@ namespace DotNetify
             vmController.VMResponse = OnVMResponse ?? ResponseVMAsync;
 
             if (_serviceProvider is HubServiceProvider)
-               (_serviceProvider as HubServiceProvider).ServiceProvider = vmController.ServiceProvider;
+               (_serviceProvider as HubServiceProvider).FactoryMethod = vmController.FactoryMethod;
 
             return vmController;
          }

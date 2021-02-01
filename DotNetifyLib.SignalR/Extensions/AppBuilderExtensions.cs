@@ -54,12 +54,7 @@ namespace DotNetify
          {
             try
             {
-               return ActivatorUtilities.CreateInstance(scopedServiceProvider.ServiceProvider ?? provider, type, args ?? new object[] { });
-            }
-            catch (ObjectDisposedException)
-            {
-               // There's a chance the scoped service provider is already disposed when we get to here, so fall back to global provider.
-               return ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
+               return scopedServiceProvider.FactoryMethod?.Invoke(type, args) ?? ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
             }
             catch (Exception ex)
             {

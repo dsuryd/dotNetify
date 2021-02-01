@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 
 namespace DotNetify
@@ -110,7 +111,8 @@ namespace DotNetify
       /// <summary>
       /// Dependency injection service scope.
       /// </summary>
-      private readonly IVMServiceScope _serviceScope;
+      private IVMServiceScope _serviceScope;
+      private readonly object _serviceScopeLock = new object();
 
       /// <summary>
       /// This class encapsulates a view model information.
@@ -177,9 +179,16 @@ namespace DotNetify
       #endregion Filters
 
       /// <summary>
-      /// Provides scoped dependency injection service provider.
+      /// Provides a factory method using the service provider scoped to this instance.
       /// </summary>
-      public IServiceProvider ServiceProvider => _serviceScope?.ServiceProvider;
+      public Func<Type, object[], object> FactoryMethod => (Type type, object[] args) =>
+      {
+         lock (_serviceScopeLock)
+         {
+            var provider = _serviceScope?.ServiceProvider;
+            return provider != null ? ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { }) : null;
+         }
+      };
 
       // Default constructor.
       internal VMController()
@@ -209,7 +218,11 @@ namespace DotNetify
          foreach (var kvp in _activeVMs)
             DisposeViewModel(kvp.Value);
 
-         _serviceScope?.Dispose();
+         lock (_serviceScopeLock)
+         {
+            _serviceScope?.Dispose();
+            _serviceScope = null;
+         }
       }
 
       /// <summary>

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2016-2018 Dicky Suryadi
+Copyright 2016-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,21 +20,21 @@ using System.Threading;
 namespace DotNetify
 {
    /// <summary>
-   /// Provides the scoped service provider of the active VMController instance.
+   /// Provides an object factory method that uses the scoped service provider of the active VMController instance.
    /// </summary>
    public interface IHubServiceProvider
    {
-      IServiceProvider ServiceProvider { get; }
+      Func<Type, object[], object> FactoryMethod { get; }
    }
 
    /// <summary>
-   /// Implements ambient data store for the scoped service provider associated with the active VMController instance.
+   /// Implements ambient data store for the object factory method associated with the active VMController instance.
    /// </summary>
    internal class HubServiceProvider : IHubServiceProvider
    {
-      private readonly static AsyncLocal<IServiceProvider> _asyncLocal = new AsyncLocal<IServiceProvider>();
+      private readonly static AsyncLocal<Func<Type, object[], object>> _asyncLocal = new AsyncLocal<Func<Type, object[], object>>();
 
-      public IServiceProvider ServiceProvider
+      public Func<Type, object[], object> FactoryMethod
       {
          get { return _asyncLocal.Value; }
          set { _asyncLocal.Value = value; }
