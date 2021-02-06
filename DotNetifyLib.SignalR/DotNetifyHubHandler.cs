@@ -347,7 +347,8 @@ namespace DotNetify
          {
             var context = _hubResponseManager.GetCallerContext(vm.ConnectionId) ?? CallerContext;
             var hubContext = new DotNetifyHubContext(context, nameof(IDotNetifyHubMethod.Response_VM), vm.Id, vmData, null, Principal);
-            hubContext.PipelineData[GROUP_NAME_TOKEN] = vm.GroupName;
+            if (vm.GroupName != null)
+               hubContext.PipelineData[GROUP_NAME_TOKEN] = vm.GroupName;
 
             await _hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
             {
