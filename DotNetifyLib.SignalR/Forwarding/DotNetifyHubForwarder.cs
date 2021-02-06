@@ -56,6 +56,7 @@ namespace DotNetify.Forwarding
          _hubResponse = hubResponse;
 
          _hubProxy.Response_VM += OnResponse_VM;
+         _hubProxy.Disconnected += OnDisconnected;
       }
 
       /// <summary>
@@ -216,6 +217,11 @@ namespace DotNetify.Forwarding
             metadata.Add(GROUP_SEND_TOKEN, JsonSerializer.Serialize(groupSend));
 
          return metadata;
+      }
+
+      private void OnDisconnected(object sender, EventArgs e)
+      {
+         _ = OnDisconnectedAsync(null);
       }
    }
 }
