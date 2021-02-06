@@ -71,7 +71,10 @@ namespace DotNetify.Forwarding
                else if (context.CallType == nameof(IDotNetifyHubMethod.Dispose_VM))
                   await hubForwarder.DisposeVMAsync(context.VMId);
                else if (context.CallType == nameof(IDotNetifyHubMethod.Response_VM))
-                  await hubForwarder.ResponseVMAsync(context.VMId, context.Data);
+               {
+                  context.PipelineData.TryGetValue(DotNetifyHubHandler.GROUP_NAME_TOKEN, out object groupName);
+                  await hubForwarder.ResponseVMAsync(context.VMId, context.Data, groupName?.ToString());
+               }
             }
             else
                _logger.LogError($"Failed to forward {context.CallType} message to {_serverUrl}: server is not connected.");
@@ -131,23 +134,30 @@ namespace DotNetify.Forwarding
       }
 
       /// <summary>
-      /// Returns the origin connection context if the hub message was forwarded from a server.
+      /// Returns the origin connection context from a forwarded hub message.
       /// </summary>
       /// <param name="callerContext">Hub caller context.</param>
-      /// <returns>Hub connection context.</returns>
       public static ConnectionContext GetOriginConnectionContext(this HubCallerContext callerContext)
       {
          return DotNetifyHubForwarder.GetOriginConnectionContext(callerContext.Items);
       }
 
       /// <summary>
-      /// Returns the multicast group send info if the hub multicast message was forwarded from a server.
+      /// Returns the group send info from a forwarded hub message of a multicast view model.
       /// </summary>
       /// <param name="callerContext">Hub caller context.</param>
-      /// <returns>Hub connection context.</returns>
       public static VMController.GroupSend GetGroupSend(this HubCallerContext callerContext)
       {
          return DotNetifyHubForwarder.GetGroupSend(callerContext.Items);
+      }
+
+      /// <summary>
+      /// Returns the group name from a forwarded hub message of a multicast view model.
+      /// </summary>
+      /// <param name="callerContext">Hub caller context.</param>
+      public static string GetGroupName(this HubCallerContext callerContext)
+      {
+         return DotNetifyHubForwarder.GetGroupName(callerContext.Items);
       }
    }
 }

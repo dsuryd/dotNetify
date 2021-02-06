@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
@@ -112,6 +111,7 @@ namespace DotNetify
       /// Dependency injection service scope.
       /// </summary>
       private IVMServiceScope _serviceScope;
+
       private readonly object _serviceScopeLock = new object();
 
       /// <summary>
@@ -139,11 +139,12 @@ namespace DotNetify
          /// </summary>
          public string GroupName { get; set; }
 
-         public VMInfo(string id, BaseVM instance, string connectionId)
+         public VMInfo(string id, BaseVM instance, string connectionId, string groupName = null)
          {
             Id = id;
             Instance = instance;
             ConnectionId = connectionId;
+            GroupName = groupName;
          }
       }
 
@@ -266,29 +267,31 @@ namespace DotNetify
             // Create a new view model instance whose class name is matching the given VMId.
             vmInstance = CreateVM(vmId, vmArg);
 
+            // Let the instance complete its initialization. If multicast, make sure it's only called once.
             if ((vmInstance as MulticastVM)?.RaiseCreatedEvent != false)
                await vmInstance.OnCreatedAsync();
          }
 
          await RequestVMFilter.Invoke(vmId, vmInstance, vmArg, async data =>
          {
-            var vmData = vmInstance.Serialize();
+            string vmData = vmInstance.Serialize();
+            string groupName = vmInstance is MulticastVM ? (vmInstance as MulticastVM).GroupName : null;
 
             // Send the view model data back to the browser client.
-            await ResponseVMFilter.Invoke(new VMInfo(vmId, vmInstance, connectionId), vmData, filteredData => VMResponse(connectionId, vmId, (string) filteredData));
+            await ResponseVMFilter.Invoke(new VMInfo(vmId, vmInstance, connectionId, groupName), vmData, filteredData => VMResponse(connectionId, vmId, (string) filteredData));
 
-            // Reset the changed property states.
-            vmInstance.AcceptChangedProperties();
+            // Reset the changed property states unless it's a multicast.
+            if (vmInstance is MulticastVM == false)
+               vmInstance.AcceptChangedProperties();
 
             // Add the view model instance to the controller.
             if (!_activeVMs.ContainsKey(vmId))
             {
-               var vmInfo = new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId);
+               var vmInfo = new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId, groupName: groupName);
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
                if (vmInstance is MulticastVM)
                {
                   var multicastVM = vmInstance as MulticastVM;
-                  vmInfo.GroupName = multicastVM.GroupName;
                   multicastVM.RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
                   multicastVM.RequestSend += VMInstance_RequestSend;
                }

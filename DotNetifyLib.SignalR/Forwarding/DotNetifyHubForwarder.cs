@@ -56,7 +56,7 @@ namespace DotNetify.Forwarding
          _hubResponse = hubResponse;
 
          _hubProxy.Response_VM += OnResponse_VM;
-         _hubProxy.Disconnected += OnDisconnected;
+         _hubProxy.Disconnected += (sender, e) => _ = OnDisconnectedAsync(null);
       }
 
       /// <summary>
@@ -96,13 +96,13 @@ namespace DotNetify.Forwarding
       /// <summary>
       /// Forwards Response_VM message through the Invoke method.
       /// </summary>
-      public async Task ResponseVMAsync(string vmId, object vmData)
+      public async Task ResponseVMAsync(string vmId, object vmData, string groupName)
       {
          var groupSend = vmData as VMController.GroupSend;
          if (groupSend?.IsEmpty() == true)
             return;
 
-         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, groupSend?.Data ?? vmData }, BuildResponseMetadata(groupSend));
+         await _hubProxy.Invoke(nameof(IDotNetifyHubMethod.Response_VM), new object[] { vmId, groupSend?.Data ?? vmData }, BuildResponseMetadata(groupName, groupSend));
       }
 
       /// <summary>
@@ -152,9 +152,9 @@ namespace DotNetify.Forwarding
       }
 
       /// <summary>
-      /// Returns the origin connection context from a dictionary.
+      /// Returns the origin connection context from the metadata dictionary.
       /// </summary>
-      /// <param name="items">Dictionary.</param>
+      /// <param name="items">Metadata dictionary.</param>
       public static ConnectionContext GetOriginConnectionContext(IDictionary<object, object> items)
       {
          var connectionContext = items.ContainsKey(CONNECTION_CONTEXT_TOKEN) ? items[CONNECTION_CONTEXT_TOKEN] : null;
@@ -162,12 +162,22 @@ namespace DotNetify.Forwarding
       }
 
       /// <summary>
-      /// Returns the multicast group send info from a dictionary.
+      /// Returns the multicast group send info from the metadata dictionary.
       /// </summary>
-      /// <param name="items">Dictonary</param>
+      /// <param name="items">Metadata dictonary.</param>
       public static VMController.GroupSend GetGroupSend(IDictionary<object, object> items)
       {
          return items.ContainsKey(GROUP_SEND_TOKEN) ? JsonSerializer.Deserialize<VMController.GroupSend>(items[GROUP_SEND_TOKEN].ToString()) : null;
+      }
+
+      /// <summary>
+      /// Returns the group name from the metadata dictionary.
+      /// </summary>
+      /// <param name="items">Metadata dictionary.</param>
+      public static string GetGroupName(IDictionary<object, object> items)
+      {
+         items.TryGetValue(DotNetifyHubHandler.GROUP_NAME_TOKEN, out object groupName);
+         return groupName?.ToString();
       }
 
       /// <summary>
@@ -205,23 +215,21 @@ namespace DotNetify.Forwarding
       /// <summary>
       /// Builds response metadata to forward to the other hub server.
       /// </summary>
-      private Dictionary<string, object> BuildResponseMetadata(VMController.GroupSend groupSend)
+      private Dictionary<string, object> BuildResponseMetadata(string groupName, VMController.GroupSend groupSend)
       {
          var metadata = new Dictionary<string, object>
          {
             { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize( CallerContext.GetConnectionContext()) }
          };
 
+         if (!string.IsNullOrEmpty(groupName))
+            metadata.Add(DotNetifyHubHandler.GROUP_NAME_TOKEN, groupName);
+
          // If multicast message, include the metadata.
          if (groupSend != null)
             metadata.Add(GROUP_SEND_TOKEN, JsonSerializer.Serialize(groupSend));
 
          return metadata;
-      }
-
-      private void OnDisconnected(object sender, EventArgs e)
-      {
-         _ = OnDisconnectedAsync(null);
       }
    }
 }

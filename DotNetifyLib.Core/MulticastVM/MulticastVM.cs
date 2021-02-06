@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2018 Dicky Suryadi
+Copyright 2018-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -129,8 +129,9 @@ namespace DotNetify
          {
             var eventArgs = new MulticastPushUpdatesEventArgs { ExcludedConnectionId = excludedConnectionId };
 
-            // First invocation cycle is to get the participating connection Ids from the VMControllers.
-            RequestMulticastPushUpdates?.Invoke(this, eventArgs);
+            // First invocation cycle is to get the participating connection Ids from the VMControllers when a group name isn't used.
+            if (string.IsNullOrEmpty(GroupName))
+               RequestMulticastPushUpdates?.Invoke(this, eventArgs);
 
             // Invoke the first available event handler to do the actual data push.
             // If successful, the handler will set the PushData back to false.
