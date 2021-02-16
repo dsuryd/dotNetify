@@ -86,9 +86,9 @@ namespace DotNetify
          catch (MissingMethodException)
          {
             if (arg != null)
-               Trace.Fail($"[dotNetify] ERROR: '{vmType.Name}' has no constructor accepting instance ID.");
+               Logger.LogError($"'{vmType.Name}' has no constructor accepting instance ID.");
             else
-               Trace.Fail($"[dotNetify] ERROR: '{vmType.Name}' has no parameterless constructor.");
+               Logger.LogError($"'{vmType.Name}' has no parameterless constructor.");
          }
 
          return null;

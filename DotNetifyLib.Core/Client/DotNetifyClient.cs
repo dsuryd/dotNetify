@@ -246,7 +246,7 @@ namespace DotNetify.Client
             }
             catch (Exception ex)
             {
-               Trace.TraceWarning($"[{_vmId}] {ex.Message} {ex.InnerException?.Message}");
+               Logger.LogError($"[{_vmId}] {ex.Message} {ex.InnerException?.Message}");
                data.Remove(propName);
             }
          }

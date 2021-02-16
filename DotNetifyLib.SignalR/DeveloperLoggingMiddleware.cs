@@ -71,7 +71,7 @@ namespace DotNetify
    {
       public static void UseDeveloperLogging(this IDotNetifyConfiguration config, LogTraceDelegate logTraceDelegate = null)
       {
-         config.UseMiddleware<DeveloperLoggingMiddleware>(logTraceDelegate ?? (log => Trace.WriteLine(log)));
+         config.UseMiddleware<DeveloperLoggingMiddleware>(logTraceDelegate ?? (log => Logger.LogInformation(log)));
       }
    }
 }

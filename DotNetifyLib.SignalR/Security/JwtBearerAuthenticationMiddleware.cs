@@ -60,7 +60,7 @@ namespace DotNetify.Security
          }
          catch (Exception ex)
          {
-            Trace.WriteLine(ex.Message);
+            Logger.LogError(ex.Message);
          }
 
          hubContext.Principal = principal ?? hubContext.CallerContext?.User ?? hubContext.Principal;

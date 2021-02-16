@@ -72,7 +72,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Trace.Fail(ex.ToString());
+            Logger.LogError($"Failed to serialize view model: {ex.Message}");
             throw ex;
          }
       }
@@ -161,7 +161,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Trace.Fail(ex.ToString());
+            Logger.LogError($"Failed to deserialize view model property '{vmPath}': {ex.Message}");
             throw ex;
          }
 

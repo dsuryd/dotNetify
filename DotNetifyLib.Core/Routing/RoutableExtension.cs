@@ -67,7 +67,7 @@ namespace DotNetify.Routing
             }
             catch (Exception ex)
             {
-               Trace.Fail(ex.ToString());
+               Logger.LogError($"Failed to route: {ex.Message}");
             }
          }
 
@@ -167,7 +167,7 @@ namespace DotNetify.Routing
          {
             viewData.Root = viewData.Root?.TrimEnd('/') + "/" + routingState.Root;
             var bestMatch = MatchTemplate(routingState.Templates, viewData.UrlPath, viewData.Root);
-            Trace.WriteLine($"[dotNetify] Matched route {viewData.UrlPath}: {bestMatch?.Value}");
+            Logger.LogInformation($"Matched route {viewData.UrlPath}: {bestMatch?.Value}");
             if (bestMatch != null)
             {
                viewData.ActiveTemplate = bestMatch.Value.Key;

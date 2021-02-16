@@ -26,6 +26,7 @@ using DotNetify.Routing;
 using System.Threading.Tasks;
 using System.Linq;
 using DotNetify.Forwarding;
+using Microsoft.Extensions.Logging;
 
 namespace DotNetify
 {
@@ -43,6 +44,8 @@ namespace DotNetify
       {
          var provider = appBuilder.ApplicationServices;
 
+         Logger.Init(provider.GetService<ILoggerFactory>());
+
          var vmControllerFactory = provider.GetService<IVMControllerFactory>();
          if (vmControllerFactory == null)
             throw new InvalidOperationException("Please call 'IServiceCollection.AddDotNetify()' inside the ConfigureServices() of the startup class.");
@@ -58,7 +61,7 @@ namespace DotNetify
             }
             catch (Exception ex)
             {
-               Trace.Fail(ex.Message);
+               Logger.LogError($"Failed to create instance of '{type}': {ex.Message}");
                throw ex;
             }
          };
@@ -139,7 +142,7 @@ namespace DotNetify
                }
                catch (Exception ex)
                {
-                  Trace.WriteLine(ex.Message);
+                  Logger.LogError($"SSR exception: {ex.Message}");
                   await onError(context);
                }
             });
