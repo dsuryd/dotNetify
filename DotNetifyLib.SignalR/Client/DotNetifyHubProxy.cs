@@ -132,8 +132,16 @@ namespace DotNetify.Client
 
          SetStateChanged(HubConnectionState.Connecting);
 
-         await _connection.StartAsync();
-         SetStateChanged(HubConnectionState.Connected);
+         try
+         {
+            await _connection.StartAsync();
+            SetStateChanged(HubConnectionState.Connected);
+         }
+         catch (Exception ex)
+         {
+            SetStateChanged(HubConnectionState.Disconnected);
+            Logger.LogError($"Failed to connect to '{_serverUrl}': {ex.Message}");
+         }
       }
 
       /// <summary>
