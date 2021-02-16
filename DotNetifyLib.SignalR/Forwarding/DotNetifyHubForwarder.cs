@@ -206,6 +206,9 @@ namespace DotNetify.Forwarding
       /// <returns></returns>
       private Dictionary<string, object> BuildMetadata()
       {
+         if (CallerContext == null)
+            return null;
+
          return new Dictionary<string, object>
          {
             { CONNECTION_CONTEXT_TOKEN, JsonSerializer.Serialize(CallerContext.GetConnectionContext()) }
