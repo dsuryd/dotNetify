@@ -34,7 +34,6 @@ namespace DotNetify.Forwarding
    /// </summary>
    public class ForwardingMiddleware : IMiddleware, IDisconnectionMiddleware
    {
-      private readonly ILogger _logger;
       private readonly IDotNetifyHubForwarderFactory _hubForwarderFactory;
       private readonly string _serverUrl;
       private readonly ForwardingOptions _config;
@@ -45,9 +44,8 @@ namespace DotNetify.Forwarding
       /// <param name="hubForwarderFactory">Factory of hub message forwarder objects.</param>
       /// <param name="serverUrl">URL of the server to forward messages to.</param>
       /// <param name="config">Forwarding configuration.</param>
-      public ForwardingMiddleware(ILogger<ForwardingMiddleware> logger, IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, ForwardingOptions config)
+      public ForwardingMiddleware(IDotNetifyHubForwarderFactory hubForwarderFactory, string serverUrl, ForwardingOptions config)
       {
-         _logger = logger;
          _hubForwarderFactory = hubForwarderFactory;
          _serverUrl = serverUrl;
          _config = config;
@@ -55,7 +53,7 @@ namespace DotNetify.Forwarding
 
       public async Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
-         await _hubForwarderFactory.InvokeInstanceAsync(_serverUrl, _config, async hubForwarder =>
+         _ = _hubForwarderFactory.InvokeInstanceAsync(_serverUrl, _config, async hubForwarder =>
          {
             if (hubForwarder.IsConnected)
             {
@@ -77,7 +75,7 @@ namespace DotNetify.Forwarding
                }
             }
             else
-               _logger.LogError($"Failed to forward {context.CallType} message to {_serverUrl}: server is not connected.");
+               Logger.LogError($"Failed to forward {context.CallType} message to {_serverUrl}: server is not connected.");
          });
 
          if (!_config.HaltPipeline)
@@ -94,7 +92,7 @@ namespace DotNetify.Forwarding
                await hubForwarder.OnDisconnectedAsync(null);
             }
             else
-               _logger.LogError($"Failed to forward OnDisconnected message to {_serverUrl}: server is not connected.");
+               Logger.LogError($"Failed to forward OnDisconnected message to {_serverUrl}: server is not connected.");
          });
       }
    }
