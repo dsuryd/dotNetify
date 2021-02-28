@@ -2,26 +2,35 @@
 
 _DotNetify-Testing_ provides a simple and effective way to test dotNetify view models. It emulates the SignalR hub and client-side connections so you can write tests that closely mimic the way your application would interact with real clients in real-time.
 
-NuGet: **DotNetify.Testing**
-
 <d-alert info="true">
 
 <b>This is closed source library for Pro, Team and Enterprise sponsors.</b> If you are one, send an email to _admin@dotnetify.net_ with your username to get your license key. Free trial is available.
 
-- Pro sponsor: single developer, up to 50 client connection per test project.
-- Team sponsor: up to 10 developers, unlimited client connection + private email support.
+- Pro sponsor: single developer, up to 50 client connections per test project.
+- Team sponsor: up to 10 developers, unlimited client connections + private email support.
 - Enterprise sponsor: usage is unlimited + private email support.
 
 </d-alert>
+
+#### Installation
+
+Create a .NET Core test project and add the following library from NuGet: **DotNetify.Testing**.
 
 #### Hub Emulator
 
 Start by creating a new instance of **HubEmulator** through **HubEmulatorBuilder**:
 
 ```csharp
-var hubEmulator = new HubEmulatorBuilder()
-  .Register<HelloWorldVM>(nameof(HelloWorldVM))
-  .Build();
+using DotNetify.Testing;
+...
+
+[TestMethod]
+public void HelloWorld_Test()
+{
+  var hubEmulator = new HubEmulatorBuilder()
+    .Register<HelloWorldVM>(nameof(HelloWorldVM))
+    .Build();
+}
 ```
 
 The builder methods are:
@@ -156,7 +165,7 @@ client.Destroy();
 You can use the same client API to connect to a live hub with **LiveHub**:
 
 ```csharp
-using (var client = await LiveHub.CreateClientAsync("https://my-webapp"))
+using (var client = await LiveHub.CreateClientAsync("https://my-app.io"))
 {
   var responses = client.Connect(nameof(HelloWorldVM));
   var response = responses.As<IHelloWorldState>();
