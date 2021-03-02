@@ -14,7 +14,7 @@ _DotNetify-Testing_ provides a simple and effective way to test dotNetify view m
 
 #### Installation
 
-Create a .NET Core test project and add the following library from NuGet: **DotNetify.Testing**.
+Add **DotNetify.Testing** from NuGet to your .NET Core test project.
 
 #### Hub Emulator
 
@@ -121,7 +121,7 @@ Assert.Equal(5, updates.Count);
 
 This method allows you to aggregate updates from the server with the span of time specified by the argument.
 
-In some cases involving _MulticastVM_, you may want to check whether one client's action will trigger server updates to another client. Calling **Listen** right after the action runs a risk of a race condition. To ensure that it starts listening before the action takes place, you hae two options:
+In some cases involving _MulticastVM_, you may want to check whether one client's action will trigger server updates to another client. Calling **Listen** right after the action runs a risk of a race condition. To ensure that it starts listening before the action takes place, you have two options:
 
 1. Use the overload that accepts an action argument:
 

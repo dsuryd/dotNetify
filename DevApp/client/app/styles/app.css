@@ -79,6 +79,20 @@ div > h2 {
   font-weight: 600;
 }
 
+.markdown table {
+  width: 100%;
+}
+
+.markdown th {
+  font-weight: 600;
+}
+
+.markdown table,
+.markdown th,
+.markdown td {
+  border: 1px solid #ccc;
+}
+
 .toc-h5 {
   font-size: 0.9rem;
 }

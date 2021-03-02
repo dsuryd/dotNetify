@@ -63,6 +63,8 @@
     <EmbeddedResource Include="Docs\APIs\Security.md" />
     <EmbeddedResource Include="Docs\APIs\WebApiMode.md" />
     <EmbeddedResource Include="Docs\Premium\DotNetifyTesting.md" />
+    <EmbeddedResource Include="Docs\Premium\DotNetifyLoadTester.md" />
+    <EmbeddedResource Include="Docs\Premium\DotNetifyObserver.md" /> 
   </ItemGroup>
 
   <ItemGroup>

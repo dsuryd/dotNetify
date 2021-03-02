@@ -14,13 +14,16 @@ _DotNetify-LoadTester_ is a tool for authoring and running performance testing o
 
 #### Installation
 
-Create a .NET Core test or console app project and add the following library from NuGet: **DotNetify.LoadTester**.
+Add **DotNetify.LoadTester** from NuGet to your .NET Core test or console app project.
 
 #### Basic Usage
 
 Start by creating a new instance of **LoadTestBuilder** and configure the application server URL, the number of clients, and how each one will interact with your server-side view model:
 
 ```csharp
+using DotNetify.LoadTester;
+...
+
 var builder = new LoadTestBuilder("https://my-app.io")
   .AddClient(5, (client, index) =>
   {
@@ -30,13 +33,7 @@ var builder = new LoadTestBuilder("https://my-app.io")
 
 The **AddClient** method allows to configure the behaviors of each client through the delegate argument of type `ILoadTestClientBuilder`. In the above example, all clients will attempt to connect to the _HelloWorldVM_ view model at the specified URL when the test commences. And just as the real API, you can pass connect options to the **Connect** method.
 
-Run the load test by calling the **RunAsync** method with the run duration as its argument:
-
-```csharp
-await builder.RunAsync(TimeSpan.FromMinutes(5));
-```
-
-You can configure how fast the clients get added or disposed with the **SetRampUpPeriod** and **SetRampDownPeriod** methods:
+Run the load test by calling the **RunAsync** method with the run duration as its argument. You can also configure how fast the clients get added or disposed with the **SetRampUpPeriod** and **SetRampDownPeriod** methods:
 
 ```csharp
 await builder
@@ -80,7 +77,9 @@ var builder = new LoadTestBuilder("https://my-app.io")
 The **Dispatch** method has an overload that allows you to pass a callback function to build the dispatch payload at runtime:
 
 ```csharp
-   client.Dispatch(_ => new { Time = DateTime.Now }).RepeatContinuosly(1000);
+    client
+      .Connect(nameof(HelloWorldVM))
+      .Dispatch(_ => new { Time = DateTime.Now }).RepeatContinuously(1000);
 ```
 
 #### Handling Server Responses
@@ -105,30 +104,24 @@ To remove a client's connection to the view model, use the **Destroy** method pr
 
 To receive callback when the event occurs, use the **OnDestroyed** method of `ILoadTestClientBuilder`.
 
-### Workload Profiles
+#### DotNetify.LoadTester.Profiles
 
-**LoadTester** comes with an open source library extension that provides view models and tests for typical application profiles.
+**DotNetify.LoadTester.Profiles** is an open-source, CLI-based test runner for measuring the peformance of dotNetify hub servers against the following workload profiles:
 
-#### Profile Types
+<b>Echo</b>
+<br/>
+Continuous back and forth communication between the client and the server. The server sends a message to the client and waits for the response before sending the next message. Each client is served by its own view model instance. The message payload contains sequence number and timestamp to allow the test to detect for undelivered messages and measure the average message latency.
 
-##### Echo
-
-Continuous back and forth communication between the client and the server. The server sends a message to the client and waits for the response before sending the next message. Each client is served by its own view model instance.
-
-The message payload contains sequence number and timestamp to allow the test to detect for undelivered messages and measure the average message latency.
-
-##### Shared Echo
-
+<b>Shared Echo</b>
+<br/>
 This profile is similar to **Echo**, but all clients sharing the same view model instance. The view model uses the connection ID from `IConnectionContext` to differentiate the clients.
 
-##### Broadcast
+<b>Broadcast</b>
+<br/>
+The server pushes updates to all clients at regular intervals. A single multicast view model instance is used. The message payload contains sequence number and timestamp to allow the test to detect for undelivered messages and measure the average interval between updates.
 
-The server pushes updates to all clients at regular intervals. A single multicast view model instance is used.
-
-The message payload contains sequence number and timestamp to allow the test to detect for undelivered messages and measure the average interval between updates.
-
-##### ChatRoom
-
+<b>ChatRoom</b>
+<br/>
 This profile models chat rooms where clients are sending and receiving messages with each other and within groups. The clients within a group are configured into 3 types:
 
 - Chatty posters (10%): send message every 11 seconds.
@@ -137,28 +130,6 @@ This profile models chat rooms where clients are sending and receiving messages 
 
 The message payload contains sequence number and timestamp to allow the test to detect for undelivered messages and measure the average message latency.
 
-#### Test Runner
+<b>How to Run</b>
 
-The NuGet library provides a convenient way to run the load test on any the above profiles. Start by creating a .NET Core console project, then add the NuGet library \*DotNetify.LoadTester.Profiles\*. In the `Main` method, pass the arguments to **LoadTestRunner.RunAsync**:
-
-```csharp
-using DotNetify.LoadTester;
-...
-
-private async static Task Main(string[] args)
-{
-    var loggerFactory = LoggerFactory.Create(configure => configure.AddConsole());
-    await LoadTestRunner.RunAsync(args, loggerFactory);
-}
-```
-
-Run the project from the command prompt with the following arguments:
-
-```
- -s, --server      Required. Hub server URL(s).
- -p, --profile     Test profile [echo, sharedecho, broadcast, chatroom] (default: echo)
- -c, --client      Number of clients (default: 20).
- -d, --rampdown    Ramp down period in seconds (default: 10).
- -i, --interval    Message interval in milliseconds (default: 1000).
- -g, --group       Number of multicast groups (default: 1).
-```
+For instructions, visit the github repo at https://github.com/dsuryd/dotNetify-LoadTester.Profiles.

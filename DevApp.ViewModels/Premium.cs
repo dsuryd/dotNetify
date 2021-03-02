@@ -6,4 +6,14 @@ namespace DotNetify.DevApp
    {
       public string Content => new Markdown("DotNetify.DevApp.Docs.Premium.DotNetifyTesting.md");
    }
+
+   public class DotNetifyLoadTester : BaseVM
+   {
+      public string Content => new Markdown("DotNetify.DevApp.Docs.Premium.DotNetifyLoadTester.md");
+   }
+
+   public class DotNetifyObserver : BaseVM
+   {
+      public string Content => new Markdown("DotNetify.DevApp.Docs.Premium.DotNetifyObserver.md");
+   }
 }
