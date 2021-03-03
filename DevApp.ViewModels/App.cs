@@ -85,9 +85,9 @@ namespace DotNetify.DevApp
            new RouteTemplate (nameof (Route.FromScratchCRA)) { UrlPattern = "fromscratch-cra" },
            new RouteTemplate (nameof (Route.FromScratchCLI)) { UrlPattern = "fromscratch-cli" },
 
-           new RouteTemplate (nameof (Route.DotNetifyTesting)) { UrlPattern = "premium/testing" },
-           new RouteTemplate (nameof (Route.DotNetifyLoadTester)) { UrlPattern = "premium/loadtester" },
-           new RouteTemplate (nameof (Route.DotNetifyObserver)) { UrlPattern = "premium/observer" },
+           new RouteTemplate (nameof (Route.DotNetifyTesting)) { UrlPattern = "dotnetify-testing" },
+           new RouteTemplate (nameof (Route.DotNetifyLoadTester)) { UrlPattern = "dotnetify-loadtester" },
+           new RouteTemplate (nameof (Route.DotNetifyObserver)) { UrlPattern = "dotnetify-observer" },
 
            new RouteTemplate (nameof (Route.NotFound404)) { UrlPattern = "*", ViewUrl = "NotFound404" },
          });

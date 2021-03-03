@@ -106,7 +106,9 @@ To receive callback when the event occurs, use the **OnDestroyed** method of `IL
 
 #### DotNetify.LoadTester.Profiles
 
-**DotNetify.LoadTester.Profiles** is an open-source, CLI-based test runner for measuring the peformance of dotNetify hub servers against the following workload profiles:
+This extension to DotNetify.LoadTester provides a command-line tool for dotNetify sponsors to perform load test on a dotNetify application server under common types of workloads.
+
+For instructions on how to run, visit the github repo at https://github.com/dsuryd/dotNetify-LoadTester.Profiles. Available workload profiles are:
 
 <b>Echo</b>
 <br/>
@@ -120,7 +122,7 @@ This profile is similar to **Echo**, but all clients sharing the same view model
 <br/>
 The server pushes updates to all clients at regular intervals. A single multicast view model instance is used. The message payload contains sequence number and timestamp to allow the test to detect for undelivered messages and measure the average interval between updates.
 
-<b>ChatRoom</b>
+<b>Chat Room</b>
 <br/>
 This profile models chat rooms where clients are sending and receiving messages with each other and within groups. The clients within a group are configured into 3 types:
 
@@ -129,7 +131,3 @@ This profile models chat rooms where clients are sending and receiving messages 
 - Lurkers (70%): only receive messages.
 
 The message payload contains sequence number and timestamp to allow the test to detect for undelivered messages and measure the average message latency.
-
-<b>How to Run</b>
-
-For instructions, visit the github repo at https://github.com/dsuryd/dotNetify-LoadTester.Profiles.
