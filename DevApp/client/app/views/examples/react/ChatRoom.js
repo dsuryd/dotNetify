@@ -12,15 +12,14 @@ class ChatRoom extends React.Component {
 
     this.vm = dotnetify.react.connect("ChatRoomVM", this);
     this.dispatchState = state => this.vm.$dispatch(state);
-  }
-
-  componentDidMount() {
     this.correlationId = `${Math.random()}`;
-    this.dispatchState({ AddUser: this.correlationId });
-    this.scrollToBottom();
-  }
+  } 
 
   componentDidUpdate() {
+    if (!this.state.Users.some(x => x.CorrelationId == this.correlationId)) {
+      this.dispatchState({ AddUser: this.correlationId });
+    }
+
     this.scrollToBottom();
     if (this.state.PrivateMessage) {
       let message = this.state.PrivateMessage;

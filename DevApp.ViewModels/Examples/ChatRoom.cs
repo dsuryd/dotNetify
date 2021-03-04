@@ -74,7 +74,19 @@ namespace DotNetify.DevApp
       [ItemKey(nameof(ChatUser.Id))]
       public List<ChatUser> Users { get; } = new List<ChatUser>();
 
-      public Action<ChatMessage> SendMessage => chat =>
+      public ChatRoomVM(IConnectionContext connectionContext)
+      {
+         _connectionContext = connectionContext;
+      }
+
+      public override void Dispose()
+      {
+         RemoveUser();
+         PushUpdates();
+         base.Dispose();
+      }
+
+      public void SendMessage(ChatMessage chat)
       {
          string userId = _connectionContext.ConnectionId;
          chat.Id = Messages.Count + 1;
@@ -92,9 +104,9 @@ namespace DotNetify.DevApp
                this.AddList(nameof(Messages), chat);
             }
          }
-      };
+      }
 
-      public Action<string> AddUser => correlationId =>
+      public void AddUser(string correlationId)
       {
          var user = new ChatUser(_connectionContext, correlationId);
          lock (Users)
@@ -102,9 +114,9 @@ namespace DotNetify.DevApp
             Users.Add(user);
             this.AddList(nameof(Users), user);
          }
-      };
+      }
 
-      public Action RemoveUser => () =>
+      public void RemoveUser()
       {
          lock (Users)
          {
@@ -115,18 +127,6 @@ namespace DotNetify.DevApp
                this.RemoveList(nameof(Users), user.Id);
             }
          }
-      };
-
-      public ChatRoomVM(IConnectionContext connectionContext)
-      {
-         _connectionContext = connectionContext;
-      }
-
-      public override void Dispose()
-      {
-         RemoveUser();
-         PushUpdates();
-         base.Dispose();
       }
 
       private string UpdateUserName(string userId, string userName)
