@@ -53,6 +53,10 @@ namespace DotNetify.Forwarding
 
       public async Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
+         // Make it so the unawaited async method below has its own copy of data to avoid mutation by the middleware that follows.
+         var contextData = context.Data;
+
+         // Don't await to avoid blocking if there's connectivity failure.
          _ = _hubForwarderFactory.InvokeInstanceAsync(_serverUrl, _config, async hubForwarder =>
          {
             if (hubForwarder.IsConnected)
@@ -60,10 +64,10 @@ namespace DotNetify.Forwarding
                hubForwarder.CallerContext = context.CallerContext;
 
                if (context.CallType == nameof(IDotNetifyHubMethod.Request_VM))
-                  await hubForwarder.RequestVMAsync(context.VMId, context.Data);
+                  await hubForwarder.RequestVMAsync(context.VMId, contextData);
                else if (context.CallType == nameof(IDotNetifyHubMethod.Update_VM))
                {
-                  var data = (Dictionary<string, object>) context.Data;
+                  var data = (Dictionary<string, object>) contextData;
                   await hubForwarder.UpdateVMAsync(context.VMId, data);
                }
                else if (context.CallType == nameof(IDotNetifyHubMethod.Dispose_VM))
@@ -71,7 +75,7 @@ namespace DotNetify.Forwarding
                else if (context.CallType == nameof(IDotNetifyHubMethod.Response_VM))
                {
                   context.PipelineData.TryGetValue(DotNetifyHubHandler.GROUP_NAME_TOKEN, out object groupName);
-                  await hubForwarder.ResponseVMAsync(context.VMId, context.Data, groupName?.ToString());
+                  await hubForwarder.ResponseVMAsync(context.VMId, contextData, groupName?.ToString());
                }
             }
             else
