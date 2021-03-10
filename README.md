@@ -12,6 +12,8 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 - v4.0: Typescript support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0).
 - v3.7: Routing enhancements: lazy-loading, server-side rendering, 404 error handling - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7).
 
+- **DotNetify-LoadTester (Premium)** - performance testing tool for dotNetify apps.
+
 <div/>
 
 - [**DotNetify-Blazor**](https://github.com/dsuryd/dotNetify-Blazor): client library for Blazor web assembly.
@@ -31,6 +33,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 ## Premium Features
 
 - [**DotNetify-Testing**](https://www.dotnetify.net/core/dotnetify-testing): testing library for dotNetify apps.
+- [**DotNetify-LoadTester**](https://www.dotnetify.net/core/dotnetify-loadtester): performance testing tool for dotNetify apps.
 
 ## Documentation
 
