@@ -18,8 +18,6 @@
     <RepositoryUrl>https://github.com/dsuryd/dotNetify</RepositoryUrl>
     <PackageTags>netcore reactive realtime signalr mobile web websocket</PackageTags>
     <PackageIconUrl></PackageIconUrl>
-    <AssemblyVersion>5.0.0.0</AssemblyVersion>
-    <FileVersion>5.0.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>dotnetify.png</PackageIcon>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -29,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.12" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
