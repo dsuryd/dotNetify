@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 
 namespace DotNetify.Forwarding
 {
@@ -29,10 +28,12 @@ namespace DotNetify.Forwarding
       }
    }
 
+   public interface IForwardingMiddleware : IMiddleware, IDisconnectionMiddleware { }
+
    /// <summary>
    /// The middleware used for forwarding incoming hub messages to another server.
    /// </summary>
-   public class ForwardingMiddleware : IMiddleware, IDisconnectionMiddleware
+   public class ForwardingMiddleware : IForwardingMiddleware
    {
       private readonly IDotNetifyHubForwarderFactory _hubForwarderFactory;
       private readonly string _serverUrl;
@@ -53,6 +54,12 @@ namespace DotNetify.Forwarding
 
       public async Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
+         if (_config.Filter != null && !_config.Filter(context))
+         {
+            await next(context);
+            return;
+         }
+
          // Make it so the unawaited async method below has its own copy of data to avoid mutation by the middleware that follows.
          var contextData = context.Data;
 

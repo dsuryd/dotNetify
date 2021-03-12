@@ -79,7 +79,7 @@ namespace DotNetify
          if (!_middlewareTypes.Exists(t => t.Item1 == typeof(ExtractHeadersMiddleware)))
          {
             // Place the middleware after any forwarding middleware to ensure it forwards unprocessed data.
-            int pos = _middlewareTypes.FindLastIndex(x => x.Item1 == typeof(ForwardingMiddleware)) + 1;
+            int pos = _middlewareTypes.FindLastIndex(x => typeof(IForwardingMiddleware).IsAssignableFrom(x.Item1)) + 1;
             _middlewareTypes.Insert(pos, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
          }
 
