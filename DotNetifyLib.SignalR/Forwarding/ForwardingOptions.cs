@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+using System;
+
 namespace DotNetify.Forwarding
 {
    public class ForwardingOptions
@@ -32,5 +34,10 @@ namespace DotNetify.Forwarding
       /// Number of connections to the target server. Default to 5.
       /// </summary>
       public int ConnectionPoolSize { get; set; } = 5;
+
+      /// <summary>
+      /// Predicate to decide whether to forward.
+      /// </summary>
+      public Func<DotNetifyHubContext, bool> Filter { get; set; }
    }
 }
