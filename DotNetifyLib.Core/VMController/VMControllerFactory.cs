@@ -76,6 +76,7 @@ namespace DotNetify
             cachedValue = new Lazy<VMController>(() => new VMController(ResponseDelegate, _vmFactory, _serviceScopeFactory.CreateScope()));
             cache.Set(key, cachedValue, GetCacheEntryOptions());
          }
+
          return cachedValue?.Value;
       }
 

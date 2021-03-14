@@ -71,7 +71,7 @@ namespace DotNetify.Routing
          }
          catch (Exception ex)
          {
-            System.Diagnostics.Trace.Fail(ex.ToString());
+            Logger.LogError($"Failed to get SSR initial states: {ex.Message}");
             return null;
          }
       }

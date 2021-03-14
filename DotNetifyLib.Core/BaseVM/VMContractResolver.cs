@@ -109,7 +109,7 @@ namespace DotNetify
          {
             var itemKeyAttr = member.GetCustomAttribute<ItemKeyAttribute>();
             _itemKeyProps = _itemKeyProps ?? new Dictionary<string, string>();
-            _itemKeyProps.Add($"{member.Name}_itemKey", itemKeyAttr.ItemKey);
+            _itemKeyProps[$"{member.Name}_itemKey"] = itemKeyAttr.ItemKey;
          }
 
          return property;

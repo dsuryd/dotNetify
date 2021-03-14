@@ -40,6 +40,8 @@ namespace DotNetify.DevApp
          Security,
          WebApiMode,
          DotNetifyTesting,
+         DotNetifyLoadTester,
+         DotNetifyObserver,
          NotFound404
       }
 
@@ -50,43 +52,45 @@ namespace DotNetify.DevApp
       public App()
       {
          this.RegisterRoutes("core", new List<RouteTemplate>
-      {
-        new RouteTemplate (nameof (Route.Home)) { UrlPattern = "", ViewUrl = nameof (Route.Overview) },
+         {
+           new RouteTemplate (nameof (Route.Home)) { UrlPattern = "", ViewUrl = nameof (Route.Overview) },
 
-        new RouteTemplate (nameof (Route.Overview)) { UrlPattern = "overview" },
-        new RouteTemplate (nameof (Route.DataFlow)) { UrlPattern = "dataflow" },
-        new RouteTemplate (nameof (Route.Reactive)) { UrlPattern = "reactive" },
-        new RouteTemplate (nameof (Route.MicroFrontend)) { UrlPattern = "mfe" },
-        new RouteTemplate (nameof (Route.GetStarted)) { UrlPattern = "getstarted" },
-        new RouteTemplate (nameof (Route.HelloWorld)) { UrlPattern = "examples/helloworld" },
-        new RouteTemplate (nameof (Route.ControlTypes)) { UrlPattern = "examples/controltypes" },
-        new RouteTemplate (nameof (Route.SimpleList)) { UrlPattern = "examples/simplelist" },
-        new RouteTemplate (nameof (Route.CompositeView)) { UrlPattern = "examples/compositeview" },
-        new RouteTemplate (nameof (Route.LiveChart)) { UrlPattern = "examples/livechart" },
-        new RouteTemplate (nameof (Route.BookStore)) { UrlPattern = "examples/bookstore" },
-        new RouteTemplate (nameof (Route.SecurePage)) { UrlPattern = "examples/securepage" },
-        new RouteTemplate (nameof (Route.ChatRoom)) { UrlPattern = "examples/chatroom" },
-        new RouteTemplate (nameof (Route.Connection)) { UrlPattern = "api/connection" },
-        new RouteTemplate (nameof (Route.CRUD)) { UrlPattern = "api/crud" },
-        new RouteTemplate (nameof (Route.DI)) { UrlPattern = "api/di" },
-        new RouteTemplate (nameof (Route.DotNetClient)) { UrlPattern = "api/dotnetclient" },
-        new RouteTemplate (nameof (Route.Filter)) { UrlPattern = "api/filter" },
-        new RouteTemplate (nameof (Route.LocalMode)) { UrlPattern = "api/localmode" },
-        new RouteTemplate (nameof (Route.Middleware)) { UrlPattern = "api/middleware" },
-        new RouteTemplate (nameof (Route.Multicast)) { UrlPattern = "api/multicast" },
-        new RouteTemplate (nameof (Route.Routing)) { UrlPattern = "api/routing" },
-        new RouteTemplate (nameof (Route.Security)) { UrlPattern = "api/security" },
-        new RouteTemplate (nameof (Route.WebApiMode)) { UrlPattern = "api/webapimode" },
+           new RouteTemplate (nameof (Route.Overview)) { UrlPattern = "overview" },
+           new RouteTemplate (nameof (Route.DataFlow)) { UrlPattern = "dataflow" },
+           new RouteTemplate (nameof (Route.Reactive)) { UrlPattern = "reactive" },
+           new RouteTemplate (nameof (Route.MicroFrontend)) { UrlPattern = "mfe" },
+           new RouteTemplate (nameof (Route.GetStarted)) { UrlPattern = "getstarted" },
+           new RouteTemplate (nameof (Route.HelloWorld)) { UrlPattern = "examples/helloworld" },
+           new RouteTemplate (nameof (Route.ControlTypes)) { UrlPattern = "examples/controltypes" },
+           new RouteTemplate (nameof (Route.SimpleList)) { UrlPattern = "examples/simplelist" },
+           new RouteTemplate (nameof (Route.CompositeView)) { UrlPattern = "examples/compositeview" },
+           new RouteTemplate (nameof (Route.LiveChart)) { UrlPattern = "examples/livechart" },
+           new RouteTemplate (nameof (Route.BookStore)) { UrlPattern = "examples/bookstore" },
+           new RouteTemplate (nameof (Route.SecurePage)) { UrlPattern = "examples/securepage" },
+           new RouteTemplate (nameof (Route.ChatRoom)) { UrlPattern = "examples/chatroom" },
+           new RouteTemplate (nameof (Route.Connection)) { UrlPattern = "api/connection" },
+           new RouteTemplate (nameof (Route.CRUD)) { UrlPattern = "api/crud" },
+           new RouteTemplate (nameof (Route.DI)) { UrlPattern = "api/di" },
+           new RouteTemplate (nameof (Route.DotNetClient)) { UrlPattern = "api/dotnetclient" },
+           new RouteTemplate (nameof (Route.Filter)) { UrlPattern = "api/filter" },
+           new RouteTemplate (nameof (Route.LocalMode)) { UrlPattern = "api/localmode" },
+           new RouteTemplate (nameof (Route.Middleware)) { UrlPattern = "api/middleware" },
+           new RouteTemplate (nameof (Route.Multicast)) { UrlPattern = "api/multicast" },
+           new RouteTemplate (nameof (Route.Routing)) { UrlPattern = "api/routing" },
+           new RouteTemplate (nameof (Route.Security)) { UrlPattern = "api/security" },
+           new RouteTemplate (nameof (Route.WebApiMode)) { UrlPattern = "api/webapimode" },
 
-        new RouteTemplate (nameof (Route.FromScratchWebPack)) { UrlPattern = "fromscratch-webpack" },
-        new RouteTemplate (nameof (Route.FromScratchScriptTag)) { UrlPattern = "fromscratch-scripttag" },
-        new RouteTemplate (nameof (Route.FromScratchCRA)) { UrlPattern = "fromscratch-cra" },
-        new RouteTemplate (nameof (Route.FromScratchCLI)) { UrlPattern = "fromscratch-cli" },
+           new RouteTemplate (nameof (Route.FromScratchWebPack)) { UrlPattern = "fromscratch-webpack" },
+           new RouteTemplate (nameof (Route.FromScratchScriptTag)) { UrlPattern = "fromscratch-scripttag" },
+           new RouteTemplate (nameof (Route.FromScratchCRA)) { UrlPattern = "fromscratch-cra" },
+           new RouteTemplate (nameof (Route.FromScratchCLI)) { UrlPattern = "fromscratch-cli" },
 
-        new RouteTemplate (nameof (Route.DotNetifyTesting)) { UrlPattern = "dotnetify-testing" },
+           new RouteTemplate (nameof (Route.DotNetifyTesting)) { UrlPattern = "dotnetify-testing" },
+           new RouteTemplate (nameof (Route.DotNetifyLoadTester)) { UrlPattern = "dotnetify-loadtester" },
+           new RouteTemplate (nameof (Route.DotNetifyObserver)) { UrlPattern = "dotnetify-observer" },
 
-        new RouteTemplate (nameof (Route.NotFound404)) { UrlPattern = "*", ViewUrl = "NotFound404" },
-      });
+           new RouteTemplate (nameof (Route.NotFound404)) { UrlPattern = "*", ViewUrl = "NotFound404" },
+         });
 
          _navMenuItems = new NavMenuItem[]
          {
@@ -145,6 +149,8 @@ namespace DotNetify.DevApp
                Routes = new NavRoute[]
               {
                  new NavRoute ("DotNetify-Testing", this.GetRoute (nameof (Route.DotNetifyTesting))),
+                 new NavRoute ("DotNetify-LoadTester", this.GetRoute (nameof (Route.DotNetifyLoadTester))),
+                 //new NavRoute ("DotNetify-Observer", this.GetRoute (nameof (Route.DotNetifyObserver))),
               },
            }
          };

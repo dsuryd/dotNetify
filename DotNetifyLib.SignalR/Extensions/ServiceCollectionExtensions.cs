@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2017-2019 Dicky Suryadi
+Copyright 2017-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using DotNetify.Client;
+using DotNetify.Forwarding;
 using DotNetify.Security;
 using DotNetify.WebApi;
 
@@ -43,8 +44,14 @@ namespace DotNetify
          // Add the dependency injection service scope factory for view model controllers.
          services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
 
+         // Add service to handle hub messages.
+         services.AddTransient<IDotNetifyHubHandler, DotNetifyHubHandler>();
+         services.AddTransient<IDotNetifyHubResponse, DotNetifyHubResponse>();
+         services.AddSingleton<IDotNetifyHubResponseManager, DotNetifyHubResponseManager>();
+
          // Add service to get the hub principal and the associated connection context.
-         services.AddSingleton<IPrincipalAccessor, HubPrincipalAccessor>();
+         services.AddSingleton<IPrincipalAccessor, HubInfoAccessor>();
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IDotNetifyHubContextAccessor);
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IHubCallerContextAccessor);
          services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IConnectionContext);
 
@@ -58,13 +65,21 @@ namespace DotNetify
          services.AddSingleton<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>(p => new List<Tuple<Type, Func<IMiddlewarePipeline>>>());
          services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
 
+         // Add web API support.
          services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
+         services.AddTransient<WebApiVMControllerFactory>();
+
+         // Add factories used for hub forwarding.
+         services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
+         services.AddSingleton<IDotNetifyHubForwarderFactory, DotNetifyHubForwarderFactory>();
+         services.AddSingleton<IDotNetifyHubForwardResponseFactory, DotNetifyHubForwardResponseFactory>();
 
          return services;
       }
 
       public static IServiceCollection AddDotNetifyClient(this IServiceCollection services)
       {
+         services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
          services.AddSingleton<IDotNetifyHubProxy, DotNetifyHubProxy>();
          services.AddTransient<IDotNetifyClient, DotNetifyClient>();
          services.AddSingleton<IUIThreadDispatcher, DefaultUIThreadDispatcher>();

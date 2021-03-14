@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +17,19 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Security.Principal;
+using DotNetify.Forwarding;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify
 {
+   /// <summary>
+   /// Provides access to request context.
+   /// </summary>
+   public interface IDotNetifyHubContextAccessor
+   {
+      DotNetifyHubContext Context { get; }
+   }
+
    /// <summary>
    /// Provides request context for a middleware.
    /// </summary>
@@ -29,6 +38,7 @@ namespace DotNetify
       private Lazy<Dictionary<string, object>> _pipelineData = new Lazy<Dictionary<string, object>>();
 
       public HubCallerContext CallerContext { get; }
+      public string ConnectionId { get; }
       public string CallType { get; }
       public string VMId { get; }
       public object Data { get; set; }
@@ -36,7 +46,7 @@ namespace DotNetify
       public IPrincipal Principal { get; set; }
       public IDictionary<string, object> PipelineData => _pipelineData.Value;
 
-      internal DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers, IPrincipal principal)
+      public DotNetifyHubContext(HubCallerContext callerContext, string callType, string vmId, object data, object headers, IPrincipal principal)
       {
          CallerContext = callerContext;
          CallType = callType;
@@ -44,6 +54,8 @@ namespace DotNetify
          Data = data;
          Headers = headers;
          Principal = principal;
+
+         ConnectionId = CallerContext.GetOriginConnectionContext()?.ConnectionId ?? CallerContext.ConnectionId;
       }
    }
 }

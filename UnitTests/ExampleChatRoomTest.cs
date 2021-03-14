@@ -76,7 +76,7 @@ namespace UnitTests
          string expectedClient1Id = response.Users_add.Id;
 
          client2.Connect(nameof(ChatRoomVM));
-         client2.Dispatch("{AddUser: '0.456'}");
+         client2.Dispatch(new { AddUser = "0.456" });
 
          var client2Responses = client2.Listen(() =>
          {

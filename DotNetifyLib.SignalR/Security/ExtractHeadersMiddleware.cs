@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json.Linq;
 using DotNetify.Client;
+using System.Linq;
+using DotNetify.Util;
 
 namespace DotNetify.Security
 {
@@ -47,20 +49,23 @@ namespace DotNetify.Security
       /// <param name="next">Next middleware delegate.</param>
       public Task Invoke(DotNetifyHubContext context, NextDelegate next)
       {
+         // Make sure the data is JObject.
+         context.Data = NormalizeType(context);
+
          // Skip if context already has headers (in the case of Web API mode).
          if (context.Headers != null)
             return next(context);
 
          // Set initial headers from previously cached headers.
          if (context.CallerContext != null)
-            context.Headers = _headersCache.Get(_headersKey(context.CallerContext.ConnectionId));
+            context.Headers = _headersCache.Get(_headersKey(context.ConnectionId));
 
          var tuple = ExtractHeaders(context.Data);
          if (tuple.Item1 != null)
          {
             context.Headers = tuple.Item1;
             if (context.CallerContext != null)
-               _headersCache.Set(_headersKey(context.CallerContext.ConnectionId), context.Headers);
+               _headersCache.Set(_headersKey(context.ConnectionId), context.Headers);
          }
          context.Data = tuple.Item2;
 
@@ -114,6 +119,20 @@ namespace DotNetify.Security
          }
 
          return Tuple.Create(headers, data);
+      }
+
+      /// <summary>
+      /// Normalize data type to JObject just because a lot of operations are still assuming data is deserialized
+      /// with Newtonsoft and will break if using MessagePack or System.Text.Json.
+      /// </summary>
+      private object NormalizeType(DotNetifyHubContext context)
+      {
+         if (context.CallType == nameof(IDotNetifyHubMethod.Request_VM))
+            return context.Data?.NormalizeType();
+         else if (context.Data is Dictionary<string, object>)
+            return (context.Data as Dictionary<string, object>).ToDictionary(x => x.Key, x => x.Value.NormalizeType());
+
+         return context.Data;
       }
    }
 }

@@ -26,7 +26,7 @@ import Multicast from "./apis/Multicast";
 import Routing from "./apis/Routing";
 import Security from "./apis/Security";
 import WebApiMode from "./apis/WebApiMode";
-import DotNetifyTesting from "./premium/DotNetifyTesting";
+import { DotNetifyTesting, DotNetifyLoadTester } from "./Premium";
 
 const NotFound404 = () => (
   <div style={{ padding: "1.5rem" }}>
@@ -68,5 +68,6 @@ export {
   Security,
   WebApiMode,
   DotNetifyTesting,
+  DotNetifyLoadTester,
   NotFound404
 };

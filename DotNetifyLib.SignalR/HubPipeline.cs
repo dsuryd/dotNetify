@@ -120,7 +120,7 @@ namespace DotNetify
          }
          catch (Exception ex)
          {
-            Trace.Fail(ex.ToString());
+            Logger.LogError($"Disconnection middleware exception: {ex.Message}");
          }
       }
 

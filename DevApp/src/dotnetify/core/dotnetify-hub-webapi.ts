@@ -102,8 +102,14 @@ export class DotNetifyHubWebApi implements IDotnetifyHub {
       .catch(request => console.error(`[${iVMId}] Update failed`, request));
   }
 
-  disposeVM(iVMId) {
+  disposeVM(iVMId: string) {
     delete this._vmArgs[iVMId];
+
+    const url = this.url + `/api/dotnetify/vm/${iVMId}`;
+
+    fetch("DELETE", url, null, request => {
+      if (typeof this.onRequest == "function") this.onRequest(url, request);
+    }).catch(request => console.error(`[${iVMId}] Dispose failed`, request));
   }
 }
 

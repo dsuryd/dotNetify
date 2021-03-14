@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2017 Dicky Suryadi
+Copyright 2017-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ namespace DotNetify
       public Task Invoke(DotNetifyHubContext hubContext, NextDelegate next)
       {
          string data = hubContext.Data == null ? string.Empty
-            : hubContext.Data is string ? (string)hubContext.Data : JsonConvert.SerializeObject(hubContext.Data, Formatting.None);
+            : hubContext.Data is string ? (string) hubContext.Data : JsonConvert.SerializeObject(hubContext.Data, Formatting.None);
 
-         var log = $@"[dotNetify] connId={hubContext.CallerContext?.ConnectionId}
+         var log = $@"[dotNetify] connId={hubContext.ConnectionId}
             type={hubContext.CallType}
             vmId={hubContext.VMId}
             data={data.Replace("\r\n", "")}";
@@ -71,7 +71,7 @@ namespace DotNetify
    {
       public static void UseDeveloperLogging(this IDotNetifyConfiguration config, LogTraceDelegate logTraceDelegate = null)
       {
-         config.UseMiddleware<DeveloperLoggingMiddleware>(logTraceDelegate ?? (log => Trace.WriteLine(log)));
+         config.UseMiddleware<DeveloperLoggingMiddleware>(logTraceDelegate ?? (log => Logger.LogInformation(log)));
       }
    }
 }

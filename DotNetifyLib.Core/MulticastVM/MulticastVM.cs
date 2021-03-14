@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2018 Dicky Suryadi
+Copyright 2018-2020 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ namespace DotNetify
       /// </summary>
       private string _groupName;
 
+      private int _createdEventFlag;
+
       /// <summary>
       /// Occurs when the view model wants to push updates to all associated clients.
       /// This event is handled by the VMController.
@@ -62,6 +64,11 @@ namespace DotNetify
       /// Determine whether the view model can be shared with the calling VMController.
       /// </summary>
       internal virtual bool IsMember => _groupName == GroupName;
+
+      /// <summary>
+      /// Used by VMController to determine whether to invoke OnCreatedAsync.
+      /// </summary>
+      internal bool RaiseCreatedEvent => Interlocked.Exchange(ref _createdEventFlag, 1) == 0 ? true : false;
 
       /// <summary>
       /// Increment reference count.
@@ -122,8 +129,9 @@ namespace DotNetify
          {
             var eventArgs = new MulticastPushUpdatesEventArgs { ExcludedConnectionId = excludedConnectionId };
 
-            // First invocation cycle is to get the participating connection Ids from the VMControllers.
-            RequestMulticastPushUpdates?.Invoke(this, eventArgs);
+            // First invocation cycle is to get the participating connection Ids from the VMControllers when a group name isn't used.
+            if (string.IsNullOrEmpty(GroupName))
+               RequestMulticastPushUpdates?.Invoke(this, eventArgs);
 
             // Invoke the first available event handler to do the actual data push.
             // If successful, the handler will set the PushData back to false.

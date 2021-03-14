@@ -19,8 +19,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 
 namespace DotNetify
@@ -42,6 +43,8 @@ namespace DotNetify
          public IList<string> ConnectionIds { get; set; }
          public IList<string> ExcludedConnectionIds { get; set; }
          public string Data { get; set; }
+
+         public bool IsEmpty() => string.IsNullOrWhiteSpace(GroupName) && (UserIds == null || UserIds.Count == 0) && (ConnectionIds == null || ConnectionIds.Count == 0);
       }
 
       /// <summary>
@@ -81,10 +84,19 @@ namespace DotNetify
       /// <summary>
       /// Delegate to provide interception hook for a view model action.
       /// </summary>
-      /// <param name="vm">View model.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vm">View model instance.</param>
       /// <param name="data">Data being passed to the view model.</param>
       /// <param name="vmAction">View model action.</param>
       public delegate Task FilterDelegate(string vmId, BaseVM vm, object data, VMActionDelegate vmAction);
+
+      /// <summary>
+      /// Delegate to provide interception hook for a view model response action.
+      /// </summary>
+      /// <param name="vm">View model info.</param>
+      /// <param name="data">Data being passed to the view model.</param>
+      /// <param name="vmAction">View model action.</param>
+      public delegate Task ResponseFilterDelegate(VMInfo vm, object data, VMActionDelegate vmAction);
 
       #endregion Delegates
 
@@ -98,12 +110,14 @@ namespace DotNetify
       /// <summary>
       /// Dependency injection service scope.
       /// </summary>
-      private readonly IVMServiceScope _serviceScope;
+      private IVMServiceScope _serviceScope;
+
+      private readonly object _serviceScopeLock = new object();
 
       /// <summary>
       /// This class encapsulates a view model information.
       /// </summary>
-      protected internal class VMInfo
+      public class VMInfo
       {
          /// <summary>
          /// Identifies the view model.
@@ -125,11 +139,12 @@ namespace DotNetify
          /// </summary>
          public string GroupName { get; set; }
 
-         public VMInfo(string id, BaseVM instance, string connectionId)
+         public VMInfo(string id, BaseVM instance, string connectionId, string groupName = null)
          {
             Id = id;
             Instance = instance;
             ConnectionId = connectionId;
+            GroupName = groupName;
          }
       }
 
@@ -141,7 +156,7 @@ namespace DotNetify
       /// <summary>
       /// Function invoked by the view model to provide response back to the client.
       /// </summary>
-      protected internal readonly VMResponseDelegate _vmResponse;
+      public VMResponseDelegate VMResponse { get; set; }
 
       #endregion Fields
 
@@ -160,21 +175,28 @@ namespace DotNetify
       /// <summary>
       /// Interception hook for outgoing response from view models.
       /// </summary>
-      public FilterDelegate ResponseVMFilter { get; set; }
+      public ResponseFilterDelegate ResponseVMFilter { get; set; }
 
       #endregion Filters
 
       /// <summary>
-      /// Provides scoped dependency injection service provider.
+      /// Provides a factory method using the service provider scoped to this instance.
       /// </summary>
-      public IServiceProvider ServiceProvider => _serviceScope?.ServiceProvider;
+      public Func<Type, object[], object> FactoryMethod => (Type type, object[] args) =>
+      {
+         lock (_serviceScopeLock)
+         {
+            var provider = _serviceScope?.ServiceProvider;
+            return provider != null ? ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { }) : null;
+         }
+      };
 
       // Default constructor.
       internal VMController()
       {
          RequestVMFilter = (string vmId, BaseVM vm, object vmArg, VMActionDelegate vmAction) => vmAction(vmArg);
          UpdateVMFilter = (string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
-         ResponseVMFilter = (string vmId, BaseVM vm, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
+         ResponseVMFilter = (VMInfo vmInfo, object vmData, VMActionDelegate vmAction) => vmAction(vmData);
       }
 
       /// <summary>
@@ -184,7 +206,7 @@ namespace DotNetify
       /// <param name="serviceScope">Dependency injection service scope.</param>
       public VMController(VMResponseDelegate vmResponse, IVMFactory vmFactory, IVMServiceScope serviceScope = null) : this()
       {
-         _vmResponse = vmResponse ?? throw new ArgumentNullException(nameof(vmResponse));
+         VMResponse = vmResponse ?? throw new ArgumentNullException(nameof(vmResponse));
          _vmFactory = vmFactory;
          _serviceScope = serviceScope;
       }
@@ -197,7 +219,11 @@ namespace DotNetify
          foreach (var kvp in _activeVMs)
             DisposeViewModel(kvp.Value);
 
-         _serviceScope?.Dispose();
+         lock (_serviceScopeLock)
+         {
+            _serviceScope?.Dispose();
+            _serviceScope = null;
+         }
       }
 
       /// <summary>
@@ -240,28 +266,32 @@ namespace DotNetify
          {
             // Create a new view model instance whose class name is matching the given VMId.
             vmInstance = CreateVM(vmId, vmArg);
-            await vmInstance.OnCreatedAsync();
+
+            // Let the instance complete its initialization. If multicast, make sure it's only called once.
+            if ((vmInstance as MulticastVM)?.RaiseCreatedEvent != false)
+               await vmInstance.OnCreatedAsync();
          }
 
          await RequestVMFilter.Invoke(vmId, vmInstance, vmArg, async data =>
          {
-            var vmData = vmInstance.Serialize();
+            string vmData = vmInstance.Serialize();
+            string groupName = vmInstance is MulticastVM ? (vmInstance as MulticastVM).GroupName : null;
 
             // Send the view model data back to the browser client.
-            await ResponseVMFilter.Invoke(vmId, vmInstance, vmData, filteredData => _vmResponse(connectionId, vmId, (string) filteredData));
+            await ResponseVMFilter.Invoke(new VMInfo(vmId, vmInstance, connectionId, groupName), vmData, filteredData => VMResponse(connectionId, vmId, (string) filteredData));
 
-            // Reset the changed property states.
-            vmInstance.AcceptChangedProperties();
+            // Reset the changed property states unless it's a multicast.
+            if (vmInstance is MulticastVM == false)
+               vmInstance.AcceptChangedProperties();
 
             // Add the view model instance to the controller.
             if (!_activeVMs.ContainsKey(vmId))
             {
-               var vmInfo = new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId);
+               var vmInfo = new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId, groupName: groupName);
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
                if (vmInstance is MulticastVM)
                {
                   var multicastVM = vmInstance as MulticastVM;
-                  vmInfo.GroupName = multicastVM.GroupName;
                   multicastVM.RequestMulticastPushUpdates += VMInstance_RequestMulticastPushUpdates;
                   multicastVM.RequestSend += VMInstance_RequestSend;
                }
@@ -298,15 +328,8 @@ namespace DotNetify
       /// <param name="iData">View model update.</param>
       public async Task OnUpdateVMAsync(string connectionId, string vmId, Dictionary<string, object> data)
       {
-         bool isRecreated = false;
          if (!_activeVMs.ContainsKey(vmId))
-         {
-            // No view model found; it must have expired and needs to be recreated.
-            isRecreated = true;
-            await OnRequestVMAsync(connectionId, vmId);
-            if (!_activeVMs.ContainsKey(vmId))
-               return;
-         }
+            return;
 
          // Update the new values from the client to the server view model.
          var vmInstance = _activeVMs[vmId].Instance;
@@ -336,26 +359,26 @@ namespace DotNetify
             lock (vmInstance)
             {
                var vmInfo = _activeVMs.Values.FirstOrDefault(vm => vm.Instance == vmInstance);
-               var changedProperties = new Dictionary<string, object>(vmInstance.ChangedProperties);
-
-               // Unless the view model was recreated, exclude the changes that trigger this update if their values don't change.
-               if (!isRecreated)
+               if (vmInfo != null)
                {
+                  var changedProperties = new Dictionary<string, object>(vmInstance.ChangedProperties);
+
+                  // Exclude the changes that trigger this update if their values don't change.
                   foreach (var kvp in data)
                      if (vmInstance.IsEqualToChangedPropertyValue(kvp.Key, kvp.Value))
                         changedProperties.Remove(kvp.Key);
-               }
 
-               if (changedProperties.Count > 0)
-               {
-                  var vmData = vmInstance.Serialize(changedProperties);
-                  PushUpdates(vmInfo, vmData);
-               }
+                  if (changedProperties.Count > 0)
+                  {
+                     var vmData = vmInstance.Serialize(changedProperties);
+                     PushUpdates(vmInfo, vmData);
+                  }
 
-               if (vmInstance is MulticastVM)
-                  (vmInstance as MulticastVM).PushUpdatesExcept(vmInfo.ConnectionId);
-               else
-                  vmInstance.AcceptChangedProperties();
+                  if (vmInstance is MulticastVM)
+                     (vmInstance as MulticastVM).PushUpdatesExcept(vmInfo.ConnectionId);
+                  else
+                     vmInstance.AcceptChangedProperties();
+               }
             }
 
             // Push updates on other view model instances in case they too change.
@@ -546,9 +569,10 @@ namespace DotNetify
          if (string.IsNullOrEmpty(vmData))
             return;
 
-         ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, vmData, filteredData =>
+         ResponseVMFilter.Invoke(vmInfo, vmData, filteredData =>
          {
-            _vmResponse(vmInfo.ConnectionId, vmInfo.Id, (string) filteredData);
+            var vmDataToSend = filteredData is GroupSend ? (filteredData as GroupSend).Data : (string) filteredData;
+            VMResponse(vmInfo.ConnectionId, vmInfo.Id, vmDataToSend);
             return Task.CompletedTask;
          });
       }
@@ -566,7 +590,7 @@ namespace DotNetify
             GroupName = groupName,
             ConnectionId = connectionId
          };
-         _vmResponse(MULTICAST + nameof(GroupRemove), vmId, JsonConvert.SerializeObject(message));
+         VMResponse(MULTICAST + nameof(GroupRemove), vmId, JsonSerializer.Serialize(message));
       }
 
       /// <summary>
@@ -576,9 +600,9 @@ namespace DotNetify
       /// <param name="args">Arguments containing information on clients to send to.</param>
       private void Send(VMInfo vmInfo, GroupSend args)
       {
-         ResponseVMFilter.Invoke(vmInfo.Id, vmInfo.Instance, args.Data, filteredData =>
+         ResponseVMFilter.Invoke(vmInfo, args, filteredData =>
          {
-            _vmResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonConvert.SerializeObject(args));
+            VMResponse(MULTICAST + nameof(GroupSend), vmInfo.Id, JsonSerializer.Serialize(args));
             return Task.CompletedTask;
          });
       }

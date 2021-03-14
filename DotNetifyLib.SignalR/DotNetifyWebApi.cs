@@ -17,19 +17,34 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetify.Security;
+using DotNetify.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DotNetify.WebApi
 {
+   /// <summary>
+   /// Provides a separate view model controller factory for web API so that each request has its own factory to
+   /// set its own response callback but still share in-memory cache for the view models.
+   /// </summary>
+   public class WebApiVMControllerFactory : VMControllerFactory
+   {
+      private readonly static IMemoryCache _cache = new MemoryCacheAdapter(new MemoryCache(new MemoryCacheOptions()));
+
+      public WebApiVMControllerFactory(IVMFactory vmFactory, IVMServiceScopeFactory serviceScopeFactory) :
+         base(_cache, vmFactory, serviceScopeFactory)
+      {
+         CacheExpiration = TimeSpan.FromMinutes(20);
+      }
+   }
+
    /// <summary>
    /// This class allows access to view models through a web API.
    /// </summary>
@@ -37,6 +52,9 @@ namespace DotNetify.WebApi
    [ApiController]
    public class DotNetifyWebApi : ControllerBase
    {
+      private readonly TaskCompletionSource<string> _taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+      private readonly List<string> _responses = new List<string>();
+
       /// <summary>
       /// Adapter for the HTTP context.
       /// </summary>
@@ -64,55 +82,38 @@ namespace DotNetify.WebApi
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional argument that may contain view model's initialization argument and/or request headers.</param>
-      /// <param name="vmFactory">Factory object to create the view model instance.</param>
-      /// <param name="hubPipeline">Middleware/VM filter pipeline.</param>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       /// <returns>View model state.</returns>
       [HttpGet("{vmId}")]
       public async Task<string> Request_VM(
          string vmId,
          [FromQuery] string vmArg,
-         [FromServices] IVMFactory vmFactory,
+         [FromServices] WebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
-         [FromServices] IVMServiceScopeFactory serviceScopeFactory,
+         [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IPrincipalAccessor principalAccessor
+         [FromServices] IDotNetifyHubResponseManager hubResponseManager
+
          )
       {
-         var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-         Task responseVM(string arg1, string arg2, string arg3)
-         {
-            taskCompletionSource.TrySetResult(arg3);
-            return Task.CompletedTask;
-         }
-
-         var vmController = new VMController(responseVM, vmFactory, serviceScopeFactory.CreateScope())
-         {
-            ResponseVMFilter = CreateRespondingVMFilter(hubPipeline, vmId, vmArg)
-         };
-
-         var httpCallerContext = InitializeContext(vmController, hubServiceProvider, principalAccessor);
-         var connectionId = httpCallerContext.ConnectionId;
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
 
          try
          {
-            var hubContext = new DotNetifyHubContext(httpCallerContext, nameof(Request_VM), vmId, vmArg, BuildHeaders(), httpCallerContext.User);
-            vmController.RequestVMFilter = CreateVMFilter(hubContext, hubPipeline);
-
-            await hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
-            {
-               await vmController.OnRequestVMAsync(connectionId, ctx.VMId, ctx.Data);
-               vmController.Dispose();
-            });
+            await hub.RequestVMAsync(vmId, vmArg);
+            _taskCompletionSource.TrySetResult(_responses.LastOrDefault());
+            _responses.Clear();
          }
          catch (Exception ex)
          {
-            var finalEx = await hubPipeline.RunExceptionMiddlewareAsync(httpCallerContext, ex);
-            if (finalEx is OperationCanceledException == false)
-               taskCompletionSource.TrySetResult(DotNetifyHub.SerializeException(finalEx));
+            _taskCompletionSource.TrySetResult(ex.Serialize());
          }
 
-         return await taskCompletionSource.Task;
+         return await _taskCompletionSource.Task;
       }
 
       /// <summary>
@@ -120,157 +121,111 @@ namespace DotNetify.WebApi
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
-      /// <param name="vmFactory">Factory object to create the view model instance.</param>
-      /// <param name="hubPipeline">Middleware/VM filter pipeline.</param>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       /// <returns>View model state.</returns>
       [HttpPost("{vmId}")]
       public async Task<string> Update_VM(
          string vmId,
-         [FromQuery] string vmArg,
          [FromBody] Dictionary<string, object> vmData,
-         [FromServices] IVMFactory vmFactory,
+         [FromServices] WebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
-         [FromServices] IVMServiceScopeFactory serviceScopeFactory,
+         [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IPrincipalAccessor principalAccessor)
+         [FromServices] IDotNetifyHubResponseManager hubResponseManager
+         )
       {
-         var taskCompletionSource1 = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-         var taskCompletionSource2 = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-         Task responseVM(string arg1, string arg2, string arg3)
-         {
-            if (!taskCompletionSource1.TrySetResult(arg3))
-               taskCompletionSource2.TrySetResult(arg3);
-            return Task.CompletedTask;
-         }
-
-         var vmController = new VMController(responseVM, vmFactory, serviceScopeFactory.CreateScope())
-         {
-            ResponseVMFilter = CreateRespondingVMFilter(hubPipeline, vmId, vmData)
-         };
-
-         var httpCallerContext = InitializeContext(vmController, hubServiceProvider, principalAccessor);
-         var connectionId = httpCallerContext.ConnectionId;
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
 
          try
          {
-            var hubContext = new DotNetifyHubContext(httpCallerContext, nameof(Request_VM), vmId, vmArg, BuildHeaders(), httpCallerContext.User);
-            vmController.RequestVMFilter = CreateVMFilter(hubContext, hubPipeline);
-
-            await hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
-            {
-               await vmController.OnRequestVMAsync(connectionId, ctx.VMId, ctx.Data);
-            });
+            await hub.UpdateVMAsync(vmId, vmData);
+            _taskCompletionSource.TrySetResult(_responses.LastOrDefault());
+            _responses.Clear();
          }
          catch (Exception ex)
          {
-            var finalEx = await hubPipeline.RunExceptionMiddlewareAsync(httpCallerContext, ex);
-            if (finalEx is OperationCanceledException == false)
-               taskCompletionSource1.TrySetResult(DotNetifyHub.SerializeException(finalEx));
+            _taskCompletionSource.TrySetResult(ex.Serialize());
          }
 
-         await taskCompletionSource1.Task;
-
-         try
-         {
-            var hubContext = new DotNetifyHubContext(httpCallerContext, nameof(Update_VM), vmId, vmData, BuildHeaders(), httpCallerContext.User);
-            vmController.UpdateVMFilter = CreateVMFilter(hubContext, hubPipeline);
-
-            await hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
-            {
-               await vmController.OnUpdateVMAsync(connectionId, ctx.VMId, ctx.Data as Dictionary<string, object>);
-               vmController.Dispose();
-
-               if (!taskCompletionSource2.Task.IsCompleted)
-                  taskCompletionSource2.TrySetResult(null);
-            });
-         }
-         catch (Exception ex)
-         {
-            var finalEx = await hubPipeline.RunExceptionMiddlewareAsync(httpCallerContext, ex);
-            if (finalEx is OperationCanceledException == false)
-               taskCompletionSource2.TrySetResult(DotNetifyHub.SerializeException(finalEx));
-         }
-
-         return await taskCompletionSource2.Task;
+         return await _taskCompletionSource.Task;
       }
 
       /// <summary>
-      /// Adapt HTTP request headers into the headers that dotNetify can consume.
+      /// This method is called by browser clients to dispose a view model.
       /// </summary>
-      /// <returns>Headers object.</returns>
-      private JObject BuildHeaders()
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model update data, where key is the property path and value is the property's new value.</param>
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
+      [HttpDelete("{vmId}")]
+      public async Task Dispose_VM(
+         string vmId,
+         [FromServices] WebApiVMControllerFactory vmControllerFactory,
+         [FromServices] IHubServiceProvider hubServiceProvider,
+         [FromServices] IPrincipalAccessor principalAccessor,
+         [FromServices] IHubPipeline hubPipeline,
+         [FromServices] IDotNetifyHubResponseManager hubResponseManager
+         )
       {
-         var headers = new JObject();
-         foreach (var kvp in HttpContext.Request.Headers.Where(x => !string.IsNullOrEmpty(x.Value)))
-            headers.Add(kvp.Key, kvp.Value.ToString());
-         return headers;
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
+         await hub.DisposeVMAsync(vmId);
       }
 
       /// <summary>
-      /// Creates view model filter delegate that runs before it is requested/updated.
+      /// Creates a dotNetify hub that uses HTTP context for its hub context, and sets the response callback to a local function.
       /// </summary>
-      /// <param name="hubContext">DotNetify hub context.</param>
-      /// <param name="hubPipeline">Middleware/VM filter pipeline.</param>
-      /// <returns>View model filter delegate.</returns>
-      private VMController.FilterDelegate CreateVMFilter(DotNetifyHubContext hubContext, IHubPipeline hubPipeline)
+      /// <param name="vmControllerFactory">Factory of view model controllers.</param>
+      /// <param name="serviceProvider">Allows to provide scoped service provider for the view models.</param>
+      /// <param name="principalAccessor">Allows to pass the hub principal.</param>
+      /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
+      /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
+      /// <param name="callType">Hub call type.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="data">View model data.</param>
+      /// <returns>Hub instance.</returns>
+      private IDotNetifyHubHandler CreateHubHandler(
+         IVMControllerFactory vmControllerFactory,
+         IHubServiceProvider hubServiceProvider,
+         IPrincipalAccessor principalAccessor,
+         IHubPipeline hubPipeline,
+         IDotNetifyHubResponseManager hubResponseManager,
+         string callType,
+         string vmId,
+         object data = null)
       {
-         return async (vmId, vm, data, vmAction) =>
-         {
-            try
-            {
-               hubContext.Data = data;
-               await hubPipeline.RunVMFiltersAsync(hubContext, vm, async ctx =>
-               {
-                  await vmAction(ctx.HubContext.Data);
-               });
-            }
-            catch (TargetInvocationException ex)
-            {
-               throw ex.InnerException;
-            }
-         };
-      }
-
-      /// <summary>
-      /// Creates view model filter delegate that runs before it responds to something.
-      /// </summary>
-      /// <param name="hubContext">DotNetify hub context.</param>
-      /// <param name="hubPipeline">Middleware/VM filter pipeline.</param>
-      /// <param name="vmData">View model data from the request.</param>
-      /// <returns>View model filter delegate.</returns>
-      private VMController.FilterDelegate CreateRespondingVMFilter(IHubPipeline hubPipeline, string vmId, object vmData)
-      {
-         return async (_vmId, vm, data, vmAction) =>
-         {
-            var hubContext = new DotNetifyHubContext(new HttpCallerContext(HttpContext), nameof(DotNetifyHub.ResponseVMAsync), vmId, vmData, BuildHeaders(), HttpContext?.User);
-            await hubPipeline.RunMiddlewaresAsync(hubContext, async ctx =>
-            {
-               await CreateVMFilter(hubContext, hubPipeline)(_vmId, vm, data, vmAction);
-            });
-         };
-      }
-
-      /// <summary>
-      /// Initializes the scoped context of the request.
-      /// </summary>
-      /// <param name="vmController">View model controller.</param>
-      /// <param name="hubServiceProvider">Service provideer context.</param>
-      /// <param name="principalAccessor">Principal user context.</param>
-      /// <returns>HTTP caller context.</returns>
-      private HttpCallerContext InitializeContext(VMController vmController, IHubServiceProvider hubServiceProvider, IPrincipalAccessor principalAccessor)
-      {
-         if (hubServiceProvider is HubServiceProvider)
-            (hubServiceProvider as HubServiceProvider).ServiceProvider = vmController.ServiceProvider;
-
          var httpCallerContext = new HttpCallerContext(HttpContext);
-         if (principalAccessor is HubPrincipalAccessor)
+
+         if (principalAccessor is HubInfoAccessor)
          {
-            var hubPrincipalAccessor = principalAccessor as HubPrincipalAccessor;
+            var hubPrincipalAccessor = principalAccessor as HubInfoAccessor;
             hubPrincipalAccessor.Principal = HttpContext?.User;
-            hubPrincipalAccessor.CallerContext = httpCallerContext;
+            hubPrincipalAccessor.Context = new DotNetifyHubContext(httpCallerContext, callType, vmId, data, null, hubPrincipalAccessor.Principal);
          }
-         return httpCallerContext;
+
+         return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager)
+         {
+            CallerContext = httpCallerContext,
+            OnVMResponse = ResponseVMCallback
+         };
+      }
+
+      /// <summary>
+      /// Response delegate to pass to the VMControllerFactory instance.
+      /// </summary>
+      /// <param name="connectionId">Identifies the connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="data">Response data.</param>
+      private Task ResponseVMCallback(string connectionId, string vmId, string data)
+      {
+         _responses.Add(data);
+         return Task.CompletedTask;
       }
    }
 }

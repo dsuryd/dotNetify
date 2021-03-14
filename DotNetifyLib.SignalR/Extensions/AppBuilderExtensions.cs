@@ -24,6 +24,9 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using DotNetify.Routing;
 using System.Threading.Tasks;
+using System.Linq;
+using DotNetify.Forwarding;
+using Microsoft.Extensions.Logging;
 
 namespace DotNetify
 {
@@ -41,6 +44,8 @@ namespace DotNetify
       {
          var provider = appBuilder.ApplicationServices;
 
+         Logger.Init(provider.GetService<ILoggerFactory>());
+
          var vmControllerFactory = provider.GetService<IVMControllerFactory>();
          if (vmControllerFactory == null)
             throw new InvalidOperationException("Please call 'IServiceCollection.AddDotNetify()' inside the ConfigureServices() of the startup class.");
@@ -52,16 +57,11 @@ namespace DotNetify
          {
             try
             {
-               return ActivatorUtilities.CreateInstance(scopedServiceProvider.ServiceProvider ?? provider, type, args ?? new object[] { });
-            }
-            catch (ObjectDisposedException)
-            {
-               // There's a chance the scoped service provider is already disposed when we get to here, so fall back to global provider.
-               return ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
+               return scopedServiceProvider.FactoryMethod?.Invoke(type, args) ?? ActivatorUtilities.CreateInstance(provider, type, args ?? new object[] { });
             }
             catch (Exception ex)
             {
-               Trace.Fail(ex.Message);
+               Logger.LogError($"Failed to create instance of '{type}': {ex.Message}");
                throw ex;
             }
          };
@@ -76,7 +76,12 @@ namespace DotNetify
             vmControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
 
          // Add middleware to extract headers from incoming requests.
-         _middlewareTypes.Insert(0, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
+         if (!_middlewareTypes.Exists(t => t.Item1 == typeof(ExtractHeadersMiddleware)))
+         {
+            // Place the middleware after any forwarding middleware to ensure it forwards unprocessed data.
+            int pos = _middlewareTypes.FindLastIndex(x => typeof(IForwardingMiddleware).IsAssignableFrom(x.Item1)) + 1;
+            _middlewareTypes.Insert(pos, Tuple.Create(typeof(ExtractHeadersMiddleware), new object[] { }));
+         }
 
          // Add middleware factories to the hub.
          var middlewareFactories = provider.GetService<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>();
@@ -94,14 +99,22 @@ namespace DotNetify
       /// </summary>
       /// <param name="dotNetifyConfig">DotNetify configuration.</param>
       /// <param name="args">Middleware arguments.</param>
-      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline => _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline
+      {
+         if (!_middlewareTypes.Any(x => x.Item1 == typeof(T) && x.Item2 == args))
+            _middlewareTypes.Add(Tuple.Create(typeof(T), args));
+      }
 
       /// <summary>
       /// Includes a view model filter to the dotNetify's pipeline.
       /// </summary>
       /// <param name="dotNetifyConfig">DotNetify configuration.</param>
       /// <param name="args">View model filter arguments.</param>
-      public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter => _filterTypes.Add(Tuple.Create(typeof(T), args));
+      public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter
+      {
+         if (!_filterTypes.Any(x => x.Item1 == typeof(T) && x.Item2 == args))
+            _filterTypes.Add(Tuple.Create(typeof(T), args));
+      }
 
       /// <summary>
       /// Includes server-side rendering in the application request pipeline.
@@ -129,7 +142,7 @@ namespace DotNetify
                }
                catch (Exception ex)
                {
-                  Trace.WriteLine(ex.Message);
+                  Logger.LogError($"SSR exception: {ex.Message}");
                   await onError(context);
                }
             });
