@@ -1,6 +1,7 @@
 import Overview from "./Overview";
 import DataFlow from "./DataFlow";
 import Reactive from "./Reactive";
+import Scaleout from "./Scaleout";
 import MicroFrontend from "./MicroFrontend";
 import GetStarted from "./GetStarted";
 import FromScratchWebPack from "./from-scratch/FromScratchWebPack";
@@ -26,7 +27,7 @@ import Multicast from "./apis/Multicast";
 import Routing from "./apis/Routing";
 import Security from "./apis/Security";
 import WebApiMode from "./apis/WebApiMode";
-import { DotNetifyTesting, DotNetifyLoadTester } from "./Premium";
+import { DotNetifyTesting, DotNetifyLoadTester, DotNetifyObserver } from "./Premium";
 
 const NotFound404 = () => (
   <div style={{ padding: "1.5rem" }}>
@@ -47,6 +48,7 @@ export {
   DataFlow,
   Reactive,
   MicroFrontend,
+  Scaleout,
   GetStarted,
   HelloWorld,
   ControlTypes,
@@ -69,5 +71,6 @@ export {
   WebApiMode,
   DotNetifyTesting,
   DotNetifyLoadTester,
+  DotNetifyObserver,
   NotFound404
 };

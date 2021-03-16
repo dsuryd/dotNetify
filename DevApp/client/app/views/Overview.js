@@ -112,11 +112,11 @@ const MyApp = () => {
 
 const HelloWorldCode = _ => (
   <Tab>
-    <TabItem label="Class">
-      <Markdown text={HelloWorldClass} />
-    </TabItem>
     <TabItem label="Hook">
       <Markdown text={HelloWorldHook} />
+    </TabItem>
+    <TabItem label="Class">
+      <Markdown text={HelloWorldClass} />
     </TabItem>
   </Tab>
 );
@@ -157,11 +157,11 @@ const MyApp = () => {
 
 const RealtimePushCode = _ => (
   <Tab>
-    <TabItem label="Class">
-      <Markdown text={RealtimePushClass} />
-    </TabItem>
     <TabItem label="Hook">
       <Markdown text={RealtimePushHook} />
+    </TabItem>
+    <TabItem label="Class">
+      <Markdown text={RealtimePushClass} />
     </TabItem>
   </Tab>
 );
@@ -273,11 +273,11 @@ const MyApp = () => {
 
 const ServerUpdateCode = _ => (
   <Tab>
-    <TabItem label="Class">
-      <Markdown text={ServerUpdateClass} />
-    </TabItem>
     <TabItem label="Hook">
       <Markdown text={ServerUpdateHook} />
+    </TabItem>
+    <TabItem label="Class">
+      <Markdown text={ServerUpdateClass} />
     </TabItem>
   </Tab>
 );

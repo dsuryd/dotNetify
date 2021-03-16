@@ -19,6 +19,7 @@ namespace DotNetify.DevApp
          DataFlow,
          Reactive,
          MicroFrontend,
+         Scaleout,
          GetStarted,
          HelloWorld,
          ControlTypes,
@@ -59,6 +60,7 @@ namespace DotNetify.DevApp
            new RouteTemplate (nameof (Route.DataFlow)) { UrlPattern = "dataflow" },
            new RouteTemplate (nameof (Route.Reactive)) { UrlPattern = "reactive" },
            new RouteTemplate (nameof (Route.MicroFrontend)) { UrlPattern = "mfe" },
+           new RouteTemplate (nameof (Route.Scaleout)) { UrlPattern = "scaleout" },
            new RouteTemplate (nameof (Route.GetStarted)) { UrlPattern = "getstarted" },
            new RouteTemplate (nameof (Route.HelloWorld)) { UrlPattern = "examples/helloworld" },
            new RouteTemplate (nameof (Route.ControlTypes)) { UrlPattern = "examples/controltypes" },
@@ -98,6 +100,7 @@ namespace DotNetify.DevApp
             new NavRoute ("Data Flow Pattern", this.GetRoute (nameof (Route.DataFlow))),
             new NavRoute ("Reactive Programming", this.GetRoute (nameof (Route.Reactive))),
             new NavRoute ("Micro-Frontend", this.GetRoute (nameof (Route.MicroFrontend))),
+            new NavRoute ("Scale-Out", this.GetRoute (nameof (Route.Scaleout))),
             new NavRoute ("Get Started", this.GetRoute (nameof (Route.GetStarted))),
 
             new NavGroup
@@ -148,9 +151,9 @@ namespace DotNetify.DevApp
               Label = "Premium Feature",
                Routes = new NavRoute[]
               {
-                 new NavRoute ("DotNetify-Testing", this.GetRoute (nameof (Route.DotNetifyTesting))),
+                 new NavRoute ("DotNetify-Observer", this.GetRoute (nameof (Route.DotNetifyObserver))),
                  new NavRoute ("DotNetify-LoadTester", this.GetRoute (nameof (Route.DotNetifyLoadTester))),
-                 //new NavRoute ("DotNetify-Observer", this.GetRoute (nameof (Route.DotNetifyObserver))),
+                 new NavRoute ("DotNetify-Testing", this.GetRoute (nameof (Route.DotNetifyTesting))),
               },
            }
          };

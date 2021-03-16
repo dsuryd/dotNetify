@@ -13,3 +13,9 @@ export const DotNetifyLoadTester = withTheme(() => (
     <Markdown id="Content" />
   </Article>
 ));
+
+export const DotNetifyObserver = withTheme(() => (
+  <Article vm="DotNetifyObserver" id="Content">
+    <Markdown id="Content" />
+  </Article>
+));

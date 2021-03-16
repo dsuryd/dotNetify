@@ -13,6 +13,7 @@
     <EmbeddedResource Include="Docs\DataFlow.md" />
     <EmbeddedResource Include="Docs\MicroFrontend.md" />
     <EmbeddedResource Include="Docs\Reactive.md" />
+    <EmbeddedResource Include="Docs\Scaleout.md" />
     <EmbeddedResource Include="Docs\GetStarted.md" />
     <EmbeddedResource Include="Docs\FromScratchWebPack.md" />
     <EmbeddedResource Include="Docs\FromScratchScriptTag.md" />
