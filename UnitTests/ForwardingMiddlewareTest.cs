@@ -65,12 +65,11 @@ namespace UnitTests
 
          var hubEmulator = new HubEmulatorBuilder()
             .AddServices(x => x.AddLogging())
-            .Register<HelloWorldVM>()
             .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
             .Build();
 
          var client = hubEmulator.CreateClient();
-         Setup(hubForwarderFactory, client);
+         Setup(_forwardingClient, hubForwarderFactory, client);
 
          var response = client.Connect(nameof(HelloWorldVM)).As<HelloWorldState>();
 
@@ -86,12 +85,11 @@ namespace UnitTests
 
          var hubEmulator = new HubEmulatorBuilder()
             .AddServices(x => x.AddLogging())
-            .Register<HelloWorldVM>()
             .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
             .Build();
 
          var client = hubEmulator.CreateClient();
-         Setup(hubForwarderFactory, client);
+         Setup(_forwardingClient, hubForwarderFactory, client);
 
          client.Connect(nameof(HelloWorldVM));
 
@@ -110,12 +108,11 @@ namespace UnitTests
 
          var hubEmulator = new HubEmulatorBuilder()
             .AddServices(x => x.AddLogging())
-            .Register<HelloWorldVM>()
             .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
             .Build();
 
          var client = hubEmulator.CreateClient();
-         Setup(hubForwarderFactory, client, (callType, vmId) =>
+         Setup(_forwardingClient, hubForwarderFactory, client, (callType, vmId) =>
          {
             dispose = callType == nameof(IDotNetifyHubMethod.Dispose_VM) && vmId == nameof(HelloWorldVM);
          });
@@ -135,14 +132,13 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
                   .AddServices(x => x.AddLogging())
-                  .Register<ChatRoomVM>()
                   .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
                   .Build();
 
          var client1 = hubEmulator.CreateClient("client1-conn-id");
          var client2 = hubEmulator.CreateClient("client2-conn-id");
 
-         Setup(hubForwarderFactory, new[] { client1, client2 });
+         Setup(_forwardingClient, hubForwarderFactory, new[] { client1, client2 });
 
          client1.Connect(nameof(ChatRoomVM));
          client1.Dispatch(new { AddUser = expectedClient1CorrelationId });
@@ -169,14 +165,13 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
             .AddServices(x => x.AddLogging())
-            .Register<ChatRoomVM>()
             .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
             .Build();
 
          var client1 = hubEmulator.CreateClient("client1-conn-id");
          var client2 = hubEmulator.CreateClient("client2-conn-id");
 
-         Setup(hubForwarderFactory, new[] { client1, client2 });
+         Setup(_forwardingClient, hubForwarderFactory, new[] { client1, client2 });
 
          client1.Connect(nameof(ChatRoomVM));
          var response = client1.Dispatch(new { AddUser = "0.123" }).As<dynamic>();
@@ -207,7 +202,6 @@ namespace UnitTests
          var hubForwarderFactory = Substitute.For<IDotNetifyHubForwarderFactory>();
          var hubEmulator = new HubEmulatorBuilder()
             .AddServices(x => x.AddLogging())
-            .Register<ChatRoomVM>()
             .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory, "serverUrl", new ForwardingOptions())
             .Build();
 
@@ -215,7 +209,7 @@ namespace UnitTests
          var client2 = hubEmulator.CreateClient("client2-conn-id");
          var client3 = hubEmulator.CreateClient("client3-conn-id");
 
-         Setup(hubForwarderFactory, new[] { client1, client2, client3 });
+         Setup(_forwardingClient, hubForwarderFactory, new[] { client1, client2, client3 });
 
          client1.Connect(nameof(ChatRoomVM));
          client1.Dispatch(new { AddUser = "0.123" });
@@ -271,14 +265,64 @@ namespace UnitTests
          Assert.IsTrue(client1.GetState<ChatRoomState>().Messages.Any(x => x.Text == expectedClient2Text && x.UserName == expectedClient2UserName));
       }
 
-      #region Test Setup
-
-      private void Setup(IDotNetifyHubForwarderFactory hubForwarderFactory, IClientEmulator client, Action<string, string> callback = null)
+      [TestMethod]
+      public void ForwardingMiddleware_FilterOption_ConnectForwarded()
       {
-         Setup(hubForwarderFactory, new IClientEmulator[] { client }, callback);
+         var forwardingClient1 = new HubEmulatorBuilder()
+          .AddServices(x => x.AddLogging())
+          .Register<HelloWorldVM>()
+          .Build()
+          .CreateClient("forwarder-conn-id-1");
+
+         var forwardingClient2 = new HubEmulatorBuilder()
+          .AddServices(x => x.AddLogging())
+          .Register<ChatRoomVM>()
+          .Build()
+          .CreateClient("forwarder-conn-id-2");
+
+         var hubForwarderFactory1 = Substitute.For<IDotNetifyHubForwarderFactory>();
+         var hubForwarderFactory2 = Substitute.For<IDotNetifyHubForwarderFactory>();
+
+         var hubEmulator = new HubEmulatorBuilder()
+            .AddServices(x => x.AddLogging())
+            .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory1, "server1Url",
+               new ForwardingOptions
+               {
+                  Filter = context => context.VMId == nameof(HelloWorldVM)
+               })
+            .UseMiddleware<ForwardingMiddleware>(hubForwarderFactory2, "server2Url",
+               new ForwardingOptions
+               {
+                  Filter = context => context.VMId == nameof(ChatRoomVM)
+               })
+            .Build();
+
+         var client = hubEmulator.CreateClient();
+
+         Setup(forwardingClient1, hubForwarderFactory1, client);
+         Setup(forwardingClient2, hubForwarderFactory2, client);
+
+         var response = client.Connect(nameof(HelloWorldVM)).As<HelloWorldState>();
+
+         Assert.AreEqual("Hello", response.FirstName);
+         Assert.AreEqual("World", response.LastName);
+         Assert.AreEqual("Hello World", response.FullName);
+
+         client.Destroy();
+
+         var response2 = client.Connect(nameof(ChatRoomVM)).As<ChatRoomState>();
+
+         Assert.AreEqual(0, response2.Users.Count);
       }
 
-      private void Setup(IDotNetifyHubForwarderFactory hubForwarderFactory, IClientEmulator[] clients, Action<string, string> callback = null)
+      #region Test Setup
+
+      private void Setup(IClientEmulator forwardingClient, IDotNetifyHubForwarderFactory hubForwarderFactory, IClientEmulator client, Action<string, string> callback = null)
+      {
+         Setup(forwardingClient, hubForwarderFactory, new IClientEmulator[] { client }, callback);
+      }
+
+      private void Setup(IClientEmulator forwardingClient, IDotNetifyHubForwarderFactory hubForwarderFactory, IClientEmulator[] clients, Action<string, string> callback = null)
       {
          // Build a mock hub proxy that will be used to forward messages.  This proxy will be set to communicate to another hub emulator.
          var hubProxy = Substitute.For<IDotNetifyHubProxy>();
@@ -306,10 +350,10 @@ namespace UnitTests
                foreach (var kvp in metadata.ToList())
                   metadata[kvp.Key] = kvp.Value is string ? kvp.Value : JObject.FromObject(kvp.Value);
 
-               _forwardingClient.Hub.InvokeAsync(callType, methodArgs, metadata).GetAwaiter().GetResult();
+               forwardingClient.Hub.InvokeAsync(callType, methodArgs, metadata).GetAwaiter().GetResult();
 
-               var responses = _forwardingClient.ResponseHistory.Select(x => x.Payload).ToArray();
-               _forwardingClient.ResponseHistory.Clear();
+               var responses = forwardingClient.ResponseHistory.Select(x => x.Payload).ToArray();
+               forwardingClient.ResponseHistory.Clear();
                foreach (var response in responses)
                {
                   hubProxy.Response_VM += Raise.EventWith(this,
