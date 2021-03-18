@@ -93,9 +93,10 @@ div > h2 {
   border: 1px solid #ccc;
 }
 
-.toc-h5 {
+.toc-h5, .toc-h6  {
   font-size: 0.9rem;
 }
+
 
 @media (max-width: 768px) {
   html,

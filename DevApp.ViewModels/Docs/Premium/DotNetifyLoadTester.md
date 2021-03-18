@@ -12,6 +12,8 @@ _DotNetify-LoadTester_ is a tool for authoring and running performance testing o
 
 </d-alert>
 
+Check out the demo video on the [Scale-Out page](/core/scaleout) to see this tool in action. 
+
 #### Installation
 
 Add **DotNetify.LoadTester** from NuGet to your .NET Core test or console app project.

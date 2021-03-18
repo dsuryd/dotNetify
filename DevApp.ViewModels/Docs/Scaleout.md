@@ -59,9 +59,9 @@ public class ForwardingOptions
 }
 ```
 
-The `ConnectionPoolSize` option specifies the number of persistent connections between the proxy server and the app server.  Messages from the client will be forwarded through these connections in a round-robin fashion.  If you expect a high message throughput, increase this number to avoid it becoming a bottleneck.
+The __ConnectionPoolSize__ option specifies the number of persistent connections between the proxy server and the app server.  Messages from the client will be forwarded through these connections in a round-robin fashion.  If you expect a high message throughput, increase this number to avoid it becoming a bottleneck.
 
-Forwarding middlewares can be chained together to support a more robust scale-out strategy involving multiple app servers.  With the `Filter` option, you can have a specific app server process certain types of client requests.  For example:
+Forwarding middlewares can be chained together to support a more robust scale-out strategy involving multiple app servers.  With the __Filter__ option, you can have a specific app server process certain types of client requests.  For example:
 
 ```csharp
 app.UseDotNetify(config =>
@@ -78,8 +78,10 @@ app.UseDotNetify(config =>
 
 The following video demonstrates a cloud configuration with two proxy servers forwarding messages to an app server.  The servers were containerized and deployed to the Heroku cloud platform.  
 
-The UI on the video were [DotNetify-Observer](/core/dotnetify-observer), a premium visualization dashboard for project sponsors.  The servers are represented as green nodes, and the clients the smaller grey nodes.  Another premium tool, [DotNetify-LoadTester](/core/dotnetify-loadtester), was used to simulate client connections to the proxy servers.
+The visualization was provided by [DotNetify-Observer](/core/dotnetify-observer), in which the servers were represented as green nodes, and the clients the smaller grey nodes.  [DotNetify-LoadTester](/core/dotnetify-loadtester) was used to simulate client connections to the proxy servers.
 
-<video width="100%" controls>
-  <source src="https://dotnetify.net/Content/Videos/scaleout-demo.mp4" type="video/mp4">
-</video>
+<div style="display:flex;justify-content:center;padding:1.5rem">
+  <video width="80%" controls style="border: 1px solid #ccc; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">
+    <source src="https://dotnetify.net/Content/Videos/scaleout-demo.mp4" type="video/mp4">
+  </video>
+</div>
