@@ -15,11 +15,7 @@ limitations under the License.
  */
 import Path from "../libs/path";
 import { createEventEmitter } from "../libs/utils";
-import {
-  IDotnetifyVMRouter,
-  IDotnetifyVM,
-  IDotnetifyRouter
-} from "../_typings";
+import { IDotnetifyVMRouter, IDotnetifyVM, IDotnetifyRouter, IDotnetifyHub } from "../_typings";
 
 export default class DotnetifyRouter implements IDotnetifyRouter {
   version = "3.0.0";
@@ -32,6 +28,7 @@ export default class DotnetifyRouter implements IDotnetifyRouter {
 
   // Internal variable.
   _init: boolean = false;
+  _unsubReconnectedEvent: any;
 
   // URL path that will be parsed when performing routing.
   get urlPath(): string {
@@ -87,8 +84,7 @@ export default class DotnetifyRouter implements IDotnetifyRouter {
   // Push state to HTML history.
   pushState(iState: any, iTitle: string, iPath: string) {
     this.urlPath = "";
-    if (typeof Path !== "undefined")
-      Path.history.pushState(iState, iTitle, iPath);
+    if (typeof Path !== "undefined") Path.history.pushState(iState, iTitle, iPath);
   }
 
   // Redirect to the a URL.
@@ -104,6 +100,12 @@ export default class DotnetifyRouter implements IDotnetifyRouter {
       }
     }
     location.replace(iUrl);
+  }
+
+  // Reset the routing start URL to the current browser URL on reconnected.
+  resetUrlOnReconnected(iHub: IDotnetifyHub) {
+    if (!this._unsubReconnectedEvent && iHub)
+      this._unsubReconnectedEvent = iHub.reconnectedEvent?.subscribe(() => (this.urlPath = document.location.pathname));
   }
 
   // Called by dotNetify when a view model is ready.

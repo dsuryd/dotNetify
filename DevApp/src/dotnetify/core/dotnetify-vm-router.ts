@@ -46,6 +46,9 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     this.router = router;
     this.debug = vm.$dotnetify.controller.debug;
 
+    // Reset the routing start URL to the current browser URL on reconnected (#275).
+    router.resetUrlOnReconnected(this.vm.$hub);
+
     // Handle 'onRouteEnter' callback being given in the VM options.
     if (vm.$options && vm.$options.onRouteEnter) vm["onRouteEnter"] = vm.$options.onRouteEnter;
   }
