@@ -35,7 +35,7 @@ const MasterList = Vue.component('MasterList', {
   created() {
     this.vm = dotnetify.vue.connect('MasterDetails.MasterList', this);
   },
-  destroyed() {
+  unmounted() {
     this.vm.$destroy();
   },
   data() {
@@ -57,7 +57,7 @@ const Details = Vue.component('Details', {
   created() {
     this.vm = dotnetify.vue.connect('MasterDetails.Details', this);
   },
-  destroyed() {
+  unmounted() {
     this.vm.$destroy();
   },
   data() {

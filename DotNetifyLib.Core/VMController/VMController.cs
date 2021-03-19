@@ -329,7 +329,10 @@ namespace DotNetify
       public async Task OnUpdateVMAsync(string connectionId, string vmId, Dictionary<string, object> data)
       {
          if (!_activeVMs.ContainsKey(vmId))
+         {
+            Logger.LogError($"Update to '{vmId}' received before connect request");
             return;
+         }
 
          // Update the new values from the client to the server view model.
          var vmInstance = _activeVMs[vmId].Instance;

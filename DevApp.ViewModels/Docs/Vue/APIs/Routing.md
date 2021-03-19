@@ -23,7 +23,7 @@ export default {
     this.vm = dotnetify.vue.connect("Index", this);
     this.vm.onRouteEnter = (path, template) => (template.Target = 'Content');
   },
-  destroyed() {
+  unmounted() {
     this.vm.$destroy();
   },
   data() {

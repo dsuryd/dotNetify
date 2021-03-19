@@ -154,7 +154,7 @@ View-models gets their model data from the back-end service layer and shape them
 View model objects stay alive on the back-end until the browser page is closed, reloaded, navigated away, or the session times out. On a single-page app, when a component can be mounted and dismounted repeatedly, it is important that you manually destroy the view model when your Vue component dismounts by calling the __$destroy__ API.
 
 ```jsx
-destroyed() {
+unmounted() {
    this.vm.$destroy();
 }
 ```

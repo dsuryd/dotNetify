@@ -38,10 +38,9 @@ export default {
     $('#BookDetails').modal();
     $('#BookDetails').on('hidden.bs.modal', function(e) {
       self.vm.$routeTo(self.BookDefaultRoute);
-      self.$destroy();
     });
   },
-  destroyed() {
+  unmounted() {
     $('#BookDetails').modal('dispose');
     $('.modal-backdrop').remove();
     this.vm.$destroy();

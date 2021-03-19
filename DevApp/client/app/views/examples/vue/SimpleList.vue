@@ -2,22 +2,11 @@
   <div>
     <d-alert info="true">
       <i class="material-icons">info_outlined</i>
-      This is a multicast list. Your edits will appear on all other browser
-      views in real-time.
+      This is a multicast list. Your edits will appear on all other browser views in real-time.
     </d-alert>
     <header>
-      <input
-        type="text"
-        class="form-control"
-        placeholder="First name"
-        v-model="firstName"
-      />
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Last name"
-        v-model="lastName"
-      />
+      <input type="text" class="form-control" placeholder="First name" v-model="firstName" />
+      <input type="text" class="form-control" placeholder="Last name" v-model="lastName" />
       <button type="button" class="btn btn-primary" @click="add">Add</button>
     </header>
     <table>
@@ -31,16 +20,10 @@
       <tbody>
         <tr v-for="employee in Employees" :key="employee.Id">
           <td>
-            <InlineEdit
-              :value="employee.FirstName"
-              @update="onUpdate(employee, 'FirstName', $event)"
-            />
+            <InlineEdit :value="employee.FirstName" @update="onUpdate(employee, 'FirstName', $event)" />
           </td>
           <td>
-            <InlineEdit
-              :value="employee.LastName"
-              @update="onUpdate(employee, 'LastName', $event)"
-            />
+            <InlineEdit :value="employee.LastName" @update="onUpdate(employee, 'LastName', $event)" />
           </td>
           <td>
             <div @click="onRemove(employee.Id)">
@@ -65,7 +48,7 @@ export default {
   created() {
     this.vm = dotnetify.vue.connect("SimpleListVM", this);
   },
-  destroyed() {
+  unmounted() {
     this.vm.$destroy();
   },
   data() {
