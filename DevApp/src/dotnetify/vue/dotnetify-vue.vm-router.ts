@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-import * as Vue from "vue";
-import { version, createApp } from "vue";
+import Vue from "vue";
+import { createApp } from "vue";
 import DotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyRouter from "../core/dotnetify-router";
 import DotnetifyVMRouter from "../core/dotnetify-vm-router";
@@ -118,7 +118,16 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
 
         document.querySelector(iTargetSelector).innerHTML = "<div />";
 
-        if (version.startsWith("2.") === true) {
+        if (createApp) {
+          // Vue 3.x
+          const app = createApp(vueClass, iProps);
+          registerDirectives(app);
+          app.mount(iTargetSelector);
+          this.mountedComponents[iTargetSelector] = () => app.unmount();
+
+          if (typeof iCallbackFn === "function") iCallbackFn.call(vm, app);
+          resolve(app);
+        } else {
           // Vue 2.x
           const vueComponentType = (<any>Vue).extend(vueClass);
           const vueComponent = new vueComponentType({
@@ -130,15 +139,6 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
 
           if (typeof iCallbackFn === "function") iCallbackFn.call(vm, vueComponent);
           resolve(vueComponent);
-        } else {
-          // Vue 3.x
-          const app = createApp(vueClass, iProps);
-          registerDirectives(app);
-          app.mount(iTargetSelector);
-          this.mountedComponents[iTargetSelector] = () => app.unmount();
-
-          if (typeof iCallbackFn === "function") iCallbackFn.call(vm, app);
-          resolve(app);
         }
       };
 
