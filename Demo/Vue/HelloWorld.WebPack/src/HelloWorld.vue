@@ -1,23 +1,23 @@
 <template>
   <div>
-    <p>{{Greetings}}</p>
-    <p>Server time is: {{ServerTime}}</p>
+    <p>{{ Greetings }}</p>
+    <p>Server time is: {{ ServerTime }}</p>
   </div>
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
+import dotnetify from "dotnetify/vue";
 
 export default {
-  name: 'HelloWorld',
+  name: "HelloWorld",
   created: function () {
     this.vm = dotnetify.vue.connect("HelloWorld", this);
   },
-  destroyed: function () {
+  unmounted: function () {
     this.vm.$destroy();
   },
   data: function () {
-    return { Greetings: '', ServerTime: '' }
+    return { Greetings: "", ServerTime: "" };
   }
-}
+};
 </script>

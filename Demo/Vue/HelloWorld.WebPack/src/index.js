@@ -1,10 +1,5 @@
-import Vue from 'vue';
-import HelloWorld from './HelloWorld.vue';
+import { createApp } from "vue";
+import HelloWorld from "./HelloWorld.vue";
 
-document.getElementById('App').innerHTML = '<hello-world />';
-new Vue({
-	el: '#App',
-	components: {
-		'hello-world': HelloWorld
-	}
-});
+document.getElementById("App").innerHTML = "<hello-world />";
+createApp({}).component("hello-world", HelloWorld).mount("#App");
