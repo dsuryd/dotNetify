@@ -1,22 +1,16 @@
 <p align="center"><img width="400px" src="http://dotnetify.net/content/images/dotnetify-logo.png"></p>
 
-![alt build](https://ci.appveyor.com/api/projects/status/github/dsuryd/dotnetify?svg=true)
+![alt build](https://github.com/dsuryd/dotNetify/actions/workflows/build.yml/badge.svg)
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 [![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/)
 
-DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org) or [Knockout](http://knockoutjs.com) front-end on C# .NET back-end via WebSocket (SignalR).
+DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org), [Knockout](http://knockoutjs.com) or [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) front-end on C# .NET back-end via WebSocket (SignalR).
 
 ## What's New
 
-- 4.1: Async view model - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1)
-- 4.0: Typescript support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0)
-- v3.7: Routing enhancements: lazy-loading, server-side rendering, 404 error handling - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7)
-
-<div/>
-
-- Check out [**DotNetify-Pulse**](https://github.com/dsuryd/dotnetify-pulse), customizable realtime monitoring for .NET Core services.
-- **DotNetify-Elements** is out! <a href="http://dotnetify.net/elements">See documentation and live demo.</a>
-- React SPA template for ASP.NET Core 3.x - [github](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
+- **v5.0: Scale-out, Vue 3.x support** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.0).
+- v4.1: Async view model - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1).
+- v4.0: Typescript support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0).
 
 ## Features
 
@@ -27,15 +21,23 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 - Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
 - Powerful back-end infrastructure, including dependency injection, WebSocket request/response pipelines, and modern tooling.
 
+## Premium Features
+
+- [**DotNetify-Observer**](https://www.dotnetify.net/core/dotnetify-observer): real-time connection visualization dashboard.
+- [**DotNetify-LoadTester**](https://www.dotnetify.net/core/dotnetify-loadtester): performance testing tool for dotNetify apps.
+- [**DotNetify-Testing**](https://www.dotnetify.net/core/dotnetify-testing): testing library for dotNetify apps.
+
 ## Documentation
 
 Documentation and live demo can be found at [https://dotnetify.net](https://dotnetify.net).
 
+[Usage with .NET Core 3.x](https://github.com/dsuryd/dotNetify/issues/159#issuecomment-547691063)
+
 ## Code Examples
 
-- React example: [dotnetify-react-demo-vs2017](https://github.com/dsuryd/dotnetify-react-demo-vs2017).
+- React example: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).
 - React Native example: [dotnetify-react-native-demo](https://github.com/dsuryd/dotnetify-react-native-demo).
-- Other examples: [demo github repo]([https://github.com/dsuryd/dotNetify/tree/master/Demo]).
+- Other examples: [demo repo](https://github.com/dsuryd/dotNetify/tree/master/Demo).
 
 ## License
 

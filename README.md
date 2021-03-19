@@ -8,17 +8,9 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-- **4.1: Async view model** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1).
+- **v5.0: Scale-out, Vue 3.x support** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.0).
+- v4.1: Async view model - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1).
 - v4.0: Typescript support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0).
-- v3.7: Routing enhancements: lazy-loading, server-side rendering, 404 error handling - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v3.7).
-
-<div/>
-
-- **DotNetify-LoadTester (Premium)** - performance testing tool for dotNetify apps.
-- [DotNetify-Blazor](https://github.com/dsuryd/dotNetify-Blazor): client library for Blazor web assembly.
-- [DotNetify-Pulse](https://github.com/dsuryd/dotnetify-pulse): customizable realtime monitoring for .NET Core services.
-- [DotNetify-Elements](https://dotnetify.net/elements"): React + web component library for dotNetify apps.
-- [React SPA template for ASP.NET Core 3.x](https://github.com/dsuryd/dotnetify-react-demo-vs2017/tree/master/ReactTemplate).
 
 ## Features
 
@@ -31,8 +23,9 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## Premium Features
 
-- [**DotNetify-Testing**](https://www.dotnetify.net/core/dotnetify-testing): testing library for dotNetify apps.
+- [**DotNetify-Observer**](https://www.dotnetify.net/core/dotnetify-observer): real-time connection visualization dashboard.
 - [**DotNetify-LoadTester**](https://www.dotnetify.net/core/dotnetify-loadtester): performance testing tool for dotNetify apps.
+- [**DotNetify-Testing**](https://www.dotnetify.net/core/dotnetify-testing): testing library for dotNetify apps.
 
 ## Documentation
 
