@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import Vue from "vue";
-import { version } from "vue";
 
 // Vue 2.x
-if (version.startsWith("2.") === true) {
+if (Vue && Vue.directive) {
   // Call a method when a property value changes.
   Vue.directive("vmOn", {
     bind: function (el, binding, vnode) {

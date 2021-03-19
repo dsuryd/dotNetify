@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-import { version } from "vue";
+import Vue from "vue";
 import _dotnetify, { Dotnetify, IDotnetifyImpl } from "../core/dotnetify";
 import dotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyVM from "../core/dotnetify-vm";
@@ -36,10 +36,6 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
 
   // Internal variables.
   _hubs = [];
-
-  get _vueVersion2() {
-    return version.startsWith("2.") === true;
-  }
 
   // Initializes connection to SignalR server hub.
   init(iHub: IDotnetifyHub) {
@@ -73,7 +69,7 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
     if (this.viewModels.hasOwnProperty(iVMId)) {
       console.error(
         `Component is attempting to connect to an already active '${iVMId}'. ` +
-          ` If it's from a dismounted component, you must call vm.$destroy in ${this._vueVersion2 ? "destroyed()" : "unmounted()"}.`
+          ` If it's from a dismounted component, you must call vm.$destroy on unmount.`
       );
       this.viewModels[iVMId].$destroy();
     }
@@ -208,7 +204,11 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       this.vm.$destroy();
     };
 
-    this._vueVersion2 ? Object.assign(iVue, { destroyed: vmDestroyFunc }) : Object.assign(iVue, { unmounted: vmDestroyFunc });
+    if (Vue && (<any>Vue).directive)
+      // Vue 2.x
+      Object.assign(iVue, { destroyed: vmDestroyFunc });
+    // Vue 3.x
+    else Object.assign(iVue, { unmounted: vmDestroyFunc });
   }
 }
 

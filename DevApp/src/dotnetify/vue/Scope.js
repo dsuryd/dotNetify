@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import dotnetify from "./dotnetify-vue";
-import { h, version } from "vue";
+import { h } from "vue";
 
 export default {
   name: "Scope",
@@ -34,7 +34,7 @@ export default {
     };
   },
   render: function (createElement) {
-    return version.startsWith("3.")
+    return typeof h === "function"
       ? h(this.tag || "div", null, this.$slots.default()) // Vue 3.x
       : createElement(this.tag || "div", null, this.$slots.default); // Vue 2.x
   },
