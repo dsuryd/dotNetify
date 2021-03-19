@@ -1,5 +1,5 @@
 ﻿/* 
-Copyright 2018 Dicky Suryadi
+Copyright 2018-2021 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,15 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+
+import { version } from "vue";
 import _dotnetify, { Dotnetify, IDotnetifyImpl } from "../core/dotnetify";
 import dotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyVM from "../core/dotnetify-vm";
-import {
-  IDotnetifyVue,
-  IConnectOptions,
-  IDotnetifyHub,
-  IDotnetifyVM
-} from "../_typings";
+import { IDotnetifyVue, IConnectOptions, IDotnetifyHub, IDotnetifyVM } from "../_typings";
 
 const _window = window || global || <any>{};
 let dotnetify: Dotnetify = _window.dotnetify || _dotnetify;
@@ -32,13 +29,17 @@ export interface IVueConnectOptions extends IConnectOptions {
 }
 
 export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
-  version = "2.0.0";
+  version = "3.0.0";
   viewModels: { [vmId: string]: DotnetifyVM } = {};
   plugins: { [pluginId: string]: any } = {};
   controller = dotnetify;
 
   // Internal variables.
   _hubs = [];
+
+  get _vueVersion2() {
+    return version.startsWith("2.") === true;
+  }
 
   // Initializes connection to SignalR server hub.
   init(iHub: IDotnetifyHub) {
@@ -54,16 +55,10 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
     };
 
     if (!hubInitialized) {
-      iHub.responseEvent.subscribe((iVMId, iVMData) =>
-        this._responseVM(iVMId, iVMData)
-      );
+      iHub.responseEvent.subscribe((iVMId, iVMData) => this._responseVM(iVMId, iVMData));
       iHub.connectedEvent.subscribe(() =>
         Object.keys(this.viewModels)
-          .filter(
-            vmId =>
-              this.viewModels[vmId].$hub === iHub &&
-              !this.viewModels[vmId].$requested
-          )
+          .filter(vmId => this.viewModels[vmId].$hub === iHub && !this.viewModels[vmId].$requested)
           .forEach(vmId => this.viewModels[vmId].$request())
       );
       iHub.reconnectedEvent.subscribe(start);
@@ -74,15 +69,11 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
   }
 
   // Connects to a server view model.
-  connect(
-    iVMId: string,
-    iVue: any,
-    iOptions: IVueConnectOptions
-  ): IDotnetifyVM {
+  connect(iVMId: string, iVue: any, iOptions: IVueConnectOptions): IDotnetifyVM {
     if (this.viewModels.hasOwnProperty(iVMId)) {
       console.error(
         `Component is attempting to connect to an already active '${iVMId}'. ` +
-          ` If it's from a dismounted component, you must call vm.$destroy in destroyed().`
+          ` If it's from a dismounted component, you must call vm.$destroy in ${this._vueVersion2 ? "destroyed()" : "unmounted()"}.`
       );
       this.viewModels[iVMId].$destroy();
     }
@@ -94,9 +85,7 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       },
       get state() {
         const vm = self.viewModels[iVMId];
-        return vm && vm["$useState"]
-          ? { ...iVue.$data, ...iVue.state }
-          : iVue.$data;
+        return vm && vm["$useState"] ? { ...iVue.$data, ...iVue.state } : iVue.$data;
       },
       setState(state: any) {
         Object.keys(state).forEach(key => {
@@ -106,13 +95,10 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
           const vm = self.viewModels[iVMId];
           if (vm && vm["$useState"]) {
             if (iVue.state.hasOwnProperty(key)) iVue.state[key] = value;
-            else if (value) iVue.$set(iVue.state, key, value);
+            else if (value) self._vueSetState(iVue, key, value);
           } else {
-            if (iVue.hasOwnProperty(key)) iVue[key] = value;
-            else if (value)
-              console.error(
-                `'${key}' is received, but the Vue instance doesn't declare the property.`
-              );
+            if (self._vueHasProperty(iVue, key)) iVue[key] = value;
+            else if (value) console.error(`'${key}' is received, but the Vue instance doesn't declare the property.`);
           }
         });
       }
@@ -123,13 +109,7 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       options: iOptions,
       hub: null
     });
-    this.viewModels[iVMId] = new dotnetifyVM(
-      connectInfo.vmId,
-      component,
-      connectInfo.options,
-      this,
-      connectInfo.hub
-    );
+    this.viewModels[iVMId] = new dotnetifyVM(connectInfo.vmId, component, connectInfo.options, this, connectInfo.hub);
     if (connectInfo.hub) this.init(connectInfo.hub);
 
     if (iOptions) {
@@ -138,16 +118,12 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       // If 'useState' is true, server state will be placed in the Vue component's 'state' data property.
       // Otherwise, they will be placed in the root data property.
       if (iOptions.useState) {
-        if (iVue.hasOwnProperty("state")) vm["$useState"] = true;
-        else
-          console.error(
-            `Option 'useState' requires the 'state' data property on the Vue instance.`
-          );
+        if (this._vueHasProperty(iVue, "state")) vm["$useState"] = true;
+        else console.error(`Option 'useState' requires the 'state' data property on the Vue instance.`);
       }
 
       // 'watch' array specifies properties to dispatch to server when the values change.
-      if (Array.isArray(iOptions.watch))
-        this._addWatchers(iOptions.watch, vm, iVue);
+      if (Array.isArray(iOptions.watch)) this._addWatchers(iOptions.watch, vm, iVue);
     }
 
     return this.viewModels[iVMId];
@@ -155,7 +131,7 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
 
   // Creates a Vue component with pre-configured connection to a server view model.
   component(iComponentOrName: any, iVMId: string, iOptions: IConnectOptions) {
-    const obj = {
+    let obj = {
       vm: null,
       created() {
         this.vm = dotnetify.vue.connect(iVMId, this, {
@@ -163,7 +139,7 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
           useState: true
         });
       },
-      destroyed() {
+      unmounted() {
         this.vm.$destroy();
       },
       data() {
@@ -171,8 +147,9 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       }
     };
 
-    if (typeof iComponentOrName == "string")
-      return { name: iComponentOrName, ...obj };
+    this._vueAddUnmounted(obj);
+
+    if (typeof iComponentOrName == "string") return { name: iComponentOrName, ...obj };
     else return { ...obj, ...iComponentOrName };
   }
 
@@ -188,9 +165,7 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
         iVM.$serverUpdate !== false && iVM.$dispatch({ [prop]: newValue });
       }.bind(iVM);
 
-    iWatchlist.forEach((prop: string) =>
-      iVue.$watch(iVM["$useState"] ? `state.${prop}` : prop, callback(prop))
-    );
+    iWatchlist.forEach((prop: string) => iVue.$watch(iVM["$useState"] ? `state.${prop}` : prop, callback(prop)));
   }
 
   _responseVM(iVMId: string, iVMData: any) {
@@ -207,6 +182,33 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       return true;
     }
     return false;
+  }
+
+  _vueHasProperty(iVue: any, iKey: string) {
+    if (iVue) {
+      // Vue 2.x
+      if (typeof iVue.hasOwnProperty === "function") return iVue.hasOwnProperty(iKey);
+      // Vue 3.x
+      else return typeof iVue[iKey] !== "undefined";
+    }
+    return false;
+  }
+
+  _vueSetState(iVue: any, iKey: any, iValue: any) {
+    if (iVue) {
+      // Vue 2.x
+      if (typeof iVue.$set === "function") iVue.$set(iVue.state, iKey, iValue);
+      // Vue 3.x
+      else iVue.state[iKey] = iValue;
+    }
+  }
+
+  _vueAddUnmounted(iVue: any) {
+    const vmDestroyFunc = function () {
+      this.vm.$destroy();
+    };
+
+    this._vueVersion2 ? Object.assign(iVue, { destroyed: vmDestroyFunc }) : Object.assign(iVue, { unmounted: vmDestroyFunc });
   }
 }
 

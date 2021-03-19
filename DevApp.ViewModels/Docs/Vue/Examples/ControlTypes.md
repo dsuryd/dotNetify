@@ -10,12 +10,7 @@
           <label>(updates on losing focus)</label>
         </td>
         <td>
-          <input
-            type="text"
-            class="form-control"
-            v-model.lazy="TextBoxValue"
-            :placeholder="TextBoxPlaceHolder"
-          >
+          <input type="text" class="form-control" v-model.lazy="TextBoxValue" :placeholder="TextBoxPlaceHolder" />
           <b>{{TextBoxResult}}</b>
         </td>
       </tr>
@@ -25,19 +20,9 @@
           <label>(updates on keystroke)</label>
         </td>
         <td>
-          <input
-            type="text"
-            class="form-control"
-            v-model="SearchBox"
-            :placeholder="SearchBoxPlaceHolder"
-          >
+          <input type="text" class="form-control" v-model="SearchBox" :placeholder="SearchBoxPlaceHolder" />
           <ul class="list-group">
-            <li
-              class="list-group-item"
-              v-for="(result, i) in SearchResults"
-              @click="SearchBox = result"
-              :key="i"
-            >{{result}}</li>
+            <li class="list-group-item" v-for="(result, i) in SearchResults" @click="SearchBox = result" :key="i">{{result}}</li>
           </ul>
         </td>
       </tr>
@@ -45,18 +30,14 @@
         <td>Check box:</td>
         <td>
           <label>
-            <input type="checkbox" v-model="ShowMeCheckBox">
+            <input type="checkbox" v-model="ShowMeCheckBox" />
             <span>Show me</span>
           </label>
           <label>
-            <input type="checkbox" v-model="EnableMeCheckBox">
+            <input type="checkbox" v-model="EnableMeCheckBox" />
             <span>Enable me</span>
           </label>
-          <button
-            class="btn btn-secondary"
-            :disabled="!EnableMeCheckBox"
-            v-if="ShowMeCheckBox"
-          >{{CheckBoxResult}}</button>
+          <button class="btn btn-secondary" :disabled="!EnableMeCheckBox" v-if="ShowMeCheckBox">{{CheckBoxResult}}</button>
         </td>
       </tr>
       <tr>
@@ -74,11 +55,7 @@
         <td>
           <select class="form-control" v-model="DropDownValue">
             <option value="0" disabled>{{DropDownCaption}}</option>
-            <option
-              v-for="option in DropDownOptions"
-              :key="option.Id"
-              :value="option.Id"
-            >{{option.Text}}</option>
+            <option v-for="option in DropDownOptions" :key="option.Id" :value="option.Id">{{option.Text}}</option>
           </select>
           <b>{{DropDownResult}}</b>
         </td>
@@ -87,11 +64,11 @@
         <td>Radio button:</td>
         <td>
           <label>
-            <input type="radio" value="green" v-model="RadioButtonValue">
+            <input type="radio" value="green" v-model="RadioButtonValue" />
             <span>Green</span>
           </label>
           <label>
-            <input type="radio" value="yellow" v-model="RadioButtonValue">
+            <input type="radio" value="yellow" v-model="RadioButtonValue" />
             <span>Yellow</span>
           </label>
           <button class="btn" :class="RadioButtonStyle">Result</button>
@@ -112,49 +89,54 @@
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
+  import dotnetify from "dotnetify/vue";
 
-export default {
-  name: 'ControlTypes',
-  created() {
-    this.vm = dotnetify.vue.connect("ControlTypesVM", this, {
-      watch: [
-        'TextBoxValue', 'SearchBox', 'ShowMeCheckBox', 'EnableMeCheckBox',
-        'SimpleDropDownValue', 'DropDownValue', 'RadioButtonValue'
-      ]
-    });
-  },
-  destroyed() {
-    this.vm.$destroy();
-  },
-  data() {
-    return {
-      TextBoxValue: '',
-      TextBoxPlaceHolder: '',
-      TextBoxResult: '',
-      SearchBox: '',
-      SearchBoxPlaceHolder: '',
-      SearchResults: [],
-      ShowMeCheckBox: true,
-      EnableMeCheckBox: true,
-      CheckBoxResult: '',
-      SimpleDropDownValue: '',
-      SimpleDropDownResult: '',
-      SimpleDropDownOptions: [],
-      DropDownCaption: '',
-      DropDownValue: '',
-      DropDownResult: '',
-      DropDownOptions: [],
-      RadioButtonValue: '',
-      RadioButtonStyle: '',
-      ClickCount: 0
+  export default {
+    name: "ControlTypes",
+    created() {
+      this.vm = dotnetify.vue.connect("ControlTypesVM", this, {
+        watch: [
+          "TextBoxValue",
+          "SearchBox",
+          "ShowMeCheckBox",
+          "EnableMeCheckBox",
+          "SimpleDropDownValue",
+          "DropDownValue",
+          "RadioButtonValue"
+        ]
+      });
+    },
+    unmounted() {
+      this.vm.$destroy();
+    },
+    data() {
+      return {
+        TextBoxValue: "",
+        TextBoxPlaceHolder: "",
+        TextBoxResult: "",
+        SearchBox: "",
+        SearchBoxPlaceHolder: "",
+        SearchResults: [],
+        ShowMeCheckBox: true,
+        EnableMeCheckBox: true,
+        CheckBoxResult: "",
+        SimpleDropDownValue: "",
+        SimpleDropDownResult: "",
+        SimpleDropDownOptions: [],
+        DropDownCaption: "",
+        DropDownValue: "",
+        DropDownResult: "",
+        DropDownOptions: [],
+        RadioButtonValue: "",
+        RadioButtonStyle: "",
+        ClickCount: 0
+      };
+    },
+    methods: {
+      onButtonClick: function () {
+        this.vm.$dispatch({ ButtonClicked: true });
+      }
     }
-  },
-  methods: {
-    onButtonClick: function () {
-      this.vm.$dispatch({ ButtonClicked: true });
-    }
-  }
-}
+  };
 </script>
 ```

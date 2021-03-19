@@ -4,30 +4,30 @@
 <template>
   <Scope vm="CompositeViewVM">
     <Scope tag="section" vm="FilterableMovieTableVM">
-      <MovieTable/>
+      <MovieTable />
     </Scope>
     <aside>
-      <MovieDetails/>
-      <MovieFilter/>
+      <MovieDetails />
+      <MovieFilter />
     </aside>
   </Scope>
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
-import MovieTable from './CompositeView.MovieTable.vue';
-import MovieDetails from './CompositeView.MovieDetails.vue';
-import MovieFilter from './CompositeView.MovieFilter.vue';
+  import dotnetify from "dotnetify/vue";
+  import MovieTable from "./CompositeView.MovieTable.vue";
+  import MovieDetails from "./CompositeView.MovieDetails.vue";
+  import MovieFilter from "./CompositeView.MovieFilter.vue";
 
-export default {
-  name: 'CompositeView',
-  components: {
-    'Scope': dotnetify.vue.Scope,
-    'MovieTable': MovieTable,
-    'MovieDetails': MovieDetails,
-    'MovieFilter': MovieFilter
-  }
-}
+  export default {
+    name: "CompositeView",
+    components: {
+      Scope: dotnetify.vue.Scope,
+      MovieTable: MovieTable,
+      MovieDetails: MovieDetails,
+      MovieFilter: MovieFilter
+    }
+  };
 </script>
 ```
 
@@ -43,12 +43,7 @@ export default {
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="data in Data"
-          :key="data.Rank"
-          :class="{selected: SelectedKey == data.Rank}"
-          @click="SelectedKey = data.Rank"
-        >
+        <tr v-for="data in Data" :key="data.Rank" :class="{selected: SelectedKey == data.Rank}" @click="SelectedKey = data.Rank">
           <td>{{data.Rank}}</td>
           <td>{{data.Movie}}</td>
           <td>{{data.Year}}</td>
@@ -57,36 +52,31 @@ export default {
       </tbody>
     </table>
     <div class="pagination">
-      <div
-        v-for="page in Pagination"
-        :key="page"
-        :class="{current: SelectedPage === page}"
-        @click="SelectedPage = page"
-      >{{page}}</div>
+      <div v-for="page in Pagination" :key="page" :class="{current: SelectedPage === page}" @click="SelectedPage = page">{{page}}</div>
     </div>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'MovieTable',
-  inject: ['connect'],
-  created() {
-    this.vm = this.connect("MovieTableVM", this, { watch: ['SelectedKey', 'SelectedPage'] });
-  },
-  destroyed() {
-    this.vm.$destroy();
-  },
-  data() {
-    return {
-      Headers: [],
-      Data: [],
-      Pagination: [],
-      SelectedKey: 0,
-      SelectedPage: 0
+  export default {
+    name: "MovieTable",
+    inject: ["connect"],
+    created() {
+      this.vm = this.connect("MovieTableVM", this, { watch: ["SelectedKey", "SelectedPage"] });
+    },
+    unmounted() {
+      this.vm.$destroy();
+    },
+    data() {
+      return {
+        Headers: [],
+        Data: [],
+        Pagination: [],
+        SelectedKey: 0,
+        SelectedPage: 0
+      };
     }
-  }
-}
+  };
 </script>
 ```
 
@@ -111,21 +101,21 @@ export default {
 </template>
 
 <script>
-export default {
-  name: 'MovieDetails',
-  inject: ['connect'],
-  created() {
-    this.vm = this.connect("MovieDetailsVM", this);
-  },
-  destroyed() {
-    this.vm.$destroy();
-  },
-  data() {
-    return {
-      Movie: { Cast: '' }
+  export default {
+    name: "MovieDetails",
+    inject: ["connect"],
+    created() {
+      this.vm = this.connect("MovieDetailsVM", this);
+    },
+    unmounted() {
+      this.vm.$destroy();
+    },
+    data() {
+      return {
+        Movie: { Cast: "" }
+      };
     }
-  }
-}
+  };
 </script>
 ```
 
@@ -137,27 +127,16 @@ export default {
     <div class="filter card">
       <div class="card-header">Filters</div>
       <div class="card-body">
-        <select
-          class="form-control"
-          :value="filter"
-          @change="updateFilterDropdown($event.target.value)"
-        >
+        <select class="form-control" :value="filter" @change="updateFilterDropdown($event.target.value)">
           <option v-for="(text, i) in movieProps" :key="i" :value="text">{{text}}</option>
         </select>
         <div class="operation">
           <div class="form-check" v-for="(op, i) in operations" :key="i">
-            <input
-              class="form-check-input"
-              type="radio"
-              :id="op"
-              :value="op"
-              :checked="operation === op"
-              @change="operation = op"
-            >
+            <input class="form-check-input" type="radio" :id="op" :value="op" :checked="operation === op" @change="operation = op" />
             <label class="form-check-label" :for="op">{{op}}</label>
           </div>
         </div>
-        <input class="form-control" v-model="text">
+        <input class="form-control" v-model="text" />
         <div>
           <div class="chip" v-for="filter in filters" :key="filter.id">
             {{filter.property}} {{filter.operation}} {{filter.text}}
@@ -175,59 +154,58 @@ export default {
 </template>
 
 <script>
-export default {
-  name: 'MovieFilter',
-  inject: ['connect'],
-  created() {
-    this.vm = this.connect("FilterableMovieTableVM.MovieFilterVM", this);
-  },
-  destroyed() {
-    this.vm.$destroy();
-  },
-  data() {
-    return {
-      filters: [],
-      filterId: 0,
-      filter: 'Any',
-      movieProps: ['Any', 'Rank', 'Movie', 'Year', 'Cast', 'Director'],
-      operation: 'contains',
-      operations: ['contains'],
-      text: ''
-    }
-  },
-  methods: {
-    handleApply: function () {
-      let newId = this.filterId + 1;
-      let filter = {
-        id: newId,
-        property: this.filter,
-        operation: this.operation,
-        text: this.text
+  export default {
+    name: "MovieFilter",
+    inject: ["connect"],
+    created() {
+      this.vm = this.connect("FilterableMovieTableVM.MovieFilterVM", this);
+    },
+    unmounted() {
+      this.vm.$destroy();
+    },
+    data() {
+      return {
+        filters: [],
+        filterId: 0,
+        filter: "Any",
+        movieProps: ["Any", "Rank", "Movie", "Year", "Cast", "Director"],
+        operation: "contains",
+        operations: ["contains"],
+        text: ""
       };
-
-      this.filterId = newId;
-      this.filters = [filter, ...this.filters];
-      this.text = '';
-
-      this.vm.$dispatch({ Apply: filter });
-      this.updateFilterDropdown('Any'); // Reset filter dropdown.
     },
-    handleDelete: function (id) {
-      this.vm.$dispatch({ Delete: id });
-      this.filters = this.filters.filter(filter => filter.id != id);
-    },
-    updateFilterDropdown: function (filter) {
-      this.filter = filter;
-      if (filter == 'Rank' || filter == 'Year') {
-        this.operations = ['equals', '>=', '<='];
-        this.operation = 'equals';
-      }
-      else {
-        this.operations = ['contains'];
-        this.operation = 'contains';
+    methods: {
+      handleApply: function () {
+        let newId = this.filterId + 1;
+        let filter = {
+          id: newId,
+          property: this.filter,
+          operation: this.operation,
+          text: this.text
+        };
+
+        this.filterId = newId;
+        this.filters = [filter, ...this.filters];
+        this.text = "";
+
+        this.vm.$dispatch({ Apply: filter });
+        this.updateFilterDropdown("Any"); // Reset filter dropdown.
+      },
+      handleDelete: function (id) {
+        this.vm.$dispatch({ Delete: id });
+        this.filters = this.filters.filter(filter => filter.id != id);
+      },
+      updateFilterDropdown: function (filter) {
+        this.filter = filter;
+        if (filter == "Rank" || filter == "Year") {
+          this.operations = ["equals", ">=", "<="];
+          this.operation = "equals";
+        } else {
+          this.operations = ["contains"];
+          this.operation = "contains";
+        }
       }
     }
-  }
-}
+  };
 </script>
 ```

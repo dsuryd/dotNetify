@@ -189,6 +189,18 @@ namespace DotNetify.DevApp
                IsExpanded = false
             };
          }
+         else if (framework == "Vue") 
+         {
+            int idx = navMenuItems.FindIndex(x => x.Label == "API Reference");
+            navMenuItems[idx] = new NavGroup
+            {
+               Label = "API Reference",
+               Routes = (navMenuItems[idx] as NavGroup).Routes.Where(x => x.Label != "Local Mode").ToArray(),
+               IsExpanded = false
+            };
+         }
+
+
          return new NavMenu(navMenuItems.ToArray());
       }
    }

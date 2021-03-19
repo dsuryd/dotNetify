@@ -1,5 +1,5 @@
 import React from "react";
-import Vue from "vue";
+import { createApp } from "vue";
 import dotnetify from "dotnetify";
 import { Markdown, withTheme } from "dotnetify-elements";
 import styled from "styled-components";
@@ -129,8 +129,7 @@ class Details extends React.Component {
 
 class MasterDetailsVue extends React.Component {
   componentDidMount() {
-    this.app = new Vue({
-      el: "#MasterDetailsVue",
+    this.app = createApp({
       components: {
         MasterList: MasterListVue,
         Details: DetailsVue
@@ -142,16 +141,17 @@ class MasterDetailsVue extends React.Component {
         </div>
       `
     });
+    this.app.mount("#MasterDetailsVue");
   }
   componentWillUnmount() {
-    this.app.$destroy();
+    this.app.unmount();
   }
   render() {
     return <div id="MasterDetailsVue" />;
   }
 }
 
-const MasterListVue = Vue.component("MasterList", {
+const MasterListVue = {
   template: `
     <ul>
       <li 
@@ -167,7 +167,7 @@ const MasterListVue = Vue.component("MasterList", {
   created() {
     this.vm = dotnetify.vue.connect("MasterDetails.MasterList", this);
   },
-  destroyed() {
+  unmounted() {
     this.vm.$destroy();
   },
   data() {
@@ -185,20 +185,20 @@ const MasterListVue = Vue.component("MasterList", {
       this.vm.$dispatch({ Select: id });
     }
   }
-});
+};
 
-const DetailsVue = Vue.component("Details", {
+const DetailsVue = {
   template:
     '<img v-if="ItemImageUrl" :src="ItemImageUrl" style="margin: 0 1rem" />',
   created() {
     this.vm = dotnetify.vue.connect("MasterDetails.Details", this);
   },
-  destroyed() {
+  unmounted() {
     this.vm.$destroy();
   },
   data() {
     return { ItemImageUrl: null };
   }
-});
+};
 
 export default withTheme(DataFlow);

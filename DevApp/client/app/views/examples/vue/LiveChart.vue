@@ -1,25 +1,25 @@
 <template>
   <section>
     <div>
-      <canvas v-vmOn="{Waveform: updateLineChart}"></canvas>
+      <canvas v-vmOn="{ Waveform: updateLineChart }"></canvas>
     </div>
     <div>
-      <canvas v-vmOn="{Pie: updatePieChart}"></canvas>
-      <canvas v-vmOn="{Bar: updateBarChart}"></canvas>
+      <canvas v-vmOn="{ Pie: updatePieChart }"></canvas>
+      <canvas v-vmOn="{ Bar: updateBarChart }"></canvas>
     </div>
   </section>
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
-import 'chartjs-plugin-streaming';
+import dotnetify from "dotnetify/vue";
+import "chartjs-plugin-streaming";
 
 export default {
-  name: 'LiveChart',
+  name: "LiveChart",
   created() {
     this.vm = dotnetify.vue.connect("LiveChartVM", this);
   },
-  destroyed() {
+  unmounted() {
     this.vm.$destroy();
   },
   data() {
@@ -27,20 +27,20 @@ export default {
       Waveform: [],
       Bar: [],
       Pie: []
-    }
+    };
   },
   methods: {
     createLineChart: function (elem, initialData) {
       const chartData = {
-        type: 'line',
+        type: "line",
         data: {
           labels: [],
           datasets: [
             {
-              label: 'Waveform',
+              label: "Waveform",
               data: initialData,
-              backgroundColor: 'rgba(217,237,245,0.4)',
-              borderColor: '#9acfea',
+              backgroundColor: "rgba(217,237,245,0.4)",
+              borderColor: "#9acfea",
               borderWidth: 2
             }
           ]
@@ -49,42 +49,44 @@ export default {
           scales: {
             xAxes: [
               {
-                type: 'realtime',
+                type: "realtime",
                 realtime: { delay: 2000 }
               }
             ],
-            yAxes: [{
-              ticks: {
-                suggestedMin: -1,
-                suggestedMax: 1
+            yAxes: [
+              {
+                ticks: {
+                  suggestedMin: -1,
+                  suggestedMax: 1
+                }
               }
-            }]
+            ]
           }
         }
       };
       const chartOptions = { responsive: true };
-      return new Chart(elem.getContext('2d'), chartData, chartOptions);
+      return new Chart(elem.getContext("2d"), chartData, chartOptions);
     },
     createBarChart(elem) {
       const chartData = {
-        type: 'bar',
+        type: "bar",
         data: {
-          labels: ['user', 'sys', 'eth0', 'lo', 'ker', 'sda1', 'sda2', 'sda3'],
+          labels: ["user", "sys", "eth0", "lo", "ker", "sda1", "sda2", "sda3"],
           datasets: [
             {
-              label: '',
+              label: "",
               data: [],
               backgroundColor: [
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)',
-                'rgba(255, 159, 64, 0.8)',
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)'
+                "rgba(255, 99, 132, 0.8)",
+                "rgba(54, 162, 235, 0.8)",
+                "rgba(255, 206, 86, 0.8)",
+                "rgba(75, 192, 192, 0.8)",
+                "rgba(153, 102, 255, 0.8)",
+                "rgba(255, 159, 64, 0.8)",
+                "rgba(255, 99, 132, 0.8)",
+                "rgba(54, 162, 235, 0.8)"
               ],
-              borderColor: ['#9acfea'],
+              borderColor: ["#9acfea"],
               borderWidth: 1
             }
           ]
@@ -94,19 +96,19 @@ export default {
           legend: { display: false }
         }
       };
-      return new Chart(elem.getContext('2d'), chartData);
+      return new Chart(elem.getContext("2d"), chartData);
     },
     createPieChart(elem) {
       const chartData = {
-        type: 'doughnut',
+        type: "doughnut",
         data: {
-          labels: ['CPU', 'Memory', 'Disk'],
+          labels: ["CPU", "Memory", "Disk"],
           datasets: [
             {
-              label: '',
+              label: "",
               data: [],
-              backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)'],
-              borderColor: ['#9acfea'],
+              backgroundColor: ["rgba(255, 99, 132, 0.8)", "rgba(54, 162, 235, 0.8)", "rgba(255, 206, 86, 0.8)"],
+              borderColor: ["#9acfea"],
               borderWidth: 1
             }
           ]
@@ -115,15 +117,14 @@ export default {
           responsive: true
         }
       };
-      return new Chart(elem.getContext('2d'), chartData);
+      return new Chart(elem.getContext("2d"), chartData);
     },
     updateLineChart: function (element) {
       if (!this.lineChart) {
         const maxIdx = this.Waveform.length - 1;
         const initialData = this.Waveform.map((data, idx) => ({ x: Date.now() - (maxIdx - idx) * 1000, y: data[1] }));
         this.lineChart = this.createLineChart(element, initialData);
-      }
-      else {
+      } else {
         const data = this.Waveform[this.Waveform.length - 1];
         this.lineChart.data.datasets[0].data.push({ x: Date.now(), y: data[1] });
       }
@@ -139,6 +140,5 @@ export default {
       this.pieChart.update();
     }
   }
-}
+};
 </script>
-

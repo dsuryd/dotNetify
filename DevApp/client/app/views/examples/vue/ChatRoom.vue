@@ -3,29 +3,23 @@
     <div class="chatPanel">
       <nav>
         <p v-for="user in Users" :key="user.Id">
-          <b :class="user.CorrelationId == correlationId ? 'myself' : ''">{{user.Name}}</b>
-          <span>{{user.IpAddress}}</span>
-          <span>{{user.Browser}}</span>
+          <b :class="user.CorrelationId == correlationId ? 'myself' : ''">{{ user.Name }}</b>
+          <span>{{ user.IpAddress }}</span>
+          <span>{{ user.Browser }}</span>
         </p>
       </nav>
       <section>
         <div>
           <div v-for="(msg, idx) in Messages" :key="idx">
             <div>
-              <span>{{getUserName(msg.UserId) || msg.UserName}}</span>
-              <span>{{new Date(msg.Date).toLocaleString()}}</span>
+              <span>{{ getUserName(msg.UserId) || msg.UserName }}</span>
+              <span>{{ new Date(msg.Date).toLocaleString() }}</span>
             </div>
-            <div :class="msg.private ? 'private' : ''">{{msg.Text}}</div>
+            <div :class="msg.private ? 'private' : ''">{{ msg.Text }}</div>
           </div>
         </div>
-        <div style="float: left; clear: both" ref="bottomElem"/>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Type your message here"
-          v-model="message"
-          @change="sendMessage"
-        >
+        <div style="float: left; clear: both;" ref="bottomElem" />
+        <input type="text" class="form-control" placeholder="Type your message here" v-model="message" @change="sendMessage" />
       </section>
     </div>
     <footer>
@@ -40,23 +34,28 @@
 
 <script>
 export default {
-  name: 'ChatRoom',
+  name: "ChatRoom",
   created() {
     this.vm = dotnetify.vue.connect("ChatRoomVM", this);
 
     this.$watch("PrivateMessage", message => {
       this.scrollToBottom();
-      message.Text = '(private) ' + message.Text;
+      message.Text = "(private) " + message.Text;
       message.private = true;
       this.Messages.push(message);
       this.PrivateMessage = null;
-    })
+    });
   },
   mounted() {
-    this.vm.$dispatch({ AddUser: this.correlationId });
     this.scrollToBottom();
   },
-  destroyed() {
+  updated() {
+    if (!this.Users.some(x => x.CorrelationId == this.correlationId)) {
+      this.vm.$dispatch({ AddUser: this.correlationId });
+    }
+  },
+  unmounted() {
+    debugger;
     this.vm.$dispatch({ RemoveUser: null });
     this.vm.$destroy();
   },
@@ -65,9 +64,9 @@ export default {
       Users: [],
       Messages: [],
       PrivateMessage: null,
-      message: '',
+      message: "",
       correlationId: `${Math.random()}`
-    }
+    };
   },
   methods: {
     getUserName(userId) {
@@ -75,7 +74,7 @@ export default {
       return user ? user.Name : null;
     },
     scrollToBottom() {
-      this.$refs.bottomElem.scrollIntoView({ behavior: 'smooth' });
+      this.$refs.bottomElem.scrollIntoView({ behavior: "smooth" });
     },
     sendMessage() {
       const match = /name is ([A-z]+)/i.exec(this.message);
@@ -83,11 +82,11 @@ export default {
         SendMessage: {
           Text: this.message,
           Date: new Date(),
-          UserName: match ? match[1] : ''
+          UserName: match ? match[1] : ""
         }
       });
-      this.message = '';
+      this.message = "";
     }
   }
-}
+};
 </script>

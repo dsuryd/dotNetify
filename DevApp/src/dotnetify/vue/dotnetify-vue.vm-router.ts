@@ -1,5 +1,5 @@
 /* 
-Copyright 2018-2019 Dicky Suryadi
+Copyright 2018-2021 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,10 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+
 import * as Vue from "vue";
+import { version, createApp } from "vue";
 import DotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyRouter from "../core/dotnetify-router";
 import DotnetifyVMRouter from "../core/dotnetify-vm-router";
+import { registerDirectives } from "./directives";
 import utils from "../libs/utils";
 import * as $ from "../libs/jquery-shim";
 import { RoutingStateType, RoutingTemplateType } from "../_typings";
@@ -50,13 +53,7 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
   }
 
   // Loads a view into a target element.
-  loadView(
-    iTargetSelector: string,
-    iViewUrl: any,
-    iJsModuleUrl?: string,
-    iVmArg?: any,
-    iCallbackFn?: Function
-  ) {
+  loadView(iTargetSelector: string, iViewUrl: any, iJsModuleUrl?: string, iVmArg?: any, iCallbackFn?: Function) {
     const vm = this.vm;
     let componentProps: any;
 
@@ -64,19 +61,12 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
     // to build the absolute route path, and view model argument if provided.
     if (this.hasRoutingState) {
       if (this.RoutingState === null) {
-        console.error(
-          "router> the RoutingState prop of '" +
-            vm.$vmId +
-            "' was not initialized."
-        );
+        console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
         return;
       }
 
       let root = this.VMRoot;
-      root =
-        root != null
-          ? "/" + utils.trim(this.RoutingState.Root) + "/" + utils.trim(root)
-          : this.RoutingState.Root;
+      root = root != null ? "/" + utils.trim(this.RoutingState.Root) + "/" + utils.trim(root) : this.RoutingState.Root;
       componentProps = { vmRoot: root, vmArg: iVmArg };
     }
 
@@ -84,53 +74,26 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
     iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-    if (utils.endsWith(iViewUrl, "html"))
-      this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
+    if (utils.endsWith(iViewUrl, "html")) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
     else {
       let component = iViewUrl;
-      if (typeof iViewUrl === "string" && _window.hasOwnProperty(iViewUrl))
-        component = Object.assign({}, _window[iViewUrl]);
+      if (typeof iViewUrl === "string" && _window.hasOwnProperty(iViewUrl)) component = Object.assign({}, _window[iViewUrl]);
 
-      if (component instanceof HTMLElement)
-        this.loadHtmlElementView(
-          iTargetSelector,
-          component,
-          iJsModuleUrl,
-          componentProps,
-          iCallbackFn
-        );
-      else
-        this.loadVueView(
-          iTargetSelector,
-          component,
-          iJsModuleUrl,
-          componentProps,
-          iCallbackFn
-        );
+      if (component instanceof HTMLElement) this.loadHtmlElementView(iTargetSelector, component, iJsModuleUrl, componentProps, iCallbackFn);
+      else this.loadVueView(iTargetSelector, component, iJsModuleUrl, componentProps, iCallbackFn);
     }
   }
 
   // Loads a Vue view.
-  loadVueView(
-    iTargetSelector: string,
-    iComponent: any,
-    iJsModuleUrl?: string,
-    iProps?: any,
-    iCallbackFn?: Function
-  ) {
+  loadVueView(iTargetSelector: string, iComponent: any, iJsModuleUrl?: string, iProps?: any, iCallbackFn?: Function) {
     return new Promise((resolve, reject) => {
       const vm = this.vm;
       const vmId = this.vm ? this.vm.$vmId : "";
       const createViewFunc = () => {
         // Resolve the vue class from the argument, which can be the object itself, or a global _window variable name.
         let vueClass = iComponent;
-        if (
-          typeof iComponent !== "object" ||
-          (typeof iComponent.render !== "function" && !iComponent.template)
-        ) {
-          console.error(
-            `[${vmId}] failed to load view '${iComponent}' because it's not a Vue element.`
-          );
+        if (typeof iComponent !== "object" || (typeof iComponent.render !== "function" && !iComponent.template)) {
+          console.error(`[${vmId}] failed to load view '${iComponent}' because it's not a Vue element.`);
           reject();
           return;
         }
@@ -139,10 +102,7 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
         this.unmountView(iTargetSelector);
 
         // Declare 'RoutingState' property in the component.
-        let data =
-          typeof vueClass.data == "function"
-            ? vueClass.data()
-            : vueClass.data || {};
+        let data = typeof vueClass.data == "function" ? vueClass.data() : vueClass.data || {};
         if (!data.hasOwnProperty("RoutingState")) {
           data.RoutingState = {};
           vueClass.data = function () {
@@ -153,21 +113,33 @@ export default class DotnetifyVueVMRouter extends DotnetifyVMRouter {
         // Add any undeclared property to the vue class.
         if (iProps) {
           vueClass.props = vueClass.props || {};
-          for (const prop in iProps)
-            if (!vueClass.props.hasOwnProperty(prop))
-              vueClass.props[prop] = { type: null };
+          for (const prop in iProps) if (!vueClass.props.hasOwnProperty(prop)) vueClass.props[prop] = { type: null };
         }
 
-        const vueComponentType = (<any>Vue).extend(vueClass);
-        const vueComponent = new vueComponentType({ propsData: { ...iProps } });
-
         document.querySelector(iTargetSelector).innerHTML = "<div />";
-        vueComponent.$mount(iTargetSelector + " > div");
-        this.mountedComponents[iTargetSelector] = () => vueComponent.$destroy();
 
-        if (typeof iCallbackFn === "function")
-          iCallbackFn.call(vm, vueComponent);
-        resolve(vueComponent);
+        if (version.startsWith("2.") === true) {
+          // Vue 2.x
+          const vueComponentType = (<any>Vue).extend(vueClass);
+          const vueComponent = new vueComponentType({
+            propsData: { ...iProps }
+          });
+
+          vueComponent.$mount(iTargetSelector + " > div");
+          this.mountedComponents[iTargetSelector] = () => vueComponent.$destroy();
+
+          if (typeof iCallbackFn === "function") iCallbackFn.call(vm, vueComponent);
+          resolve(vueComponent);
+        } else {
+          // Vue 3.x
+          const app = createApp(vueClass, iProps);
+          registerDirectives(app);
+          app.mount(iTargetSelector);
+          this.mountedComponents[iTargetSelector] = () => app.unmount();
+
+          if (typeof iCallbackFn === "function") iCallbackFn.call(vm, app);
+          resolve(app);
+        }
       };
 
       if (iJsModuleUrl == null) createViewFunc();

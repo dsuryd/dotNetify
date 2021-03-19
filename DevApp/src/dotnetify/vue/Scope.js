@@ -1,5 +1,5 @@
 /* 
-Copyright 2018 Dicky Suryadi
+Copyright 2018-2021 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 import dotnetify from "./dotnetify-vue";
+import { h, version } from "vue";
 
 export default {
   name: "Scope",
@@ -33,7 +34,9 @@ export default {
     };
   },
   render: function (createElement) {
-    return createElement(this.tag || "div", null, this.$slots.default);
+    return version.startsWith("3.")
+      ? h(this.tag || "div", null, this.$slots.default()) // Vue 3.x
+      : createElement(this.tag || "div", null, this.$slots.default); // Vue 2.x
   },
   methods: {
     getScope: function (vmId) {

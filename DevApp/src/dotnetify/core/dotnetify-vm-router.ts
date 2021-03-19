@@ -1,5 +1,5 @@
 /* 
-Copyright 2017-2018 Dicky Suryadi
+Copyright 2017-2021 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,23 +17,20 @@ import utils from "../libs/utils";
 import * as $ from "../libs/jquery-shim";
 import DotnetifyVM from "./dotnetify-vm";
 import DotnetifyRouter from "./dotnetify-router";
-import {
-  IDotnetifyVMRouter,
-  RouteType,
-  RoutingStateType,
-  RoutingTemplateType
-} from "../_typings";
+import { IDotnetifyVMRouter, RouteType, RoutingStateType, RoutingTemplateType } from "../_typings";
 
 export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
   routes: RouteType[] = [];
   vm: DotnetifyVM;
   router: DotnetifyRouter;
   debug: boolean;
-  hasRoutingState: boolean;
   pathToRoute: any;
 
   _absRoot: string;
 
+  get hasRoutingState(): boolean {
+    throw new Error("Not implemented");
+  }
   get RoutingState(): RoutingStateType {
     throw new Error("Not implemented");
   }
@@ -50,8 +47,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     this.debug = vm.$dotnetify.controller.debug;
 
     // Handle 'onRouteEnter' callback being given in the VM options.
-    if (vm.$options && vm.$options.onRouteEnter)
-      vm["onRouteEnter"] = vm.$options.onRouteEnter;
+    if (vm.$options && vm.$options.onRouteEnter) vm["onRouteEnter"] = vm.$options.onRouteEnter;
   }
 
   // Dispatch the active routing state to the server.
@@ -70,21 +66,13 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
       path = iArg.currentTarget.pathname;
     } else if (typeof iArg === "string") path = iArg;
 
-    if (path == null || path == "")
-      throw new Error(
-        "$handleRoute requires path argument or event with pathname."
-      );
+    if (path == null || path == "") throw new Error("$handleRoute requires path argument or event with pathname.");
     setTimeout(() => this.router.pushState({}, "", path));
   }
 
   // Build the absolute root path from the "vmRoot" property on React component.
   initRoot() {
-    if (
-      !this.hasRoutingState ||
-      this.RoutingState === null ||
-      this.RoutingState.Root === null
-    )
-      return;
+    if (!this.hasRoutingState || this.RoutingState === null || this.RoutingState.Root === null) return;
 
     if (this._absRoot != this.RoutingState.Root) {
       var absRoot = utils.trim(this.VMRoot);
@@ -104,11 +92,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     }
 
     if (this.RoutingState === null) {
-      console.error(
-        "router> the RoutingState prop of '" +
-          vm.$vmId +
-          "' was not initialized."
-      );
+      console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
       return;
     }
 
@@ -126,21 +110,18 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
 
     templates.forEach((template: RoutingTemplateType) => {
       // If url pattern isn't given, consider Id as the pattern.
-      let urlPattern =
-        template.UrlPattern != null ? template.UrlPattern : template.Id;
+      let urlPattern = template.UrlPattern != null ? template.UrlPattern : template.Id;
       urlPattern = urlPattern != "" ? urlPattern : "/";
       const mapUrl = this.toUrl(urlPattern);
 
-      if (this.debug)
-        console.log("router> map " + mapUrl + " to template id=" + template.Id);
+      if (this.debug) console.log("router> map " + mapUrl + " to template id=" + template.Id);
 
       this.router.mapTo(mapUrl, iParams => {
         this.router.urlPath = "";
 
         // Construct the path from the template pattern and the params passed by PathJS.
         let path = urlPattern;
-        for (var param in iParams)
-          path = path.replace(":" + param, iParams[param]);
+        for (var param in iParams) path = path.replace(":" + param, iParams[param]);
         path = path.replace(/\(\/:([^)]+)\)/g, "").replace(/\(|\)/g, "");
 
         this.routeTo(path, template);
@@ -164,12 +145,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
   }
 
   // Loads an HTML view.
-  loadHtmlView(
-    iTargetSelector: string,
-    iViewUrl?: string,
-    iJsModuleUrl?: string,
-    iCallbackFn?: Function
-  ) {
+  loadHtmlView(iTargetSelector: string, iViewUrl?: string, iJsModuleUrl?: string, iCallbackFn?: Function) {
     const vm = this.vm;
     this.unmountView(iTargetSelector);
 
@@ -177,22 +153,12 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     $(iTargetSelector).load(iViewUrl, null, function () {
       if (iJsModuleUrl != null) {
         const getScripts = iJsModuleUrl.split(",").map(i => $.getScript(i));
-        $.when
-          .apply($, getScripts)
-          .done(
-            () => typeof iCallbackFn === "function" && iCallbackFn.call(vm)
-          );
+        $.when.apply($, getScripts).done(() => typeof iCallbackFn === "function" && iCallbackFn.call(vm));
       } else if (typeof iCallbackFn === "function") iCallbackFn.call(vm);
     });
   }
 
-  loadHtmlElementView(
-    iTargetSelector: string,
-    iHtmlElement: HTMLElement,
-    iJsModuleUrl?: string,
-    iVmArg?: any,
-    iCallbackFn?: Function
-  ) {
+  loadHtmlElementView(iTargetSelector: string, iHtmlElement: HTMLElement, iJsModuleUrl?: string, iVmArg?: any, iCallbackFn?: Function) {
     const vm = this.vm;
     const mountViewFunc = () => {
       this.unmountView(iTargetSelector);
@@ -213,23 +179,12 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
   }
 
   // Loads a view into a target element.
-  loadView(
-    iTargetSelector: string,
-    iViewUrl: any,
-    iJsModuleUrl?: string,
-    iVmArg?: any,
-    iCallbackFn?: Function
-  ) {
+  loadView(iTargetSelector: string, iViewUrl: any, iJsModuleUrl?: string, iVmArg?: any, iCallbackFn?: Function) {
     throw new Error("Not implemented");
   }
 
   // Routes to a path.
-  manualRouteTo(
-    iPath: string,
-    iTarget: string,
-    iViewUrl?: any,
-    iJSModuleUrl?: string
-  ) {
+  manualRouteTo(iPath: string, iTarget: string, iViewUrl?: any, iJSModuleUrl?: string) {
     const vm = this.vm;
     const template: RoutingTemplateType = {
       Id: "manual",
@@ -251,12 +206,9 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     if (this.RoutingState && this.RoutingState.Templates) {
       if (noMatch) {
         // Use the no match template if given, otherwise fallback to "/404.html".
-        const noMatchTemplate = this.RoutingState.Templates.find(
-          x => x.UrlPattern === "*"
-        );
+        const noMatchTemplate = this.RoutingState.Templates.find(x => x.UrlPattern === "*");
         if (noMatchTemplate) this.routeTo(this.router.urlPath, noMatchTemplate);
-        else if (this.router.notFound404Url)
-          setTimeout(() => (window.location.href = this.router.notFound404Url));
+        else if (this.router.notFound404Url) setTimeout(() => (window.location.href = this.router.notFound404Url));
       }
       if (this.debug) console.log("router> routed" + (noMatch ? " (404)" : ""));
     }
@@ -268,8 +220,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     // No route to process. Return silently.
     if (iRoute == null) return;
 
-    if (!iRoute.hasOwnProperty("Path") && !iRoute.hasOwnProperty("TemplateId"))
-      throw new Error("Not a valid route");
+    if (!iRoute.hasOwnProperty("Path") && !iRoute.hasOwnProperty("TemplateId")) throw new Error("Not a valid route");
 
     // Build the absolute root path.
     this.initRoot();
@@ -278,11 +229,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     // This is so that we don't send the same data twice if both are equal.
     let path = iRoute.Path;
     let template = null;
-    if (
-      this.hasRoutingState &&
-      this.RoutingState.Templates != null &&
-      iRoute.TemplateId != null
-    ) {
+    if (this.hasRoutingState && this.RoutingState.Templates != null && iRoute.TemplateId != null) {
       let match = this.RoutingState.Templates.filter(function (iTemplate) {
         return iTemplate.Id == iRoute.TemplateId;
       });
@@ -292,14 +239,10 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
         if (typeof iTarget === "string") template.Target = iTarget;
 
         if (path == null) {
-          path =
-            template.UrlPattern != null ? template.UrlPattern : template.Id;
+          path = template.UrlPattern != null ? template.UrlPattern : template.Id;
           iRoute.Path = path;
         }
-      } else if (iRoute.RedirectRoot == null)
-        throw new Error(
-          `vmRoute cannot find route template ${iRoute.TemplateId}`
-        );
+      } else if (iRoute.RedirectRoot == null) throw new Error(`vmRoute cannot find route template ${iRoute.TemplateId}`);
     }
 
     // If the path has a redirect root, the path doesn't belong to the current root and needs to be
@@ -309,8 +252,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     if (iRoute.RedirectRoot != null) {
       // Combine the redirect root with the view model's root.
       let redirectRoot = iRoute.RedirectRoot;
-      if (redirectRoot.charAt(0) == "/")
-        redirectRoot = redirectRoot.substr(0, redirectRoot.length - 1);
+      if (redirectRoot.charAt(0) == "/") redirectRoot = redirectRoot.substr(0, redirectRoot.length - 1);
       let redirectRootPath = iRoute.RedirectRoot.split("/");
 
       let urlRedirect = "";
@@ -318,22 +260,19 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
       if (absRoot != null) {
         let absRootPath = absRoot.split("/");
         for (let i = 0; i < absRootPath.length; i++) {
-          if (absRootPath[i] != "" && absRootPath[i] == redirectRootPath[0])
-            break;
+          if (absRootPath[i] != "" && absRootPath[i] == redirectRootPath[0]) break;
           urlRedirect += absRootPath[i] + "/";
         }
       }
 
       urlRedirect += redirectRoot + "/" + path;
       urlRedirect = urlRedirect.replace(/\/\/+/g, "/");
-      if (!this.routes.some(x => x.Path === path))
-        this.routes.push({ TemplateId: null, Path: path, Url: urlRedirect });
+      if (!this.routes.some(x => x.Path === path)) this.routes.push({ TemplateId: null, Path: path, Url: urlRedirect });
       return urlRedirect;
     }
 
     // For quick lookup, save the mapping between the path to the route inside the view model.
-    if (template == null)
-      throw new Error("vmRoute cannot find any route template");
+    if (template == null) throw new Error("vmRoute cannot find any route template");
 
     iRoute["$template"] = template;
     this.pathToRoute = this.pathToRoute || {};
@@ -343,26 +282,16 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     // the anchor click event and instead do push to HTML5 history state.
     let url = this.toUrl(path);
     url = url.length > 0 ? url : "/";
-    if (!this.routes.some(x => x.Path === path))
-      this.routes.push({ TemplateId: null, Path: path, Url: url });
+    if (!this.routes.some(x => x.Path === path)) this.routes.push({ TemplateId: null, Path: path, Url: url });
     return url;
   }
 
   // Routes to a path.
-  routeTo(
-    iPath: string,
-    iTemplate: RoutingTemplateType,
-    iDisableEvent?: boolean,
-    iCallbackFn?: Function,
-    isRedirect?: boolean
-  ) {
+  routeTo(iPath: string, iTemplate: RoutingTemplateType, iDisableEvent?: boolean, iCallbackFn?: Function, isRedirect?: boolean) {
     const vm = this.vm;
     const viewModels = vm.$dotnetify.getViewModels();
 
-    if (this.debug)
-      console.log(
-        "router> route '" + iPath + "' to template id=" + iTemplate.Id
-      );
+    if (this.debug) console.log("router> route '" + iPath + "' to template id=" + iTemplate.Id);
 
     // We can determine whether the view has already been loaded by matching the 'RoutingState.Origin' argument
     // on the existing view model inside that target selector with the path.
@@ -371,64 +300,38 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
       let vmOther = viewModels[i];
       let vmArg = vmOther["$router"].VMArg;
       if (vmArg != null) {
-        if (
-          typeof vmArg["RoutingState.Origin"] === "string" &&
-          utils.equal(vmArg["RoutingState.Origin"], pathUrl)
-        )
-          return;
+        if (typeof vmArg["RoutingState.Origin"] === "string" && utils.equal(vmArg["RoutingState.Origin"], pathUrl)) return;
       }
     }
 
     const activateRoute = () => {
       // Check if the route has valid target.
       if (iTemplate.Target == null) {
-        console.error(
-          "router> the Target for template '" +
-            iTemplate.Id +
-            "' was not set.  Use vm.onRouteEnter() to set the target."
-        );
+        console.error("router> the Target for template '" + iTemplate.Id + "' was not set.  Use vm.onRouteEnter() to set the target.");
         return;
       }
 
       // If target DOM element isn't found, redirect URL to the path.
       if (document.getElementById(iTemplate.Target) == null) {
         if (isRedirect === true) {
-          if (this.debug)
-            console.log(
-              "router> target '" + iTemplate.Target + "' not found in DOM"
-            );
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM");
           return;
         } else {
-          if (this.debug)
-            console.log(
-              "router> target '" +
-                iTemplate.Target +
-                "' not found in DOM, use redirect instead"
-            );
-          return this.router.redirect(this.toUrl(iPath), [
-            ...viewModels,
-            ...vm.$dotnetify.controller.getViewModels()
-          ]);
+          if (this.debug) console.log("router> target '" + iTemplate.Target + "' not found in DOM, use redirect instead");
+          return this.router.redirect(this.toUrl(iPath), [...viewModels, ...vm.$dotnetify.controller.getViewModels()]);
         }
       }
 
       // Load the view associated with the route asynchronously.
-      this.loadView(
-        "#" + iTemplate.Target,
-        iTemplate.ViewUrl,
-        iTemplate.JSModuleUrl,
-        { "RoutingState.Origin": iPath },
-        () => {
-          // If load is successful, update the active route.
-          this.dispatchActiveRoutingState(iPath);
+      this.loadView("#" + iTemplate.Target, iTemplate.ViewUrl, iTemplate.JSModuleUrl, { "RoutingState.Origin": iPath }, () => {
+        // If load is successful, update the active route.
+        this.dispatchActiveRoutingState(iPath);
 
-          // Support exit interception.
-          if (iDisableEvent != true && vm.hasOwnProperty("onRouteExit"))
-            vm["onRouteExit"](iPath, iTemplate);
+        // Support exit interception.
+        if (iDisableEvent != true && vm.hasOwnProperty("onRouteExit")) vm["onRouteExit"](iPath, iTemplate);
 
-          if (typeof iCallbackFn === "function") iCallbackFn.call(vm);
-        }
-      );
+        if (typeof iCallbackFn === "function") iCallbackFn.call(vm);
+      });
     };
 
     // Support enter interception.
@@ -439,9 +342,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
       if (result === false) return;
       else if (result && typeof (<any>result).then == "function") {
         // If returning a promise, wait until it's resolved.
-        (<Promise<boolean>>result).then(
-          (res: boolean) => res !== false && activateRoute()
-        );
+        (<Promise<boolean>>result).then((res: boolean) => res !== false && activateRoute());
         return;
       }
     }
@@ -451,8 +352,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
 
   routeToRoute(iRoute) {
     var path = this.vm["$route"](iRoute);
-    if (path == null || path == "")
-      throw new Error("The route passed to $routeTo is invalid.");
+    if (path == null || path == "") throw new Error("The route passed to $routeTo is invalid.");
 
     setTimeout(() => this.router.pushState({}, "", path));
   }
@@ -472,11 +372,7 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
     if (this.debug) console.log("router> routing " + urlPath);
 
     // If the URL path matches the root path of this view, use the template with a blank URL pattern if provided.
-    if (
-      utils.equal(urlPath, root) ||
-      utils.equal(urlPath, root + "/") ||
-      urlPath === "/"
-    ) {
+    if (utils.equal(urlPath, root) || utils.equal(urlPath, root + "/") || urlPath === "/") {
       let match = utils.grep(this.RoutingState.Templates, function (iTemplate) {
         return iTemplate.UrlPattern === "";
       });
@@ -499,32 +395,20 @@ export default class DotnetifyVMRouter implements IDotnetifyVMRouter {
       });
       if (match.length > 0) {
         // If more than one match, find the best match.
-        for (let i = 0; i < match.length; i++)
-          if (routeElem == null || routeElem.Url.length < match[i].Url.length)
-            routeElem = match[i];
+        for (let i = 0; i < match.length; i++) if (routeElem == null || routeElem.Url.length < match[i].Url.length) routeElem = match[i];
       }
 
       if (routeElem != null) {
         let path = routeElem.Path;
         let template =
-          this.hasOwnProperty("pathToRoute") &&
-          this.pathToRoute.hasOwnProperty(path)
-            ? this.pathToRoute[path].$template
-            : null;
+          this.hasOwnProperty("pathToRoute") && this.pathToRoute.hasOwnProperty(path) ? this.pathToRoute[path].$template : null;
         if (template != null) {
           // If the URL path is completely routed, clear it.
-          if (utils.equal(this.router.urlPath, this.toUrl(path)))
-            this.router.urlPath = "";
+          if (utils.equal(this.router.urlPath, this.toUrl(path))) this.router.urlPath = "";
 
           // If route's not already active, route to it.
           if (!utils.equal(this.RoutingState.Active, path)) {
-            this.routeTo(
-              path,
-              template,
-              false,
-              () => this.raiseRoutedEvent(),
-              isRedirect
-            );
+            this.routeTo(path, template, false, () => this.raiseRoutedEvent(), isRedirect);
           } else this.raiseRoutedEvent();
           return true;
         }

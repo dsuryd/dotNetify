@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Vue from "vue";
+import { createApp } from "vue";
 import dotnetify, { useConnect } from "dotnetify";
 import { Markdown, Tab, TabItem, withTheme } from "dotnetify-elements";
 import Article from "../components/Article";
@@ -195,23 +195,23 @@ class RealTimePushKO extends React.Component {
 
 class RealTimePushVue extends React.Component {
   componentDidMount() {
-    this.app = new Vue({
+    this.app = createApp({
       template:
         "<div><p>{{Greetings}}</p><p>Server time is: {{ServerTime}}</p></div>",
       created() {
         this.vm = dotnetify.vue.connect("RealTimePush", this);
       },
-      destroyed() {
+      unmounted() {
         this.vm.$destroy();
       },
       data() {
         return { Greetings: "", ServerTime: "" };
       }
     });
-    this.app.$mount("#RealTimePushVue");
+    this.app.mount("#RealTimePushVue");
   }
   componentWillUnmount() {
-    this.app.$destroy();
+    this.app.unmount();
   }
   render() {
     return <div id="RealTimePushVue" />;
@@ -326,7 +326,7 @@ class ServerUpdateKO extends React.Component {
 
 class ServerUpdateVue extends React.Component {
   componentDidMount() {
-    this.app = new Vue({
+    this.app = createApp({
       template: `
       <div>
         <div>{{Greetings}}</div>
@@ -337,7 +337,7 @@ class ServerUpdateVue extends React.Component {
       created() {
         this.vm = dotnetify.vue.connect("ServerUpdate", this);
       },
-      destroyed() {
+      unmounted() {
         this.vm.$destroy();
       },
       data() {
@@ -351,10 +351,10 @@ class ServerUpdateVue extends React.Component {
         }
       }
     });
-    this.app.$mount("#ServerUpdateVue");
+    this.app.mount("#ServerUpdateVue");
   }
   componentWillUnmount() {
-    this.app.$destroy();
+    this.app.unmount();
   }
   render() {
     return <div id="ServerUpdateVue" />;
@@ -363,7 +363,7 @@ class ServerUpdateVue extends React.Component {
 
 class TwoWayBindingVue extends React.Component {
   componentDidMount() {
-    this.app = new Vue(
+    this.app = createApp(
       dotnetify.vue.component(
         {
           name: "TwoWayBinding",
@@ -378,10 +378,10 @@ class TwoWayBindingVue extends React.Component {
         { watch: ["Name"] }
       )
     );
-    this.app.$mount("#TwoWayBindingVue");
+    this.app.mount("#TwoWayBindingVue");
   }
   componentWillUnmount() {
-    this.app.$destroy();
+    this.app.unmount();
   }
   render() {
     return <div id="TwoWayBindingVue" />;
