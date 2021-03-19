@@ -55,7 +55,6 @@ export default {
     }
   },
   unmounted() {
-    debugger;
     this.vm.$dispatch({ RemoveUser: null });
     this.vm.$destroy();
   },
