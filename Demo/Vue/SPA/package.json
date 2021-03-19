@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "chart.js": "~2.7.2",
-    "dotnetify": "^3.6.0",
+    "dotnetify": "^5.0.1",
     "vue": "~2.5.17"
   },
   "devDependencies": {
@@ -15,7 +15,7 @@
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "css-loader": "~1.0.0",
-    "node-sass": "~4.9.4",
+    "node-sass": "^4.14.1",
     "sass-loader": "~7.1.0",
     "vue-loader": "~15.4.2",
     "vue-template-compiler": "~2.5.17",
