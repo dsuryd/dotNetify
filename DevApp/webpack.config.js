@@ -22,7 +22,7 @@ module.exports = {
     modules: [ 'src', 'client', 'node_modules' ],
     extensions: [ '.js', '.jsx', '.ts', '.tsx', '.vue' ],
     alias: {
-      vue$: 'vue/dist/vue.esm.js',
+      vue: '@vue/runtime-dom',
       'styled-components': path.resolve(__dirname, 'node_modules', 'dotnetify-elements/node_modules/styled-components')
     }
   },

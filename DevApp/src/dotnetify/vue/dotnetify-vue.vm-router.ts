@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import * as Vue from "vue";
+
 import DotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyRouter from "../core/dotnetify-router";
 import DotnetifyVMRouter from "../core/dotnetify-vm-router";
