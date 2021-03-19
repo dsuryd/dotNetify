@@ -8,7 +8,7 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-- **v5.0: Scale-out, Vue 3.x support** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.0).
+<!-- - **v5.0: Scale-out, Vue 3.x support** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.0). -->
 - v4.1: Async view model - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1).
 - v4.0: Typescript support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.0).
 
