@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.2",
-    "dotnetify": "^4.1.0",
+    "dotnetify": "^5.0.1",
     "react": "~16.11.0",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "~16.11.0",
