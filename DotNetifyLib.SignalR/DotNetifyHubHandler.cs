@@ -145,6 +145,8 @@ namespace DotNetify
       /// </summary>
       public async Task OnDisconnectedAsync(Exception exception)
       {
+         _hubContext = new DotNetifyHubContext(CallerContext, nameof(OnDisconnectedAsync), null, null, null, Principal);
+
          // Access VMController to set the ambient context.
          VMController _ = VMController;
 
