@@ -196,8 +196,16 @@ namespace DotNetify.Client
                   {
                      _dispatcher.InvokeAsync(() =>
                      {
-                        listIface.Insert(i, newItem);
-                        listIface.RemoveAt(i + 1);
+                         foreach (var newItemProp in newItem.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                         {
+                             var oldItemPropValue = newItemProp.GetValue(listIface[i]);
+                             var newItemPropValue = newItemProp.GetValue(newItem);
+                             if (!(oldItemPropValue?.Equals(newItemPropValue) == true))
+                             {
+                                 newItemProp.SetValue(listIface[i], newItemPropValue);
+                             }
+                         }
+
                      });
                      return;
                   }
