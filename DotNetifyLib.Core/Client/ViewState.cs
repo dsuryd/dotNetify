@@ -205,7 +205,6 @@ namespace DotNetify.Client
                                  newItemProp.SetValue(listIface[i], newItemPropValue);
                              }
                          }
-
                      });
                      return;
                   }
