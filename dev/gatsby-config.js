@@ -1,15 +1,13 @@
 module.exports = {
-  pathPrefix: "/dotnetify",
+  pathPrefix: "/dotNetify",
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
+    title: `DotNetify`,
     author: {
-      name: `Kyle Mathews`,
-      summary: `who lives and works in San Francisco building useful things.`,
+      name: `Dicky Suryadi`,
     },
-    description: `A starter blog demonstrating what Gatsby can do.`,
-    siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
+    siteUrl: `https://dsuryd.github.io/dotNetify`,
     social: {
-      twitter: `kylemathews`,
+      twitter: `dotnetify`,
     },
   },
   plugins: [
