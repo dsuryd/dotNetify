@@ -1,313 +1,220 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Gatsby Starter Blog]]></title><description><![CDATA[Gatsby Starter Blog]]></description><link>https://dsuryd.github.io/dotNetify</link><generator>GatsbyJS</generator><lastBuildDate>Wed, 31 Mar 2021 05:07:31 GMT</lastBuildDate><item><title><![CDATA[New Beginnings]]></title><description><![CDATA[Far far away, behind the word mountains, far from the countries Vokalia and
-Consonantia, there live the blind texts. Separated they live in…]]></description><link>https://dsuryd.github.io/dotNetify/new-beginnings/</link><guid isPermaLink="false">https://dsuryd.github.io/dotNetify/new-beginnings/</guid><pubDate>Thu, 28 May 2015 22:40:32 GMT</pubDate><content:encoded>&lt;p&gt;Far far away, behind the word mountains, far from the countries Vokalia and
-Consonantia, there live the blind texts. Separated they live in Bookmarksgrove
-right at the coast of the Semantics, a large language ocean. A small river named
-Duden flows by their place and supplies it with the necessary regelialia.&lt;/p&gt;
-&lt;h2&gt;On deer horse aboard tritely yikes and much&lt;/h2&gt;
-&lt;p&gt;The Big Oxmox advised her not to do so, because there were thousands of bad
-Commas, wild Question Marks and devious Semikoli, but the Little Blind Text
-didn’t listen. She packed her seven versalia, put her initial into the belt and
-made herself on the way.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;This however showed weasel&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Well uncritical so misled&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;this is very interesting&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Goodness much until that fluid owl&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;When she reached the first hills of the &lt;strong&gt;Italic Mountains&lt;/strong&gt;, she had a last
-view back on the skyline of her hometown &lt;em&gt;Bookmarksgrove&lt;/em&gt;, the headline of
-&lt;a href=&quot;http://google.com&quot;&gt;Alphabet Village&lt;/a&gt; and the subline of her own road, the Line
-Lane. Pityful a rhetoric question ran over her cheek, then she continued her
-way. On her way she met a copy.&lt;/p&gt;
-&lt;h3&gt;Overlaid the jeepers uselessly much excluding&lt;/h3&gt;
-&lt;p&gt;But nothing the copy said could convince her and so it didn’t take long until a
-few insidious Copy Writers ambushed her, made her drunk with
-&lt;a href=&quot;http://google.com&quot;&gt;Longe and Parole&lt;/a&gt; and dragged her into their agency, where
-they abused her for their projects again and again. And if she hasn’t been
-rewritten, then they are still using her.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Gatsby Starter Blog]]></title><description><![CDATA[Gatsby Starter Blog]]></description><link>https://dsuryd.github.io/dotNetify</link><generator>GatsbyJS</generator><lastBuildDate>Wed, 31 Mar 2021 05:26:25 GMT</lastBuildDate><item><title><![CDATA[No title]]></title><description><![CDATA[DotNetify: Adding “Azure SignalR”-like Scale-Out Option A few weeks ago dotNetify passed the 100k downloads on NuGet. I’m so thrilled that…]]></description><link>https://dsuryd.github.io/dotNetify/scale-out/</link><guid isPermaLink="false">https://dsuryd.github.io/dotNetify/scale-out/</guid><content:encoded>&lt;h1&gt;DotNetify: Adding “Azure SignalR”-like Scale-Out Option&lt;/h1&gt;
+&lt;p&gt;A few weeks ago dotNetify passed the 100k downloads on NuGet. I’m so thrilled that so many people have found this project compelling enough to try out, and even use it in production! For those who are unfamiliar with dotNetify, it’s an Apache2-licensed FOSS that does this in a nutshell:&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;Far far away, behind the word mountains, far from the countries Vokalia and
-Consonantia, there live the blind texts. Separated they live in Bookmarksgrove
-right at the coast of the Semantics, a large language ocean.&lt;/p&gt;
+&lt;p&gt;dotNetify provides a layer of MVVM-styled abstraction over SignalR to facilitate real-time communication between the web front-end of your application and its ASP.NET Core back-end.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;It is a paradisematic country, in which roasted parts of sentences fly into your
-mouth. Even the all-powerful Pointing has no control about the blind texts it is
-an almost unorthographic life One day however a small line of blind text by the
-name of Lorem Ipsum decided to leave for the far World of Grammar.&lt;/p&gt;
-&lt;h3&gt;According a funnily until pre-set or arrogant well cheerful&lt;/h3&gt;
-&lt;p&gt;The Big Oxmox advised her not to do so, because there were thousands of bad
-Commas, wild Question Marks and devious Semikoli, but the Little Blind Text
-didn’t listen. She packed her seven versalia, put her initial into the belt and
-made herself on the way.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;So baboon this&lt;/li&gt;
-&lt;li&gt;Mounted militant weasel gregariously admonishingly straightly hey&lt;/li&gt;
-&lt;li&gt;Dear foresaw hungry and much some overhung&lt;/li&gt;
-&lt;li&gt;Rash opossum less because less some amid besides yikes jeepers frenetic
-impassive fruitlessly shut&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;When she reached the first hills of the Italic Mountains, she had a last view
-back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet
-Village and the subline of her own road, the Line Lane. Pityful a rhetoric
-question ran over her cheek, then she continued her way. On her way she met a
-copy.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;The copy warned the Little Blind Text, that where it came from it would have
-been rewritten a thousand times and everything that was left from its origin
-would be the word “and” and the Little Blind Text should turn around and
-return to its own, safe country.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;But nothing the copy said could convince her and so it didn’t take long until a
-few insidious Copy Writers ambushed her, made her drunk with Longe and Parole
-and dragged her into their agency, where they abused her for their projects
-again and again. And if she hasn’t been rewritten, then they are still using
-her. Far far away, behind the word mountains, far from the countries Vokalia and
-Consonantia, there live the blind texts.&lt;/p&gt;
-&lt;h4&gt;Silent delightfully including because before one up barring chameleon&lt;/h4&gt;
-&lt;p&gt;Separated they live in Bookmarksgrove right at the coast of the Semantics, a
-large language ocean. A small river named Duden flows by their place and
-supplies it with the necessary regelialia. It is a paradisematic country, in
-which roasted parts of sentences fly into your mouth.&lt;/p&gt;
-&lt;p&gt;Even the all-powerful Pointing has no control about the blind texts it is an
-almost unorthographic life One day however a small line of blind text by the
-name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox
-advised her not to do so, because there were thousands of bad Commas, wild
-Question Marks and devious Semikoli, but the Little Blind Text didn’t listen.&lt;/p&gt;
-&lt;h5&gt;Wherever far wow thus a squirrel raccoon jeez jaguar this from along&lt;/h5&gt;
-&lt;p&gt;She packed her seven versalia, put her initial into the belt and made herself on
-the way. When she reached the first hills of the Italic Mountains, she had a
-last view back on the skyline of her hometown Bookmarksgrove, the headline of
-Alphabet Village and the subline of her own road, the Line Lane. Pityful a
-rhetoric question ran over her cheek, then she continued her way. On her way she
-met a copy.&lt;/p&gt;
-&lt;h6&gt;Slapped cozy a that lightheartedly and far&lt;/h6&gt;
-&lt;p&gt;The copy warned the Little Blind Text, that where it came from it would have
-been rewritten a thousand times and everything that was left from its origin
-would be the word “and” and the Little Blind Text should turn around and return
-to its own, safe country. But nothing the copy said could convince her and so it
-didn’t take long until a few insidious Copy Writers ambushed her, made her drunk
-with Longe and Parole and dragged her into their agency, where they abused her
-for their projects again and again.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[My Second Post!]]></title><description><![CDATA[Wow! I love blogging so much already. Did you know that “despite its name, salted duck eggs can also be made from
-chicken eggs, though the…]]></description><link>https://dsuryd.github.io/dotNetify/my-second-post/</link><guid isPermaLink="false">https://dsuryd.github.io/dotNetify/my-second-post/</guid><pubDate>Wed, 06 May 2015 23:46:37 GMT</pubDate><content:encoded>&lt;p&gt;Wow! I love blogging so much already.&lt;/p&gt;
-&lt;p&gt;Did you know that “despite its name, salted duck eggs can also be made from
-chicken eggs, though the taste and texture will be somewhat different, and the
-egg yolk will be less rich.”?
-(&lt;a href=&quot;https://en.wikipedia.org/wiki/Salted_duck_egg&quot;&gt;Wikipedia Link&lt;/a&gt;)&lt;/p&gt;
-&lt;p&gt;Yeah, I didn’t either.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Hello World]]></title><description><![CDATA[This is my first post on my new fake blog! How exciting! I’m sure I’ll write a lot more interesting things in the future. Oh, and here’s a…]]></description><link>https://dsuryd.github.io/dotNetify/hello-world/</link><guid isPermaLink="false">https://dsuryd.github.io/dotNetify/hello-world/</guid><pubDate>Fri, 01 May 2015 22:12:03 GMT</pubDate><content:encoded>&lt;p&gt;This is my first post on my new fake blog! How exciting!&lt;/p&gt;
-&lt;p&gt;I’m sure I’ll write a lot more interesting things in the future.&lt;/p&gt;
-&lt;p&gt;Oh, and here’s a great quote from this Wikipedia on
-&lt;a href=&quot;https://en.wikipedia.org/wiki/Salted_duck_egg&quot;&gt;salted duck eggs&lt;/a&gt;.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;A salted duck egg is a Chinese preserved food product made by soaking duck
-eggs in brine, or packing each egg in damp, salted charcoal. In Asian
-supermarkets, these eggs are sometimes sold covered in a thick layer of salted
-charcoal paste. The eggs may also be sold with the salted paste removed,
-wrapped in plastic, and vacuum packed. From the salt curing process, the
-salted duck eggs have a briny aroma, a gelatin-like egg white and a
-firm-textured, round yolk that is bright orange-red in color.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;It offers built-in integration with some client-side frameworks, such as React, Vue, and Blazor, resulting in code that’s declarative, concise, and easy to read. For example, here’s what it would look like to implement a rudimentary stock ticker UI using Vue:&lt;/p&gt;
 &lt;p&gt;&lt;span
       class=&quot;gatsby-resp-image-wrapper&quot;
       style=&quot;position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 630px; &quot;
     &gt;
       &lt;a
     class=&quot;gatsby-resp-image-link&quot;
-    href=&quot;/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/e1596/salty_egg.jpg&quot;
+    href=&quot;/dotNetify/static/203bd6a152cdff20e9e56290fa94a3e0/cd536/stock-ticker-code.png&quot;
     style=&quot;display: block&quot;
     target=&quot;_blank&quot;
     rel=&quot;noopener&quot;
   &gt;
     &lt;span
     class=&quot;gatsby-resp-image-background-image&quot;
-    style=&quot;padding-bottom: 75.31645569620254%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAPABQDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAMB/8QAFwEAAwEAAAAAAAAAAAAAAAAAAAEEBf/aAAwDAQACEAMQAAABgik0dWC//8QAGRABAAMBAQAAAAAAAAAAAAAAAQACERJC/9oACAEBAAEFAkqW7B5Zovtvk//EABcRAQADAAAAAAAAAAAAAAAAAAAREkH/2gAIAQMBAT8B1WX/xAAWEQEBAQAAAAAAAAAAAAAAAAAAESL/2gAIAQIBAT8BjT//xAAbEAABBAMAAAAAAAAAAAAAAAAAAQIRISIxMv/aAAgBAQAGPwK9GNocyS8hCj//xAAaEAADAQEBAQAAAAAAAAAAAAAAAREhQYGx/9oACAEBAAE/IXOrA43oOyg9wgU86OZMfwZKypT/2gAMAwEAAgADAAAAEMjv/8QAFxEBAQEBAAAAAAAAAAAAAAAAAQARIf/aAAgBAwEBPxARwyusv//EABcRAQEBAQAAAAAAAAAAAAAAAAEAIVH/2gAIAQIBAT8QOoVoX//EAB0QAQEAAgIDAQAAAAAAAAAAAAERADFhgSFB0eH/2gAIAQEAAT8QSpwaGjrBSrtHyF9iY8RpUnGRBGqtOcsiDE6fM3AgiXf5M//Z&apos;); background-size: cover; display: block;&quot;
+    style=&quot;padding-bottom: 51.26582278481012%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAKCAIAAAA7N+mxAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAB2ElEQVQoz22Ry27TQBSG8wqQRKSosefmGTu+pUkR4gWoRJKC4E27aFkECbFAwKLtoouuEKCuGuXmOPbM2B5zLBUhJI6O/tX85/vPmZYfekejsYDiHARjjGxECen1eicnL2+vv95efZ5/vDx7/+3s4svFh6v5p5vz+fX5/BK6ZVt94sWD0Ys48MPx8/DoOIpib/jsENPXb99lZf3rLkuSVf2/aiFkUe578bEXxm44dIMh9wIm3INDa3b6ZqOSzVqmqSwq03RZVZVp2jTawgg7IkDMtW1EbIsgy+r3bctqP370ajIzdZ3uytXabHfFNtcwJM/zoigfyASTOByP4rHHBcOYYYRgDEKdTnsymcGLfVpudmqviyStklTvdkmaKq2rugYywWLgR1HoDnzKXYdTwYjrsCcHT6fTUzDnmVqutpvtNlMKHLooof6QCRGuCKLI8wRqqBDZeiBPm9hAWK+XP77/XNyv8zwzxvw9GKHUBx8XiDqYMMIFjIMZ7XZjbqzGyDxbLJZpmmmt/jHDxwo/8KIhdwhzHMJdTB3uDrrdLuxcNbH1fl8o3ezZiNZSymyfweValDFKKMKQAAMTU2YjEKfb7QC5NLlSpVJGSiVlKaXWRaGUznMJ+hs9v0ztfT1RaAAAAABJRU5ErkJggg==&apos;); background-size: cover; display: block;&quot;
   &gt;&lt;/span&gt;
   &lt;img
         class=&quot;gatsby-resp-image-image&quot;
-        alt=&quot;Chinese Salty Egg&quot;
-        title=&quot;Chinese Salty Egg&quot;
-        src=&quot;/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/828fb/salty_egg.jpg&quot;
-        srcset=&quot;/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/ff44c/salty_egg.jpg 158w,
-/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/a6688/salty_egg.jpg 315w,
-/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/828fb/salty_egg.jpg 630w,
-/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/0ede0/salty_egg.jpg 945w,
-/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/3ac88/salty_egg.jpg 1260w,
-/dotnetify/static/8058f3f26913fea3b6a89a73344fe94a/e1596/salty_egg.jpg 2048w&quot;
+        alt=&quot;Stock Ticker - Vue&quot;
+        title=&quot;Stock Ticker - Vue&quot;
+        src=&quot;/dotNetify/static/203bd6a152cdff20e9e56290fa94a3e0/f058b/stock-ticker-code.png&quot;
+        srcset=&quot;/dotNetify/static/203bd6a152cdff20e9e56290fa94a3e0/c26ae/stock-ticker-code.png 158w,
+/dotNetify/static/203bd6a152cdff20e9e56290fa94a3e0/6bdcf/stock-ticker-code.png 315w,
+/dotNetify/static/203bd6a152cdff20e9e56290fa94a3e0/f058b/stock-ticker-code.png 630w,
+/dotNetify/static/203bd6a152cdff20e9e56290fa94a3e0/40601/stock-ticker-code.png 945w,
+/dotNetify/static/203bd6a152cdff20e9e56290fa94a3e0/cd536/stock-ticker-code.png 1114w&quot;
         sizes=&quot;(max-width: 630px) 100vw, 630px&quot;
         style=&quot;width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;&quot;
         loading=&quot;lazy&quot;
       /&gt;
   &lt;/a&gt;
     &lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;You can also write code blocks here!&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;js&quot;&gt;&lt;pre class=&quot;language-js&quot;&gt;&lt;code class=&quot;language-js&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; saltyDuckEgg &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;chinese preserved food product&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&quot;left&quot;&gt;Number&lt;/th&gt;
-&lt;th align=&quot;left&quot;&gt;Title&lt;/th&gt;
-&lt;th align=&quot;right&quot;&gt;Year&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&quot;left&quot;&gt;1&lt;/td&gt;
-&lt;td align=&quot;left&quot;&gt;Harry Potter and the Philosopher’s Stone&lt;/td&gt;
-&lt;td align=&quot;right&quot;&gt;2001&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td align=&quot;left&quot;&gt;2&lt;/td&gt;
-&lt;td align=&quot;left&quot;&gt;Harry Potter and the Chamber of Secrets&lt;/td&gt;
-&lt;td align=&quot;right&quot;&gt;2002&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td align=&quot;left&quot;&gt;3&lt;/td&gt;
-&lt;td align=&quot;left&quot;&gt;Harry Potter and the Prisoner of Azkaban&lt;/td&gt;
-&lt;td align=&quot;right&quot;&gt;2004&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;a href=&quot;https://raw.github.com/adamschwartz/github-markdown-kitchen-sink/master/README.md&quot;&gt;View raw (TEST.md)&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;This is a paragraph.&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;This is a paragraph.&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h1&gt;Header 1&lt;/h1&gt;
-&lt;h2&gt;Header 2&lt;/h2&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;Header 1
-========
-
-Header 2
---------&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h1&gt;Header 1&lt;/h1&gt;
-&lt;h2&gt;Header 2&lt;/h2&gt;
-&lt;h3&gt;Header 3&lt;/h3&gt;
-&lt;h4&gt;Header 4&lt;/h4&gt;
-&lt;h5&gt;Header 5&lt;/h5&gt;
-&lt;h6&gt;Header 6&lt;/h6&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;# Header 1
-## Header 2
-### Header 3
-#### Header 4
-##### Header 5
-###### Header 6&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h1&gt;Header 1&lt;/h1&gt;
-&lt;h2&gt;Header 2&lt;/h2&gt;
-&lt;h3&gt;Header 3&lt;/h3&gt;
-&lt;h4&gt;Header 4&lt;/h4&gt;
-&lt;h5&gt;Header 5&lt;/h5&gt;
-&lt;h6&gt;Header 6&lt;/h6&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;# Header 1 #
-## Header 2 ##
-### Header 3 ###
-#### Header 4 ####
-##### Header 5 #####
-###### Header 6 ######&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;&amp;gt; Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;blockquote&gt;
-&lt;h2&gt;This is a header.&lt;/h2&gt;
+&lt;p&gt;Doesn’t it look clean and simple? With dotNetify, you only write views and its view models, and you automatically get easy access to the bidirectional, real-time functionality provided by SignalR without having to write the low-level code yourself.&lt;/p&gt;
+&lt;h2&gt;SignalR Scale-Out Options&lt;/h2&gt;
+&lt;p&gt;Running a dotNetify app on a single server is pretty straightforward, but on a few occasions there were questions about its scalability in a multi-server architecture. Scaling SignalR horizontally is tricky compared to REST APIs. There are at least two major issues to address:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;This is the first list item.&lt;/li&gt;
-&lt;li&gt;This is the second list item.&lt;/li&gt;
+&lt;li&gt;Given the connection is stateful, when a client sends a request to an app server, subsequent requests need to stay on that server.&lt;/li&gt;
+&lt;li&gt;A server is only aware of its own client connections. And so if the app needs to broadcast, it needs a way to get the payload on all the app servers so they can broadcast it to their respective clients.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Here’s some example code:&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;Markdown.generate();&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;/blockquote&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;&amp;gt; ## This is a header.
-&amp;gt; 1. This is the first list item.
-&amp;gt; 2. This is the second list item.
-&amp;gt;
-&amp;gt; Here&amp;#39;s some example code:
-&amp;gt;
-&amp;gt;     Markdown.generate();&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The first issue can be solved by either configuring the load balancer to always direct the requests from a particular client to the same server (so-called “sticky sessions”), or making SignalR skips its transport negotiation and straight to persistent WebSocket connection. But both give rise to a harder problem: sticky connections persist on one server; when that server is at capacity, how do we redistribute the load to a new server?&lt;/p&gt;
+&lt;p&gt;The second issue is commonly addressed by having an intermediary server with a pub/sub channel to which every app server subscribes. Incoming client messages to one server are published to the channel so the other servers may get them as well. Microsoft’s SignalR documentation refers to this as a “backplane”, with Redis being the recommended technology.&lt;/p&gt;
+&lt;p&gt;&lt;span
+      class=&quot;gatsby-resp-image-wrapper&quot;
+      style=&quot;position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 614px; &quot;
+    &gt;
+      &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/dotNetify/static/bf9bfca531f728f2b4d568c22eeb2300/e9131/backplane.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+    &lt;span
+    class=&quot;gatsby-resp-image-background-image&quot;
+    style=&quot;padding-bottom: 57.59493670886076%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAMCAYAAABiDJ37AAAACXBIWXMAAA7DAAAOwwHHb6hkAAACKklEQVQoz2VTTW8SQRjeH+RNDx5MvHoxeDImJh6IcquJmnrQg02L/gDOcPFmTcpJCAfjAZpiJBUL1dBSWpbvsmzZL2BmZ/ZxZteFpT7JZD7yzjPP+7zvKNVqFYVCAeVyGRKe560NhLOAadk4b3dACEEIz6Xgi5k/5FrJ5/NIJBKIxWJrhMu1mBnj/v5b8QCPn75A60L194RSsLkgogRcDkGqZLNZlEol5HI56JYLzldkqwc4CAM+7eVw4/Y9/Kr9BhNqpoYBOnMAzuAxBk7mUBCBNaPQDLIkCskNx8Wk10Vx/wAv37zHhdpd3pEkQR7BWlFVFf1+H7p+5R/qJvUJQjAR22t3QU0NV1MDlmn6HoZ2cLKAZ1uglyORsiCsVCp4vrGBzc3XwGwKd9JDRxhfq9VRPz7G6UkD9qWK6wgt4S7B0ZOHKN+5iYWuQUmn00ilUtjaehcY7S4w1vs4a56h0WgI5RPo9hhUXJSSQnUIE/UYWvkvONn7DIjCKMPhEFRUK8R4OoDL3DU1RASa8wn2v//Aq7cf0OkNAnUybZFyezDAubDNT3k0GsEQ1SKEiiqPYc+tf8E80o8B8cfdXdy6+wBH9T9wxSPSUzqzfbUyyCc8/HmI7e1tJJM7mFPnv5bxCyNaQqLwtYj7j56hcdoKzjkPmjrah5lMRpAlEY/HA2U8ogyrJpfnshtUtQPHcVbFEfYsf4pYK81mE5qmrRNd+y2rvmTLrxiNieIvSo99waJyhU8AAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+  &gt;&lt;/span&gt;
+  &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        alt=&quot;Redis Backplane&quot;
+        title=&quot;Redis Backplane&quot;
+        src=&quot;/dotNetify/static/bf9bfca531f728f2b4d568c22eeb2300/e9131/backplane.png&quot;
+        srcset=&quot;/dotNetify/static/bf9bfca531f728f2b4d568c22eeb2300/c26ae/backplane.png 158w,
+/dotNetify/static/bf9bfca531f728f2b4d568c22eeb2300/6bdcf/backplane.png 315w,
+/dotNetify/static/bf9bfca531f728f2b4d568c22eeb2300/e9131/backplane.png 614w&quot;
+        sizes=&quot;(max-width: 614px) 100vw, 614px&quot;
+        style=&quot;width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;&quot;
+        loading=&quot;lazy&quot;
+      /&gt;
+  &lt;/a&gt;
+    &lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In 2018, Microsoft started to offer its own cloud solution versus Redis — the Azure SignalR Service. What’s interesting is that it doesn’t use a pub/sub broker, but what looks to be a cluster of reverse proxies. Instead of duplicating the app servers, it puts this cluster of proxy servers in front of the app server and maintains a fixed number of persistent connections between them. Any client that attempts to connect to the app server will be redirected to establish the connection with a proxy, which then forward messages from the client to the app server and vice versa.&lt;/p&gt;
+&lt;p&gt;&lt;span
+      class=&quot;gatsby-resp-image-wrapper&quot;
+      style=&quot;position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 484px; &quot;
+    &gt;
+      &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/dotNetify/static/19ad0f9c58609cbf8886ec29dbcaac28/ff42b/azure-signalr.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+    &lt;span
+    class=&quot;gatsby-resp-image-background-image&quot;
+    style=&quot;padding-bottom: 75.31645569620254%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAYAAADkmO9VAAAACXBIWXMAAA7DAAAOwwHHb6hkAAACGklEQVQ4y5VUO48SURSe/0OrFnRIbWFNLaEyWSu0tuIHuKEihFCQQNzCwgJJpAAKYHV5uLjGjbLjME/GOzzmyee9l2VgF9aEk5zcO/ee+eac831nBEIIWq0Wms0mer0eRFGE7/tgtlqtuB9jQrvdRqPRgGEYSCQSSKVSCIIt4O56yDYf3bigaRqy2SxyuRySySSi0Shsd7UHuOv371hFzDkgO5RlGZ1OB6ZpQtc1yIYN03L3wO634VDmwubQdV14nhde3KgLOK5/JzgIgu3+9j2W2afPDXz4WMNiuYTAgljZzB3HCUF9Gn+j2fD8ABONQNLmEBWCsTSlwNvMXBqffPkGzxMpqJoOodvtolarYTgcIp1O493pKZwZwWoxBaFEXV5r0E0L518uOHHW3MXP3woIMW9bRMl8cYKnzxKQFQ0Ck0qpVOJMx2IxPHr8BPCWsHUJvqXg6tcEE9XExddzSJKEH2MDMs3Y91zeptl8jpPXbynoK5qhsSalWq2iXC5zPZ6dvQ/LkaYiphYtc/IXynRBVwLVmN3pq2VZGH67xOj7FWzbXgMyYwLfNYOolGk9fHZcLyRll2nW83XvXX7PWVYUhfuSsuR5Phb2jEpHPDgtD+1D2YxGI05Kv99HJpNBsVjEH3UMP/D+K+qHRC8MBgNUKhUu7Hg8jkgkspfBMfMcklIoFFCv15HP5/fm9Kifw2ajqurBph8L+A+Xa2SJzQ6IvgAAAABJRU5ErkJggg==&apos;); background-size: cover; display: block;&quot;
+  &gt;&lt;/span&gt;
+  &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        alt=&quot;Azure SignalR&quot;
+        title=&quot;Azure SignalR&quot;
+        src=&quot;/dotNetify/static/19ad0f9c58609cbf8886ec29dbcaac28/ff42b/azure-signalr.png&quot;
+        srcset=&quot;/dotNetify/static/19ad0f9c58609cbf8886ec29dbcaac28/c26ae/azure-signalr.png 158w,
+/dotNetify/static/19ad0f9c58609cbf8886ec29dbcaac28/6bdcf/azure-signalr.png 315w,
+/dotNetify/static/19ad0f9c58609cbf8886ec29dbcaac28/ff42b/azure-signalr.png 484w&quot;
+        sizes=&quot;(max-width: 484px) 100vw, 484px&quot;
+        style=&quot;width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;&quot;
+        loading=&quot;lazy&quot;
+      /&gt;
+  &lt;/a&gt;
+    &lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The messages are multiplexed through that constant number of connections, which means that the app server won’t be sensitive to how many active client connections there are, only the message throughput.
+The proxy scale-out method seems to be the better option because:
+The app server won’t need to scale just to handle a large number of concurrent connections, especially when they’re mostly idle.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The app server won’t waste its resources on maintaining connections.&lt;/li&gt;
+&lt;li&gt;The app server is aware of all the (logical) connections and can use connection ids to track clients.&lt;/li&gt;
+&lt;li&gt;You won’t have to deal with the hassle of managing (or paying for) Redis.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The obvious downside is that if you can’t / won’t run on Azure, then you don’t get that option! Even when the cost factor is omitted, many still face restriction on which cloud provider they can use, if at all.&lt;/p&gt;
+&lt;p&gt;In the following section I describe my effort to update dotNetify so its apps can use the proxy scale-out option either on-prem or on non-Azure cloud providers.&lt;/p&gt;
+&lt;h2&gt;Forwarding Middleware&lt;/h2&gt;
+&lt;p&gt;The Azure SignalR service is not open source, so I could only guess how the proxying is actually done, but it can be surmised that the ability to forward messages from one SignalR hub server to another is the critical piece. The thought of using the dotNetify middleware mechanism immediately jumped out to me.&lt;br&gt;
+DotNetify middlewares are similar to ASP.NET middlewares in concept, but instead of HTTP requests, they intercept SignalR messages. They are intended to process payload metadata, such as JWT access tokens and custom initialization arguments, and can be chained like a pipeline.&lt;/p&gt;
+&lt;p&gt;The idea I ran with was to introduce a middleware that makes a fixed number of SignalR connections to an app server and passes all client messages through these connections. It also needs to be bi-directional — to pass messages from the app server to the intended clients. In essence, its purpose is to facilitate logical connections between the app server and the clients. Implementing scale-out then becomes a matter of enabling this middleware on some plain, inexpensive proxy servers:&lt;/p&gt;
+&lt;p&gt;A proxy server is simply a bare-bone ASP.NET Core web app with the following code in Startup.cs:&lt;/p&gt;
+&lt;p&gt;&lt;span
+      class=&quot;gatsby-resp-image-wrapper&quot;
+      style=&quot;position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 599px; &quot;
+    &gt;
+      &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/dotNetify/static/6a916f1e3d5c39fb9db7498e9bdc5c77/43142/forwarding-proxy.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+    &lt;span
+    class=&quot;gatsby-resp-image-background-image&quot;
+    style=&quot;padding-bottom: 61.39240506329114%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAMCAYAAABiDJ37AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAB5UlEQVQoz31Tu47TQBT1T/EB/EF6pKWiWSqkFKRDSofSAEsVEokS0VCRIg9twaJEKGSTFImMnDjRxgTj9yP2esY+eMYkIcPCkcZ3Hude33vmjjSdTjEajdDpdKAoChiyLDvYu+Z7iOcMUrvd5gFLpRLK5TLfJIScOBfzYh3HMcIw5FYMzIa0WCzQaDTQan1Et3cJn/OyExJb0zSD7RN8vvqE4XCI2WyG3W73V9YSBFhuDDdIxG38NH3Y2hqmZWG1WkHXdR7QcRykaXoMyA4nkwkneb5fOLsEYUyRMWKWwg0JtuoSoDEvnEmyD8LmG22Lp8+eo3N5Banb7UKWZZydPcTri4ucEeDW1iF/UzAeX2N0PcZakUFD+7dex2wopdze5AHv3S/hzdt3kAaDAer1OqrVKrcMnqvnJW6xudlA077DD5w86y3uAqUES3WNB4+e4P2HVqEh02EPklIYno5McIxuQxjuD0RRhCAI+C0zDT3Pg+u6WC5VWJYNyTAMsJs2TRMJSaA7GghNhHYoyoySEMOvX9Dv9zGfz/PstQOPacp4Uq/X4xqenz/Gy1cvCkIqts2xcVlG7AGoqnrQ8M/W4Ro2m01UKhXUarWi7FwXsWFFx9OmP3Il9mEZsu4Xg/zvCf7rR78ALBWFjFlNb84AAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+  &gt;&lt;/span&gt;
+  &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        alt=&quot;Forwarding Proxy&quot;
+        title=&quot;Forwarding Proxy&quot;
+        src=&quot;/dotNetify/static/6a916f1e3d5c39fb9db7498e9bdc5c77/43142/forwarding-proxy.png&quot;
+        srcset=&quot;/dotNetify/static/6a916f1e3d5c39fb9db7498e9bdc5c77/c26ae/forwarding-proxy.png 158w,
+/dotNetify/static/6a916f1e3d5c39fb9db7498e9bdc5c77/6bdcf/forwarding-proxy.png 315w,
+/dotNetify/static/6a916f1e3d5c39fb9db7498e9bdc5c77/43142/forwarding-proxy.png 599w&quot;
+        sizes=&quot;(max-width: 599px) 100vw, 599px&quot;
+        style=&quot;width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;&quot;
+        loading=&quot;lazy&quot;
+      /&gt;
+  &lt;/a&gt;
+    &lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;An important consideration for me was to make sure that the view models or other middlewares won’t be aware of the proxies. A multicast view model that uses connection ids to track clients shouldn’t be implemented any different when it’s operating behind proxies than when it’s not. This was solved by having the receiver end on the app server create a logical connection context that exposes the original connection id.&lt;/p&gt;
+&lt;h2&gt;Forwarding Options&lt;/h2&gt;
+&lt;p&gt;The forwarding middleware provides the following options:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;csharp&quot;&gt;&lt;pre class=&quot;language-csharp&quot;&gt;&lt;code class=&quot;language-csharp&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;token namespace&quot;&gt;DotNetify&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;token namespace&quot;&gt;DotNetify&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Forwarding&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token range operator&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;namespace&lt;/span&gt; &lt;span class=&quot;token namespace&quot;&gt;ProxyServer&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;token keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;Startup&lt;/span&gt;
+   &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;token keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;token return-type class-name&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;void&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;ConfigureServices&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;IServiceCollection&lt;/span&gt; services&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+         services&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;AddSignalR&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+         services&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;AddDotNetify&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+      &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+      &lt;span class=&quot;token keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;token return-type class-name&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;void&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;Configure&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;IApplicationBuilder&lt;/span&gt; app&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+         app&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;UseWebSockets&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+         app&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;UseDotNetify&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;config &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt;
+         &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+            config&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;UseForwarding&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;app_server_url&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+         &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+         app&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;UseRouting&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+         app&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;UseEndpoints&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ep &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; ep&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token generic-method&quot;&gt;&lt;span class=&quot;token function&quot;&gt;MapHub&lt;/span&gt;&lt;span class=&quot;token generic class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;DotNetifyHub&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;/dotnetify&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+      &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+   &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;ConnectionPoolSize:&lt;/strong&gt; the number of SignalR connections the proxy server will establish with the app server. Messages to be delivered will take turns using a connection from the pool in a round-robin fashion. Naturally, the pool size should be increased if the anticipated throughput is high.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Filter:&lt;/strong&gt; optional predicate for whether or not to forward a message. Chaining multiple forwarding middlewares with filters allow for all kinds of interesting configuration, such as having specialized app servers handling different user groups or certain types of view models.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;UseMessagePack:&lt;/strong&gt; use MessagePack serialization format to keep the payload small.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;HaltPipeline:&lt;/strong&gt; stop processing beyond the middleware. This flag allows the middleware to be used not just for scale-out, but for observability, i.e. sending messages to a real-time monitoring server.&lt;/p&gt;
+&lt;h2&gt;Devising Load Tests&lt;/h2&gt;
+&lt;p&gt;Needless to say, substantial code refactoring had to be done to dotNetify for this, and I needed to build confidence that the whole thing would actually work! First, I would need a load testing tool to emulate a high number of concurrent client connections. There’s a Microsoft tool called Crankier, but it only tries to hold open connections and not measuring anything related to the message payload.&lt;/p&gt;
+&lt;p&gt;In the end, I built my own tool that can be customized for any kind of workload, and wrote some test profiles according to what I thought were the most common ones:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Red&lt;/li&gt;
-&lt;li&gt;Green&lt;/li&gt;
-&lt;li&gt;Blue&lt;/li&gt;
-&lt;li&gt;Red&lt;/li&gt;
-&lt;li&gt;Green&lt;/li&gt;
-&lt;li&gt;Blue&lt;/li&gt;
-&lt;li&gt;Red&lt;/li&gt;
-&lt;li&gt;Green&lt;/li&gt;
-&lt;li&gt;Blue&lt;/li&gt;
+&lt;li&gt;Broadcast: The server pushes updates to all clients at regular intervals. A single multicast view model instance is used.&lt;/li&gt;
+&lt;li&gt;Echo: Continuous back and forth communication between the client and the server. The server sends a message to the client and waits for the response before sending the next one.&lt;/li&gt;
+&lt;li&gt;Chat Room: This profile models chat rooms where clients are sending and receiving messages with each other and within groups. The clients within a group are configured into 3 types:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;markdown&quot;&gt;&lt;pre class=&quot;language-markdown&quot;&gt;&lt;code class=&quot;language-markdown&quot;&gt;&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; Red
-&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; Green
-&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; Blue
-
-&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; Red
-&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; Green
-&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; Blue
-
-&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; Red
-&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; Green
-&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; Blue&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div style=&quot;margin-left: 30px&quot;&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code class=&quot;language-text&quot;&gt;code goes&lt;/code&gt; here in this line&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;bold&lt;/strong&gt; goes here&lt;/li&gt;
+&lt;li&gt;Chatty posters (10%): send message every 11 seconds.&lt;/li&gt;
+&lt;li&gt;Casual posters (20%): send message every 59 seconds.&lt;/li&gt;
+&lt;li&gt;Lurkers (70%): only receive messages.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;markdown&quot;&gt;&lt;pre class=&quot;language-markdown&quot;&gt;&lt;code class=&quot;language-markdown&quot;&gt;- &lt;span class=&quot;token code keyword&quot;&gt;`code goes`&lt;/span&gt; here in this line
-&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;token bold&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;bold&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;**&lt;/span&gt;&lt;/span&gt; goes here&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;ol&gt;
-&lt;li&gt;Buy flour and salt&lt;/li&gt;
-&lt;li&gt;Mix together with water&lt;/li&gt;
-&lt;li&gt;Bake&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;markdown&quot;&gt;&lt;pre class=&quot;language-markdown&quot;&gt;&lt;code class=&quot;language-markdown&quot;&gt;&lt;span class=&quot;token list punctuation&quot;&gt;1.&lt;/span&gt; Buy flour and salt
-&lt;span class=&quot;token list punctuation&quot;&gt;1.&lt;/span&gt; Mix together with water
-&lt;span class=&quot;token list punctuation&quot;&gt;1.&lt;/span&gt; Bake&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;code class=&quot;language-text&quot;&gt;code goes&lt;/code&gt; here in this line&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;bold&lt;/strong&gt; goes here&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;markdown&quot;&gt;&lt;pre class=&quot;language-markdown&quot;&gt;&lt;code class=&quot;language-markdown&quot;&gt;1. &lt;span class=&quot;token code keyword&quot;&gt;`code goes`&lt;/span&gt; here in this line
-&lt;span class=&quot;token list punctuation&quot;&gt;1.&lt;/span&gt; &lt;span class=&quot;token bold&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;bold&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;**&lt;/span&gt;&lt;/span&gt; goes here&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Paragraph:&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;Code&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;!-- --&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;Paragraph:
+&lt;/div&gt;
+&lt;p&gt;The message payload contains a sequence number and a timestamp to allow the test to detect for undelivered messages and measure the average round-trip latency. You can view the source code here.&lt;/p&gt;
+&lt;p&gt;Next, I created an app server with the test view models and deployed it along with 2 proxy servers to a free-tier Heroku container environment. According to the specs, each server node only has 500MB memory and 1x CPU share, so I would have to balance the number of the connections with the throughput so as not to overwhelm the resources.&lt;/p&gt;
+&lt;p&gt;I ran my tool from my own machine to emulate client connections. I set the connections to 1000 (following the limit on an Azure SignalR standard unit) with a new connection every 100 ms, running broadcast test with 3 seconds interval for 5 minutes. The results:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;js&quot;&gt;&lt;pre class=&quot;language-js&quot;&gt;&lt;code class=&quot;language-js&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// dotnetify-proxy1.herokuapp.com&lt;/span&gt;
+Clients&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Received&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;134262&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Missed&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Min interval&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;3003.35&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Max interval&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;3088.73&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Avg interval&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;3034.29&lt;/span&gt;
 
-    Code&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;hr&gt;
-&lt;hr&gt;
-&lt;hr&gt;
-&lt;hr&gt;
-&lt;hr&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;* * *
+&lt;span class=&quot;token comment&quot;&gt;// dotnetify-proxy2.herokuapp.com&lt;/span&gt;
+Clients&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Received&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;134263&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Missed&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Min interval&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;3004.32&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Max interval&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;3122.66&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Avg interval&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;3034.98&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;With each connection passing 20 messages/minute, 2000 concurrent connections running for just 1 day would generate close to 58 million messages and would’ve cost me about &lt;strong&gt;$60/day on Azure SignalR&lt;/strong&gt;, if I understood their pricing model correctly.&lt;/p&gt;
+&lt;p&gt;Next, I run the chat room test, but this time with connections reduced to 500 since there will be a lot more messages being sent out among the clients. I set the number of rooms to 10, and again with a new client coming every 100 ms and the test duration of 5 minutes. The results:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;js&quot;&gt;&lt;pre class=&quot;language-js&quot;&gt;&lt;code class=&quot;language-js&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// dotnetify-proxy1.herokuapp.com&lt;/span&gt;
+Clients&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;500&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Min latency&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;618.12&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Max latency&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;3819.86&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Avg Latency&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1154.09&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Received&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;213462&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Missed&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt;
 
-***
-
-*****
-
-- - -
-
----------------------------------------&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;This is &lt;a href=&quot;http://example.com&quot; title=&quot;Example&quot;&gt;an example&lt;/a&gt; link.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://example.com&quot;&gt;This link&lt;/a&gt; has no title attr.&lt;/p&gt;
-&lt;p&gt;This is &lt;a href=&quot;http://example.com&quot; title=&quot;Optional Title&quot;&gt;an example&lt;/a&gt; reference-style link.&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;This is [an example](http://example.com &amp;quot;Example&amp;quot;) link.
-
-[This link](http://example.com) has no title attr.
-
-This is [an example] [id] reference-style link.
-
-[id]: http://example.com &amp;quot;Optional Title&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;em&gt;single asterisks&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;single underscores&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;double asterisks&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;double underscores&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;*single asterisks*
-
-_single underscores_
-
-**double asterisks**
-
-__double underscores__&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;This paragraph has some &lt;code class=&quot;language-text&quot;&gt;code&lt;/code&gt; in it.&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;This paragraph has some `code` in it.&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;img src=&quot;https://placehold.it/200x50&quot; alt=&quot;Alt Text&quot; title=&quot;Image Title&quot;&gt;&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;![Alt Text](https://placehold.it/200x50 &amp;quot;Image Title&amp;quot;)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item></channel></rss>
+&lt;span class=&quot;token comment&quot;&gt;// dotnetify-proxy2.herokuapp.com&lt;/span&gt;
+Clients&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;500&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Min latency&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;631.95&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Max latency&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;3315.52&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Avg Latency&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1152.81&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Received&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;212945&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; Missed&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;With almost 500K messages sent across 1000 chat users in only 5 to 6 minutes, I can see now how Azure SignalR is making its profit!&lt;/p&gt;
+&lt;p&gt;Note that I didn’t always get perfect results on Heroku with the high connection count. Sometimes clients couldn’t connect and threw socket exceptions, or some clients didn’t get a few messages at random times. I think I could attribute it to the fluctuating level of the shared resources on the server nodes. Things were more consistent when the connections were limited to a few hundreds or having lower throughput.&lt;/p&gt;
+&lt;p&gt;Building and running these tests were extremely time consuming but they provided me with valuable insights which allow me to improve the reliability and robustness of dotNetify’s codebase. I have since released this as a core feature in dotNetify version 5 (&lt;a href=&quot;https://github.com/dsuryd/dotNetify/releases/tag/v5.0&quot;&gt;release notes&lt;/a&gt;), along with support for Vue version 3.&lt;/p&gt;
+&lt;h2&gt;Tools for Sponsors&lt;/h2&gt;
+&lt;p&gt;DotNetify will always be FOSS, but it needs an active community and sponsors to grow beyond a side project. If your company is already using dotNetify in production, consider supporting its development and get access to these exclusive new tools I made just for sponsors:&lt;/p&gt;
+&lt;h4&gt;DotNetify-Load-Tester:&lt;/h4&gt;
+&lt;p&gt;This is the tool I’ve been using to write and run the above tests. If you really want to understand how your dotNetify app will behave under different load scenarios, this is the tool to have.&lt;/p&gt;
+&lt;h4&gt;DotNetify-Observer:&lt;/h4&gt;
+&lt;p&gt;A web dashboard that can show you in real-time all the active connections with your app, including details like IP addresses, user agents, payload strings, and throughput metrics. The hosted version will give you intel on the CPU and memory usage of the proxy servers (works on either Windows or Linux).&lt;/p&gt;</content:encoded></item></channel></rss>
