@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "module": "commonjs"
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
-}
