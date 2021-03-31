@@ -36,17 +36,19 @@ const Bio = () => {
         className="bio-avatar"
         layout="fixed"
         formats={["AUTO", "WEBP", "AVIF"]}
-        src="../images/dotnetify.png"
+        src="../images/profile-pic.png"
         width={50}
         height={50}
         quality={95}
-        alt="dotNetify"
+        alt="Profile picture"
       />
       {author?.name && (
         <p>
-          Written by <strong>{author.name}</strong> {author?.summary || null}
-          {` `}
-          <a href={`https://twitter.com/${social?.twitter || ``}`}>Twitter</a>
+          by <strong>{author.name}</strong> {author?.summary || null}
+          <br />
+          <a href={`https://twitter.com/${social?.twitter || ``}`}>
+            Follow on Twitter
+          </a>
         </p>
       )}
     </div>

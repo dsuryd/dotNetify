@@ -1,7 +1,7 @@
 module.exports = {
   pathPrefix: "/dotNetify",
   siteMetadata: {
-    title: `DotNetify`,
+    title: `dotNetify`,
     author: {
       name: `Dicky Suryadi`,
     },
