@@ -3,6 +3,7 @@ DevApp/wwwroot/dist
 DevApp/dist/dist/*.js
 DevApp/dist/dist/*.map
 Demo/**/wwwroot/dist
+blog-dev
 
 ### Code ###
 # Visual Studio Code - https://code.visualstudio.com/
