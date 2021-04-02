@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 import Vue from "vue";
+import { watch } from "vue";
 import _dotnetify, { Dotnetify, IDotnetifyImpl } from "../core/dotnetify";
 import dotnetifyVM from "../core/dotnetify-vm";
 import DotnetifyVM from "../core/dotnetify-vm";
@@ -161,7 +162,14 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
         iVM.$serverUpdate !== false && iVM.$dispatch({ [prop]: newValue });
       }.bind(iVM);
 
-    iWatchlist.forEach((prop: string) => iVue.$watch(iVM["$useState"] ? `state.${prop}` : prop, callback(prop)));
+    const useState = iVM["$useState"];
+    if (watch) {
+      // Vue 3.x
+      iWatchlist.forEach((prop: string) => watch(() => (useState ? iVue.state[prop] : iVue[prop]), callback(prop)));
+    } else {
+      // Vue 2.x
+      iWatchlist.forEach((prop: string) => iVue.$watch(useState ? `state.${prop}` : prop, callback(prop)));
+    }
   }
 
   _responseVM(iVMId: string, iVMData: any) {
