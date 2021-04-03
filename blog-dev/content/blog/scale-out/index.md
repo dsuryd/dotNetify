@@ -1,7 +1,7 @@
 ---
-title: Building "Azure SignalR"-like Scale-Out Option
+title: Recreating "Azure SignalR" Scale-Out
 date: "2021-03-31T05:58:56Z"
-description: "Horizontal scaling with proxy instead of a backplane."
+description: "Scaling dotNetify apps horizontally using proxy instead of a backplane."
 ---
 
 Just a few weeks ago [dotNetify](https://dotnetify.net) passed the 100k NuGet downloads. I'm thrilled that so many people have found this project compelling enough to try out, and based on the feedback I've been getting, it's being used in production as well!
@@ -149,7 +149,7 @@ Clients=1000, Received=134262, Missed=0%, Min interval=3003.35, Max interval=308
 Clients=1000, Received=134263, Missed=0%, Min interval=3004.32, Max interval=3122.66, Avg interval: 3034.98
 ```
 
-With each connection passing 20 messages/minute, 2000 concurrent connections running for just 1 day would generate close to 58 million messages and would've cost me about **$60/day on Azure SignalR**, if I understood their [pricing model](https://azure.microsoft.com/en-us/pricing/details/signalr-service/) correctly.
+With each connection passing 20 messages/minute, 2000 concurrent connections running for just 1 day would generate close to 58 million messages and would've cost me about **\$60/day on Azure SignalR**, if I understood their [pricing model](https://azure.microsoft.com/en-us/pricing/details/signalr-service/) correctly.
 
 Next, I run the chat room test, but this time with connections reduced to 500 since there will be a lot more messages being sent out among the clients. I set the number of rooms to 10, and again with a new client coming every 100 ms and the test duration of 5 minutes. The results:
 
