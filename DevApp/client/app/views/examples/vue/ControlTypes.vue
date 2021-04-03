@@ -27,11 +27,11 @@
         <td>Check box:</td>
         <td>
           <label>
-            <input type="checkbox" v-model="ShowMeCheckBox" />
+            <input type="checkbox" style="margin-right: 0.4rem;" v-model="ShowMeCheckBox" />
             <span>Show me</span>
           </label>
           <label>
-            <input type="checkbox" v-model="EnableMeCheckBox" />
+            <input type="checkbox" style="margin-right: 0.4rem;" v-model="EnableMeCheckBox" />
             <span>Enable me</span>
           </label>
           <button class="btn btn-secondary" :disabled="!EnableMeCheckBox" v-if="ShowMeCheckBox">{{ CheckBoxResult }}</button>
@@ -61,11 +61,11 @@
         <td>Radio button:</td>
         <td>
           <label>
-            <input type="radio" value="green" v-model="RadioButtonValue" />
+            <input type="radio" value="green" style="margin-right: 0.4rem;" v-model="RadioButtonValue" />
             <span>Green</span>
           </label>
           <label>
-            <input type="radio" value="yellow" v-model="RadioButtonValue" />
+            <input type="radio" value="yellow" style="margin-right: 0.4rem;" v-model="RadioButtonValue" />
             <span>Yellow</span>
           </label>
           <button class="btn" :class="RadioButtonStyle">Result</button>
