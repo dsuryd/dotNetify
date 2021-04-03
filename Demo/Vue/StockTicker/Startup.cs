@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.DependencyInjection;
+using BrunoLau.SpaServices.Webpack;
 using DotNetify;
 
 namespace StockTicker
@@ -22,13 +22,11 @@ namespace StockTicker
          app.UseWebSockets();
          app.UseDotNetify();
 
-#pragma warning disable 618
-         app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+         app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions
          {
             HotModuleReplacement = true,
             HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
          });
-#pragma warning restore 618
 
          app.UseStaticFiles();
          app.UseRouting();
