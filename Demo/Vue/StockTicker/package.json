@@ -1,5 +1,5 @@
 {
-  "name": "helloworld",
+  "name": "stock-ticker",
   "private": true,
   "scripts": {
     "build": "webpack"
