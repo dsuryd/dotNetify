@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using BrunoLau.SpaServices.Webpack;
 using DotNetify;
 
@@ -10,23 +11,19 @@ namespace StockTicker
    {
       public void ConfigureServices(IServiceCollection services)
       {
-         services.AddMemoryCache();
          services.AddSignalR();
          services.AddDotNetify();
 
          services.AddTransient<IStockTickerService, StockTickerService>();
       }
 
-      public void Configure(IApplicationBuilder app)
+      public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
       {
          app.UseWebSockets();
          app.UseDotNetify();
 
-         app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions
-         {
-            HotModuleReplacement = true,
-            HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
-         });
+         if (env.IsDevelopment())
+            app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions { HotModuleReplacement = true });
 
          app.UseStaticFiles();
          app.UseRouting();

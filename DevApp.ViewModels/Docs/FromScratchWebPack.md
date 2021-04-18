@@ -4,28 +4,28 @@ The following steps will create a simple real-time Hello World ASP.NET Core app 
 
 Prerequisites:
 
-- Visual Studio 2017
+- Visual Studio 2019 with .NET 5 SDK
 - Node.js
 
 ##### Create Project
 
-Create an empty ASP.NET Core Web Application (.NET Core 3.x) project and name it _HelloWorld_.  Then use the NuGet Package Manager Console to install the dotNetify package:
+Create an empty ASP.NET 5 Web Application project and name it _HelloWorld_. Then use the NuGet Package Manager Console to install the dotNetify package:
+
 ```csharp
 install-package DotNetify.SignalR
+install-package BrunoLau.SpaServices
 ```
+
 <br/>
 
 ##### Configure Startup
 
 Open _Startup.cs_ file and replace the content with the following:
+
 ```csharp
-using System.IO;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.DependencyInjection;
+using BrunoLau.SpaServices.Webpack;
 using DotNetify;
 
 namespace HelloWorld
@@ -35,7 +35,7 @@ namespace HelloWorld
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSignalR();
-            services.AddDotNetify();          
+            services.AddDotNetify();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -43,58 +43,56 @@ namespace HelloWorld
             app.UseWebSockets();
             app.UseDotNetify();
 
-            // Optional: utilize webpack hot reload feature.
-            app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-            {
-                HotModuleReplacement = true,
-                HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
-            });            
+            if (env.IsDevelopment())
+              app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions { HotModuleReplacement = true });
+
 
             app.UseStaticFiles();
-			app.UseRouting();
-	  	    app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
-
-            app.Run(async (context) =>
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
             {
-                using (var reader = new StreamReader(File.OpenRead("wwwroot/index.html")))
-                    await context.Response.WriteAsync(reader.ReadToEnd());
+                endpoints.MapHub<DotNetifyHub>("/dotnetify");
+                endpoints.MapFallbackToFile("index.html");
             });
         }
     }
 }
 ```
+
 <br/>
 
 ##### Configure NPM
 
 Add NPM configuration file _package.json_ with the following content:
+
 ```json
 {
   "name": "helloworld",
+  "private": true,
   "scripts": {
     "build": "webpack"
   },
   "babel": {
-    "presets": [
-      "env",
-      "react"
-    ]
+    "presets": ["env", "react"]
   },
   "dependencies": {
-    "dotnetify": "~3.5.0",
-    "react": "~16.6.0",
-    "react-dom": "~16.6.0"
+    "dotnetify": "^5.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "aspnet-webpack": "^3.0.0",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
     "babel-core": "~6.26.3",
     "babel-loader": "~7.1.4",
     "babel-preset-env": "~1.7.0",
     "babel-preset-react": "~6.24.1",
-    "webpack": "^4.18.0",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-middleware": "^3.3.0",
-    "webpack-hot-middleware": "^2.23.1"
+    "ts-loader": "~7.0.4",
+    "typescript": "~3.9.3",
+    "webpack": "~4.18.0",
+    "webpack-cli": "~3.3.11",
+    "webpack-dev-middleware": "~3.3.0",
+    "webpack-hot-middleware": "~2.23.1"
   }
 }
 ```
@@ -105,34 +103,42 @@ The packages will be automatically downloaded by Visual Studio when the file is 
 ##### Configure WebPack
 
 Add _webpack.config.js_ with the following content:
+
 ```js
-'use strict';
+"use strict";
 
 module.exports = {
-  mode: 'development',
-  entry: { main: './src/index.js' },
+  mode: "development",
+  entry: { main: "./src/index" },
   output: {
-    path: __dirname + '/wwwroot/dist',
-    publicPath: '/dist/'
+    path: __dirname + "/wwwroot/dist",
+    publicPath: "/dist/"
   },
+  devtool: "source-map",
   resolve: {
-    modules: [ 'src', 'node_modules' ]
+    extensions: [".tsx", ".ts", ".js"],
+    modules: ["src", "node_modules"]
   },
   module: {
-    rules: [ { test: /\.jsx?$/, use: 'babel-loader', exclude: /node_modules/ } ]
+    rules: [
+      { test: /\.jsx?$/, use: "babel-loader", exclude: /node_modules/ },
+      { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ }
+    ]
   }
 };
 ```
+
 <br/>
 
 ##### Add Index Page
 
 Add a new file _wwwroot/index.html_ with the following content:
+
 ```html
 <html>
   <head>
     <title>DotNetify</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
   <body>
@@ -141,43 +147,45 @@ Add a new file _wwwroot/index.html_ with the following content:
   </body>
 </html>
 ```
+
 <br/>
 
 ##### Add Hello World
 
 Create a new folder _src_, and add a new file _src/index.js_ with the following content:
-```jsx
-import React from 'react';
-import ReactDOM from 'react-dom';
-import HelloWorld from './HelloWorld';
 
-ReactDOM.render(<HelloWorld />, document.getElementById('App'));
+```jsx
+import React from "react";
+import ReactDOM from "react-dom";
+import HelloWorld from "./HelloWorld";
+
+ReactDOM.render(<HelloWorld />, document.getElementById("App"));
 ```
 
-Add a new file _src/HelloWorld.js_ with the following content:
-```jsx
-import React from 'react';
-import dotnetify from 'dotnetify';
+Add a new file _src/HelloWorld.tsx_ with the following content:
 
-export default class HelloWorld extends React.Component {
-  constructor(props) {
-    super(props);
-    dotnetify.react.connect('HelloWorld', this);
-    this.state = { Greetings: '', ServerTime: '' };
-  }
+```tsx
+import React from "react";
+import { useConnect } from "dotnetify";
 
-  render() {
-    return (
-      <div>
-        <p>{this.state.Greetings}</p>
-        <p>Server time is: {this.state.ServerTime}</p>
-      </div>
-    );
-  }
+interface State {
+  Greetings: string;
+  ServerTime: string;
 }
+
+export const HelloWorld = () => {
+  const { state } = useConnect<State>("HelloWorld", this);
+  return (
+    <div>
+      <p>{state.Greetings}</p>
+      <p>Server time is: {state.ServerTime}</p>
+    </div>
+  );
+};
 ```
 
 Add a new file _HelloWorld.cs_ with the following content:
+
 ```csharp
 using System;
 using DotNetify;
@@ -204,8 +212,9 @@ namespace HelloWorld
     }
 }
 ```
+
 <br/>
 
 ##### Build and Run
 
-Run the application.  Hello World!
+Run the application. Hello World!

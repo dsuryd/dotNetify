@@ -1,40 +1,35 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.SpaServices.Webpack;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using BrunoLau.SpaServices.Webpack;
 using DotNetify;
 
 namespace HelloWorld.WebPack
 {
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMemoryCache();
-            services.AddSignalR();
-            services.AddDotNetify();          
-        }
+   public class Startup
+   {
+      public void ConfigureServices(IServiceCollection services)
+      {
+         services.AddSignalR();
+         services.AddDotNetify(); 
+      }
 
-        public void Configure(IApplicationBuilder app)
-        {
-            app.UseWebSockets();
-            app.UseDotNetify();
+      public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+      {
+         app.UseWebSockets();
+         app.UseDotNetify();
 
-#pragma warning disable 618
-            app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-            {
-                HotModuleReplacement = true,
-                HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
-            });            
-#pragma warning restore 618            
+         if (env.IsDevelopment())
+            app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions { HotModuleReplacement = true });
 
-            app.UseStaticFiles();
-            app.UseRouting();
-            app.UseEndpoints(endpoints => 
-            {
-              endpoints.MapHub<DotNetifyHub>("/dotnetify");
-              endpoints.MapFallbackToFile("index.html");
-            }); 
-        }
-    }
+         app.UseStaticFiles();
+         app.UseRouting();
+         app.UseEndpoints(endpoints =>
+         { 
+            endpoints.MapHub<DotNetifyHub>("/dotnetify"); 
+            endpoints.MapFallbackToFile("index.html");
+         });
+      }
+   }
 }
