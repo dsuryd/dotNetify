@@ -7,7 +7,7 @@ The easiest way to get started is to use the basic SPA template that contains so
 Prerequisites:
 
 - Node.js
-- .NET Core SDK (2.x or 3.x)
+- .NET Core SDK
 
 Download the template from nuget from the command line, then create your project:
 
@@ -44,10 +44,6 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
    app.UseWebSockets();
    app.UseDotNetify();
 
-   // .NET Core 2.x:
-   app.UseSignalR(routes => routes.MapDotNetifyHub());
-
-   // .NET Core 3.x:
    app.UseRouting();
    app.UseEndpoints(endpoints => endpoints.MapHub<DotNetifyHub>("/dotnetify"));
 
@@ -78,8 +74,8 @@ npm i --save dotnetify react react-dom
 If using script tags, include _React_, _signalR_, and _dotNetify_ from their respective CDNs:
 
 ```html
-<script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
 <script src="https://unpkg.com/dotnetify@latest/dist/dotnetify-react.min.js"></script>
 ```
@@ -115,7 +111,7 @@ namespace MyProject
 The library uses SignalR .NET Core client by default. To switch to .NET Framework client, add:
 
 ```jsx
-import signalR from 'dotnetify/dist/signalR-netfx';
+import signalR from "dotnetify/dist/signalR-netfx";
 dotnetify.hubLib = signalR;
 ```
 
