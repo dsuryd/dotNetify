@@ -22,11 +22,7 @@ export interface IDotnetify {
   debugFn: (vmId: string, direction: string, payload: any) => void;
 
   // Use this to get notified of connection state changed events.
-  connectionStateHandler: (
-    state: string,
-    exception: ExceptionType,
-    hub: IDotnetifyHub
-  ) => void;
+  connectionStateHandler: (state: string, exception: ExceptionType, hub: IDotnetifyHub) => void;
 
   // Use this intercept a view model prior to establishing connection.
   connectHandler: (args: VMConnectArgsType) => VMConnectArgsType | void;
@@ -35,28 +31,17 @@ export interface IDotnetify {
   connect: (vmId: string, options?: IConnectOptions) => IDotnetifyVM;
 
   // Creates a SignalR hub client.
-  createHub: (
-    iHubServerUrl: string,
-    iHubPath?: string,
-    iHubLib?: any
-  ) => IDotnetifyHub;
+  createHub: (iHubServerUrl: string, iHubPath?: string, iHubLib?: any) => IDotnetifyHub;
 
   // Creates a Web API hub client.
-  createWebApiHub: (
-    iBaseUrl: string,
-    iRequestHandler: RequestHandlerType
-  ) => IDotnetifyHub;
+  createWebApiHub: (iBaseUrl: string, iRequestHandler: RequestHandlerType) => IDotnetifyHub;
 
   // Active view models.
   getViewModels(): IDotnetifyVM[];
 }
 
 export interface IDotnetifyReact {
-  connect(
-    iVMId: string,
-    iReact: React.Component | any,
-    iOptions?: IConnectOptions
-  ): IDotnetifyVM;
+  connect(iVMId: string, iReact: React.Component | any, iOptions?: IConnectOptions): IDotnetifyVM;
 }
 
 export interface IDotnetifyVue {
@@ -96,12 +81,7 @@ export interface IDotnetifyHub {
   connectionFailedEvent: IEventEmitter;
 
   init: (hubPath: string, hubServerUrl: string, hubLib: any) => void;
-  startHub: (
-    hubOptions: HubOptionsType,
-    doneHandler: () => void,
-    failHandler: (ex: any) => void,
-    iForceRestart: boolean
-  ) => void;
+  startHub: (hubOptions: HubOptionsType, doneHandler: () => void, failHandler: (ex: any) => void, iForceRestart: boolean) => void;
 
   stateChanged: (handler: (state: string) => void) => void;
 
@@ -135,11 +115,7 @@ export type ExceptionType = { name: string; message: string };
 
 export type ExceptionHandlerType = (exception: ExceptionType) => void;
 
-export type RequestHandlerType = (
-  url: string,
-  request: any,
-  payload?: any
-) => void;
+export type RequestHandlerType = (url: string, request: any, payload?: any) => void;
 
 export interface IDotnetifyRouter {
   notFound404Url: string;
@@ -172,10 +148,7 @@ export type RouteType = {
   RedirectRoot?: string;
 };
 
-export type OnRouteEnterType = (
-  path: string,
-  template: RoutingTemplateType
-) => void | boolean | Promise<boolean>;
+export type OnRouteEnterType = (path: string, template: RoutingTemplateType) => void | boolean | Promise<boolean>;
 
 export interface IRouteLinkProps {
   vm: IDotnetifyVM;
@@ -204,4 +177,4 @@ export declare const useConnect: <T>(
   vmId: string,
   component?: any,
   options?: IConnectOptions
-) => { vm: IDotnetifyVM; state: T };
+) => { vm: IDotnetifyVM; state: T; setState: React.Dispatch<any> };

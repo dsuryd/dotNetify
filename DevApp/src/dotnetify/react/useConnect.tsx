@@ -23,16 +23,20 @@ dotnetify.react.useConnect = function <T>(
   iVMId: string,
   iComponent?: { state: T; props: any } | any,
   iOptions?: IConnectOptions
-): { vm: IDotnetifyVM; state: T } {
-  if (useState == null || useEffect == null)
-    throw "Error: using React hooks requires at least v16.8.";
+): { vm: IDotnetifyVM; state: T; setState: React.Dispatch<any> } {
+  if (useState == null || useEffect == null) throw "Error: using React hooks requires at least v16.8.";
 
-  let { state, props } = iComponent;
+  let { state, props } = iComponent || {};
   if (state == null) state = iComponent || {};
 
-  const [_state, setState] = useState(state);
+  const [_state, _setState] = useState(state);
   const vm = useRef<IDotnetifyVM>();
   const vmData = useRef(_state);
+
+  const setState = (newState: any) => {
+    vmData.current = $.extend({}, vmData.current, newState);
+    _setState(vmData.current);
+  };
 
   useEffect(() => {
     vm.current = dotnetify.react.connect(
@@ -42,23 +46,20 @@ dotnetify.react.useConnect = function <T>(
         get state() {
           return vmData.current;
         },
-        setState: (newState: any) => {
-          vmData.current = $.extend({}, vmData.current, newState);
-          setState(vmData.current);
-        }
+        setState
       },
       iOptions
     );
     return () => vm.current.$destroy();
   }, []);
 
-  return { vm: vm.current, state: _state };
+  return { vm: vm.current, state: _state, setState };
 };
 
 export default function <T>(
   iVMId: string,
   iComponent?: { state: T; props: any } | any,
   iOptions?: IConnectOptions
-): { vm: IDotnetifyVM; state: T } {
+): { vm: IDotnetifyVM; state: T; setState: React.Dispatch<any> } {
   return dotnetify.react.useConnect(iVMId, iComponent, iOptions);
 }
