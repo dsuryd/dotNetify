@@ -1,39 +1,27 @@
 ##### LiveChart.js
 
 ```jsx
-import React from 'react';
-import dotnetify from 'dotnetify';
-import { LiveChartCss } from './components/css';
-import { Line, Bar, Doughnut } from 'react-chartjs-2'; 
-import 'chartjs-plugin-streaming';
+import React from "react";
+import { useConnect } from "dotnetify";
+import { LiveChartCss } from "./components/css";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
+import "chartjs-plugin-streaming";
 
-class LiveChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { Waveform: [], Bar: [], Pie: [] };
+const LiveChart = () => {
+  const { state } = useConnect("LiveChartVM", { Waveform: [], Bar: [], Pie: [] });
 
-    // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect('LiveChartVM', this);
-  }
-
-  componentWillUnmount() {
-    this.vm.$destroy();
-  }
-
-  render() {
-    return (
-      <LiveChartCss>
-        <div>
-          <LineChart data={this.state.Waveform} />
-        </div>
-        <div>
-          <PieChart data={this.state.Pie} />
-          <BarChart data={this.state.Bar} />
-        </div>
-      </LiveChartCss>
-    );
-  }
-}
+  return (
+    <LiveChartCss>
+      <div>
+        <LineChart data={state.Waveform} />
+      </div>
+      <div>
+        <PieChart data={state.Pie} />
+        <BarChart data={state.Bar} />
+      </div>
+    </LiveChartCss>
+  );
+};
 ```
 
 ##### LineChart.js
@@ -46,10 +34,10 @@ class LineChart extends React.Component {
       labels: [],
       datasets: [
         {
-          label: 'Waveform',
+          label: "Waveform",
           data: [],
-          backgroundColor: 'rgba(217,237,245,0.4)',
-          borderColor: '#9acfea',
+          backgroundColor: "rgba(217,237,245,0.4)",
+          borderColor: "#9acfea",
           borderWidth: 2
         }
       ]
@@ -59,7 +47,7 @@ class LineChart extends React.Component {
       scales: {
         xAxes: [
           {
-            type: 'realtime',
+            type: "realtime",
             realtime: { delay: 2000 }
           }
         ],
@@ -97,22 +85,22 @@ class BarChart extends React.Component {
   constructor(props) {
     super(props);
     this.chartData = {
-      labels: [ 'user', 'sys', 'eth0', 'lo', 'ker', 'sda1', 'sda2', 'sda3' ],
+      labels: ["user", "sys", "eth0", "lo", "ker", "sda1", "sda2", "sda3"],
       datasets: [
         {
-          label: '',
+          label: "",
           data: [],
           backgroundColor: [
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(54, 162, 235, 0.8)',
-            'rgba(255, 206, 86, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(153, 102, 255, 0.8)',
-            'rgba(255, 159, 64, 0.8)',
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(54, 162, 235, 0.8)'
+            "rgba(255, 99, 132, 0.8)",
+            "rgba(54, 162, 235, 0.8)",
+            "rgba(255, 206, 86, 0.8)",
+            "rgba(75, 192, 192, 0.8)",
+            "rgba(153, 102, 255, 0.8)",
+            "rgba(255, 159, 64, 0.8)",
+            "rgba(255, 99, 132, 0.8)",
+            "rgba(54, 162, 235, 0.8)"
           ],
-          borderColor: [ '#9acfea' ],
+          borderColor: ["#9acfea"],
           borderWidth: 1
         }
       ]
@@ -133,13 +121,13 @@ class PieChart extends React.Component {
   constructor(props) {
     super(props);
     this.chartData = {
-      labels: [ 'CPU', 'Memory', 'Disk' ],
+      labels: ["CPU", "Memory", "Disk"],
       datasets: [
         {
-          label: '',
+          label: "",
           data: [],
-          backgroundColor: [ 'rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)' ],
-          borderColor: [ '#9acfea' ],
+          backgroundColor: ["rgba(255, 99, 132, 0.8)", "rgba(54, 162, 235, 0.8)", "rgba(255, 206, 86, 0.8)"],
+          borderColor: ["#9acfea"],
           borderWidth: 1
         }
       ]

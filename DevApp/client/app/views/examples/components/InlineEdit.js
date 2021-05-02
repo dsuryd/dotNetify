@@ -4,7 +4,8 @@ import TextBox from "./TextBox";
 
 const EditableText = styled.div`
   display: inline-block;
-  &:hover {
+  &:hover,
+  &:focus {
     &:after {
       font-family: "Material Icons";
       content: "edit";
@@ -19,14 +20,13 @@ class InlineEdit extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    if (prevProps.text !== this.props.text)
-      this.setState({ value: this.props.text });
+    if (prevProps.text !== this.props.text) this.setState({ value: this.props.text });
   }
 
   handleBlur = () => this.setState({ edit: false });
 
   handleClick = event => {
-    event.stopPropagation();
+    event && event.stopPropagation();
     if (!this.state.edit) this.setState({ edit: true });
   };
 
@@ -54,7 +54,7 @@ class InlineEdit extends React.Component {
       );
 
     return (
-      <EditableText className="editable" onClick={this.handleClick}>
+      <EditableText tabIndex="0" className="editable" onClick={this.handleClick} onKeyDown={e => e.keyCode === 13 && this.handleClick()}>
         {this.state.value}
       </EditableText>
     );

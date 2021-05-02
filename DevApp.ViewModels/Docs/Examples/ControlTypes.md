@@ -2,213 +2,198 @@
 
 ```jsx
 import React from "react";
-import dotnetify from "dotnetify";
-import { ControlTypesCss } from "./components/css";
+import { useConnect } from "dotnetify";
+import { ControlTypesCss } from "../components/css";
 
-class ControlTypes extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      TextBoxValue: '',
-      SearchBox: '',
-      SearchResults: [],
-      ShowMeCheckBox: true,
-      EnableMeCheckBox: true,
-      SimpleDropDownValue: '',
-      SimpleDropDownOptions: [],
-      DropDownValue: '',
-      DropDownOptions: []
-    };
+const ControlTypes = () => {
+  const { vm, state, setState } = useConnect("ControlTypesVM", {
+    SearchResults: [],
+    SimpleDropDownOptions: [],
+    DropDownOptions: []
+  });
 
-    // Connect this component to the back-end view model.
-    this.vm = dotnetify.react.connect('ControlTypesVM', this);
+  // Set up function to dispatch state to the back-end with optimistic update.
+  const dispatchState = state => {
+    setState(state);
+    vm.$dispatch(state);
+  };
 
-    // Set up function to dispatch state to the back-end with optimistic update.
-    this.dispatchState = state => {
-      this.setState(state);
-      this.vm.$dispatch(state);
-    };
-  }
+  return (
+    <ControlTypesCss>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              Text box:
+              <label>(updates on losing focus)</label>
+            </td>
+            <td>
+              <input
+                type="text"
+                className="form-control"
+                placeholder={state.TextBoxPlaceHolder}
+                value={state.TextBoxValue}
+                onChange={e => setState({ TextBoxValue: e.target.value })}
+                onBlur={_ =>
+                  dispatchState({
+                    TextBoxValue: state.TextBoxValue
+                  })
+                }
+              />
+              <b>{state.TextBoxResult}</b>
+            </td>
+          </tr>
 
-  componentWillUnmount() {
-    this.vm.$destroy();
-  }
-
-  render() {
-    return (
-      <ControlTypesCss>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                Text box:
-                <label>(updates on losing focus)</label>
-              </td>
-              <td>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder={this.state.TextBoxPlaceHolder}
-                  value={this.state.TextBoxValue}
-                  onChange={e => this.setState({ TextBoxValue: e.target.value })}
-                  onBlur={_ => this.dispatchState({ TextBoxValue: this.state.TextBoxValue })}
-                />
-                <b>{this.state.TextBoxResult}</b>
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                Search box:
-                <label>(updates on keystroke)</label>
-              </td>
-              <td>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder={this.state.SearchBoxPlaceHolder}
-                  value={this.state.SearchBox}
-                  onChange={e => this.dispatchState({ SearchBox: e.target.value })}
-                />
-                {this.state.SearchResults.length > 0 && (
-                  <ul className="list-group">
-                    {this.state.SearchResults.map((text, idx) => (
-                      <li 
-                        className="list-group-item" key={idx} 
-                        onClick={_ => this.dispatchState({ SearchBox: text })}
-                      >
-                        {text}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </td>
-            </tr>
-
-            <tr>
-              <td>Check box:</td>
-              <td>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={this.state.ShowMeCheckBox}
-                    onChange={_ => this.dispatchState({ ShowMeCheckBox: !this.state.ShowMeCheckBox })}
-                  />
-                  <span>Show me</span>
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={this.state.EnableMeCheckBox}
-                    onChange={_ => this.dispatchState({ EnableMeCheckBox: !this.state.EnableMeCheckBox })}
-                  />
-                  <span>Enable me</span>
-                </label>
-                {this.state.ShowMeCheckBox && (
-                  <button className="btn btn-secondary" disabled={!this.state.EnableMeCheckBox}>
-                    {this.state.CheckBoxResult}
-                  </button>
-                )}
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                Simple drop-down list:
-                <label>(string data type)</label>
-              </td>
-              <td>
-                <select
-                  className="form-control"
-                  value={this.state.SimpleDropDownValue}
-                  onChange={e => this.dispatchState({ SimpleDropDownValue: e.target.value })}
-                >
-                  <option value="" disabled>
-                    Choose...
-                  </option>
-                  {this.state.SimpleDropDownOptions.map((text, idx) => (
-                    <option key={idx} value={text}>
+          <tr>
+            <td>
+              Search box:
+              <label>(updates on keystroke)</label>
+            </td>
+            <td>
+              <input
+                type="text"
+                className="form-control"
+                placeholder={state.SearchBoxPlaceHolder}
+                value={state.SearchBox}
+                onChange={e => dispatchState({ SearchBox: e.target.value })}
+              />
+              {state.SearchResults.length > 0 && (
+                <ul className="list-group">
+                  {state.SearchResults.map((text, idx) => (
+                    <li className="list-group-item" key={idx} onClick={_ => dispatchState({ SearchBox: text })}>
                       {text}
-                    </option>
+                    </li>
                   ))}
-                </select>
-                <b>{this.state.SimpleDropDownResult}</b>
-              </td>
-            </tr>
+                </ul>
+              )}
+            </td>
+          </tr>
 
-            <tr>
-              <td>
-                Drop-down list:
-                <label>(object data type)</label>
-              </td>
-              <td>
-                <select
-                  className="form-control"
-                  value={this.state.DropDownValue}
-                  onChange={e => this.dispatchState({ DropDownValue: e.target.value })}
-                >
-                  <option value="0" disabled>
-                    {this.state.DropDownCaption}
-                  </option>
-                  {this.state.DropDownOptions.map((opt, idx) => (
-                    <option key={idx} value={opt.Id}>
-                      {opt.Text}
-                    </option>
-                  ))}
-                </select>
-                <b>{this.state.DropDownResult}</b>
-              </td>
-            </tr>
-
-            <tr>
-              <td>Radio button:</td>
-              <td>
-                <label>
-                  <input
-                    type="radio"
-                    value="green"
-                    checked={this.state.RadioButtonValue == 'green'}
-                    onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
-                  />
-                  <span>Green</span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="yellow"
-                    checked={this.state.RadioButtonValue == 'yellow'}
-                    onChange={e => this.dispatchState({ RadioButtonValue: e.target.value })}
-                  />
-                  <span>Yellow</span>
-                </label>
-                <button className={'btn ' + this.state.RadioButtonStyle}>Result</button>
-              </td>
-            </tr>
-
-            <tr>
-              <td>Button: </td>
-              <td>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={_ => this.dispatchState({ ButtonClicked: true })}
-                >
-                  Click Me
+          <tr>
+            <td>Check box:</td>
+            <td>
+              <label>
+                <input
+                  type="checkbox"
+                  style={{ marginRight: ".4rem" }}
+                  checked={state.ShowMeCheckBox}
+                  onChange={_ =>
+                    dispatchState({
+                      ShowMeCheckBox: !state.ShowMeCheckBox
+                    })
+                  }
+                />
+                <span>Show me</span>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  style={{ marginRight: ".4rem" }}
+                  checked={state.EnableMeCheckBox}
+                  onChange={_ =>
+                    dispatchState({
+                      EnableMeCheckBox: !state.EnableMeCheckBox
+                    })
+                  }
+                />
+                <span>Enable me</span>
+              </label>
+              {state.ShowMeCheckBox && (
+                <button className="btn btn-secondary" disabled={!state.EnableMeCheckBox}>
+                  {state.CheckBoxResult}
                 </button>
-                {this.state.ClickCount > 0 && (
-                  <span style={{ marginLeft: '2rem' }}>
-                    You clicked me <b>{this.state.ClickCount}</b>
-                    &nbsp;times!
-                  </span>
-                )}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </ControlTypesCss>
-    );
-  }
-}
+              )}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Simple drop-down list:
+              <label>(string data type)</label>
+            </td>
+            <td>
+              <select
+                className="form-control"
+                value={state.SimpleDropDownValue}
+                onChange={e => dispatchState({ SimpleDropDownValue: e.target.value })}
+              >
+                <option value="" disabled>
+                  Choose...
+                </option>
+                {state.SimpleDropDownOptions.map((text, idx) => (
+                  <option key={idx} value={text}>
+                    {text}
+                  </option>
+                ))}
+              </select>
+              <b>{state.SimpleDropDownResult}</b>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Drop-down list:
+              <label>(object data type)</label>
+            </td>
+            <td>
+              <select className="form-control" value={state.DropDownValue} onChange={e => dispatchState({ DropDownValue: e.target.value })}>
+                <option value="0" disabled>
+                  {state.DropDownCaption}
+                </option>
+                {state.DropDownOptions.map((opt, idx) => (
+                  <option key={idx} value={opt.Id}>
+                    {opt.Text}
+                  </option>
+                ))}
+              </select>
+              <b>{state.DropDownResult}</b>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Radio button:</td>
+            <td>
+              <label>
+                <input
+                  type="radio"
+                  value="green"
+                  checked={state.RadioButtonValue == "green"}
+                  onChange={e => dispatchState({ RadioButtonValue: e.target.value })}
+                />
+                <span>Green</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="yellow"
+                  checked={state.RadioButtonValue == "yellow"}
+                  onChange={e => dispatchState({ RadioButtonValue: e.target.value })}
+                />
+                <span>Yellow</span>
+              </label>
+              <button className={"btn " + state.RadioButtonStyle}>Result</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Button: </td>
+            <td>
+              <button type="button" className="btn btn-secondary" onClick={_ => dispatchState({ ButtonClicked: true })}>
+                Click Me
+              </button>
+              {state.ClickCount > 0 && (
+                <span style={{ marginLeft: "2rem" }}>
+                  You clicked me <b>{state.ClickCount}</b>
+                  &nbsp;times!
+                </span>
+              )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ControlTypesCss>
+  );
+};
 ```
 
 ##### ControlTypesVM.cs
@@ -227,25 +212,25 @@ public class ControlTypesVM : BaseVM
             Changed(() => TextBoxResult);
         }
     }
-    public string TextBoxPlaceHolder => "Type something here"; 
-    public string TextBoxResult => !string.IsNullOrEmpty(TextBoxValue) ? $"You typed: {TextBoxValue}" : null; 
+    public string TextBoxPlaceHolder => "Type something here";
+    public string TextBoxResult => !string.IsNullOrEmpty(TextBoxValue) ? $"You typed: {TextBoxValue}" : null;
 
     // Search Box
 
     private List<string> Planets = new List<string> { "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Neptune", "Uranus" };
     public string SearchBox
     {
-        get => Get<string>() ?? ""; 
+        get => Get<string>() ?? "";
         set
         {
             Set(value);
             Changed(() => SearchResults);
         }
     }
-    public string SearchBoxPlaceHolder => "Type a planet"; 
-    public IEnumerable<string> SearchResults => Planets.Where(i => !string.IsNullOrEmpty(SearchBox) 
+    public string SearchBoxPlaceHolder => "Type a planet";
+    public IEnumerable<string> SearchResults => Planets.Where(i => !string.IsNullOrEmpty(SearchBox)
       && i.ToLower().StartsWith(SearchBox.ToLower())
-      && i.ToLower() != SearchBox.ToLower()); 
+      && i.ToLower() != SearchBox.ToLower());
 
     // Check Box
 
@@ -260,18 +245,18 @@ public class ControlTypesVM : BaseVM
     }
     public bool EnableMeCheckBox
     {
-        get => Get<bool?>() ?? true; 
+        get => Get<bool?>() ?? true;
         set
         {
             Set(value);
             Changed(() => CheckBoxResult);
         }
     }
-    public string CheckBoxResult => EnableMeCheckBox ? "Enabled" : "Disabled"; 
+    public string CheckBoxResult => EnableMeCheckBox ? "Enabled" : "Disabled";
 
     // Simple Drop-down
 
-    public List<string> SimpleDropDownOptions => new List<string> { "One", "Two", "Three", "Four" }; 
+    public List<string> SimpleDropDownOptions => new List<string> { "One", "Two", "Three", "Four" };
     public string SimpleDropDownValue
     {
         get => Get<string>() ?? "";
@@ -281,7 +266,7 @@ public class ControlTypesVM : BaseVM
             Changed(() => SimpleDropDownResult);
         }
     }
-    public string SimpleDropDownResult => !string.IsNullOrEmpty(SimpleDropDownValue) ? $"You selected: {SimpleDropDownValue}" : null; 
+    public string SimpleDropDownResult => !string.IsNullOrEmpty(SimpleDropDownValue) ? $"You selected: {SimpleDropDownValue}" : null;
 
     // Drop Down Objects
 
@@ -290,7 +275,7 @@ public class ControlTypesVM : BaseVM
         public int Id { get; set; }
         public string Text { get; set; }
     }
-    public string DropDownCaption => "Select an item ..."; 
+    public string DropDownCaption => "Select an item ...";
     public List<DropDownItem> DropDownOptions
     {
         get => new List<DropDownItem>
@@ -303,20 +288,20 @@ public class ControlTypesVM : BaseVM
     }
     public int DropDownValue
     {
-        get => Get<int>(); 
+        get => Get<int>();
         set
         {
             Set(value);
             Changed(() => DropDownResult);
         }
     }
-    public string DropDownResult => DropDownValue > 0 ? $"You selected: {DropDownOptions.First(i => i.Id == DropDownValue).Text}" : null; 
+    public string DropDownResult => DropDownValue > 0 ? $"You selected: {DropDownOptions.First(i => i.Id == DropDownValue).Text}" : null;
 
     // Radio Buttons
 
     public string RadioButtonValue
     {
-        get => Get<string>() ?? "green"; 
+        get => Get<string>() ?? "green";
         set
         {
             Set(value);
@@ -328,11 +313,11 @@ public class ControlTypesVM : BaseVM
     // Button
 
     public Action<bool> ButtonClicked => _ => ClickCount++;
-    
+
     public int ClickCount
     {
-        get => Get<int>(); 
-        set => Set(value); 
+        get => Get<int>();
+        set => Set(value);
     }
 }
 ```
