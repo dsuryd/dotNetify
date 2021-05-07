@@ -5,7 +5,7 @@ import InlineEdit from "../components/InlineEdit";
 import { SimpleListCss } from "../components/css";
 
 const SimpleList = () => {
-  const { vm, state, setState } = useConnect("SimpleListVM", { Employees: [] });
+  const { vm, state } = useConnect("SimpleListVM", { Employees: [] });
   const [newName, setNewName] = useState();
   return (
     <SimpleListCss>
