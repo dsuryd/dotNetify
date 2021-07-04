@@ -1,35 +1,28 @@
-import React, { Fragment } from "react";
-import dotnetify from "dotnetify";
+import React from "react";
 import { RouteLink } from "dotnetify/react";
 import { Modal, Theme } from "dotnetify-elements";
 import { BookStoreCss, BookCss } from "../components/css";
 
-export default class BookStore extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+export default BookStore = () => {
+  const { vm, state } = useConnect(
+    "BookStoreVM",
+    {},
+    {
+      onRouteEnter: (path, template) => (template.Target = "BookPanel")
+    }
+  );
 
-    this.vm = dotnetify.react.connect("BookStoreVM", this);
-    this.vm.onRouteEnter = (path, template) => (template.Target = "BookPanel");
-  }
-
-  componentWillUnmount() {
-    this.vm.$destroy();
-  }
-
-  render() {
-    return (
-      <BookStoreCss>
-        <header>
-          Each product here is represented by a unique URL that can be entered
-          into the address bar to go directly to that specific product page.
-        </header>
-        <BookStoreFront vm={this.vm} books={this.state.Books} />
-        <div id="BookPanel" />
-      </BookStoreCss>
-    );
-  }
-}
+  return (
+    <BookStoreCss>
+      <header>
+        Each product here is represented by a unique URL that can be entered into the address bar to go directly to that specific product
+        page.
+      </header>
+      <BookStoreFront vm={vm} books={state.Books} />
+      <div id="BookPanel" />
+    </BookStoreCss>
+  );
+};
 
 const BookStoreFront = ({ vm, books }) => {
   if (!books) return <div />;
@@ -54,54 +47,42 @@ const BookStoreFront = ({ vm, books }) => {
 
 export const BookDefault = () => <div />;
 
-export class Book extends React.Component {
-  constructor(props) {
-    super(props);
-    this.vm = dotnetify.react.connect("BookDetailsVM", this);
-    this.state = {
-      Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" },
-      open: true
-    };
-  }
-
-  componentWillUnmount() {
-    this.vm && this.vm.$destroy();
-  }
+export const Book = () => {
+  const { vm, state, setState } = useConnect("BookDetailsVM", {
+    Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" },
+    open: true
+  });
 
   handleClose = () => {
-    this.setState({ open: false });
-    this.vm.$routeTo(this.state.BookDefaultRoute);
-    this.vm.$destroy();
-    this.vm = null;
+    setState({ open: false });
+    vm.$routeTo(state.BookDefaultRoute);
+    vm.$destroy();
   };
 
-  render() {
-    const book = this.state.Book;
-    return (
-      <Theme>
-        <Modal open={this.state.open}>
-          {book != null ? (
-            <BookCss>
-              <img className="thumbnail" src={book.ImageUrl} />
-              <div>
-                <h3>{book.Title}</h3>
-                <h5>{book.Author}</h5>
-                <button className="btn btn-primary">Buy</button>
-              </div>
-            </BookCss>
-          ) : (
+  const book = state.Book;
+  return (
+    <Theme>
+      <Modal open={state.open}>
+        {book != null ? (
+          <BookCss>
+            <img className="thumbnail" src={book.ImageUrl} />
             <div>
-              Sorry, we couldn't find any book title that matches{" "}
-              <b>{this.state.SearchTitle}</b>.
+              <h3>{book.Title}</h3>
+              <h5>{book.Author}</h5>
+              <button className="btn btn-primary">Buy</button>
             </div>
-          )}
-          <footer>
-            <button className="btn btn-success" onClick={this.handleClose}>
-              Back
-            </button>
-          </footer>
-        </Modal>
-      </Theme>
-    );
-  }
-}
+          </BookCss>
+        ) : (
+          <div>
+            Sorry, we couldn't find any book title that matches <b>{state.SearchTitle}</b>.
+          </div>
+        )}
+        <footer>
+          <button className="btn btn-success" onClick={handleClose}>
+            Back
+          </button>
+        </footer>
+      </Modal>
+    </Theme>
+  );
+};
