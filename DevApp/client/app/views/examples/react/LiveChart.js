@@ -37,20 +37,8 @@ export const LineChart = ({ data }) => {
   const chartOptions = useRef({
     responsive: true,
     scales: {
-      xAxes: [
-        {
-          type: "realtime",
-          realtime: { delay: 2000 }
-        }
-      ],
-      yAxes: [
-        {
-          ticks: {
-            suggestedMin: -1,
-            suggestedMax: 1
-          }
-        }
-      ]
+      xAxes: [{ type: "realtime", realtime: { delay: 2000 } }],
+      yAxes: [{ ticks: { suggestedMin: -1, suggestedMax: 1 } }]
     }
   });
 
