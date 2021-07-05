@@ -7,7 +7,7 @@ import { LiveChartCss } from "../components/css";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 import "chartjs-plugin-streaming";
 
-const LiveChart = () => {
+export const LiveChart = () => {
   const { state } = useConnect("LiveChartVM", { Waveform: [], Bar: [], Pie: [] });
 
   return (
@@ -93,10 +93,7 @@ export const BarChart = ({ data }) => {
   });
   const chartOptions = useRef({ responsive: true, legend: { display: false } });
 
-  useEffect(() => {
-    chartData.current.datasets[0].data = data;
-  }, [data]);
-
+  chartData.current.datasets[0].data = data;
   return <Bar data={chartData.current} options={chartOptions.current} />;
 };
 ```
@@ -119,10 +116,7 @@ export const PieChart = ({ data }) => {
   });
   const chartOptions = useRef({ responsive: true });
 
-  useEffect(() => {
-    chartData.current.datasets[0].data = data;
-  }, [data]);
-
+  chartData.current.datasets[0].data = data;
   return <Doughnut data={chartData.current} options={chartOptions.current} />;
 };
 ```

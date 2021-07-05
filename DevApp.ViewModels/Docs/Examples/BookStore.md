@@ -6,10 +6,10 @@ import { RouteLink } from "dotnetify/react";
 import { Modal, Theme } from "dotnetify-elements";
 import { BookStoreCss, BookCss } from "../components/css";
 
-export default BookStore = () => {
+export const BookStore = props => {
   const { vm, state } = useConnect(
     "BookStoreVM",
-    {},
+    { props },
     {
       onRouteEnter: (path, template) => (template.Target = "BookPanel")
     }
@@ -31,7 +31,7 @@ export default BookStore = () => {
 ##### BookStoreFront.js
 
 ```jsx
-const BookStoreFront = ({ vm, books }) => {
+export const BookStoreFront = ({ vm, books }) => {
   if (!books) return <div />;
   return (
     <section>
@@ -56,13 +56,16 @@ const BookStoreFront = ({ vm, books }) => {
 ##### Book.js
 
 ```jsx
-export const Book = () => {
+export const Book = props => {
   const { vm, state, setState } = useConnect("BookDetailsVM", {
-    Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" },
-    open: true
+    state: {
+      Book: { Title: "", ImageUrl: "", Author: "", ItemUrl: "" },
+      open: true
+    },
+    props
   });
 
-  handleClose = () => {
+  const handleClose = () => {
     setState({ open: false });
     vm.$routeTo(state.BookDefaultRoute);
     vm.$destroy();
