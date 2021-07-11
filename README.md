@@ -30,8 +30,6 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 Documentation and live demo can be found at [https://dotnetify.net](https://dotnetify.net).
 
-[Usage with .NET Core 3.x](https://github.com/dsuryd/dotNetify/issues/159#issuecomment-547691063)
-
 ## Code Examples
 
 - React example: [dotnetify-react-demo](https://github.com/dsuryd/dotnetify-react-demo).
