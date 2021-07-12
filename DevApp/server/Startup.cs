@@ -15,6 +15,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DotInitializr;
 
 namespace DotNetify.DevApp
 {
@@ -30,6 +31,7 @@ namespace DotNetify.DevApp
             ;
          services.AddDotNetify();
          services.AddDotNetifyPulse();
+         services.AddDotInitializr();
          services.AddMvc();
 
          services.AddScoped<IEmployeeRepository, EmployeeRepository>();

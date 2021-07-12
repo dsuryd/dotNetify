@@ -9,16 +9,9 @@ Prerequisites:
 - Node.js
 - .NET Core SDK
 
-Download the template from nuget from the command line, then create your project:
+[inset]
 
-```js
-dotnet new -i dotnetify.react.template
-
-dotnet new dotnetify -o MyApp
-cd MyApp
-npm i
-dotnet watch run
-```
+#### Write From Scratch
 
 You can also perform the following step-by-step instructions to create a new project from scratch with either WebPack or script tag.
 [inset]
