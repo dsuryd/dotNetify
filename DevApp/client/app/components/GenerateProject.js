@@ -44,6 +44,7 @@ export const GenerateProject = ({ caption, sourceUrl, sourceDir }) => {
   const handleSubmit = async () => {
     setLoading(true);
     const zip = await generate();
+    setLoading(false);
     setShow(false);
 
     const blob = new Blob([zip], { type: "application/zip" });
