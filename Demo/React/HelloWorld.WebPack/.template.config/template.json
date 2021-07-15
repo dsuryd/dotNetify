@@ -6,11 +6,10 @@
   "identity": "HelloWorld",
   "shortName": "HelloWorld",
   "symbols": {
-    "Title": {
+    "HelloWorld": {
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "HelloWorld",
-      "replaces": "HelloWorld"
+      "defaultValue": "HelloWorld"
     }
   }
 }
