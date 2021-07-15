@@ -1,14 +1,17 @@
 ## From Scratch with CRA
 
-The following steps will create a simple real-time Hello World ASP.NET Core app from `create-react-app`. 
+The following steps will create a simple real-time Hello World ASP.NET Core app from `create-react-app`.
 
 Prerequisites:
 
 - Node.js
 
+[inset]
+
 ##### Create Project
 
 From the command line, run the following:
+
 ```jsx
 npx create-react-app helloworld
 cd helloworld
@@ -19,11 +22,13 @@ npm i --save tslib
 dotnet new web
 dotnet add package DotNetify.SignalR
 ```
+
 <br/>
 
 ##### Configure Startup
 
 Open _Startup.cs_ file and replace the content with the following:
+
 ```csharp
 using System.IO;
 using System.Collections.Generic;
@@ -42,7 +47,7 @@ namespace helloworld
         services.AddCors();
         services.AddMemoryCache();
         services.AddSignalR();
-        services.AddDotNetify();          
+        services.AddDotNetify();
     }
 
     public void Configure(IApplicationBuilder app)
@@ -52,10 +57,10 @@ namespace helloworld
         .AllowAnyHeader()
         .WithOrigins("http://localhost:3000")
         .AllowCredentials());
-          
+
       app.UseWebSockets();
       app.UseSignalR(routes => routes.MapDotNetifyHub());
-      app.UseDotNetify();  
+      app.UseDotNetify();
 
       app.Run(async (context) =>
       {
@@ -65,30 +70,34 @@ namespace helloworld
   }
 }
 ```
+
 <br/>
 
 ##### Configure NPM
 
 Add the following settings to _package.json_:
+
 ```js
   "proxy": "http://localhost:5000/"
 ```
+
 <br/>
 
 ##### Add Hello World
 
 Add a new file _src/HelloWorld.js_ with the following content:
-```jsx
-import React from 'react';
-import dotnetify from 'dotnetify';
 
-dotnetify.hubServerUrl = 'http://localhost:5000';
+```jsx
+import React from "react";
+import dotnetify from "dotnetify";
+
+dotnetify.hubServerUrl = "http://localhost:5000";
 
 export default class HelloWorld extends React.Component {
   constructor(props) {
     super(props);
-    dotnetify.react.connect('HelloWorld', this);
-    this.state = { Greetings: '', ServerTime: '' };
+    dotnetify.react.connect("HelloWorld", this);
+    this.state = { Greetings: "", ServerTime: "" };
   }
 
   render() {
@@ -103,27 +112,29 @@ export default class HelloWorld extends React.Component {
 ```
 
 Add the _HelloWorld_ component in _src/App.js_:
+
 ```jsx
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import HelloWorld from './HelloWorld';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import HelloWorld from "./HelloWorld";
 
 class App extends Component {
-	render() {
-		return (
-			<div className="App">
-				{/* ... */}
-				<HelloWorld />
-			</div>
-		);
-	}
+  render() {
+    return (
+      <div className="App">
+        {/* ... */}
+        <HelloWorld />
+      </div>
+    );
+  }
 }
 
 export default App;
 ```
 
 Add a new file _HelloWorld.cs_ with the following content:
+
 ```csharp
 using System;
 using DotNetify;
@@ -150,8 +161,9 @@ namespace helloworld
     }
 }
 ```
+
 <br/>
 
 ##### Build and Run
 
-Open a new terminal and run `dotnet run`.  On another terminal, run `npm start`.  Hello World!
+Open a new terminal and run `dotnet run`. On another terminal, run `npm start`. Hello World!

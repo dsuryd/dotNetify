@@ -4,20 +4,25 @@ The following steps will create a simple real-time Hello World ASP.NET Core app 
 
 Prerequisites:
 
-- Visual Studio 2017
+- Visual Studio 2019
 - Node.js
+
+[inset]
 
 ##### Create Project
 
-Create an empty ASP.NET Core Web Application (.NET Core 2.1) project and name it _HelloWorld_.  Then use the NuGet Package Manager Console to install the dotNetify package:
+Create an empty ASP.NET Core Web Application (.NET Core 2.1) project and name it _HelloWorld_. Then use the NuGet Package Manager Console to install the dotNetify package:
+
 ```csharp
 install-package DotNetify.SignalR
 ```
+
 <br/>
 
 ##### Configure Startup
 
 Open _Startup.cs_ file and replace the content with the following:
+
 ```csharp
 using System.IO;
 using System.Collections.Generic;
@@ -36,7 +41,7 @@ namespace HelloWorld
         {
             services.AddMemoryCache();
             services.AddSignalR();
-            services.AddDotNetify();          
+            services.AddDotNetify();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -50,7 +55,7 @@ namespace HelloWorld
             {
                 HotModuleReplacement = true,
                 HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
-            });            
+            });
 
             app.UseStaticFiles();
             app.Run(async (context) =>
@@ -62,11 +67,13 @@ namespace HelloWorld
     }
 }
 ```
+
 <br/>
 
 ##### Configure NPM
 
 Add NPM configuration file _package.json_ with the following content:
+
 ```json
 {
   "name": "helloworld",
@@ -95,38 +102,41 @@ The packages will be automatically downloaded by Visual Studio when the file is 
 ##### Configure WebPack
 
 Add _webpack.config.js_ with the following content:
-```js
-'use strict';
 
-const { VueLoaderPlugin } = require('vue-loader');
+```js
+"use strict";
+
+const { VueLoaderPlugin } = require("vue-loader");
 
 module.exports = {
-	mode: 'development',
-	entry: { main: './src/index.js' },
-	output: {
-		path: __dirname + '/wwwroot/dist',
-		publicPath: '/dist/'
-	},
-	resolve: {
-		modules: [ 'src', 'node_modules' ],
-		alias: { vue$: 'vue/dist/vue.esm.js' }
-	},
-	module: {
-		rules: [ { test: /\.vue$/, use: 'vue-loader' } ]
-	},
-  plugins: [ new VueLoaderPlugin() ]
+  mode: "development",
+  entry: { main: "./src/index.js" },
+  output: {
+    path: __dirname + "/wwwroot/dist",
+    publicPath: "/dist/"
+  },
+  resolve: {
+    modules: ["src", "node_modules"],
+    alias: { vue$: "vue/dist/vue.esm.js" }
+  },
+  module: {
+    rules: [{ test: /\.vue$/, use: "vue-loader" }]
+  },
+  plugins: [new VueLoaderPlugin()]
 };
 ```
+
 <br/>
 
 ##### Add Index Page
 
 Add a new file _wwwroot/index.html_ with the following content:
+
 ```html
 <html>
   <head>
     <title>DotNetify</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
   <body>
@@ -135,52 +145,56 @@ Add a new file _wwwroot/index.html_ with the following content:
   </body>
 </html>
 ```
+
 <br/>
 
 ##### Add Hello World
 
 Create a new folder _src_, and add a new file _src/index.js_ with the following content:
-```jsx
-import Vue from 'vue';
-import HelloWorld from './HelloWorld.vue';
 
-document.getElementById('App').innerHTML = '<hello-world />';
+```jsx
+import Vue from "vue";
+import HelloWorld from "./HelloWorld.vue";
+
+document.getElementById("App").innerHTML = "<hello-world />";
 new Vue({
-	el: '#App',
-	components: {
-		'hello-world': HelloWorld
-	}
+  el: "#App",
+  components: {
+    "hello-world": HelloWorld
+  }
 });
 ```
 
 Add a new file _src/HelloWorld.vue_ with the following content:
+
 ```html
 <template>
-	<div>
-		<p>{{Greetings}}</p>
-		<p>Server time is: {{ServerTime}}</p>
-	</div>
+  <div>
+    <p>{{Greetings}}</p>
+    <p>Server time is: {{ServerTime}}</p>
+  </div>
 </template>
 
 <script>
-import dotnetify from 'dotnetify/vue';
+  import dotnetify from "dotnetify/vue";
 
-export default {
-	name: 'HelloWorld',
-	created: function () {
-		this.vm = dotnetify.vue.connect("HelloWorld", this);
-	},
-	destroyed: function () {
-		this.vm.$destroy();
-	},
-	data: function () {
-		return { Greetings: '', ServerTime: '' }
-	}
-}
+  export default {
+    name: "HelloWorld",
+    created: function () {
+      this.vm = dotnetify.vue.connect("HelloWorld", this);
+    },
+    destroyed: function () {
+      this.vm.$destroy();
+    },
+    data: function () {
+      return { Greetings: "", ServerTime: "" };
+    }
+  };
 </script>
 ```
 
 Add a new file _HelloWorld.cs_ with the following content:
+
 ```csharp
 using System;
 using DotNetify;
@@ -207,8 +221,9 @@ namespace HelloWorld
     }
 }
 ```
+
 <br/>
 
 ##### Build and Run
 
-Run the application.  Hello World!
+Run the application. Hello World!

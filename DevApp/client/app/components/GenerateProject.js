@@ -1,7 +1,8 @@
 import React, { useRef, useState, useLayoutEffect, Fragment } from "react";
 import { Alert, Button, Modal, Panel, TextField } from "dotnetify-elements";
+import styled from "styled-components";
 
-export const GenerateProject = ({ caption, sourceUrl, sourceDir }) => {
+export const GenerateProject = ({ caption, title, sourceUrl, sourceDir, useAnchor }) => {
   const [show, setShow] = useState(false);
   const [projectName, setProjectName] = useState();
   const [loading, setLoading] = useState();
@@ -23,7 +24,7 @@ export const GenerateProject = ({ caption, sourceUrl, sourceDir }) => {
       templateSourceUrl: sourceUrl,
       templateSourceDirectory: sourceDir,
       templateType: "dotnet",
-      tags: { projectName: projectName || "MyProject" }
+      tags: { projectName: projectName || "MyProject", HelloWorld: projectName || "HelloWorld" }
     };
 
     const response = await fetch("/api/generator", {
@@ -62,11 +63,19 @@ export const GenerateProject = ({ caption, sourceUrl, sourceDir }) => {
     a.click();
   };
 
+  const Anchor = styled.a`
+    font-weight: 600;
+    cursor: pointer;
+    &:hover {
+      opacity: 80%;
+    }
+  `;
+
   return (
     <Fragment>
-      <Button onClick={() => setShow(true)}>{caption}</Button>
+      {useAnchor ? <Anchor onClick={() => setShow(true)}>{caption}</Anchor> : <Button onClick={() => setShow(true)}>{caption}</Button>}
       <Modal open={show} onSubmit={handleSubmit}>
-        <header>{caption}</header>
+        <header>{title || caption}</header>
         {loading && <Alert warning>Generating the project, please wait...</Alert>}
         <TextField
           ref={textRef}

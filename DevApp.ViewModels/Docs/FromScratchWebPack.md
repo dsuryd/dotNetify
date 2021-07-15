@@ -7,6 +7,8 @@ Prerequisites:
 - Visual Studio 2019 with .NET 5 SDK
 - Node.js
 
+[inset]
+
 ##### Create Project
 
 Create an empty ASP.NET 5 Web Application project and name it _HelloWorld_. Then use the NuGet Package Manager Console to install the dotNetify package:

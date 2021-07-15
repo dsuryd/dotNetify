@@ -6,7 +6,7 @@ Prerequisites:
 
 - .NET Core 5 SDK.
 
-<br/>
+[inset]
 
 ##### Create Project
 

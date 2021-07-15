@@ -5,21 +5,25 @@ The following steps will create a simple real-time Hello World ASP.NET Core app 
 Prerequisites:
 
 - .NET Core 2.1 SDK.
-<br/>
+
+[inset]
 
 ##### Create Project
 
 From the command line, run the following:
+
 ```js
 dotnet new web -o HelloWorld
 cd HelloWorld
 dotnet add package DotNetify.SignalR
 ```
+
 <br/>
 
 ##### Configure Startup
 
 Open _Startup.cs_ file and replace the content with the following:
+
 ```csharp
 using System.IO;
 using System.Collections.Generic;
@@ -37,14 +41,14 @@ namespace HelloWorld
         {
             services.AddMemoryCache();
             services.AddSignalR();
-            services.AddDotNetify();          
+            services.AddDotNetify();
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.UseWebSockets();
             app.UseSignalR(routes => routes.MapDotNetifyHub());
-            app.UseDotNetify();          
+            app.UseDotNetify();
 
             app.UseStaticFiles();
             app.Run(async (context) =>
@@ -56,17 +60,18 @@ namespace HelloWorld
     }
 }
 ```
-<br/>
 
+<br/>
 
 ##### Add Index Page
 
 Add a new file _wwwroot/index.html_ with the following content:
+
 ```html
 <html>
   <head>
     <title>DotNetify</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
   <body>
@@ -83,17 +88,21 @@ Add a new file _wwwroot/index.html_ with the following content:
 
     <script>
       new Vue({
-        el: '#App',
-        created: function() { dotnetify.vue.connect("HelloWorld", this) },
-        data: { Greetings: '', ServerTime: '' }
-      })
+        el: "#App",
+        created: function () {
+          dotnetify.vue.connect("HelloWorld", this);
+        },
+        data: { Greetings: "", ServerTime: "" }
+      });
     </script>
   </body>
 </html>
 ```
+
 <br/>
 
 Add a new file _HelloWorld.cs_ with the following content:
+
 ```csharp
 using System;
 using DotNetify;
@@ -120,8 +129,9 @@ namespace HelloWorld
     }
 }
 ```
+
 <br/>
 
 ##### Build and Run
 
-Run `dotnet run`.  Hello World!
+Run `dotnet run`. Hello World!

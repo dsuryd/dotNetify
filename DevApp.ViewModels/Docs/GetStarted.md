@@ -1,7 +1,5 @@
 ## Get Started
 
-#### SPA Template
-
 The easiest way to get started is to use the basic SPA template that contains some examples, and also include a functional login page with JWT authentication.
 
 Prerequisites:
@@ -11,9 +9,10 @@ Prerequisites:
 
 [inset]
 
-#### Write From Scratch
+<br/>
 
 You can also perform the following step-by-step instructions to create a new project from scratch with either WebPack or script tag.
+
 [inset]
 
 #### NuGet Packages
