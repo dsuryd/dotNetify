@@ -1,18 +1,5 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "AUTHOR-NAME",
-  "classifications": ["Web"],
-  "name": "HelloWorld",
-  "identity": "HelloWorld",
-  "shortName": "HelloWorld",
-  "sourceName": "HelloWorld",
-  "symbols": {
-    "projectRename": {
-      "type": "derived",
-      "replaces": "HelloWorld",
-      "valueSource": "projectName",
-      "defaultValue": "HelloWorld"
-    }
-  },
+  "symbols": {},
   "sources": []
 }
