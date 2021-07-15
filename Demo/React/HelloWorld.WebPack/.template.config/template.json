@@ -7,9 +7,10 @@
   "shortName": "HelloWorld",
   "sourceName": "HelloWorld",
   "symbols": {
-    "HelloWorld": {
-      "type": "parameter",
-      "datatype": "string",
+    "projectRename": {
+      "type": "derived",
+      "replaces": "HelloWorld",
+      "valueSource": "projectName",
       "defaultValue": "HelloWorld"
     }
   }
