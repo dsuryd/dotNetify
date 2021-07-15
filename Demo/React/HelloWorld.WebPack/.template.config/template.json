@@ -5,6 +5,7 @@
   "name": "HelloWorld",
   "identity": "HelloWorld",
   "shortName": "HelloWorld",
+  "sourceName": "HelloWorld",
   "symbols": {
     "HelloWorld": {
       "type": "parameter",
