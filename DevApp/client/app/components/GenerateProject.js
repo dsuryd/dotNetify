@@ -1,5 +1,6 @@
 import React, { useRef, useState, useLayoutEffect, Fragment } from "react";
 import { Alert, Button, Modal, Panel, TextField } from "dotnetify-elements";
+import SpinnerIcon from "./SpinnerIcon";
 import styled from "styled-components";
 
 export const GenerateProject = ({ caption, title, sourceUrl, sourceDir, useAnchor }) => {
@@ -76,7 +77,12 @@ export const GenerateProject = ({ caption, title, sourceUrl, sourceDir, useAncho
       {useAnchor ? <Anchor onClick={() => setShow(true)}>{caption}</Anchor> : <Button onClick={() => setShow(true)}>{caption}</Button>}
       <Modal open={show} onSubmit={handleSubmit}>
         <header>{title || caption}</header>
-        {loading && <Alert warning>Generating the project, please wait...</Alert>}
+        {loading && (
+          <Alert warning>
+            Generating the project, please wait...
+            <SpinnerIcon style={{ marginLeft: "10px", transform: "scale(.2)" }} />
+          </Alert>
+        )}
         <TextField
           ref={textRef}
           horizontal
