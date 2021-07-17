@@ -11,7 +11,7 @@
     ]
   },
   "dependencies": {
-    "dotnetify": "^5.0.1",
+    "dotnetify": "^5.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
