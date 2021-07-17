@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using BrunoLau.SpaServices.Webpack;
 using DotNetify;
 
-namespace HelloWorld.WebPack
+namespace HelloWorld
 {
    public class Startup
    {
