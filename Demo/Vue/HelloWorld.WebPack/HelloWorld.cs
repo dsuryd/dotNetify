@@ -2,7 +2,7 @@ using System;
 using DotNetify;
 using System.Threading;
 
-namespace HelloWorld.WebPack
+namespace HelloWorld
 {
     public class HelloWorld : BaseVM
     {
