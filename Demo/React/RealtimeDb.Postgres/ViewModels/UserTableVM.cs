@@ -19,7 +19,7 @@ namespace RealtimeDb
          _dbContextFactory = dbContextFactory;
 
          using var dbContext = _dbContextFactory.CreateDbContext();
-         Users = dbContext.Users.ToList();
+         Users = dbContext.Users.OrderBy(x => x.UserId).ToList();
 
          this.ObserveList<User>(nameof(Users), dbChangeObserver);
       }
