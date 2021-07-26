@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Postgres", "DotNetifyLib.Postgres\DotNetifyLib.Postgres.csproj", "{8ADC2176-5FB0-4AE2-96A6-24AF894348D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Core", "DotNetifyLib.Core\DotNetifyLib.Core.csproj", "{81B64FDD-0D10-4278-A9D2-204B07BAF4EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeDb", "Demo\React\RealtimeDb.Postgres\RealtimeDb.csproj", "{1518C5FB-F8FD-4937-8B05-98ABE0D66A2F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8ADC2176-5FB0-4AE2-96A6-24AF894348D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ADC2176-5FB0-4AE2-96A6-24AF894348D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ADC2176-5FB0-4AE2-96A6-24AF894348D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ADC2176-5FB0-4AE2-96A6-24AF894348D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81B64FDD-0D10-4278-A9D2-204B07BAF4EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81B64FDD-0D10-4278-A9D2-204B07BAF4EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81B64FDD-0D10-4278-A9D2-204B07BAF4EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81B64FDD-0D10-4278-A9D2-204B07BAF4EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1518C5FB-F8FD-4937-8B05-98ABE0D66A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1518C5FB-F8FD-4937-8B05-98ABE0D66A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1518C5FB-F8FD-4937-8B05-98ABE0D66A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1518C5FB-F8FD-4937-8B05-98ABE0D66A2F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ECF8EF13-5071-4FFC-93E9-9F1E88C10A24}
+	EndGlobalSection
+EndGlobal
