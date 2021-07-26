@@ -16,7 +16,7 @@ export const UserTable = () => {
   const [newName, setNewName] = useState<string>("");
 
   const addUser = (name: string) => {
-    vm.$dispatch({ AddUser: name });
+    vm.$dispatch({ AddUser: { UserName: name } });
     setNewName("");
   };
 
@@ -24,15 +24,15 @@ export const UserTable = () => {
     vm.$dispatch({ UpdateUser: { UserId: id, UserName: name } as User });
   };
 
-  const removeUser = (UserId: number) => {
-    vm.$dispatch({ RemoveUser: UserId });
+  const removeUser = (id: number) => {
+    vm.$dispatch({ RemoveUser: { UserId: id } });
   };
 
   return (
     <div className="container">
       <h2>Realtime Database Demo</h2>
       <div style={{ padding: "1rem 0" }}>
-        <TextBox tabIndex={0} placeholder="Add new user name" value={newName} onChange={setNewName} onUpdate={addUser} />
+        <TextBox tabIndex={0} placeholder="Add a new user name" value={newName} onChange={setNewName} onUpdate={addUser} />
       </div>
       <table className="table table-striped">
         <tbody>

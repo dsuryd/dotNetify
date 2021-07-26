@@ -24,10 +24,10 @@ namespace RealtimeDb
          this.ObserveList<User>(nameof(Users), dbChangeObserver);
       }
 
-      public void AddUser(string userName)
+      public void AddUser(User userInfo)
       {
          using var dbContext = _dbContextFactory.CreateDbContext();
-         dbContext.Users.Add(new User { UserName = userName });
+         dbContext.Users.Add(userInfo);
          dbContext.SaveChanges();
       }
 
@@ -42,10 +42,10 @@ namespace RealtimeDb
          }
       }
 
-      public void RemoveUser(long userId)
+      public void RemoveUser(User userInfo)
       {
          using var dbContext = _dbContextFactory.CreateDbContext();
-         var user = dbContext.Users.Find(userId);
+         var user = dbContext.Users.Find(userInfo.UserId);
          if (user != null)
          {
             dbContext.Users.Remove(user);
