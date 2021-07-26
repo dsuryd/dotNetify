@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { useConnect } from "dotnetify";
 import { TextBox, InlineEdit } from "./components";
-
-class User {
-  UserId: number;
-  UserName: string;
-}
+import { User } from "./models/User";
 
 interface State {
   Users: User[];
@@ -16,16 +12,16 @@ export const UserTable = () => {
   const [newName, setNewName] = useState<string>("");
 
   const addUser = (name: string) => {
-    vm.$dispatch({ AddUser: { UserName: name } });
+    vm.$dispatch({ AddUser: new User(0, name) });
     setNewName("");
   };
 
   const updateUser = (id: number, name: string) => {
-    vm.$dispatch({ UpdateUser: { UserId: id, UserName: name } as User });
+    vm.$dispatch({ UpdateUser: new User(id, name) });
   };
 
   const removeUser = (id: number) => {
-    vm.$dispatch({ RemoveUser: { UserId: id } });
+    vm.$dispatch({ RemoveUser: new User(id, "") });
   };
 
   return (
@@ -48,9 +44,7 @@ export const UserTable = () => {
                 <InlineEdit text={user.UserName} onChange={(value: string) => updateUser(user.UserId, value)} />
               </td>
               <td>
-                <button type="button" className="btn btn-link" onClick={_ => removeUser(user.UserId)}>
-                  Delete
-                </button>
+                <button type="button" className="btn btn-link" onClick={_ => removeUser(user.UserId)} children="Delete" />
               </td>
             </tr>
           ))}
