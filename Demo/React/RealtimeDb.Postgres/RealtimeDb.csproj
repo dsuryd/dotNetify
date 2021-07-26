@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="typings\**" />
+    <Content Remove="typings\**" />
+    <EmbeddedResource Remove="typings\**" />
+    <None Remove="typings\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
