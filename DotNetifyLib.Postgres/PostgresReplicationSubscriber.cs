@@ -20,6 +20,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using Npgsql;
 using Npgsql.Replication;
 using Npgsql.Replication.PgOutput;
 using Npgsql.Replication.PgOutput.Messages;
@@ -59,14 +60,13 @@ namespace DotNetify.Postgres
             throw new ArgumentNullException(nameof(_config.ReplicationSlotName));
 
          _connection = new LogicalReplicationConnection(_config.ConnectionString);
-         _ = ConnectAsync().ContinueWith(_ => SubscribeAsync());
+         _ = StartAsync();
       }
 
       public void Dispose()
       {
-         _cancelTokenSource.Cancel();
          _transactionSubject.OnCompleted();
-         _connection.DisposeAsync().GetAwaiter().GetResult();
+         StopAsync().GetAwaiter().GetResult();
       }
 
       private void EmitEvent(Transaction transactionEvent)
@@ -75,16 +75,36 @@ namespace DotNetify.Postgres
             _transactionSubject.OnNext(transactionEvent);
       }
 
-      private async Task ConnectAsync()
+      private async Task StartAsync()
       {
-         try
+         int retryDelayMsecs = 10000;
+
+         do
          {
-            await _connection.Open();
+            try
+            {
+               await _connection.Open();
+               Logger.LogInformation("Connection opened");
+
+               await SubscribeAsync();
+            }
+            catch (NpgsqlException ex)
+            {
+               Logger.LogError($"[DotNetifyPostgres] {ex.Message}");
+               await Task.Delay(retryDelayMsecs);
+            }
+            catch (Exception ex)
+            {
+               throw new DotNetifyPostgresException(ex.Message, ex);
+            }
          }
-         catch (Exception ex)
-         {
-            throw new DotNetifyPostgresException(ex.Message, ex);
-         }
+         while (!_cancelTokenSource.IsCancellationRequested);
+      }
+
+      private async Task StopAsync()
+      {
+         _cancelTokenSource.Cancel();
+         await _connection.DisposeAsync();
       }
 
       /// <summary>
@@ -108,92 +128,87 @@ namespace DotNetify.Postgres
       /// </remarks>
       private async Task SubscribeAsync()
       {
-         try
+         Transaction transactionEvent = null;
+
+         var publication = new PgOutputReplicationOptions(_config.PublicationName);
+         var slot = new PgOutputReplicationSlot(_config.ReplicationSlotName);
+
+         var replication = _connection.StartReplication(slot, publication, _cancelTokenSource.Token);
+         Logger.LogInformation($"Start replication at slot '{_config.ReplicationSlotName}'");
+
+         await foreach (var message in replication)
          {
-            Transaction transactionEvent = null;
-
-            var publication = new PgOutputReplicationOptions(_config.PublicationName);
-            var slot = new PgOutputReplicationSlot(_config.ReplicationSlotName);
-
-            var replication = _connection.StartReplication(slot, publication, _cancelTokenSource.Token);
-            await foreach (var message in replication)
+            var messageType = message.GetType();
+            if (messageType == typeof(BeginMessage))
             {
-               var messageType = message.GetType();
-               if (messageType == typeof(BeginMessage))
-               {
-                  transactionEvent = new Transaction();
-               }
-               else if (messageType == typeof(CommitMessage))
-               {
-                  EmitEvent(transactionEvent);
-               }
-               else if (messageType == typeof(RelationMessage))
-               {
-                  var relationMsg = message as RelationMessage;
-                  if (!_relations.ContainsKey(relationMsg.RelationId))
-                  {
-                     _relations.Add(relationMsg.RelationId, new Relation
-                     {
-                        Id = relationMsg.RelationId,
-                        Name = relationMsg.RelationName,
-                        ColumnNames = relationMsg.Columns.ToArray().Select(x => x.ColumnName).ToArray()
-                     });
-                  }
-               }
-               else if (messageType == typeof(InsertMessage))
-               {
-                  var insertMsg = message as InsertMessage;
-                  transactionEvent.DataEvents.Add(new InsertEvent
-                  {
-                     Relation = _relations.ContainsKey(insertMsg.RelationId) ? _relations[insertMsg.RelationId] : null,
-                     ColumnValues = insertMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
-                  });
-               }
-               else if (messageType == typeof(UpdateMessage))
-               {
-                  var updateMsg = message as UpdateMessage;
-                  transactionEvent.DataEvents.Add(new UpdateEvent
-                  {
-                     Relation = _relations.ContainsKey(updateMsg.RelationId) ? _relations[updateMsg.RelationId] : null,
-                     ColumnValues = updateMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
-                  });
-               }
-               else if (messageType == typeof(FullUpdateMessage))
-               {
-                  var updateMsg = message as FullUpdateMessage;
-                  transactionEvent.DataEvents.Add(new UpdateEvent
-                  {
-                     Relation = _relations.ContainsKey(updateMsg.RelationId) ? _relations[updateMsg.RelationId] : null,
-                     ColumnValues = updateMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray(),
-                     OldColumnValues = updateMsg.OldRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
-                  });
-               }
-               else if (messageType == typeof(KeyDeleteMessage))
-               {
-                  var deleteMsg = message as KeyDeleteMessage;
-                  transactionEvent.DataEvents.Add(new DeleteEvent
-                  {
-                     Relation = _relations.ContainsKey(deleteMsg.RelationId) ? _relations[deleteMsg.RelationId] : null,
-                     Keys = deleteMsg.KeyRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
-                  });
-               }
-               else if (messageType == typeof(FullDeleteMessage))
-               {
-                  var deleteMsg = message as FullDeleteMessage;
-                  transactionEvent.DataEvents.Add(new DeleteEvent
-                  {
-                     Relation = _relations.ContainsKey(deleteMsg.RelationId) ? _relations[deleteMsg.RelationId] : null,
-                     OldColumnValues = deleteMsg.OldRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
-                  });
-               }
-
-               // Inform the server which WAL files can removed or recycled.
-               _connection.SetReplicationStatus(message.WalEnd);
+               transactionEvent = new Transaction();
             }
-         }
-         catch (Exception ex)
-         {
-            throw new DotNetifyPostgresException(ex.Message, ex);
+            else if (messageType == typeof(CommitMessage))
+            {
+               EmitEvent(transactionEvent);
+            }
+            else if (messageType == typeof(RelationMessage))
+            {
+               var relationMsg = message as RelationMessage;
+               if (!_relations.ContainsKey(relationMsg.RelationId))
+               {
+                  _relations.Add(relationMsg.RelationId, new Relation
+                  {
+                     Id = relationMsg.RelationId,
+                     Name = relationMsg.RelationName,
+                     ColumnNames = relationMsg.Columns.ToArray().Select(x => x.ColumnName).ToArray()
+                  });
+               }
+            }
+            else if (messageType == typeof(InsertMessage))
+            {
+               var insertMsg = message as InsertMessage;
+               transactionEvent.DataEvents.Add(new InsertEvent
+               {
+                  Relation = _relations.ContainsKey(insertMsg.RelationId) ? _relations[insertMsg.RelationId] : null,
+                  ColumnValues = insertMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+               });
+            }
+            else if (messageType == typeof(UpdateMessage))
+            {
+               var updateMsg = message as UpdateMessage;
+               transactionEvent.DataEvents.Add(new UpdateEvent
+               {
+                  Relation = _relations.ContainsKey(updateMsg.RelationId) ? _relations[updateMsg.RelationId] : null,
+                  ColumnValues = updateMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+               });
+            }
+            else if (messageType == typeof(FullUpdateMessage))
+            {
+               var updateMsg = message as FullUpdateMessage;
+               transactionEvent.DataEvents.Add(new UpdateEvent
+               {
+                  Relation = _relations.ContainsKey(updateMsg.RelationId) ? _relations[updateMsg.RelationId] : null,
+                  ColumnValues = updateMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray(),
+                  OldColumnValues = updateMsg.OldRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+               });
+            }
+            else if (messageType == typeof(KeyDeleteMessage))
+            {
+               var deleteMsg = message as KeyDeleteMessage;
+               transactionEvent.DataEvents.Add(new DeleteEvent
+               {
+                  Relation = _relations.ContainsKey(deleteMsg.RelationId) ? _relations[deleteMsg.RelationId] : null,
+                  Keys = deleteMsg.KeyRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+               });
+            }
+            else if (messageType == typeof(FullDeleteMessage))
+            {
+               var deleteMsg = message as FullDeleteMessage;
+               transactionEvent.DataEvents.Add(new DeleteEvent
+               {
+                  Relation = _relations.ContainsKey(deleteMsg.RelationId) ? _relations[deleteMsg.RelationId] : null,
+                  OldColumnValues = deleteMsg.OldRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+               });
+            }
+
+            // Inform the server which WAL files can removed or recycled.
+            _connection.SetReplicationStatus(message.WalEnd);
          }
       }
    }

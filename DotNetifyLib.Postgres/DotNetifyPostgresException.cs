@@ -22,7 +22,7 @@ namespace DotNetify.Postgres
    {
       public DotNetifyPostgresException(string message, Exception innerException = null) : base(message, innerException)
       {
-         Console.WriteLine(this);
+         Logger.LogError($"[DotNetifyPostgres] {message}");
       }
    }
 }
