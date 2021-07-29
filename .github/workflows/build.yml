@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 3.1.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore DotNetify.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build DotNetify.sln --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test DotNetify.sln --no-build --verbosity normal
