@@ -9,6 +9,6 @@ namespace RealtimeDb
 
       public UserAccountDbContext(DbContextOptions<UserAccountDbContext> options) : base(options)
       {
-      }
+      } 
    }
 }

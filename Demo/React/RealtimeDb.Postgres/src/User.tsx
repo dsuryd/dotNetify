@@ -1,34 +1,34 @@
 import React, { useState } from "react";
 import { useConnect } from "dotnetify";
 import { TextBox, InlineEdit } from "./components";
-import { User } from "./models/User";
+import { UserModel } from "./models/UserModel";
 
 interface State {
-  Users: User[];
+  Users: UserModel[];
 }
 
-export const UserTable = () => {
-  const { vm, state } = useConnect<State>("UserTableVM", this);
+export const User = () => {
+  const { vm, state } = useConnect<State>("UserVM", this);
   const [newName, setNewName] = useState<string>("");
 
   const addUser = (name: string) => {
-    vm.$dispatch({ AddUser: new User(0, name) });
+    vm.$dispatch({ AddUser: new UserModel(0, name) });
     setNewName("");
   };
 
   const updateUser = (id: number, name: string) => {
-    vm.$dispatch({ UpdateUser: new User(id, name) });
+    vm.$dispatch({ UpdateUser: new UserModel(id, name) });
   };
 
   const removeUser = (id: number) => {
-    vm.$dispatch({ RemoveUser: new User(id, "") });
+    vm.$dispatch({ RemoveUser: new UserModel(id, "") });
   };
 
   return (
     <div className="container">
       <h2>Realtime Database Demo</h2>
       <div style={{ padding: "1rem 0" }}>
-        <TextBox tabIndex={0} placeholder="Add a new user name" value={newName} onChange={setNewName} onUpdate={addUser} />
+        <TextBox tabIndex={0} placeholder="Add user name here" value={newName} onChange={setNewName} onUpdate={addUser} />
       </div>
       <table className="table table-striped">
         <tbody>

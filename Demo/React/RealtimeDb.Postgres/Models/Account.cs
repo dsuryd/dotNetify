@@ -19,5 +19,7 @@ namespace RealtimeDb
 
       [Column("created_on")]
       public DateTime CreatedOn { get; set; }
+
+      public User User { get; set; }
    }
 }

@@ -7,6 +7,7 @@ using DotNetify;
 using DotNetify.Postgres;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace RealtimeDb
 {
@@ -40,7 +41,11 @@ namespace RealtimeDb
          app.UseDotNetify();
 
          if (env.IsDevelopment())
-            app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions { HotModuleReplacement = true });
+            app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions
+            {
+               HotModuleReplacement = true,
+               HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } }
+            });
 
          app.UseStaticFiles();
          app.UseRouting();

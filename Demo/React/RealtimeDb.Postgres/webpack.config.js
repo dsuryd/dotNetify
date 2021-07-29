@@ -1,21 +1,21 @@
-'use strict';
+"use strict";
 
 module.exports = {
-  mode: 'development',
-  entry: { main: './src/index' },
+  mode: "development",
+  entry: { main: "./src/index" },
   output: {
-    path: __dirname + '/wwwroot/dist',
-    publicPath: '/dist/'
+    path: __dirname + "/wwwroot/dist",
+    publicPath: "/dist/"
   },
-  devtool: 'source-map',
+  devtool: "source-map",
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    modules: ['src', 'node_modules']
+    extensions: [".tsx", ".jsx", ".ts", ".js"],
+    modules: ["src", "node_modules"]
   },
   module: {
     rules: [
-      { test: /\.jsx?$/, use: 'babel-loader', exclude: /node_modules/ },
-      { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ }
+      { test: /\.jsx?$/, use: "babel-loader", exclude: /node_modules/ },
+      { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ }
     ]
   }
 };

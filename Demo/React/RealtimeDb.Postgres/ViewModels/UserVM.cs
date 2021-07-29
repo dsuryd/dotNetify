@@ -7,14 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RealtimeDb
 {
-   public class UserTableVM : BaseVM
+   public class UserVM : BaseVM
    {
       private readonly IDbContextFactory<UserAccountDbContext> _dbContextFactory;
 
       [ItemKey(nameof(User.UserId))]
       public List<User> Users { get; set; }
 
-      public UserTableVM(IDbContextFactory<UserAccountDbContext> dbContextFactory, IDbChangeObserver dbChangeObserver)
+      public UserVM(IDbContextFactory<UserAccountDbContext> dbContextFactory, IDbChangeObserver dbChangeObserver)
       {
          _dbContextFactory = dbContextFactory;
 
