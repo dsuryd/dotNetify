@@ -7,16 +7,10 @@ ALTER ROLE my_user WITH REPLICATION;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO my_user;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO my_user;
 
-CREATE TABLE IF NOT EXISTS users (
-	user_id serial PRIMARY KEY,
-	username VARCHAR ( 50 ) UNIQUE NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS accounts (
-	account_id serial PRIMARY KEY,	
-	user_id integer REFERENCES users(user_id),
-	balance decimal,
-	created_on TIMESTAMP NOT NULL
+CREATE TABLE IF NOT EXISTS businesses (
+	business_id serial PRIMARY KEY,
+	business_name VARCHAR ( 50 ) UNIQUE NOT NULL,
+	rating integer
 );
 
 CREATE PUBLICATION dotnetify_pub FOR ALL TABLES;

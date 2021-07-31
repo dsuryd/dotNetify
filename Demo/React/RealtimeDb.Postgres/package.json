@@ -15,6 +15,7 @@
     "dotnetify": "^5.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-star-ratings": "^2.3.0",
     "styled-components": "^5.3.0"
   },
   "devDependencies": {

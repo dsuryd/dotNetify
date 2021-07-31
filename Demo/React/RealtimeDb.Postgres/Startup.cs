@@ -31,7 +31,7 @@ namespace RealtimeDb
             ReplicationSlotName = "dotnetify_slot"
          });
 
-         services.AddDbContextFactory<UserAccountDbContext>(options =>
+         services.AddDbContextFactory<BusinessDbContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
       }
 

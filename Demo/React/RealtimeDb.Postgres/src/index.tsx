@@ -1,9 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import dotnetify from "dotnetify";
-import { User } from "./User";
-import { Account } from "./Account";
+import { Businesses } from "./Businesses";
 
 dotnetify.debug = true;
 
-ReactDOM.render(<User />, document.getElementById("App"));
+ReactDOM.render(<Businesses />, document.getElementById("App"));
