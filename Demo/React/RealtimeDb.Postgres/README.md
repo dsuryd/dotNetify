@@ -1,6 +1,6 @@
 ## DotNetify - Realtime DB demo
 
-<a href="tinyurl.com/demorealtimedbpostgres">Download this project</a>
+<a href="https://www.tinyurl.com/demorealtimedbpostgres">Download this project</a>
 
 ### PostgreSQL Setup
 
