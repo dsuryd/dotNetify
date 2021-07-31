@@ -37,6 +37,7 @@ export const ProjectGenerator = () => {
 
   const handleSubmit = async () => {
     if (!sourceUrl || !sourceDir) throw "[Error] Query string required: ?url=<git repo url>&dir=><git repo directory>";
+    if (!sourceUrl.startsWith("https://github.com/dsuryd/")) throw "[Error] unexpected source";
 
     setLoading(true);
     const zip = await generate();
