@@ -1,6 +1,6 @@
 ## DotNetify - Realtime DB demo
 
-<a href="https://dotnetify.net/generate/?url=https://github.com/dsuryd/dotNetify&dir=Demo/React/RealtimeDb.Postgres&project=realtimeDbDemo">Download this project</a>
+<a href="https://www.tinyurl.com/demorealtimedbpostgres">Download this project</a>
 
 ### PostgreSQL Setup
 
