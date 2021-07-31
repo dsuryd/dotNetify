@@ -61,13 +61,19 @@ export const ProjectGenerator = () => {
     handleSubmit();
   }, []);
 
-  return loading ? (
+  return (
     <div style={{ padding: ".5rem" }}>
-      <span>Generating project, please wait...</span>
-      <SpinnerIcon style={{ marginLeft: "10px", transform: "scale(.2)" }} />
+      {loading === true ? (
+        <React.Fragment>
+          <span>Generating project, please wait...</span>
+          <SpinnerIcon style={{ marginLeft: "10px", transform: "scale(.2)" }} />{" "}
+        </React.Fragment>
+      ) : loading === false ? (
+        <span>Project generated. You may close this window.</span>
+      ) : (
+        <span />
+      )}
     </div>
-  ) : (
-    <div />
   );
 };
 
