@@ -2,5 +2,12 @@
 
 ### PostgreSQL Setup
 
-- Use the version of PostgreSQL that supports logical replication (v10+).
-- Execute the statements in `init-db.sql`.
+- Requires PostgreSQL version >= 10.
+- Run the SQL statements in `init-db.sql`.
+
+### How to Run
+
+```
+npm install
+dotnet run
+```
