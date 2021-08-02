@@ -18,13 +18,10 @@
 
   <ItemGroup>
     <PackageReference Include="BrunoLau.SpaServices" Version="0.8.0" />
+    <PackageReference Include="DotNetify.Postgres" Version="1.0.0" />
     <PackageReference Include="DotNetify.SignalR" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\DotNetifyLib.Postgres\DotNetifyLib.Postgres.csproj" />
   </ItemGroup>
 
 </Project>
