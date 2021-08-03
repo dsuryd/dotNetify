@@ -9,7 +9,7 @@ interface State {
 }
 
 export const Businesses = () => {
-  const { vm, state } = useConnect<State>("BusinessesVM", this);
+  const { vm, state } = useConnect<State>("BusinessesVM");
   const [newName, setNewName] = useState<string>("");
 
   const addBusiness = (name: string) => {
