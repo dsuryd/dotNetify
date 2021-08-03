@@ -7,7 +7,7 @@ interface State {
 }
 
 export const HelloWorld = () => {
-  const { state } = useConnect<State>('HelloWorld', this);
+  const { state } = useConnect<State>('HelloWorld');
   return (
     <div>
       <p>{state.Greetings}</p>
