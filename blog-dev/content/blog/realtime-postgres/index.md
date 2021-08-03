@@ -10,17 +10,17 @@ I was reading up on PostgreSQL when I noticed an interesting feature called logi
 
 In other words, it's a way of ensuring copies of the database are always in sync by having the database publish logical data changes in real-time to subscriber nodes.
 
-A replication subscriber would typically be another database that are serving as a copy of the master, but it's limited to it and could be anything. What if we make that to be a web service? The service can then push those changes to multiple clients of a web application so they can always have their data synchronized in real-time.
+A replication subscriber would typically be another database that is serving as a copy of the master, but it's limited to it and could be anything. What if we make that to be a web service? The service can then push those changes to multiple clients of a web application so they can always have their data synchronized in real-time.
 
 There's actually another PostgreSQL feature, the NOTIFY command, that are intended to generate notifications, but we will need to write database triggers for each table we're interested in, and the string payload size has a limit of 8000 bytes. Logical replication has no such limit and can listen to all tables in the database, which makes it more scalable.
 
-So I wrote a small open-source library that combines [dotNetify](https://dotnetify.net) with PostgreSQL logical replication. You can use it to build web application with ASP.NET 5 that can react to all the inserts, updates and deletes that any user of the app commits to a PostgreSQL database.
+So I wrote a small open-source library that combines [dotNetify](https://dotnetify.net) with PostgreSQL logical replication. You can use it to build a web application with ASP.NET 5 that can react to all the inserts, updates, and deletes that any user of the app commits to a PostgreSQL database.
 
 With this library that I named **DotNetify.Postgres** ([source code](https://github.com/dsuryd/dotNetify/tree/master/DotNetifyLib.Postgres)), your project won't involve polling the database, setting up a complicated pub/sub system, or take much code at all. The rest of the blog will take you through building a demo app.
 
 ## PostgreSQL Setup
 
-To enable logical replication in your PostgreSQL database, find the postgresql.conf configuration file, change the parameter `wal_level` to _logical_, and both `max_wal_senders` and `max_replication_slots` to at least 1. Changes will take effect after the service restarts.
+To enable logical replication in your PostgreSQL database, find the _postgresql.conf_ configuration file, change the parameter `wal_level` to _logical_, and both `max_wal_senders` and `max_replication_slots` to at least 1. Changes will take effect after the service restarts.
 
 You can also change them with SQL commands:
 
@@ -38,9 +38,9 @@ CREATE PUBLICATION my_pub FOR ALL TABLES;
 
 We set it to publish data changes for all tables, but you can restrict it to just a specific table if you want.
 
-When the PostgreSQL is publishing replication records (also known as _write-ahead logs_ or WAL), it uses something called replication slots to ensure that the records do not get deleted until they're received by the subscribers.
+When PostgreSQL is publishing replication records (also known as _write-ahead logs_ or WAL), it uses something called replication slots to ensure that the records do not get deleted until they're received by the subscribers.
 
-Replication slots are great, because they allow a subscriber to go temporarily offline and, on reconnect, to simply pick up where it left off. But there's a caveat: the WAL records can pile up in a prolonged disconnection event, to the point that it can run out of space and crash the database, and therefore, the slots need to be monitored.
+Replication slots are great because they allow a subscriber to go temporarily offline and, on reconnect, to simply pick up where it left off. But there's a caveat: the WAL records can pile up in a prolonged disconnection event, to the point that it can run out of space and crash the database, and therefore, the slots need to be monitored.
 
 Here's how we create a replication slot:
 
@@ -48,15 +48,15 @@ Here's how we create a replication slot:
 SELECT * FROM pg_create_logical_replication_slot('my_slot', 'pgoutput');
 ```
 
-The _pgoutput_ is a PostgreSQL's standard logical decoding plugin for transforming the changes from WAL to the logical replication protocol.
+The _pgoutput_ is PostgreSQL's standard logical decoding plugin for transforming the changes from WAL to the logical replication protocol.
 
 For the demo, let's create a simple table. We will also create a new user that will be used by our web service to connect to the database:
 
 ```sql
 CREATE TABLE IF NOT EXISTS businesses (
-	business_id serial PRIMARY KEY,
-	business_name VARCHAR ( 50 ) UNIQUE NOT NULL,
-	rating integer
+  business_id serial PRIMARY KEY,
+  business_name VARCHAR ( 50 ) UNIQUE NOT NULL,
+  rating integer
 );
 
 CREATE USER my_user WITH PASSWORD 'my_pwd';
@@ -71,7 +71,7 @@ The Postgres database is now configured for logical replication. The next step i
 
 ## Web Service Setup
 
-You can download the source code from [this github repo](https://github.com/dsuryd/dotNetify/tree/master/Demo/React/RealtimeDb.Postgres). This is an ASP.NET project with a React/Typescript front-end and Webpack. After installing the npm packages, you can run the project from either Visual Studio or dotnet CLI.
+You can download the source code from [this Github repo](https://github.com/dsuryd/dotNetify/tree/master/Demo/React/RealtimeDb.Postgres). This is an ASP.NET project with a React/Typescript front-end and Webpack. After installing the npm packages, you can run the project from either Visual Studio or dotnet CLI.
 
 The code has an entity class for the demo table:
 
