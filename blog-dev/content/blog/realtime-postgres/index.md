@@ -2,6 +2,7 @@
 title: Real-time Web Updates From Your PostgreSQL Database
 date: "2021-08-03T00:00:00Z"
 description: "Combine PostgreSQL logical replication feature with dotNetify to broadcast data changes to your website in real-time."
+thumbnail: "./dotnetify-postgres.png"
 ---
 
 I was reading up on PostgreSQL when I noticed an interesting feature called logical replication. The documentation explains that logical replication is:
