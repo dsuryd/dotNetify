@@ -11,7 +11,7 @@ I was reading up on PostgreSQL when I noticed an interesting feature called logi
 
 In other words, it's a way of ensuring copies of the database are always in sync by having the database publish logical data changes in real-time to subscriber nodes.
 
-A replication subscriber would typically be another database that is serving as a copy of the master, but it's limited to it and could be anything. What if we make that to be a web service? The service can then push those changes to multiple clients of a web application so they can always have their data synchronized in real-time.
+A replication subscriber would typically be another database that is serving as a copy of the master, but it's not limited to it and could be anything. What if we make that to be a web service? The service can then push those changes to multiple clients of a web application so they can always have their data synchronized in real-time.
 
 There's actually another PostgreSQL feature, the NOTIFY command, that are intended to generate notifications, but we will need to write database triggers for each table we're interested in, and the string payload size has a limit of 8000 bytes. Logical replication has no such limit and can listen to all tables in the database, which makes it more scalable.
 
@@ -264,4 +264,4 @@ And with that, here's the demo of two browser instances of the app keeping in sy
 
 ##
 
-I hope this is useful to you! I'd be interested to hear what you think. Reply to my tweet about this article and let me know. And feel free to retweet!
+I hope this is useful to you! I'd be interested to hear what you think. Reply to [my tweet](https://twitter.com/dotnetify/status/1422453418581389315) and let me know. And feel free to retweet!
