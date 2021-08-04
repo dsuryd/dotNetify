@@ -13,7 +13,7 @@ In other words, it's a way of ensuring copies of the database are always in sync
 
 A replication subscriber would typically be another database that is serving as a copy of the master, but it's not limited to it and could be anything. What if we make that to be a web service? The service can then push those changes to multiple clients of a web application so they can always have their data synchronized in real-time.
 
-There's actually another PostgreSQL feature, the NOTIFY command, that are intended to generate notifications, but we will need to write database triggers for each table we're interested in, and the string payload size has a limit of 8000 bytes. Logical replication has no such limit and can listen to all tables in the database, which makes it more scalable.
+There's actually another PostgreSQL feature, the NOTIFY command, that is intended to generate notifications, but we will need to write database triggers for each table we're interested in, and the string payload size has a limit of 8000 bytes. Logical replication has no such limit and can listen to all tables in the database, which makes it more scalable.
 
 So I wrote a small open-source library that combines [dotNetify](https://dotnetify.net) with PostgreSQL logical replication. You can use it to build a web application with ASP.NET 5 that can react to all the inserts, updates, and deletes that any user of the app commits to a PostgreSQL database.
 
