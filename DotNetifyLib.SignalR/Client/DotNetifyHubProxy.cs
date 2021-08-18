@@ -115,6 +115,8 @@ namespace DotNetify.Client
 
          _connection = hubConnectionBuilder.Build();
          _connection.Closed += OnConnectionClosed;
+         _connection.Reconnecting += OnReconnecting;
+         _connection.Reconnected += OnReconnected;
 
          _subs.Add(_connection.On<object[]>(nameof(IDotNetifyHubMethod.Response_VM), OnResponse_VM));
       }
@@ -130,17 +132,23 @@ namespace DotNetify.Client
          if (_connectionState == HubConnectionState.Connected)
             return;
 
-         SetStateChanged(HubConnectionState.Connecting);
+         while (true)
+         {
+            SetStateChanged(HubConnectionState.Connecting);
 
-         try
-         {
-            await _connection.StartAsync();
-            SetStateChanged(HubConnectionState.Connected);
-         }
-         catch (Exception ex)
-         {
-            SetStateChanged(HubConnectionState.Disconnected);
-            Logger.LogError($"Failed to connect to '{_serverUrl}': {ex.Message}");
+            try
+            {
+               await _connection.StartAsync();
+               SetStateChanged(HubConnectionState.Connected);
+               return;
+            }
+            catch (Exception ex)
+            {
+               SetStateChanged(HubConnectionState.Disconnected);
+               Logger.LogError($"Failed to connect to '{_serverUrl}': {ex.Message}");
+
+               await Task.Delay(TimeSpan.FromSeconds(5));
+            }
          }
       }
 
@@ -257,6 +265,24 @@ namespace DotNetify.Client
       }
 
       /// <summary>
+      /// Handles reconnecting event after losing connection.
+      /// </summary>
+      private Task OnReconnecting(Exception arg)
+      {
+         SetStateChanged(HubConnectionState.Reconnecting);
+         return Task.CompletedTask;
+      }
+
+      /// <summary>
+      /// Handles reconnected event.
+      /// </summary>
+      private Task OnReconnected(string newConnectionId)
+      {
+         SetStateChanged(HubConnectionState.Connected);
+         return Task.CompletedTask;
+      }
+
+      /// <summary>
       /// Handles incoming Response_VM message.
       /// </summary>
       private void OnResponse_VM(object[] payload)
@@ -285,6 +311,8 @@ namespace DotNetify.Client
       /// <param name="state">State to change.</param>
       private void SetStateChanged(HubConnectionState state)
       {
+         Logger.LogInformation(state.ToString());
+
          _connectionState = state;
          StateChanged?.Invoke(this, state);
          if (state == HubConnectionState.Disconnected)
