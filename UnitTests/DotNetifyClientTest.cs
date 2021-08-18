@@ -101,6 +101,8 @@ namespace UnitTests
       public async Task DotNetifyClient_Dispose()
       {
          var mockHubProxy = Substitute.For<IDotNetifyHubProxy>();
+         mockHubProxy.ConnectionState.Returns(HubConnectionState.Connected);
+
          var sut = new DotNetifyClient(mockHubProxy, new DefaultUIThreadDispatcher());
 
          var helloWorldVM = new HelloWorldVM();
@@ -114,6 +116,8 @@ namespace UnitTests
       public async Task DotNetifyClient_DisposeAsync()
       {
          var mockHubProxy = Substitute.For<IDotNetifyHubProxy>();
+         mockHubProxy.ConnectionState.Returns(HubConnectionState.Connected);
+
          var sut = new DotNetifyClient(mockHubProxy, new DefaultUIThreadDispatcher());
 
          var helloWorldVM = new HelloWorldVM();
