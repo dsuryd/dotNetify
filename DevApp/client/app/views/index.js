@@ -3,6 +3,7 @@ import DataFlow from "./DataFlow";
 import Reactive from "./Reactive";
 import Scaleout from "./Scaleout";
 import MicroFrontend from "./MicroFrontend";
+import RealtimePostgres from "./RealtimePostgres";
 import GetStarted from "./GetStarted";
 import FromScratchWebPack from "./from-scratch/FromScratchWebPack";
 import FromScratchScriptTag from "./from-scratch/FromScratchScriptTag";
@@ -33,9 +34,7 @@ const NotFound404 = () => (
   <div style={{ padding: "1.5rem" }}>
     <h2>Page not found (404)</h2>
     <p>Redirecting to home page...</p>
-    <script>
-      setTimeout(function() {(window.location.href = "/?react")}, 2000)
-    </script>
+    <script>setTimeout(function() {(window.location.href = "/?react")}, 2000)</script>
   </div>
 );
 
@@ -48,6 +47,7 @@ export {
   DataFlow,
   Reactive,
   MicroFrontend,
+  RealtimePostgres,
   Scaleout,
   GetStarted,
   HelloWorld,

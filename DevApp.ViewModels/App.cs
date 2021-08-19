@@ -18,6 +18,7 @@ namespace DotNetify.DevApp
          FromScratchCLI,
          DataFlow,
          Reactive,
+         RealtimePostgres,
          MicroFrontend,
          Scaleout,
          GetStarted,
@@ -61,7 +62,9 @@ namespace DotNetify.DevApp
            new RouteTemplate (nameof (Route.Reactive)) { UrlPattern = "reactive" },
            new RouteTemplate (nameof (Route.MicroFrontend)) { UrlPattern = "mfe" },
            new RouteTemplate (nameof (Route.Scaleout)) { UrlPattern = "scaleout" },
+           new RouteTemplate (nameof (Route.RealtimePostgres)) { UrlPattern = "postgres" },
            new RouteTemplate (nameof (Route.GetStarted)) { UrlPattern = "getstarted" },
+
            new RouteTemplate (nameof (Route.HelloWorld)) { UrlPattern = "examples/helloworld" },
            new RouteTemplate (nameof (Route.ControlTypes)) { UrlPattern = "examples/controltypes" },
            new RouteTemplate (nameof (Route.SimpleList)) { UrlPattern = "examples/simplelist" },
@@ -97,11 +100,21 @@ namespace DotNetify.DevApp
          _navMenuItems = new NavMenuItem[]
          {
             new NavRoute ("Overview", this.GetRoute (nameof (Route.Overview))),
-            new NavRoute ("Data Flow Pattern", this.GetRoute (nameof (Route.DataFlow))),
-            new NavRoute ("Reactive Programming", this.GetRoute (nameof (Route.Reactive))),
-            new NavRoute ("Micro-Frontend", this.GetRoute (nameof (Route.MicroFrontend))),
-            new NavRoute ("Scale-Out", this.GetRoute (nameof (Route.Scaleout))),
             new NavRoute ("Get Started", this.GetRoute (nameof (Route.GetStarted))),
+
+            new NavGroup
+            {
+               Label = "Topics",
+               Routes = new NavRoute[]
+               {
+                  new NavRoute ("Data Flow Pattern", this.GetRoute (nameof (Route.DataFlow))),
+                  new NavRoute ("Micro-Frontend", this.GetRoute (nameof (Route.MicroFrontend))),
+                  new NavRoute ("Reactive Programming", this.GetRoute (nameof (Route.Reactive))),
+                  new NavRoute ("Realtime PostgreSQL", this.GetRoute (nameof (Route.RealtimePostgres))),
+                  new NavRoute ("Scale-Out", this.GetRoute (nameof (Route.Scaleout))),
+               },
+               IsExpanded = false
+            },
 
             new NavGroup
             {
@@ -148,13 +161,15 @@ namespace DotNetify.DevApp
            },
            new NavGroup
            {
-              Label = "Premium Feature",
+              Label = "For Sponsors",
+              Icon = "material-icons volunteer_activism",
                Routes = new NavRoute[]
               {
                  new NavRoute ("DotNetify-Observer", this.GetRoute (nameof (Route.DotNetifyObserver))),
                  new NavRoute ("DotNetify-LoadTester", this.GetRoute (nameof (Route.DotNetifyLoadTester))),
                  new NavRoute ("DotNetify-Testing", this.GetRoute (nameof (Route.DotNetifyTesting))),
               },
+              IsExpanded = false
            }
          };
 
@@ -189,7 +204,7 @@ namespace DotNetify.DevApp
                IsExpanded = false
             };
          }
-         else if (framework == "Vue") 
+         else if (framework == "Vue")
          {
             int idx = navMenuItems.FindIndex(x => x.Label == "API Reference");
             navMenuItems[idx] = new NavGroup
@@ -199,7 +214,6 @@ namespace DotNetify.DevApp
                IsExpanded = false
             };
          }
-
 
          return new NavMenu(navMenuItems.ToArray());
       }
