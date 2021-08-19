@@ -7,12 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Docs\RealtimePostgres.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Docs\Examples\AFITop100.json" />
     <EmbeddedResource Include="Docs\Examples\webstore.json" />
     <EmbeddedResource Include="Docs\Overview.md" />
     <EmbeddedResource Include="Docs\DataFlow.md" />
     <EmbeddedResource Include="Docs\MicroFrontend.md" />
     <EmbeddedResource Include="Docs\Reactive.md" />
+    <EmbeddedResource Include="Docs\RealtimePostgres.md" />
     <EmbeddedResource Include="Docs\Scaleout.md" />
     <EmbeddedResource Include="Docs\GetStarted.md" />
     <EmbeddedResource Include="Docs\FromScratchWebPack.md" />
