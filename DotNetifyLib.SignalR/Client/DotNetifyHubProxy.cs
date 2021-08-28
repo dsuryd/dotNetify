@@ -16,8 +16,8 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -48,6 +48,11 @@ namespace DotNetify.Client
       /// DotNetify hub server URL.
       /// </summary>
       public static string ServerUrl { get; set; } = "http://localhost:5000";
+
+      /// <summary>
+      /// Connection retry policy. Defaults to 1, 2, 5, then every 10 seconds indefinitely.
+      /// </summary>
+      public static IRetryPolicy RetryPolicy { get; set; } = new RetryPolicy();
 
       /// <summary>
       /// Current connection state.
@@ -108,7 +113,7 @@ namespace DotNetify.Client
 
          hubConnectionBuilder
              .WithUrl(_serverUrl)
-             .WithAutomaticReconnect();
+             .WithAutomaticReconnect(RetryPolicy);
 
          if (ConnectionBuilder != null)
             hubConnectionBuilder = ConnectionBuilder.Invoke(hubConnectionBuilder);
@@ -132,6 +137,8 @@ namespace DotNetify.Client
          if (_connectionState == HubConnectionState.Connected)
             return;
 
+         var retryContext = new RetryContext();
+
          while (true)
          {
             SetStateChanged(HubConnectionState.Connecting);
@@ -147,7 +154,8 @@ namespace DotNetify.Client
                SetStateChanged(HubConnectionState.Disconnected);
                Logger.LogError($"Failed to connect to '{_serverUrl}': {ex.Message}");
 
-               await Task.Delay(TimeSpan.FromSeconds(5));
+               await Task.Delay(RetryPolicy.NextRetryDelay(retryContext).Value);
+               retryContext.PreviousRetryCount++;
             }
          }
       }
