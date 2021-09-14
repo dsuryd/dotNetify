@@ -15,7 +15,7 @@ If using script tags, include _vue_, _signalR_, and _dotNetify_ from their respe
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@5/dist/browser/signalr.min.js"></script>
 <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-vue.min.js"></script>
 ```
 

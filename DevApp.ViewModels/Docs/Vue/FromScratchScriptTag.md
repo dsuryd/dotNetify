@@ -83,7 +83,7 @@ Add a new file _wwwroot/index.html_ with the following content:
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@5/dist/browser/signalr.min.js"></script>
     <script src="https://unpkg.com/dotnetify@3/dist/dotnetify-vue.min.js"></script>
 
     <script>

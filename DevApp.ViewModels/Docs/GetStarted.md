@@ -68,7 +68,7 @@ If using script tags, include _React_, _signalR_, and _dotNetify_ from their res
 ```html
 <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1/dist/browser/signalr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@5/dist/browser/signalr.min.js"></script>
 <script src="https://unpkg.com/dotnetify@latest/dist/dotnetify-react.min.js"></script>
 ```
 
