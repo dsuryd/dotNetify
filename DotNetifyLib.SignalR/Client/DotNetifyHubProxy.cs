@@ -16,8 +16,8 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -48,6 +48,11 @@ namespace DotNetify.Client
       /// DotNetify hub server URL.
       /// </summary>
       public static string ServerUrl { get; set; } = "http://localhost:5000";
+
+      /// <summary>
+      /// Connection retry policy. Defaults to 1, 2, 5, then every 10 seconds indefinitely.
+      /// </summary>
+      public static IRetryPolicy RetryPolicy { get; set; } = new RetryPolicy();
 
       /// <summary>
       /// Current connection state.
@@ -108,13 +113,15 @@ namespace DotNetify.Client
 
          hubConnectionBuilder
              .WithUrl(_serverUrl)
-             .WithAutomaticReconnect();
+             .WithAutomaticReconnect(RetryPolicy);
 
          if (ConnectionBuilder != null)
             hubConnectionBuilder = ConnectionBuilder.Invoke(hubConnectionBuilder);
 
          _connection = hubConnectionBuilder.Build();
          _connection.Closed += OnConnectionClosed;
+         _connection.Reconnecting += OnReconnecting;
+         _connection.Reconnected += OnReconnected;
 
          _subs.Add(_connection.On<object[]>(nameof(IDotNetifyHubMethod.Response_VM), OnResponse_VM));
       }
@@ -130,17 +137,26 @@ namespace DotNetify.Client
          if (_connectionState == HubConnectionState.Connected)
             return;
 
-         SetStateChanged(HubConnectionState.Connecting);
+         var retryContext = new RetryContext();
 
-         try
+         while (true)
          {
-            await _connection.StartAsync();
-            SetStateChanged(HubConnectionState.Connected);
-         }
-         catch (Exception ex)
-         {
-            SetStateChanged(HubConnectionState.Disconnected);
-            Logger.LogError($"Failed to connect to '{_serverUrl}': {ex.Message}");
+            SetStateChanged(HubConnectionState.Connecting);
+
+            try
+            {
+               await _connection.StartAsync();
+               SetStateChanged(HubConnectionState.Connected);
+               return;
+            }
+            catch (Exception ex)
+            {
+               SetStateChanged(HubConnectionState.Disconnected);
+               Logger.LogError($"Failed to connect to '{_serverUrl}': {ex.Message}");
+
+               await Task.Delay(RetryPolicy.NextRetryDelay(retryContext).Value);
+               retryContext.PreviousRetryCount++;
+            }
          }
       }
 
@@ -257,6 +273,24 @@ namespace DotNetify.Client
       }
 
       /// <summary>
+      /// Handles reconnecting event after losing connection.
+      /// </summary>
+      private Task OnReconnecting(Exception arg)
+      {
+         SetStateChanged(HubConnectionState.Reconnecting);
+         return Task.CompletedTask;
+      }
+
+      /// <summary>
+      /// Handles reconnected event.
+      /// </summary>
+      private Task OnReconnected(string newConnectionId)
+      {
+         SetStateChanged(HubConnectionState.Connected);
+         return Task.CompletedTask;
+      }
+
+      /// <summary>
       /// Handles incoming Response_VM message.
       /// </summary>
       private void OnResponse_VM(object[] payload)
@@ -285,6 +319,8 @@ namespace DotNetify.Client
       /// <param name="state">State to change.</param>
       private void SetStateChanged(HubConnectionState state)
       {
+         Logger.LogInformation(state.ToString());
+
          _connectionState = state;
          StateChanged?.Invoke(this, state);
          if (state == HubConnectionState.Disconnected)

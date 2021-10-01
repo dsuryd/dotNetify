@@ -3,6 +3,7 @@ using DotNetify.Client;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ViewModels;
 
@@ -15,6 +16,7 @@ namespace HelloWorld
    public class HelloWorldVMProxy : INotifyPropertyChanged, IDisposable
    {
       private readonly IDotNetifyClient _dotnetify;
+      private readonly IDotNetifyHubProxy _hubProxy;
 
       #region Server Bindings
 
@@ -101,25 +103,35 @@ namespace HelloWorld
 
       #endregion INotifyPropertyChanged
 
-      public HelloWorldVMProxy(IDotNetifyClient dotnetify)
+      public HelloWorldVMProxy(IDotNetifyClient dotnetify, IDotNetifyHubProxy hubProxy)
       {
          _dotnetify = dotnetify;
+         _hubProxy = hubProxy;
 
          AddCommand = new Command(Add);
          UpdateCommand = new Command(Update);
          RemoveCommand = new Command(Remove);
 
-         Connect();
+         _ = ConnectAsync();
       }
 
-      public void Connect()
+      public async Task ConnectAsync()
       {
          // Connect to the server-side view model.
-         _dotnetify.ConnectAsync(
+         await _dotnetify.ConnectAsync(
             nameof(HelloWorldVM),
             this,
             new VMConnectOptions { VMArg = new { Greetings = "Hello World!" } }
          );
+
+         _hubProxy.StateChanged += async (sender, state) =>
+         {
+            if (state == HubConnectionState.Connected)
+            {
+               Dispose();
+               await ConnectAsync();
+            }
+         };
       }
 
       public void Dispose() => _dotnetify.DisposeAsync();

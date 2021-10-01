@@ -17,7 +17,6 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -105,7 +104,8 @@ namespace DotNetify.Client
          if (!string.IsNullOrEmpty(_vmId))
          {
             _hubProxy.Response_VM -= OnResponseReceived;
-            await _hubProxy.Dispose_VM(_vmId);
+            if (_hubProxy.ConnectionState == HubConnectionState.Connected)
+               await _hubProxy.Dispose_VM(_vmId);
             _vmId = null;
          }
       }
@@ -130,7 +130,10 @@ namespace DotNetify.Client
       public async Task ConnectAsync(string vmId, IViewState viewState, VMConnectOptions options = null)
       {
          if (!string.IsNullOrEmpty(_vmId))
-            throw new Exception($"The instance was connected to '{_vmId}'. Call Dispose to disconnect.");
+         {
+            Logger.LogWarning($"The instance was already connected to '{_vmId}'. Call Dispose to disconnect.");
+            await DisposeAsync();
+         }
 
          _vmId = vmId;
          _viewState = viewState;

@@ -1,15 +1,16 @@
+using DotNetify;
 using DotNetify.Client;
-using ViewModels;
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using ViewModels;
 
-namespace HelloWorld
+namespace XamarinClient
 {
    /// <summary>
-   /// This is Avalonia view model that serves as a proxy to the server-side view model.
+   /// This is Xamarin view model that serves as a proxy to the server-side view model.
    /// Properties in the "Server bindings" region will be initialized with data coming from the server on successful connection.
    /// </summary>
    public class HelloWorldVMProxy : INotifyPropertyChanged, IDisposable
@@ -32,11 +33,25 @@ namespace HelloWorld
 
       public string EditFirstName { get; set; }
       public string EditLastName { get; set; }
-      public bool CanEdit => SelectedEmployee.Count > 0;
+      public bool CanEdit => SelectedEmployee != null;
 
-      public ObservableCollection<HelloWorldVM.EmployeeInfo> SelectedEmployee { get; } = new ObservableCollection<HelloWorldVM.EmployeeInfo>();
+      private HelloWorldVM.EmployeeInfo _selectedEmployee;
 
-      public Action AddCommand => async () =>
+      public HelloWorldVM.EmployeeInfo SelectedEmployee
+      {
+         get => _selectedEmployee;
+         set
+         {
+            _selectedEmployee = value;
+            OnSelectedEmployee();
+         }
+      }
+
+      public ICommand AddCommand { get; }
+      public ICommand UpdateCommand { get; }
+      public ICommand RemoveCommand { get; }
+
+      private Action Add => async () =>
       {
          await _dotnetify.DispatchAsync(nameof(HelloWorldVM.Add), $"{AddFirstName} {AddLastName}");
 
@@ -45,34 +60,33 @@ namespace HelloWorld
          Changed(nameof(AddLastName));
       };
 
-      public Action UpdateCommand => async () =>
+      private Action Update => async () =>
       {
-         var employee = SelectedEmployee[0];
+         var employee = SelectedEmployee;
          employee.FirstName = EditFirstName;
          employee.LastName = EditLastName;
 
          await _dotnetify.DispatchAsync(nameof(HelloWorldVM.Update), employee);
       };
 
-      public Action RemoveCommand => async () =>
+      private Action Remove => async () =>
       {
-         var employee = SelectedEmployee[0];
+         var employee = SelectedEmployee;
          await _dotnetify.DispatchAsync(nameof(HelloWorldVM.Remove), employee.Id);
 
-         SelectedEmployee.RemoveAt(0);
+         SelectedEmployee = null;
          EditFirstName = EditLastName = string.Empty;
          Changed(nameof(EditFirstName));
          Changed(nameof(EditLastName));
          Changed(nameof(CanEdit));
       };
 
-      private void OnSelectedEmployee(object sender, NotifyCollectionChangedEventArgs e)
+      private void OnSelectedEmployee()
       {
-         if (e.Action == NotifyCollectionChangedAction.Add)
+         if (SelectedEmployee != null)
          {
-            var selectedItem = e.NewItems[0] as HelloWorldVM.EmployeeInfo;
-            EditFirstName = selectedItem.FirstName;
-            EditLastName = selectedItem.LastName;
+            EditFirstName = SelectedEmployee.FirstName;
+            EditLastName = SelectedEmployee.LastName;
             Changed(nameof(EditFirstName));
             Changed(nameof(EditLastName));
             Changed(nameof(CanEdit));
@@ -85,7 +99,7 @@ namespace HelloWorld
 
       public event PropertyChangedEventHandler PropertyChanged;
 
-      private void Changed(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+      public void Changed(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 
       #endregion INotifyPropertyChanged
 
@@ -93,7 +107,10 @@ namespace HelloWorld
       {
          _dotnetify = dotnetify;
          _hubProxy = hubProxy;
-         SelectedEmployee.CollectionChanged += OnSelectedEmployee;
+
+         AddCommand = new Command(Add);
+         UpdateCommand = new Command(Update);
+         RemoveCommand = new Command(Remove);
 
          _ = ConnectAsync();
       }

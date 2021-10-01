@@ -21,6 +21,7 @@
     <PackageReference Include="DotNetify.SignalR" Version="4.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
     <ProjectReference Include="..\AspNetCoreServer\ViewModels\ViewModels.csproj" />
   </ItemGroup>
 </Project>
