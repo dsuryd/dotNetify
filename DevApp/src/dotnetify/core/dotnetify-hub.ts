@@ -15,7 +15,7 @@ limitations under the License.
  */
 import { createEventEmitter } from "../libs/utils";
 import * as jQueryShim from "../libs/jquery-shim";
-import * as signalRNetCore from "@aspnet/signalr";
+import * as signalRNetCore from "@microsoft/signalr";
 import { IDotnetifyHub } from "../_typings";
 
 let $ = jQueryShim;
@@ -34,8 +34,7 @@ export class dotnetifyHubFactory {
       _init: false,
 
       // Hub server methods.
-      requestVM: (iVMId, iOptions) =>
-        dotnetifyHub.server.request_VM(iVMId, iOptions),
+      requestVM: (iVMId, iOptions) => dotnetifyHub.server.request_VM(iVMId, iOptions),
       updateVM: (iVMId, iValue) => dotnetifyHub.server.update_VM(iVMId, iValue),
       disposeVM: iVMId => dotnetifyHub.server.dispose_VM(iVMId),
 
@@ -63,9 +62,7 @@ export class dotnetifyHubFactory {
 
         if (this._startInfo === null || forceRestart) {
           try {
-            this._startInfo = this.start(hubOptions)
-              .done(_doneHandler)
-              .fail(_failHandler);
+            this._startInfo = this.start(hubOptions).done(_doneHandler).fail(_failHandler);
           } catch (err) {
             this._startInfo = null;
           }
@@ -74,12 +71,7 @@ export class dotnetifyHubFactory {
             this._startInfo.done(_doneHandler);
           } catch (err) {
             this._startInfo = null;
-            return this.startHub(
-              hubOptions,
-              doneHandler,
-              failHandler,
-              forceRestart
-            );
+            return this.startHub(hubOptions, doneHandler, failHandler, forceRestart);
           }
         }
       }
@@ -98,10 +90,7 @@ export class dotnetifyHubFactory {
 
         Object.defineProperty(dotnetifyHub, "isConnected", {
           get: function () {
-            return (
-              dotnetifyHub._connection &&
-              dotnetifyHub._connection.connection.connectionState === 1
-            );
+            return dotnetifyHub._connection && dotnetifyHub._connection.connection.connectionState === signalR.HubConnectionState.Connected;
           }
         });
 
@@ -136,29 +125,19 @@ export class dotnetifyHubFactory {
           },
 
           _startConnection: function (iHubOptions, iTransportArray) {
-            let url = dotnetifyHub.url
-              ? dotnetifyHub.url + dotnetifyHub.hubPath
-              : dotnetifyHub.hubPath;
+            let url = dotnetifyHub.url ? dotnetifyHub.url + dotnetifyHub.hubPath : dotnetifyHub.hubPath;
             let hubOptions: any = {};
             Object.keys(iHubOptions).forEach(function (key) {
               hubOptions[key] = iHubOptions[key];
             });
             hubOptions.transport = iTransportArray.shift();
 
-            let hubConnectionBuilder = new signalR.HubConnectionBuilder().withUrl(
-              url,
-              hubOptions
-            );
+            let hubConnectionBuilder = new signalR.HubConnectionBuilder().withUrl(url, hubOptions);
             if (typeof hubOptions.connectionBuilder == "function")
-              hubConnectionBuilder = hubOptions.connectionBuilder(
-                hubConnectionBuilder
-              );
+              hubConnectionBuilder = hubOptions.connectionBuilder(hubConnectionBuilder);
 
             dotnetifyHub._connection = hubConnectionBuilder.build();
-            dotnetifyHub._connection.on(
-              "response_vm",
-              dotnetifyHub.client.response_VM
-            );
+            dotnetifyHub._connection.on("response_vm", dotnetifyHub.client.response_VM);
             dotnetifyHub._connection.onclose(dotnetifyHub._onDisconnected);
 
             let promise = dotnetifyHub._connection
@@ -168,15 +147,12 @@ export class dotnetifyHubFactory {
               })
               .catch(function () {
                 // If failed to start, fallback to the next transport.
-                if (iTransportArray.length > 0)
-                  dotnetifyHub._startConnection(iHubOptions, iTransportArray);
+                if (iTransportArray.length > 0) dotnetifyHub._startConnection(iHubOptions, iTransportArray);
                 else dotnetifyHub._onDisconnected();
               });
 
             if (typeof dotnetifyHub._startDoneHandler === "function")
-              promise
-                .then(dotnetifyHub._startDoneHandler)
-                .catch(dotnetifyHub._startFailHandler || function () {});
+              promise.then(dotnetifyHub._startDoneHandler).catch(dotnetifyHub._startFailHandler || function () {});
             return promise;
           },
 
@@ -214,30 +190,22 @@ export class dotnetifyHubFactory {
           },
 
           disconnected: function (iHandler) {
-            if (typeof iHandler === "function")
-              dotnetifyHub._disconnectedHandler = iHandler;
+            if (typeof iHandler === "function") dotnetifyHub._disconnectedHandler = iHandler;
           },
 
           stateChanged: function (iHandler) {
-            if (typeof iHandler === "function")
-              dotnetifyHub._stateChangedHandler = iHandler;
+            if (typeof iHandler === "function") dotnetifyHub._stateChangedHandler = iHandler;
           },
 
           reconnect: function (iStartHubFunc) {
             if (typeof iStartHubFunc === "function") {
               // Only attempt reconnect if the specified retry hasn't been exceeded.
-              if (
-                !dotnetifyHub.reconnectRetry ||
-                dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry
-              ) {
+              if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
                 // Determine reconnect delay from the specified configuration array.
                 let delay =
-                  dotnetifyHub._reconnectCount <
-                  dotnetifyHub.reconnectDelay.length
+                  dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length
                     ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount]
-                    : dotnetifyHub.reconnectDelay[
-                        dotnetifyHub.reconnectDelay.length - 1
-                      ];
+                    : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
 
                 dotnetifyHub._reconnectCount++;
 
@@ -277,9 +245,7 @@ export class dotnetifyHubFactory {
           "use strict";
 
           if (typeof $.signalR !== "function") {
-            throw new Error(
-              "SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js."
-            );
+            throw new Error("SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.");
           }
 
           var signalR = $.signalR;
@@ -321,11 +287,7 @@ export class dotnetifyHubFactory {
                       continue;
                     }
 
-                    subscriptionMethod.call(
-                      hub,
-                      memberKey,
-                      makeProxyCallback(hub, memberValue)
-                    );
+                    subscriptionMethod.call(hub, memberKey, makeProxyCallback(hub, memberValue));
                   }
                 }
               }
@@ -350,24 +312,15 @@ export class dotnetifyHubFactory {
             proxies["dotNetifyHub"].client = {};
             proxies["dotNetifyHub"].server = {
               dispose_VM: function (vmId) {
-                return proxies["dotNetifyHub"].invoke.apply(
-                  proxies["dotNetifyHub"],
-                  $.merge(["Dispose_VM"], $.makeArray(arguments))
-                );
+                return proxies["dotNetifyHub"].invoke.apply(proxies["dotNetifyHub"], $.merge(["Dispose_VM"], $.makeArray(arguments)));
               },
 
               request_VM: function (vmId, vmArg) {
-                return proxies["dotNetifyHub"].invoke.apply(
-                  proxies["dotNetifyHub"],
-                  $.merge(["Request_VM"], $.makeArray(arguments))
-                );
+                return proxies["dotNetifyHub"].invoke.apply(proxies["dotNetifyHub"], $.merge(["Request_VM"], $.makeArray(arguments)));
               },
 
               update_VM: function (vmId, vmData) {
-                return proxies["dotNetifyHub"].invoke.apply(
-                  proxies["dotNetifyHub"],
-                  $.merge(["Update_VM"], $.makeArray(arguments))
-                );
+                return proxies["dotNetifyHub"].invoke.apply(proxies["dotNetifyHub"], $.merge(["Update_VM"], $.makeArray(arguments)));
               }
             };
 
@@ -403,9 +356,7 @@ export class dotnetifyHubFactory {
 
         Object.defineProperty(dotnetifyHub, "isConnected", {
           get: function () {
-            return (
-              $.connection.hub.state == $.signalR.connectionState.connected
-            );
+            return $.connection.hub.state == $.signalR.connectionState.connected;
           }
         });
 
@@ -423,13 +374,8 @@ export class dotnetifyHubFactory {
             if (iHubOptions) deferred = $.connection.hub.start(iHubOptions);
             else deferred = $.connection.hub.start();
             deferred.fail(function (error) {
-              if (
-                error.source &&
-                error.source.message === "Error parsing negotiate response."
-              )
-                console.warn(
-                  "This client may be attempting to connect to an incompatible SignalR .NET Core server."
-                );
+              if (error.source && error.source.message === "Error parsing negotiate response.")
+                console.warn("This client may be attempting to connect to an incompatible SignalR .NET Core server.");
             });
             return deferred;
           },
@@ -456,18 +402,12 @@ export class dotnetifyHubFactory {
           reconnect: function (iStartHubFunc) {
             if (typeof iStartHubFunc === "function") {
               // Only attempt reconnect if the specified retry hasn't been exceeded.
-              if (
-                !dotnetifyHub.reconnectRetry ||
-                dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry
-              ) {
+              if (!dotnetifyHub.reconnectRetry || dotnetifyHub._reconnectCount < dotnetifyHub.reconnectRetry) {
                 // Determine reconnect delay from the specified configuration array.
                 let delay =
-                  dotnetifyHub._reconnectCount <
-                  dotnetifyHub.reconnectDelay.length
+                  dotnetifyHub._reconnectCount < dotnetifyHub.reconnectDelay.length
                     ? dotnetifyHub.reconnectDelay[dotnetifyHub._reconnectCount]
-                    : dotnetifyHub.reconnectDelay[
-                        dotnetifyHub.reconnectDelay.length - 1
-                      ];
+                    : dotnetifyHub.reconnectDelay[dotnetifyHub.reconnectDelay.length - 1];
 
                 dotnetifyHub._reconnectCount++;
 

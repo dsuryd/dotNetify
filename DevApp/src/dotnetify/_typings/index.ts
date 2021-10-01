@@ -1,4 +1,4 @@
-import { HubConnectionBuilder } from "@aspnet/signalr";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 import * as React from "react";
 
 declare const dotnetify: IDotnetify;

@@ -13,7 +13,7 @@ dotnetify.debug = true;
 
 // Enable this to switch from JSON to MessagePack protocol
 /*
-import { MessagePackHubProtocol } from '@aspnet/signalr-protocol-msgpack';
+import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
 const protocol = new MessagePackHubProtocol();
 dotnetify.hubOptions.connectionBuilder = builder => builder.withHubProtocol(protocol);
  */

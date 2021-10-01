@@ -75,7 +75,7 @@ Use **hubOptions.connectionBuilder** to gain access to the `HubConnectionBuilder
 For example, the following code will configure the client to use the MessagePack binary protocol:
 
 ```jsx
-import { MessagePackHubProtocol } from '@aspnet/signalr-protocol-msgpack';
+import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
 
 const protocol = new MessagePackHubProtocol();
 dotnetify.hubOptions.connectionBuilder = builder => builder.withHubProtocol(protocol);
