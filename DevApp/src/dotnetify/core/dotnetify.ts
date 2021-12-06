@@ -160,6 +160,7 @@ export class Dotnetify implements IDotnetify {
   }
 
   checkServerSideException(iVMId: string, iVMData: any, iExceptionHandler: ExceptionHandlerType) {
+    if (!iVMData) return;
     const vmData = JSON.parse(iVMData);
     if (vmData && vmData.hasOwnProperty("ExceptionType") && vmData.hasOwnProperty("Message")) {
       const exception: ExceptionType = {
