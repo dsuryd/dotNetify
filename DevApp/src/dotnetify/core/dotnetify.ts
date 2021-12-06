@@ -96,29 +96,16 @@ export class Dotnetify implements IDotnetify {
 
   // Creates a SignalR hub client.
   createHub(iHubServerUrl: string, iHubPath: string, iHubLib: any) {
-    return this.initHub(
-      dotnetifyHubFactory.create(),
-      iHubPath,
-      iHubServerUrl,
-      iHubLib
-    );
+    return this.initHub(dotnetifyHubFactory.create(), iHubPath, iHubServerUrl, iHubLib);
   }
 
   // Creates a Web API hub client.
-  createWebApiHub(
-    iBaseUrl: string,
-    iRequestHandler: RequestHandlerType
-  ): IDotnetifyHub {
+  createWebApiHub(iBaseUrl: string, iRequestHandler: RequestHandlerType): IDotnetifyHub {
     return createWebApiHub(iBaseUrl, iRequestHandler);
   }
 
   // Configures hub connection to SignalR hub server.
-  initHub(
-    iHub?: IDotnetifyHub,
-    iHubPath?: string,
-    iHubServerUrl?: string,
-    iHubLib?: any
-  ) {
+  initHub(iHub?: IDotnetifyHub, iHubPath?: string, iHubServerUrl?: string, iHubLib?: any) {
     const hub = iHub || this.hub;
     const hubPath = iHubPath || this.hubPath;
     const hubServerUrl = iHubServerUrl || this.hubServerUrl;
@@ -128,9 +115,7 @@ export class Dotnetify implements IDotnetify {
       hub.init(hubPath, hubServerUrl, hubLib);
 
       // Use SignalR event to raise the connection state event.
-      hub.stateChanged((state: string) =>
-        this.handleConnectionStateChanged(state, null, hub)
-      );
+      hub.stateChanged((state: string) => this.handleConnectionStateChanged(state, null, hub));
     }
     return hub;
   }
@@ -139,16 +124,9 @@ export class Dotnetify implements IDotnetify {
   selectHub(vmConnectArgs: VMConnectArgsType): VMConnectArgsType {
     vmConnectArgs = vmConnectArgs || <VMConnectArgsType>{};
     vmConnectArgs.options = vmConnectArgs.options || {};
-    let override =
-      (typeof this.connectHandler == "function" &&
-        this.connectHandler(vmConnectArgs)) ||
-      {};
+    let override = (typeof this.connectHandler == "function" && this.connectHandler(vmConnectArgs)) || {};
     if (!override.hub) {
-      override.hub = hasLocalVM(vmConnectArgs.vmId)
-        ? localHub
-        : vmConnectArgs.options.webApi
-        ? webApiHub
-        : this.initHub();
+      override.hub = hasLocalVM(vmConnectArgs.vmId) ? localHub : vmConnectArgs.options.webApi ? webApiHub : this.initHub();
       override.hub.debug = this.debug;
     }
     return Object.assign(vmConnectArgs, override);
@@ -159,56 +137,31 @@ export class Dotnetify implements IDotnetify {
     const hub = iHub || this.hub;
 
     const doneHandler = () => {};
-    const failHandler = (ex: any) =>
-      this.handleConnectionStateChanged("error", ex, hub);
+    const failHandler = (ex: any) => this.handleConnectionStateChanged("error", ex, hub);
     hub.startHub(this.hubOptions, doneHandler, failHandler, iForceRestart);
   }
 
   // Used by framework-specific dotnetify instances to expose their view model accessors.
   addVMAccessor(iVMAccessor: VMAccessorsType) {
-    !this._vmAccessors.includes(iVMAccessor) &&
-      this._vmAccessors.push(iVMAccessor);
+    !this._vmAccessors.includes(iVMAccessor) && this._vmAccessors.push(iVMAccessor);
   }
 
   // Get all view models.
   getViewModels(): IDotnetifyVM[] {
     return this._vmAccessors
-      .reduce(
-        (prev: IDotnetifyVM[], current: VMAccessorsType) => [
-          ...prev,
-          ...current()
-        ],
-        []
-      )
-      .filter(
-        (val: IDotnetifyVM, idx: number, self: IDotnetifyVM[]) =>
-          self.indexOf(val) === idx
-      ); // returns distinct items.
+      .reduce((prev: IDotnetifyVM[], current: VMAccessorsType) => [...prev, ...current()], [])
+      .filter((val: IDotnetifyVM, idx: number, self: IDotnetifyVM[]) => self.indexOf(val) === idx); // returns distinct items.
   }
 
-  handleConnectionStateChanged(
-    iState: string,
-    iException: ExceptionType,
-    iHub: IDotnetifyHub
-  ) {
-    if (this.debug)
-      console.log("SignalR: " + (iException ? iException.message : iState));
-    if (typeof this.connectionStateHandler === "function")
-      this.connectionStateHandler(iState, iException, iHub);
+  handleConnectionStateChanged(iState: string, iException: ExceptionType, iHub: IDotnetifyHub) {
+    if (this.debug) console.log("SignalR: " + (iException ? iException.message : iState));
+    if (typeof this.connectionStateHandler === "function") this.connectionStateHandler(iState, iException, iHub);
     else if (iException) console.error(iException);
   }
 
-  checkServerSideException(
-    iVMId: string,
-    iVMData: any,
-    iExceptionHandler: ExceptionHandlerType
-  ) {
+  checkServerSideException(iVMId: string, iVMData: any, iExceptionHandler: ExceptionHandlerType) {
     const vmData = JSON.parse(iVMData);
-    if (
-      vmData &&
-      vmData.hasOwnProperty("ExceptionType") &&
-      vmData.hasOwnProperty("Message")
-    ) {
+    if (vmData && vmData.hasOwnProperty("ExceptionType") && vmData.hasOwnProperty("Message")) {
       const exception: ExceptionType = {
         name: vmData.ExceptionType,
         message: vmData.Message
@@ -217,9 +170,7 @@ export class Dotnetify implements IDotnetify {
       if (typeof iExceptionHandler === "function") {
         iExceptionHandler(exception);
       } else {
-        console.error(
-          "[" + iVMId + "] " + exception.name + ": " + exception.message
-        );
+        console.error("[" + iVMId + "] " + exception.name + ": " + exception.message);
         throw exception;
       }
     }
