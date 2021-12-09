@@ -66,6 +66,7 @@ export class DotNetifyHubWebApi implements IDotnetifyHub {
       if (typeof this.onRequest == "function") this.onRequest(url, request);
     })
       .then(response => {
+        if (!response) response = "{}";
         this.responseEvent.emit(iVMId, response);
       })
       .catch(request => console.error(`[${iVMId}] Request failed`, request));
@@ -85,6 +86,7 @@ export class DotNetifyHubWebApi implements IDotnetifyHub {
       if (typeof this.onRequest == "function") this.onRequest(url, request, payload);
     })
       .then(response => {
+        if (!response) response = "{}";
         this.responseEvent.emit(iVMId, response);
       })
       .catch(request => console.error(`[${iVMId}] Update failed`, request));
