@@ -130,7 +130,7 @@ namespace DotNetify.Postgres
       {
          Transaction transactionEvent = null;
 
-         var publication = new PgOutputReplicationOptions(_config.PublicationName);
+         var publication = new PgOutputReplicationOptions(_config.PublicationName, 1);
          var slot = new PgOutputReplicationSlot(_config.ReplicationSlotName);
 
          var replication = _connection.StartReplication(slot, publication, _cancelTokenSource.Token);
@@ -165,17 +165,17 @@ namespace DotNetify.Postgres
                var insertMsg = message as InsertMessage;
                transactionEvent.DataEvents.Add(new InsertEvent
                {
-                  Relation = _relations.ContainsKey(insertMsg.RelationId) ? _relations[insertMsg.RelationId] : null,
-                  ColumnValues = insertMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+                  Relation = _relations.ContainsKey(insertMsg.Relation.RelationId) ? _relations[insertMsg.Relation.RelationId] : null,
+                  ColumnValues = await ToStringArrayAsync(insertMsg.NewRow)
                });
             }
-            else if (messageType == typeof(UpdateMessage))
+            else if (messageType == typeof(DefaultUpdateMessage))
             {
-               var updateMsg = message as UpdateMessage;
+               var updateMsg = message as DefaultUpdateMessage;
                transactionEvent.DataEvents.Add(new UpdateEvent
                {
-                  Relation = _relations.ContainsKey(updateMsg.RelationId) ? _relations[updateMsg.RelationId] : null,
-                  ColumnValues = updateMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+                  Relation = _relations.ContainsKey(updateMsg.Relation.RelationId) ? _relations[updateMsg.Relation.RelationId] : null,
+                  ColumnValues = await ToStringArrayAsync(updateMsg.NewRow)
                });
             }
             else if (messageType == typeof(FullUpdateMessage))
@@ -183,9 +183,9 @@ namespace DotNetify.Postgres
                var updateMsg = message as FullUpdateMessage;
                transactionEvent.DataEvents.Add(new UpdateEvent
                {
-                  Relation = _relations.ContainsKey(updateMsg.RelationId) ? _relations[updateMsg.RelationId] : null,
-                  ColumnValues = updateMsg.NewRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray(),
-                  OldColumnValues = updateMsg.OldRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+                  Relation = _relations.ContainsKey(updateMsg.Relation.RelationId) ? _relations[updateMsg.Relation.RelationId] : null,
+                  ColumnValues = await ToStringArrayAsync(updateMsg.NewRow),
+                  OldColumnValues = await ToStringArrayAsync(updateMsg.OldRow)
                });
             }
             else if (messageType == typeof(KeyDeleteMessage))
@@ -193,8 +193,8 @@ namespace DotNetify.Postgres
                var deleteMsg = message as KeyDeleteMessage;
                transactionEvent.DataEvents.Add(new DeleteEvent
                {
-                  Relation = _relations.ContainsKey(deleteMsg.RelationId) ? _relations[deleteMsg.RelationId] : null,
-                  Keys = deleteMsg.KeyRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+                  Relation = _relations.ContainsKey(deleteMsg.Relation.RelationId) ? _relations[deleteMsg.Relation.RelationId] : null,
+                  Keys = await ToStringArrayAsync(deleteMsg.Key)
                });
             }
             else if (messageType == typeof(FullDeleteMessage))
@@ -202,14 +202,19 @@ namespace DotNetify.Postgres
                var deleteMsg = message as FullDeleteMessage;
                transactionEvent.DataEvents.Add(new DeleteEvent
                {
-                  Relation = _relations.ContainsKey(deleteMsg.RelationId) ? _relations[deleteMsg.RelationId] : null,
-                  OldColumnValues = deleteMsg.OldRow.ToArray().Select(x => x.Kind == TupleDataKind.TextValue ? x.TextValue : x.Value).ToArray()
+                  Relation = _relations.ContainsKey(deleteMsg.Relation.RelationId) ? _relations[deleteMsg.Relation.RelationId] : null,
+                  OldColumnValues = await ToStringArrayAsync(deleteMsg.OldRow)
                });
             }
 
             // Inform the server which WAL files can removed or recycled.
             _connection.SetReplicationStatus(message.WalEnd);
          }
+      }
+
+      private ValueTask<string[]> ToStringArrayAsync(ReplicationTuple tuple)
+      {
+         return tuple.Where(x => !x.IsDBNull).SelectAwait(x => x.Get<string>()).ToArrayAsync();
       }
    }
 }
