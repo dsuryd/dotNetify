@@ -214,7 +214,8 @@ namespace DotNetify.Postgres
 
       private ValueTask<string[]> ToStringArrayAsync(ReplicationTuple tuple)
       {
-         return tuple.Where(x => !x.IsDBNull).SelectAwait(x => x.Get<string>()).ToArrayAsync();
+         var valueTaskNullString = new ValueTask<string>(Task.FromResult<string>(null));
+         return tuple.SelectAwait(x => !x.IsDBNull ? x.Get<string>() : valueTaskNullString).ToArrayAsync();
       }
    }
 }

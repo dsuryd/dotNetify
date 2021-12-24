@@ -9,7 +9,7 @@
     <Company />
     <Description>Send data updates from PostgreSQL databases to web applications in real-time.</Description>
     <Copyright>Copyright 2021</Copyright>
-	<VersionPrefix>2.0.0</VersionPrefix>
+	<VersionPrefix>2.0.1</VersionPrefix>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>https://dotnetify.net/</PackageProjectUrl>
     <PackageIcon>dotnetify.png</PackageIcon>
