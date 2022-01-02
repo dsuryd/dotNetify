@@ -16,6 +16,20 @@ namespace DotNetify.Postgres
       /// <param name="dbChangeObserver">Db change observer service.</param>
       public static void ObserveList<TTable>(this BaseVM baseVM, string listPropName, IDbChangeObserver dbChangeObserver) where TTable : new()
       {
+         ObserveList<TTable, TTable>(baseVM, listPropName, dbChangeObserver, _ => _);
+      }
+
+      /// <summary>
+      /// Observes database changes on the table associated with a view model's list property.
+      /// </summary>
+      /// <typeparam name="TTable">Type associated with a database table.</typeparam>
+      /// <typeparam name="TList">Type associated with the view model's list.</typeparam>
+      /// <param name="baseVM">View model instance.</param>
+      /// <param name="listPropName">Property name of the view model's list.</param>
+      /// <param name="dbChangeObserver">Db change observer service.</param>
+      /// <param name="selector">Selector to transform TTable instance into TList instance.</param>
+      public static void ObserveList<TTable, TList>(this BaseVM baseVM, string listPropName, IDbChangeObserver dbChangeObserver, Func<TTable, TList> selector) where TTable : new()
+      {
          listPropName = listPropName ?? throw new ArgumentNullException(nameof(listPropName));
 
          PropertyInfo listProp = baseVM.GetType().GetProperty(listPropName);
@@ -33,11 +47,11 @@ namespace DotNetify.Postgres
          {
             if (dbChangeEvent is DbInsertEvent<TTable>)
             {
-               baseVM.AddList(listPropName, (dbChangeEvent as DbInsertEvent<TTable>).Row);
+               baseVM.AddList(listPropName, selector((dbChangeEvent as DbInsertEvent<TTable>).Row));
             }
             else if (dbChangeEvent is DbUpdateEvent<TTable>)
             {
-               baseVM.UpdateList(listPropName, (dbChangeEvent as DbUpdateEvent<TTable>).NewRow);
+               baseVM.UpdateList(listPropName, selector((dbChangeEvent as DbUpdateEvent<TTable>).NewRow));
             }
             else if (dbChangeEvent is DbDeleteEvent<TTable>)
             {
