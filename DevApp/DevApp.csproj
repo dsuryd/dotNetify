@@ -4,7 +4,8 @@
     <RootNamespace>DotNetify.DevApp</RootNamespace>
     <AssemblyName>DotNetify.DevApp</AssemblyName>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
-     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
