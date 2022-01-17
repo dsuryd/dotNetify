@@ -33,7 +33,8 @@ namespace DotNetify
    /// Attribute to prevent a property from being sent to the client.
    /// </summary>
    [AttributeUsage(AttributeTargets.Property)]
-   public class IgnoreAttribute : Attribute { }
+   public class IgnoreAttribute : Attribute
+   { }
 
    /// <summary>
    /// Exception that gets thrown a JSON view model update from the client cannot be resolved.
@@ -53,6 +54,7 @@ namespace DotNetify
       private readonly INotifyPropertyChanged _vmInstance;
       private PropertyDictionary _changedProperties;
       private List<string> _ignoredProperties;
+      private IEnumerable<Attribute> _customAttributes;
 
       private static readonly VMSerializer _vmSerializer = new VMSerializer();
       protected ISerializer _serializer = _vmSerializer;
@@ -67,6 +69,16 @@ namespace DotNetify
       public event EventHandler RequestPushUpdates;
 
       /// <summary>
+      /// Custom attributes on this class.
+      /// </summary>
+      [Ignore]
+      public IEnumerable<Attribute> CustomAttributes
+      {
+         get => _customAttributes ?? GetType().GetTypeInfo().GetCustomAttributes();
+         set => _customAttributes = value;
+      }
+
+      /// <summary>
       /// Runtime reactive properties.
       /// </summary>
       [Ignore]
@@ -76,7 +88,7 @@ namespace DotNetify
       /// Gets properties that have been changed after the last accept command.
       /// </summary>
       [Ignore]
-      public ConcurrentDictionary<string, object> ChangedProperties => _changedProperties;
+      public PropertyDictionary ChangedProperties => _changedProperties;
 
       /// <summary>
       /// Gets a list of ignored properties.
