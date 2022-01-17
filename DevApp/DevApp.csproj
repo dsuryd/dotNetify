@@ -4,8 +4,13 @@
     <RootNamespace>DotNetify.DevApp</RootNamespace>
     <AssemblyName>DotNetify.DevApp</AssemblyName>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+<<<<<<< HEAD
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked> 
     <ImplicitUsings>enable</ImplicitUsings>
+=======
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+	<ImplicitUsings>enable</ImplicitUsings>
+>>>>>>> Implement minimal API.
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
