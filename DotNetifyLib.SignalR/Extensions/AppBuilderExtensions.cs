@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using DotNetify.Forwarding;
 using DotNetify.Routing;
@@ -47,7 +48,7 @@ namespace DotNetify
 
          var vmControllerFactory = provider.GetService<IVMControllerFactory>();
          if (vmControllerFactory == null)
-            throw new InvalidOperationException("Please call 'services.AddDotNetify()'.");
+            throw new InvalidOperationException("Please add the required service by calling 'IServiceCollection.AddDotNetify()' in the application startup.");
 
          var scopedServiceProvider = provider.GetService<IHubServiceProvider>();
 
@@ -84,11 +85,11 @@ namespace DotNetify
 
          // Add middleware factories to the hub.
          var middlewareFactories = provider.GetService<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>();
-         _middlewareTypes.ForEach(t => middlewareFactories?.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(t.Item1, () => (IMiddlewarePipeline)factoryMethod(t.Item1, t.Item2))));
+         _middlewareTypes.ForEach(t => middlewareFactories?.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(t.Item1, () => (IMiddlewarePipeline) factoryMethod(t.Item1, t.Item2))));
 
          // Add filter factories to the hub.
          var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
-         _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter)factoryMethod(t.Item1, t.Item2)));
+         _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter) factoryMethod(t.Item1, t.Item2)));
 
          return appBuilder;
       }
@@ -160,9 +161,9 @@ namespace DotNetify
          vmName = !string.IsNullOrWhiteSpace(vmName) ? vmName : throw new ArgumentNullException(nameof(vmName));
          propertyBuilder = propertyBuilder ?? throw new ArgumentNullException(nameof(propertyBuilder));
 
-         // Make sure "IApplicationBuilder.UseDotNetify()" is invoked first.
+         // Make sure "UseDotNetify()" is called first.
          if (!_middlewareTypes.Exists(t => t.Item1 == typeof(ExtractHeadersMiddleware)))
-            app.UseDotNetify();
+            app.UseDotNetify(config => config.UseFilter<AuthorizeFilter>());
 
          VMController.Register(vmName, _ =>
          {
@@ -175,8 +176,7 @@ namespace DotNetify
                   args.Add(instance);
                }
 
-               var state = propertyBuilder.DynamicInvoke(args.ToArray());
-               return VMBuilder.Build(state);
+               return VMBuilder.Build(propertyBuilder.DynamicInvoke(args.ToArray()), propertyBuilder.Method.GetCustomAttributes());
             }
          });
 

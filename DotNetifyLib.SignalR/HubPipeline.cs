@@ -175,7 +175,7 @@ namespace DotNetify
          nextFilters.Push(finalFilter);
 
          // Find and execute the filter that matches each view model class attribute.
-         foreach (var attr in vm.GetType().GetTypeInfo().GetCustomAttributes().Reverse())
+         foreach (var attr in vm.CustomAttributes.Reverse())
          {
             var vmFilterType = typeof(IVMFilter<>).GetTypeInfo().MakeGenericType(attr.GetType());
             if (_vmFilterFactories.Keys.Any(t => vmFilterType.GetTypeInfo().IsAssignableFrom(t)))

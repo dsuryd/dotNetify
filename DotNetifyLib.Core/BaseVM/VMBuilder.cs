@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
@@ -23,18 +24,21 @@ namespace DotNetify
    public static class VMBuilder
    {
       /// <summary>
-      /// Builds a view model instance whose properties are generated from the properties of the provided object.
+      /// Builds a view model instance whose properties are generated from given object's properties.
       /// The object's property value can be primitive value, an observable, or an action delegate.
       /// </summary>
-      public static BaseVM Build(object propertyBuilder)
+      public static BaseVM Build(object propertySource, IEnumerable<Attribute> customAttributes)
       {
          var vm = new BaseVM();
 
-         foreach (var prop in propertyBuilder.GetType().GetProperties())
+         if (customAttributes?.Count() > 0)
+            vm.CustomAttributes = customAttributes;
+
+         foreach (var prop in propertySource.GetType().GetProperties())
          {
             var propType = prop.PropertyType;
             var propName = prop.Name;
-            var propValue = prop.GetValue(propertyBuilder);
+            var propValue = prop.GetValue(propertySource);
 
             // If the property value is an observable, convert it into a reactive property that subscribes to that observable.
             if (propType.IsGenericType && propType.GetGenericTypeDefinition() == typeof(IObservable<>))
@@ -52,13 +56,10 @@ namespace DotNetify
                PropertyChangedEventHandler pushUpdates = (sender, e) => vm.PushUpdates();
                propChangedEvent.AddEventHandler(reactiveProp, pushUpdates);
             }
-            else if (propType == typeof(Action))
-            {
-               vm.AddProperty(propName, new Command(propValue as Action));
-            }
             else
             {
-               vm.AddProperty(propName, propValue);
+               var addPropertyMethod = vm.GetType().GetMethods().First(m => m.Name == nameof(BaseVM.AddProperty) && m.GetParameters().Length == 2).MakeGenericMethod(propType);
+               var reactiveProp = addPropertyMethod.Invoke(vm, new object[] { propName, propValue });
             }
          }
 
