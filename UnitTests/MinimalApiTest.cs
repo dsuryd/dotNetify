@@ -115,7 +115,7 @@ namespace UnitTests
          builder.Services.AddScoped<ILiveDataService, LiveDataService>();
          var app = builder.Build();
 
-         app.MapVM(vmName, (ILiveDataService live) => new { Tick = live.Tick, Reset = new Command<int>(x => live.Reset(x)) });
+         app.MapVM(vmName, (ILiveDataService live) => new { Tick = live.Tick, Reset = new Action<int>(x => live.Reset(x)) });
 
          var vm = VMController.VMTypes.Find(x => x.Name == vmName).CreateInstance();
 
