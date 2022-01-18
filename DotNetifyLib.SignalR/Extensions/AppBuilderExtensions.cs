@@ -34,6 +34,7 @@ namespace DotNetify
    {
       private static readonly List<Tuple<Type, object[]>> _middlewareTypes = new List<Tuple<Type, object[]>>();
       private static readonly List<Tuple<Type, object[]>> _filterTypes = new List<Tuple<Type, object[]>>();
+      private static bool _useDotNetify;
 
       /// <summary>
       /// Includes dotNetify in the application request pipeline.
@@ -91,6 +92,7 @@ namespace DotNetify
          var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
          _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter) factoryMethod(t.Item1, t.Item2)));
 
+         _useDotNetify = true;
          return appBuilder;
       }
 
@@ -162,8 +164,11 @@ namespace DotNetify
          propertyBuilder = propertyBuilder ?? throw new ArgumentNullException(nameof(propertyBuilder));
 
          // Make sure "UseDotNetify()" is called first.
-         if (!_middlewareTypes.Exists(t => t.Item1 == typeof(ExtractHeadersMiddleware)))
+         if (!_useDotNetify)
+         {
+            app.UseWebSockets();
             app.UseDotNetify(config => config.UseFilter<AuthorizeFilter>());
+         }
 
          VMController.Register(vmName, _ =>
          {
