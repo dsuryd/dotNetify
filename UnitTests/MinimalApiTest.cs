@@ -111,7 +111,7 @@ namespace UnitTests
       [TestMethod]
       public async Task MinimalApiTest_WithCommand_CommandsExecuted()
       {
-         var vmName = "LiveDataWithReset";
+         var vmName = "LiveDataWithCommand";
          var builder = WebApplication.CreateBuilder();
          builder.Services.AddDotNetify().AddSignalR();
          builder.Services.AddScoped<ILiveDataService, LiveDataService>();
@@ -140,7 +140,7 @@ namespace UnitTests
       [TestMethod]
       public void MinimalApiTest_WithAuthorizeOnUnauthenticatedClient_AccessDenied()
       {
-         var vmName = "HelloWorld";
+         var vmName = "HelloWorldAccessDenied";
          var builder = WebApplication.CreateBuilder();
          builder.Services.AddDotNetify().AddSignalR();
          var app = builder.Build();
@@ -155,7 +155,7 @@ namespace UnitTests
             .Build();
 
          var identity = Stubber.Create<IIdentity>().Setup(x => x.AuthenticationType).Returns(string.Empty).Object;
-         var client = hubEmulator.CreateClient(user: new ClaimsPrincipal(identity));
+         var client = hubEmulator.CreateClient(user: null);
 
          var response = client.Connect(vmName);
          Assert.IsTrue(response.First().ToString().Contains(nameof(UnauthorizedAccessException)));
@@ -164,7 +164,7 @@ namespace UnitTests
       [TestMethod]
       public void MinimalApiTest_WithAuthorizeOnAuthenticatedClient_AccessGranted()
       {
-         var vmName = "HelloWorld";
+         var vmName = "HelloWorldAccessGranted";
          var builder = WebApplication.CreateBuilder();
          builder.Services.AddDotNetify().AddSignalR();
          var app = builder.Build();
