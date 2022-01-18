@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Dicky Suryadi
+Copyright 2017-2022 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,24 +16,25 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using DotNetify.Security;
 using System.IO;
-using Microsoft.AspNetCore.Http;
-using DotNetify.Routing;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using DotNetify.Forwarding;
+using DotNetify.Routing;
+using DotNetify.Security;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DotNetify
 {
    public static class AppBuilderExtensions
    {
-      private readonly static List<Tuple<Type, object[]>> _middlewareTypes = new List<Tuple<Type, object[]>>();
-      private readonly static List<Tuple<Type, object[]>> _filterTypes = new List<Tuple<Type, object[]>>();
+      private static readonly List<Tuple<Type, object[]>> _middlewareTypes = new List<Tuple<Type, object[]>>();
+      private static readonly List<Tuple<Type, object[]>> _filterTypes = new List<Tuple<Type, object[]>>();
+      private static bool _useDotNetify;
 
       /// <summary>
       /// Includes dotNetify in the application request pipeline.
@@ -48,7 +49,7 @@ namespace DotNetify
 
          var vmControllerFactory = provider.GetService<IVMControllerFactory>();
          if (vmControllerFactory == null)
-            throw new InvalidOperationException("Please call 'IServiceCollection.AddDotNetify()' inside the ConfigureServices() of the startup class.");
+            throw new InvalidOperationException("Please add the required service by calling 'IServiceCollection.AddDotNetify()' in the application startup.");
 
          var scopedServiceProvider = provider.GetService<IHubServiceProvider>();
 
@@ -91,6 +92,7 @@ namespace DotNetify
          var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
          _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter) factoryMethod(t.Item1, t.Item2)));
 
+         _useDotNetify = true;
          return appBuilder;
       }
 
@@ -99,7 +101,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="dotNetifyConfig">DotNetify configuration.</param>
       /// <param name="args">Middleware arguments.</param>
-      public static void UseMiddleware<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IMiddlewarePipeline
+      public static void UseMiddleware<T>(this IDotNetifyConfiguration _, params object[] args) where T : IMiddlewarePipeline
       {
          if (!_middlewareTypes.Any(x => x.Item1 == typeof(T) && x.Item2 == args))
             _middlewareTypes.Add(Tuple.Create(typeof(T), args));
@@ -110,7 +112,7 @@ namespace DotNetify
       /// </summary>
       /// <param name="dotNetifyConfig">DotNetify configuration.</param>
       /// <param name="args">View model filter arguments.</param>
-      public static void UseFilter<T>(this IDotNetifyConfiguration dotNetifyConfig, params object[] args) where T : IVMFilter
+      public static void UseFilter<T>(this IDotNetifyConfiguration _, params object[] args) where T : IVMFilter
       {
          if (!_filterTypes.Any(x => x.Item1 == typeof(T) && x.Item2 == args))
             _filterTypes.Add(Tuple.Create(typeof(T), args));
@@ -148,6 +150,42 @@ namespace DotNetify
             });
          });
          return appBuilder;
+      }
+
+      /// <summary>
+      /// Adds a dynamic dotNetify view model.
+      /// </summary>
+      /// <param name="app">Application builder.</param>
+      /// <param name="vmName">View model name.</param>
+      /// <param name="propertyBuilder">Delegate that returns an object for building the view model's properties.</param>
+      public static IApplicationBuilder MapVM(this IApplicationBuilder app, string vmName, Delegate propertyBuilder)
+      {
+         vmName = !string.IsNullOrWhiteSpace(vmName) ? vmName : throw new ArgumentNullException(nameof(vmName));
+         propertyBuilder = propertyBuilder ?? throw new ArgumentNullException(nameof(propertyBuilder));
+
+         // Make sure "UseDotNetify()" is called first.
+         if (!_useDotNetify)
+         {
+            app.UseWebSockets();
+            app.UseDotNetify(config => config.UseFilter<AuthorizeFilter>());
+         }
+
+         VMController.Register(vmName, _ =>
+         {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+               var args = new List<object>();
+               foreach (var parameter in propertyBuilder.Method.GetParameters())
+               {
+                  var instance = scope.ServiceProvider.GetRequiredService(parameter.ParameterType);
+                  args.Add(instance);
+               }
+
+               return VMBuilder.Build(propertyBuilder.DynamicInvoke(args.ToArray()), propertyBuilder.Method.GetCustomAttributes());
+            }
+         });
+
+         return app;
       }
    }
 }

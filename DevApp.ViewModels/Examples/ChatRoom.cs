@@ -59,7 +59,7 @@ namespace DotNetify.DevApp
          {
             var browserInfo = Parser.GetDefault().Parse(userAgent);
             if (browserInfo != null)
-               Browser = $"{browserInfo.UserAgent.Family}/{browserInfo.OS.Family} {browserInfo.OS.Major}";
+               Browser = $"{browserInfo.UA.Family}/{browserInfo.OS.Family} {browserInfo.OS.Major}";
          }
       }
    }
