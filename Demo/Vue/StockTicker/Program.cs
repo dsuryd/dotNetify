@@ -13,7 +13,7 @@ app.MapHub<DotNetifyHub>("/dotnetify");
 app.MapVM("StockTicker", (IStockTickerService service) => new
 {
    service.StockPrices,
-   AddSymbol = new Command<string>(symbol => service.AddSymbol(symbol))
+   AddSymbol = new Action<string>(symbol => service.AddSymbol(symbol))
 });
 
 app.UseStaticFiles();
