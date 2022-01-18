@@ -2,9 +2,9 @@
 using StockTicker;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IStockTickerService, StockTickerService>();
 
 builder.Services.AddDotNetify().AddSignalR();
-builder.Services.AddScoped<IStockTickerService, StockTickerService>();
 
 var app = builder.Build();
 
