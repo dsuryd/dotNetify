@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using DotNetify;
 using DotNetify.Security;
@@ -152,7 +154,8 @@ namespace UnitTests
             .UseFilter<AuthorizeFilter>()
             .Build();
 
-         var client = hubEmulator.CreateClient();
+         var identity = Stubber.Create<IIdentity>().Setup(x => x.AuthenticationType).Returns(string.Empty).Object;
+         var client = hubEmulator.CreateClient(user: new ClaimsPrincipal(identity));
 
          var response = client.Connect(vmName);
          Assert.IsTrue(response.First().ToString().Contains(nameof(UnauthorizedAccessException)));
@@ -175,8 +178,8 @@ namespace UnitTests
             .UseFilter<AuthorizeFilter>()
             .Build();
 
-         var identity = Stubber.Create<System.Security.Principal.IIdentity>().Setup(x => x.IsAuthenticated).Returns(true).Object;
-         var client = hubEmulator.CreateClient(user: new System.Security.Claims.ClaimsPrincipal(identity));
+         var identity = Stubber.Create<IIdentity>().Setup(x => x.AuthenticationType).Returns("CustomAuth").Object;
+         var client = hubEmulator.CreateClient(user: new ClaimsPrincipal(identity));
 
          var response = client.Connect(vmName).As<HelloWorldState>();
 
