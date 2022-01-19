@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace DotNetify
 {
@@ -30,6 +31,22 @@ namespace DotNetify
       /// How long to keep a view model controller in memory after it hasn't been accessed for a while. Default to never expire.
       /// </summary>
       public TimeSpan? VMControllerCacheExpiration { get; set; }
+
+      /// <summary>
+      /// Use camel case naming when serializing the view model.
+      /// </summary>
+      public bool CamelCaseSerialization
+      {
+         set
+         {
+            VMSerializer.SerializerSettings = VMSerializer.GetDefaultSerializerSettings();
+            var contractResolver = VMSerializer.SerializerSettings.ContractResolver as DefaultContractResolver;
+            if (value)
+               contractResolver.NamingStrategy = new CamelCaseNamingStrategy { ProcessDictionaryKeys = true };
+            else
+               contractResolver.NamingStrategy = new DefaultNamingStrategy();
+         }
+      }
 
       /// <summary>
       /// Provides a factory method to create view model instances.
@@ -102,6 +119,6 @@ namespace DotNetify
       /// </summary>
       public bool HasAssembly => VMController._registeredAssemblies.Count > 0;
 
-      #endregion
+      #endregion Methods for internal use
    }
 }

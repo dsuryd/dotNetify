@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Copyright 2017 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,11 @@ namespace DotNetify
       TimeSpan? VMControllerCacheExpiration { get; set; }
 
       /// <summary>
+      /// Apply camel case naming to view model serialization.
+      /// </summary>
+      bool CamelCaseSerialization { set; }
+
+      /// <summary>
       /// Provides a factory method to create view model instances.
       /// The method accepts a class type and constructor arguments, and returns an instance of that type.
       /// </summary>
@@ -41,7 +46,7 @@ namespace DotNetify
       /// Provides custom global json serializer settings.
       /// </summary>
       void UseJsonSerializerSettings(JsonSerializerSettings settings);
-      
+
       /// <summary>
       /// Provides custom global json serializer settings.
       /// </summary>
@@ -51,12 +56,14 @@ namespace DotNetify
       /// Register view model classes in an assembly that are subtypes of BaseVM.
       /// </summary>
       void RegisterAssembly(Assembly assembly);
+
       void RegisterAssembly(string assemblyName);
 
       /// <summary>
       /// Register view model classes in an assembly that are subtypes of a certain type.
       /// </summary>
       void RegisterAssembly<T>(Assembly assembly) where T : INotifyPropertyChanged;
+
       void RegisterAssembly<T>(string assemblyName) where T : INotifyPropertyChanged;
 
       /// <summary>

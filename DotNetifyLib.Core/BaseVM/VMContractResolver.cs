@@ -109,7 +109,7 @@ namespace DotNetify
          {
             var itemKeyAttr = member.GetCustomAttribute<ItemKeyAttribute>();
             _itemKeyProps = _itemKeyProps ?? new Dictionary<string, string>();
-            _itemKeyProps[$"{member.Name}_itemKey"] = itemKeyAttr.ItemKey;
+            _itemKeyProps[ResolvePropertyName($"{member.Name}_itemKey")] = itemKeyAttr.ItemKey;
          }
 
          return property;
@@ -131,7 +131,7 @@ namespace DotNetify
                {
                   PropertyType = typeof(string),
                   DeclaringType = type,
-                  PropertyName = prop.Key,
+                  PropertyName = ResolvePropertyName(prop.Key),
                   ValueProvider = new DefaultValueProvider(prop.Value),
                   Readable = true,
                   Writable = false
@@ -148,7 +148,7 @@ namespace DotNetify
             {
                PropertyType = typeof(string),
                DeclaringType = type,
-               PropertyName = command.Name,
+               PropertyName = ResolvePropertyName(command.Name),
                ValueProvider = new DefaultValueProvider(string.Empty),
                Readable = true,
                Writable = false
