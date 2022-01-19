@@ -17,7 +17,6 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -32,10 +31,12 @@ namespace DotNetify
    /// </summary>
    public sealed class VMSerializer : ISerializer, IDeserializer
    {
-      internal static JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+      internal static JsonSerializerSettings GetDefaultSerializerSettings() => new JsonSerializerSettings
       {
          ContractResolver = new VMContractResolver()
       };
+
+      internal static JsonSerializerSettings SerializerSettings { get; set; } = GetDefaultSerializerSettings();
 
       /// <summary>
       /// Serializes a view model into JSON-formatted string.

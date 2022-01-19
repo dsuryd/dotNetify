@@ -134,7 +134,8 @@ namespace UnitTests
          client.Dispatch(new { Reset = 1000 });
          var response = (await task).As<LiveDataState>();
 
-         Assert.IsTrue(int.Parse(response.Tick) >= 1000);
+         int.TryParse(response.Tick, out int tick);
+         Assert.IsTrue(tick >= 1000);
       }
 
       [TestMethod]
