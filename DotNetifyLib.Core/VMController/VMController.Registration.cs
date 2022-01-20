@@ -66,6 +66,12 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Creates a view model instance.
+      /// </summary>
+      /// <param name="vmName">View model name.</param>
+      public static object CreateVMInstance(string vmName, params object[] args) => VMTypes.Find(x => x.Name == vmName)?.CreateInstance(args);
+
+      /// <summary>
       /// Registers all view model types in an assembly.
       /// </summary>
       /// <param name="vmAssembly">Assembly.</param>

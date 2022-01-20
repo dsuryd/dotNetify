@@ -158,7 +158,23 @@ namespace DotNetify
       /// <param name="app">Application builder.</param>
       /// <param name="vmName">View model name.</param>
       /// <param name="propertyBuilder">Delegate that returns an object for building the view model's properties.</param>
-      public static IApplicationBuilder MapVM(this IApplicationBuilder app, string vmName, Delegate propertyBuilder)
+      public static IApplicationBuilder MapVM(this IApplicationBuilder app, string vmName, Delegate propertyBuilder) => MapVM<BaseVM>(app, vmName, propertyBuilder);
+
+      /// <summary>
+      /// Adds a dynamic dotNetify multicast view model.
+      /// </summary>
+      /// <param name="app">Application builder.</param>
+      /// <param name="vmName">View model name.</param>
+      /// <param name="propertyBuilder">Delegate that returns an object for building the view model's properties.</param>
+      public static IApplicationBuilder MapMulticastVM(this IApplicationBuilder app, string vmName, Delegate propertyBuilder) => MapVM<MulticastVM>(app, vmName, propertyBuilder);
+
+      /// <summary>
+      /// Adds a dynamic dotNetify view model.
+      /// </summary>
+      /// <param name="app">Application builder.</param>
+      /// <param name="vmName">View model name.</param>
+      /// <param name="propertyBuilder">Delegate that returns an object for building the view model's properties.</param>
+      private static IApplicationBuilder MapVM<T>(this IApplicationBuilder app, string vmName, Delegate propertyBuilder) where T : BaseVM, new()
       {
          vmName = !string.IsNullOrWhiteSpace(vmName) ? vmName : throw new ArgumentNullException(nameof(vmName));
          propertyBuilder = propertyBuilder ?? throw new ArgumentNullException(nameof(propertyBuilder));
@@ -181,7 +197,14 @@ namespace DotNetify
                   args.Add(instance);
                }
 
-               return VMBuilder.Build(propertyBuilder.DynamicInvoke(args.ToArray()), propertyBuilder.Method.GetCustomAttributes());
+               var propertySource = propertyBuilder.DynamicInvoke(args.ToArray());
+               if (propertySource is Task)
+               {
+                  var resultProperty = propertySource.GetType().GetProperty("Result");
+                  propertySource = resultProperty.GetValue(propertySource);
+               }
+
+               return VMBuilder.Build<T>(propertySource, propertyBuilder.Method.GetCustomAttributes());
             }
          });
 

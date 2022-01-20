@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Security.Claims;
@@ -22,6 +23,8 @@ namespace UnitTests
          IObservable<int[]> ServerUsage { get; }
 
          void Reset(int count);
+
+         Task<string> GreetingsAsync();
       }
 
       public class LiveDataService : ILiveDataService
@@ -45,6 +48,8 @@ namespace UnitTests
          }
 
          public void Reset(int count) => _count = count;
+
+         public Task<string> GreetingsAsync() => Task.FromResult("Hello World!");
       }
 
       private struct HelloWorldState
@@ -69,7 +74,7 @@ namespace UnitTests
 
          app.MapVM(vmName, () => new { FirstName = "Hello", LastName = "World" });
 
-         var vm = VMController.VMTypes.Find(x => x.Name == vmName).CreateInstance();
+         var vm = VMController.CreateVMInstance(vmName);
 
          var hubEmulator = new HubEmulatorBuilder()
             .Register(vmName, vm)
@@ -94,7 +99,7 @@ namespace UnitTests
 
          app.MapVM(vmName, (ILiveDataService live) => new { ServerUsage = live.ServerUsage });
 
-         var vm = VMController.VMTypes.Find(x => x.Name == vmName).CreateInstance();
+         var vm = VMController.CreateVMInstance(vmName);
 
          var hubEmulator = new HubEmulatorBuilder()
             .Register(vmName, vm)
@@ -109,6 +114,36 @@ namespace UnitTests
       }
 
       [TestMethod]
+      public void MinimalApiTest_WithAsyncAction_ActionAwaited()
+      {
+         var vmName = "LiveDataAsync";
+         var builder = WebApplication.CreateBuilder();
+         builder.Services.AddDotNetify().AddSignalR();
+         builder.Services.AddScoped<ILiveDataService, LiveDataService>();
+         var app = builder.Build();
+
+         app.MapVM(vmName, async (ILiveDataService live) => new
+         {
+            Greetings = await live.GreetingsAsync(),
+            Reset = new Action(async () => await live.GreetingsAsync())
+         });
+
+         var vm = VMController.CreateVMInstance(vmName);
+
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register(vmName, vm)
+            .Build();
+
+         var client = hubEmulator.CreateClient();
+
+         var response = client.Connect(vmName).As<dynamic>();
+
+         Assert.AreEqual("Hello World!", response.Greetings.ToString());
+
+         client.Dispatch(new { Reset = "" });
+      }
+
+      [TestMethod]
       public async Task MinimalApiTest_WithCommand_CommandsExecuted()
       {
          var vmName = "LiveDataWithCommand";
@@ -119,7 +154,7 @@ namespace UnitTests
 
          app.MapVM(vmName, (ILiveDataService live) => new { Tick = live.Tick, Reset = new Action<int>(x => live.Reset(x)) });
 
-         var vm = VMController.VMTypes.Find(x => x.Name == vmName).CreateInstance();
+         var vm = VMController.CreateVMInstance(vmName);
 
          var hubEmulator = new HubEmulatorBuilder()
             .Register(vmName, vm)
@@ -148,7 +183,7 @@ namespace UnitTests
 
          app.MapVM(vmName, [Authorize]() => new { FirstName = "Hello", LastName = "World" });
 
-         var vm = VMController.VMTypes.Find(x => x.Name == vmName).CreateInstance();
+         var vm = VMController.CreateVMInstance(vmName);
 
          var hubEmulator = new HubEmulatorBuilder()
             .Register(vmName, vm)
@@ -172,7 +207,7 @@ namespace UnitTests
 
          app.MapVM(vmName, [Authorize]() => new { FirstName = "Hello", LastName = "World" });
 
-         var vm = VMController.VMTypes.Find(x => x.Name == vmName).CreateInstance();
+         var vm = VMController.CreateVMInstance(vmName);
 
          var hubEmulator = new HubEmulatorBuilder()
             .Register(vmName, vm)
@@ -186,6 +221,36 @@ namespace UnitTests
 
          Assert.AreEqual("Hello", response.FirstName);
          Assert.AreEqual("World", response.LastName);
+      }
+
+      [TestMethod]
+      public void MinimalApiTest_MulticastVM_ViewModelShared()
+      {
+         var vmName = "MulticastTestVM";
+         var builder = WebApplication.CreateBuilder();
+         builder.Services.AddDotNetify().AddSignalR();
+         var app = builder.Build();
+
+         app.MapMulticastVM(vmName, () => new { Message = "Hello" });
+
+         var vm = VMController.CreateVMInstance(vmName);
+
+         var hubEmulator = new HubEmulatorBuilder()
+            .Register(vmName, vm)
+            .Build();
+
+         var client1 = hubEmulator.CreateClient();
+         var client2 = hubEmulator.CreateClient();
+
+         var response = client1.Connect(vmName).As<dynamic>();
+
+         Assert.AreEqual("Hello", (string) response.Message);
+
+         var update = new Dictionary<string, object>() { { "Message", "World" } };
+         client1.Dispatch(update);
+
+         response = client2.Connect(vmName).As<dynamic>();
+         Assert.AreEqual("World", (string) response.Message);
       }
    }
 }

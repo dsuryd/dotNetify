@@ -27,9 +27,9 @@ namespace DotNetify
       /// Builds a view model instance whose properties are generated from given object's properties.
       /// The object's property value can be primitive value, an observable, or an action delegate.
       /// </summary>
-      public static BaseVM Build(object propertySource, IEnumerable<Attribute> customAttributes)
+      public static BaseVM Build<T>(object propertySource, IEnumerable<Attribute> customAttributes) where T : BaseVM, new()
       {
-         var vm = new BaseVM();
+         var vm = new T();
 
          if (customAttributes?.Count() > 0)
             vm.CustomAttributes = customAttributes;
