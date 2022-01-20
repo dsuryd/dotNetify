@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Docs\APIs\MinimalApi.md" />
     <None Remove="Docs\RealtimePostgres.md" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Docs\APIs\MinimalApi.md" />
     <EmbeddedResource Include="Docs\Examples\AFITop100.json" />
     <EmbeddedResource Include="Docs\Examples\webstore.json" />
     <EmbeddedResource Include="Docs\Overview.md" />

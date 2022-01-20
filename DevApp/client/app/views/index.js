@@ -24,6 +24,7 @@ import DotNetClient from "./apis/DotNetClient";
 import Filter from "./apis/Filter";
 import LocalMode from "./apis/LocalMode";
 import Middleware from "./apis/Middleware";
+import MinimalApi from "./apis/MinimalApi";
 import Multicast from "./apis/Multicast";
 import Routing from "./apis/Routing";
 import Security from "./apis/Security";
@@ -65,6 +66,7 @@ export {
   Filter,
   LocalMode,
   Middleware,
+  MinimalApi,
   Multicast,
   Routing,
   Security,
