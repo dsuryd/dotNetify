@@ -8,8 +8,9 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## What's New
 
-- **v5.x: [Scale-out, Vue 3.x support](https://github.com/dsuryd/dotNetify/releases)**. 
-- v4.x: [Async view model](https://github.com/dsuryd/dotNetify/releases/tag/v4.1), [Typescript support](https://github.com/dsuryd/dotNetify/releases/tag/v4.0).
+- **Minimal API** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.3).
+- Scale-out, Vue 3.x support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.0).
+- Async view model - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1).
 
 **DotNetify.Postgres: [Real-time Web Updates From Your PostgreSQL Database](https://dsuryd.github.io/dotNetify/realtime-postgres/)**
 
