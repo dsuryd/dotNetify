@@ -5,10 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockTicker", "StockTicker.csproj", "{ED808A3C-4037-4307-ACB1-BD6E1F863211}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.Core", "..\..\..\DotNetifyLib.Core\DotNetifyLib.Core.csproj", "{07F00A86-29C7-4917-B1BE-AEF09C50685E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetifyLib.SignalR", "..\..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj", "{F4552C8B-8B7C-44EE-909E-BF88015A8A4D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,14 +15,6 @@ Global
 		{ED808A3C-4037-4307-ACB1-BD6E1F863211}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED808A3C-4037-4307-ACB1-BD6E1F863211}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED808A3C-4037-4307-ACB1-BD6E1F863211}.Release|Any CPU.Build.0 = Release|Any CPU
-		{07F00A86-29C7-4917-B1BE-AEF09C50685E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07F00A86-29C7-4917-B1BE-AEF09C50685E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07F00A86-29C7-4917-B1BE-AEF09C50685E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07F00A86-29C7-4917-B1BE-AEF09C50685E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F4552C8B-8B7C-44EE-909E-BF88015A8A4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4552C8B-8B7C-44EE-909E-BF88015A8A4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4552C8B-8B7C-44EE-909E-BF88015A8A4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4552C8B-8B7C-44EE-909E-BF88015A8A4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

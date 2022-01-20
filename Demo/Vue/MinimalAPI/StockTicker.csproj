@@ -6,11 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetify.SignalR" Version="5.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\DotNetifyLib.SignalR\DotNetifyLib.SignalR.csproj" />
+    <PackageReference Include="DotNetify.SignalR" Version="5.3.0" />
   </ItemGroup>
 
 </Project>
