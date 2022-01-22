@@ -6,9 +6,9 @@ thumbnail: "./thumbnail.png"
 ---
 
 When .NET 6 came out late last year, I was quite amazed by how lightweight you can now write an ASP.NET web service. Much of the boilerplate code that you'd normally find in previous iterations of .NET can be replaced with this succinct, easy-to-understand configuration that fits comfortably in a single file.
-As one who loves to seek ways to write less code when it can do the same thing, given that it doesn't sacrifice readability, this resonates with me.
+As one who loves to seek ways to write less code when it can do the same thing and as long as that it doesn't affect readability, this resonates with me.
 
-I was inspired to do the same thing with real-time updates. SignalR is already doing a great job in hiding all that complexity of implementing real-time bi-directional communication on the web. DotNetify builds on top of it by introducing a state management abstraction between the server and its connected clients that integrates with a variety of front-end frameworks, and in doing so, reduces a lot of plumbing code.
+I was inspired to do something similar with real-time updates. SignalR is already doing a great job in hiding all that complexity of implementing real-time bi-directional communication on the web. DotNetify builds on top of it by introducing a state management abstraction between the server and its connected clients that integrates with a variety of front-end frameworks, and in doing so, reduces a lot of plumbing code.
 
 However, when it comes to web applications leveraging real-time technology, I suspect that for many applications, the use case is fairly simple: _unidirectional data flow from an event source to the browser_. There won't be any need for server-side state management or for complex orchestration. Something like minimal APIs but for real-time updates would be appealing.
 
@@ -62,7 +62,7 @@ app.MapVM("HelloWorld", async (IDateTimeService service) => new {
 And lastly, this API can be protected with [dotNetify's [Authorize] attribute](https://dotnetify.net/core/api/security) from unauthenticated requests:
 
 ```csharp
-app.MapVM("HelloWorld", [Authorize] ()) => new { /*...*/ });
+app.MapVM("HelloWorld", [Authorize] () => new { /*...*/ });
 
 ```
 
