@@ -2,6 +2,7 @@
 title: Introducing Minimal Real-Time API for .NET
 date: "2022-01-21T00:00:00Z"
 description: "A lightweight alternative for serving real-time updates from a .NET web service."
+thumbnail: "./thumbnail.png"
 ---
 
 When .NET 6 came out late last year, I was quite amazed by how lightweight you can now write an ASP.NET web service. Much of the boilerplate code that you'd normally find in previous iterations of .NET can be replaced with this succinct, easy-to-understand configuration that fits comfortably in a single file.
@@ -73,7 +74,11 @@ Let's say our goal is to create a UI component to display those updates and that
 
 The most portable way to share UI components is by making them native HTML custom elements. It usually involves quite a few steps to make one, but luckily, beginning with version 3.2, [Vue](https://v3.vuejs.org/guide/web-components.html) provides a built-in API to convert a Vue component into one. Vue is a great UI framework to work with, and if we just keep it to modern browsers, it's very possible to write code using the latest Javascript syntax and run without needing to transpile.
 
-I came up with an example that simulates a rudimentary stock ticker app. It has an input field for stock symbol lookup, and an area to display the symbols with their current prices which updates every second. Altogether, I only need two front-end files to add to the service:
+I came up with an example that simulates a rudimentary stock ticker app. It has an input field for stock symbol lookup, and an area to display the symbols with their current prices which updates every second. Here's what it looks like:
+
+![Stock Ticker - Vue](./screencapture.gif)
+
+I only need two front-end files to add to the service:
 
 **1. index.html:**
 
