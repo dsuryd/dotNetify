@@ -110,7 +110,7 @@ namespace UnitTests
          client.Connect(vmName);
          var response = client.Listen(2100);
 
-         Assert.IsTrue(response.Count >= 5);
+         Assert.IsTrue(response.Count >= 3);
       }
 
       [TestMethod]
