@@ -49,25 +49,18 @@ Now that we have our routes all defined in the back-end, this is how they are se
 import React from 'react';
 import dotnetify, { RouteLink, RouteTarget } from 'dotnetify';
 
-class Index extends React.Component {
-  constructor() {
-     super();
-     const onRouteEnter = (path, template) => template.Target = "Content"; 
-     this.vm = dotnetify.react.connect("Index", this, { onRouteEnter });
-     this.state = {};
-  }
-  componentWillUnmount() {
-     this.vm.$destroy();
-  }
-  render() {
-    return (
-        <div>
-          <RouteLink vm={this.vm} route={this.state.LinkPage1}>Page 1</RouteLink>
-          <RouteLink vm={this.vm} route={this.state.LinkPage2}>Page 2</RouteLink>
-          <RouteTarget id="Content" />
-        </div>
-    );
-  }
+const onRouteEnter = (path, template) => (template.Target = "Content");
+
+export const Index = props => {
+  const { vm, state } = useConnect("Index", { props }, { onRouteEnter });
+
+  return (
+    <div>
+        <RouteLink vm={vm} route={state.LinkPage1}>Page 1</RouteLink>
+        <RouteLink vm={vm} route={state.LinkPage2}>Page 2</RouteLink>
+        <RouteTarget id="Content" />
+    </div>
+  );
 }
 ```
 
