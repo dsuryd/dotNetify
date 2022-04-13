@@ -9,7 +9,7 @@ export const ChatRoom = () => {
   const [correlationId] = useState(`${Math.random()}`);
 
   useEffect(() => {
-    return () => vm.$dispatch({ RemoveUser: null });
+    return () => vm && vm.$dispatch({ RemoveUser: null });
   }, []);
 
   useEffect(() => {

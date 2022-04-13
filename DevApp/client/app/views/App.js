@@ -51,6 +51,9 @@ class App extends React.Component {
         theme: arg || this.state.theme.name === "light" ? darkTheme : lightTheme
       });
     });
+
+    const spinner = document.querySelector(".spinner");
+    if (spinner) spinner.style.display = "none";
   }
 
   render() {
