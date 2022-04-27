@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { HelloWorld } from './HelloWorld';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { HelloWorld } from "./HelloWorld";
 
-ReactDOM.render(<HelloWorld />, document.getElementById('App'));
+createRoot(document.getElementById("App") as Element).render(<HelloWorld />);
