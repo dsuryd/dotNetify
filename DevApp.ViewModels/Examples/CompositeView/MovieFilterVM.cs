@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotNetify;
 
 namespace DotNetify.DevApp
 {
@@ -18,8 +17,11 @@ namespace DotNetify.DevApp
 
          public string ToQuery()
          {
+            /* Cast is a reserved query word */
+            if (Operation == "Cast") Operation = "MovieCast";
+
             if (Operation == "contains")
-               return Property == "Any" ? $"( Movie + Cast + Director ).toLower().contains(\"{Text.ToLower()}\")"
+               return Property == "Any" ? $"( Movie + MovieCast + Director ).toLower().contains(\"{Text.ToLower()}\")"
                   : $"{Property}.toLower().contains(\"{Text.ToLower()}\")";
             else
             {
@@ -35,16 +37,16 @@ namespace DotNetify.DevApp
       }
 
       public Action<MovieFilter> Apply => arg =>
-      {
-         _filters.Add(arg);
-         FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
-      };
+         {
+            _filters.Add(arg);
+            FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
+         };
 
       public Action<int> Delete => id =>
-      {
-         _filters = _filters.Where(i => i.Id != id).ToList();
-         FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
-      };
+         {
+            _filters = _filters.Where(i => i.Id != id).ToList();
+            FilterChanged?.Invoke(this, MovieFilter.BuildQuery(_filters));
+         };
 
       public event EventHandler<string> FilterChanged;
    }
