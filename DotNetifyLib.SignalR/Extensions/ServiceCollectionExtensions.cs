@@ -75,7 +75,7 @@ namespace DotNetify
          return services;
       }
 
-      public static IServiceCollection AddDotnetify(this IServiceCollection services)
+      public static IServiceCollection AddDotNetify(this IServiceCollection services)
       {
           services.AddDotNetifyWithoutWebApi()
           // Add web API support.
