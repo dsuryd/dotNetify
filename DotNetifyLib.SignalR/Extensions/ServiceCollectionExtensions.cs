@@ -27,7 +27,7 @@ namespace DotNetify
 {
    public static class ServiceCollectionExtensions
    {
-      public static IServiceCollection AddDotNetify(this IServiceCollection services)
+      public static IServiceCollection AddDotNetifyCore(this IServiceCollection services)
       {
          // Add memory cache.
          if (!services.Any(x => x.ServiceType == typeof(Microsoft.Extensions.Caching.Memory.IMemoryCache)))
@@ -65,15 +65,20 @@ namespace DotNetify
          services.AddSingleton<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>(p => new List<Tuple<Type, Func<IMiddlewarePipeline>>>());
          services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
 
-         // Add web API support.
-         services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
-         services.AddTransient<WebApiVMControllerFactory>();
-
          // Add factories used for hub forwarding.
          services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
          services.AddSingleton<IDotNetifyHubForwarderFactory, DotNetifyHubForwarderFactory>();
          services.AddSingleton<IDotNetifyHubForwardResponseFactory, DotNetifyHubForwardResponseFactory>();
 
+         return services;
+      }
+
+      public static IServiceCollection AddDotNetify(this IServiceCollection services)
+      {
+         services.AddDotNetifyCore()
+            // Add web API support.
+            .AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
+         services.AddTransient<WebApiVMControllerFactory>();
          return services;
       }
 
