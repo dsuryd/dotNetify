@@ -27,7 +27,8 @@ namespace DotNetify
    /// Attribute to identify a method as a command to be included in serialization.
    /// </summary>
    [AttributeUsage(AttributeTargets.Method)]
-   public class CommandAttribute : Attribute { }
+   public class CommandAttribute : Attribute
+   { }
 
    /// <summary>
    /// Defines a command that needs to execute asynchronously.
@@ -48,33 +49,25 @@ namespace DotNetify
       /// <summary>
       /// Not implemented.
       /// </summary>
-      public event EventHandler CanExecuteChanged { add { } remove { } }
+      public event EventHandler CanExecuteChanged
+      { add { } remove { } }
 
       /// <summary>
       /// Can execute the command.
       /// </summary>
-      public bool CanExecute(object parameter)
-      {
-         return _canExecuteAction != null ? _canExecuteAction.Invoke(parameter) : true;
-      }
+      public bool CanExecute(object parameter) => _canExecuteAction == null || _canExecuteAction.Invoke(parameter);
 
       /// <summary>
       /// Executes the command.
       /// </summary>
       /// <param name="parameter">Not used.</param>
-      public void Execute(object parameter)
-      {
-         _executeAction?.Invoke();
-      }
+      public void Execute(object parameter) => _executeAction?.Invoke();
 
       /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="executeAction">Execute action.</param>
-      public Command(Action executeAction)
-      {
-         _executeAction = executeAction;
-      }
+      public Command(Action executeAction) => _executeAction = executeAction;
 
       /// <summary>
       /// Constructor.
@@ -95,7 +88,10 @@ namespace DotNetify
       {
          if (parameter != null)
          {
-            if (type.GetTypeInfo().IsClass && type != typeof(string))
+            bool isClass = type.GetTypeInfo().IsClass && type != typeof(string);
+            bool isTuple = type.Name.Contains(nameof(Tuple));
+
+            if (isClass || isTuple)
                parameter = JsonConvert.DeserializeObject(parameter.ToString(), type);
             else
             {
@@ -121,65 +117,45 @@ namespace DotNetify
       /// <summary>
       /// Not implemented.
       /// </summary>
-      public event EventHandler CanExecuteChanged { add { } remove { } }
+      public event EventHandler CanExecuteChanged
+      { add { } remove { } }
 
       /// <summary>
       /// Can execute the command.
       /// </summary>
-      public bool CanExecute(object parameter)
-      {
-         return _canExecuteAction != null ? _canExecuteAction.Invoke(parameter) : true;
-      }
+      public bool CanExecute(object parameter) => _canExecuteAction == null || _canExecuteAction.Invoke(parameter);
 
       /// <summary>
       /// Executes the command.
       /// </summary>
       /// <param name="parameter">command parameter.</param>
-      public void Execute(object parameter)
-      {
-         _executeAction?.Invoke(ConvertParameter(parameter));
-      }
+      public void Execute(object parameter) => _executeAction?.Invoke(ConvertParameter(parameter));
 
       /// <summary>
       /// Executes asynchronous command.
       /// </summary>
       /// <param name="parameter">command parameter.</param>
-      public Task ExecuteAsync(object parameter)
-      {
-         return _executeAsyncAction?.Invoke(ConvertParameter(parameter));
-      }
+      public Task ExecuteAsync(object parameter) => _executeAsyncAction?.Invoke(ConvertParameter(parameter));
 
       /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="executeAction">Execute action.</param>
-      public Command(Action<T> executeAction)
-      {
-         _executeAction = executeAction;
-      }
+      public Command(Action<T> executeAction) => _executeAction = executeAction;
 
-      public Command(Func<T, Task> executeAsyncAction)
-      {
-         _executeAsyncAction = executeAsyncAction;
-      }
+      public Command(Func<T, Task> executeAsyncAction) => _executeAsyncAction = executeAsyncAction;
 
       /// <summary>
       /// Constructor.
       /// </summary>
       /// <param name="executeAction">Execute action.</param>
       /// <param name="canExecuteAction">Can execute action.</param>
-      public Command(Action<T> executeAction, Func<object, bool> canExecuteAction) : this(executeAction)
-      {
-         _canExecuteAction = canExecuteAction;
-      }
+      public Command(Action<T> executeAction, Func<object, bool> canExecuteAction) : this(executeAction) => _canExecuteAction = canExecuteAction;
 
       /// <summary>
       /// Convert the parameter to the expected type.
       /// </summary>
       /// <param name="parameter">Parameter to convert.</param>
-      private T ConvertParameter(object parameter)
-      {
-         return (T) Command.ConvertParameter(parameter, typeof(T));
-      }
+      private T ConvertParameter(object parameter) => (T) Command.ConvertParameter(parameter, typeof(T));
    }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using DotNetify;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace UnitTests
 {
@@ -20,6 +20,10 @@ namespace UnitTests
          public List<Employee> Employees { get; set; } = new();
 
          public int Count { get => Get<int>(); set => Set(value); }
+
+         public void AddTuple((int Id, string Name) tuple) => Employees.Add(new Employee { Id = tuple.Id, Name = tuple.Name });
+
+         public void Add(int Id, string Name) => Employees.Add(new Employee { Id = Id, Name = Name });
       }
 
       [TestMethod]
@@ -83,6 +87,34 @@ namespace UnitTests
          Assert.IsTrue(data.Contains("Id"));
          Assert.IsTrue(data.Contains("Name"));
          Assert.IsTrue(data.Contains("Count"));
+      }
+
+      [TestMethod]
+      public void Deserialize_MethodWithTupleArg()
+      {
+         var serializer = new VMSerializer();
+
+         (int Id, string Name) tuple = (1012, "Karen Doe");
+         var value = JsonConvert.SerializeObject(tuple);
+
+         var vm = new EmployeeVM();
+         serializer.Deserialize(vm, "AddTuple", value);
+
+         Assert.IsTrue(vm.Employees.Exists(x => x.Id == tuple.Id && x.Name == tuple.Name));
+      }
+
+      [TestMethod]
+      public void Deserialize_MethodWithMultipleArgs()
+      {
+         var serializer = new VMSerializer();
+
+         var item = new { Id = 1013, Name = "Bob Smith" };
+         var value = JsonConvert.SerializeObject(item);
+
+         var vm = new EmployeeVM();
+         serializer.Deserialize(vm, "Add", value);
+
+         Assert.IsTrue(vm.Employees.Exists(x => x.Id == item.Id && x.Name == item.Name));
       }
    }
 }

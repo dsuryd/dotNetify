@@ -57,7 +57,7 @@ namespace DotNetify.DevApp
             .Select(i => new EmployeeInfo { Id = i.Id, FirstName = i.FirstName, LastName = i.LastName });
       }
 
-      [Command] /* only for Knockout client */
+      [Command] /* This attribute is only for Knockout client */
       public void Add(string fullName)
       {
          var names = fullName.Split(new char[] { ' ' }, 2);
@@ -76,14 +76,14 @@ namespace DotNetify.DevApp
          });
       }
 
-      [Command] /* only for Knockout client */
-      public void Update(EmployeeInfo employeeInfo)
+      [Command] /* This attribute is only for Knockout client */
+      public void Update(int Id, string FirstName, string LastName)
       {
-         var employee = _repository.Get(employeeInfo.Id);
+         var employee = _repository.Get(Id);
          if (employee != null)
          {
-            employee.FirstName = employeeInfo.FirstName ?? employee.FirstName;
-            employee.LastName = employeeInfo.LastName ?? employee.LastName;
+            employee.FirstName = FirstName ?? employee.FirstName;
+            employee.LastName = LastName ?? employee.LastName;
             _repository.Update(employee);
 
             this.UpdateList(nameof(Employees), new EmployeeInfo
@@ -95,7 +95,7 @@ namespace DotNetify.DevApp
          }
       }
 
-      [Command] /* only for Knockout client */
+      [Command] /* This attribute is only for Knockout client */
       public void Remove(int id)
       {
          _repository.Remove(id);
