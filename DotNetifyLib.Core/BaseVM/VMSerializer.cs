@@ -178,16 +178,27 @@ namespace DotNetify
       /// <returns>True if the method was invoked.</returns>
       private bool InvokeIfMethod(object viewModel, string name, string newValue)
       {
-         var methodInfo = viewModel.GetType().GetTypeInfo().GetMethods().FirstOrDefault(x => x.Name == name && x.GetParameters().Length <= 1);
+         var methodInfo = viewModel.GetType().GetTypeInfo().GetMethods().FirstOrDefault(x => x.Name == name);
          if (methodInfo != null)
          {
             object result = null;
-            if (methodInfo.GetParameters().Length == 0)
+            int paramLength = methodInfo.GetParameters().Length;
+
+            if (paramLength == 0)
                result = methodInfo.Invoke(viewModel, new object[] { });
-            else
+            else if (paramLength == 1)
             {
                var arg = Command.ConvertParameter(newValue, methodInfo.GetParameters().First().ParameterType);
                result = methodInfo.Invoke(viewModel, new object[] { arg });
+            }
+            else
+            {
+               var newValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(newValue);
+               if (newValues?.Count > 0)
+               {
+                  var args = methodInfo.GetParameters().Select(p => Command.ConvertParameter(newValues.TryGetValue(p.Name, out object y) ? y : null, p.ParameterType));
+                  result = methodInfo.Invoke(viewModel, args.ToArray());
+               }
             }
 
             if (result is Task && viewModel is BaseVM)
