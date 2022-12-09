@@ -86,7 +86,8 @@ export class DotnetifyVue implements IDotnetifyVue, IDotnetifyImpl {
       },
       setState(state: any) {
         Object.keys(state).forEach(key => {
-          const value = state[key];
+          let value = state[key];
+          if (Array.isArray(value)) value = [...value];
 
           // If 'useState' option is enabled, store server state in the Vue instance's 'state' property.
           const vm = self.viewModels[iVMId];
