@@ -273,9 +273,6 @@ export const LiveChartCss = styled.div`
   > div:last-child {
     display: inline-block;
     width: 30%;
-    > *:last-child {
-      margin-top: 2rem;
-    }
   }
   .example-root > * {
     display: flex;
@@ -289,9 +286,6 @@ export const LiveChartCss = styled.div`
     > div:last-child {
       display: inline-block;
       width: 30%;
-      > *:last-child {
-        margin-top: 2rem;
-      }
     }
   }
   @media (max-width: 1170px) {

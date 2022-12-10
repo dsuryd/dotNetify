@@ -1,8 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useConnect } from "dotnetify";
 import { LiveChartCss } from "../components/css";
-import { Line, Bar, Doughnut } from "react-chartjs-2";
-import "chartjs-plugin-streaming";
 
 export const LiveChart = () => {
   const { state } = useConnect("LiveChartVM", { Waveform: [], Bar: [], Pie: [] });
@@ -10,7 +8,7 @@ export const LiveChart = () => {
   return (
     <LiveChartCss>
       <div>
-        <LineChart data={state.Waveform} />
+        <LineChart data={[...state.Waveform]} />
       </div>
       <div>
         <PieChart data={state.Pie} />
@@ -37,25 +35,39 @@ export const LineChart = ({ data }) => {
   const chartOptions = useRef({
     responsive: true,
     scales: {
-      xAxes: [{ type: "realtime", realtime: { delay: 2000 } }],
-      yAxes: [{ ticks: { suggestedMin: -1, suggestedMax: 1 } }]
+      x: { type: "realtime", realtime: { delay: 2000 } },
+      y: { ticks: { suggestedMin: -1, suggestedMax: 1 } }
     }
   });
 
-  if (data.length > 0) {
-    if (chartData.current.datasets[0].data.length === 0) {
-      const maxIdx = data.length - 1;
-      chartData.current.datasets[0].data = data.map((item, idx) => ({
-        x: Date.now() - (maxIdx - idx) * 1000,
-        y: item[1]
-      }));
-    } else {
-      const lastItem = data[data.length - 1];
-      chartData.current.datasets[0].data.push({ x: Date.now(), y: lastItem[1] });
+  useEffect(() => {
+    if (data.length > 0) {
+      if (chartData.current.datasets[0].data.length === 0) {
+        const maxIdx = data.length - 1;
+        chartData.current.datasets[0].data = data.map((item, idx) => ({
+          x: Date.now() - (maxIdx - idx) * 1000,
+          y: item[1]
+        }));
+      } else {
+        const lastItem = data[data.length - 1];
+        chartData.current.datasets[0].data = [...chartData.current.datasets[0].data, { x: Date.now(), y: lastItem[1] }];
+      }
+      chartRef.current.update();
     }
-  }
+  }, [data]);
 
-  return <Line data={chartData.current} options={chartOptions.current} />;
+  const elemRef = useRef();
+  const chartRef = useRef();
+
+  useLayoutEffect(() => {
+    chartRef.current = new Chart(elemRef.current.getContext("2d"), {
+      type: "line",
+      data: chartData.current,
+      options: chartOptions.current
+    });
+  }, []);
+
+  return <canvas ref={elemRef} />;
 };
 
 export const BarChart = ({ data }) => {
@@ -80,10 +92,20 @@ export const BarChart = ({ data }) => {
       }
     ]
   });
-  const chartOptions = useRef({ responsive: true, legend: { display: false } });
+  const chartOptions = useRef({ responsive: true, plugins: { legend: { display: false } } });
+  const elemRef = useRef();
+  const chartRef = useRef();
 
-  chartData.current.datasets[0].data = data;
-  return <Bar data={chartData.current} options={chartOptions.current} />;
+  useLayoutEffect(() => {
+    chartRef.current = new Chart(elemRef.current.getContext("2d"), { type: "bar", data: chartData.current, options: chartOptions.current });
+  }, []);
+
+  useEffect(() => {
+    chartData.current.datasets[0].data = [...data];
+    chartRef.current.update();
+  }, [data]);
+
+  return <canvas ref={elemRef} />;
 };
 
 export const PieChart = ({ data }) => {
@@ -99,10 +121,28 @@ export const PieChart = ({ data }) => {
       }
     ]
   });
-  const chartOptions = useRef({ responsive: true });
+  const chartOptions = useRef({ responsive: true, plugins: { legend: { position: "left" } } });
+  const elemRef = useRef();
+  const chartRef = useRef();
 
-  chartData.current.datasets[0].data = [...data];
-  return <Doughnut data={chartData.current} options={chartOptions.current} />;
+  useLayoutEffect(() => {
+    chartRef.current = new Chart(elemRef.current.getContext("2d"), {
+      type: "doughnut",
+      data: chartData.current,
+      options: chartOptions.current
+    });
+  }, []);
+
+  useEffect(() => {
+    chartData.current.datasets[0].data = [...data];
+    chartRef.current.update();
+  }, [data]);
+
+  return (
+    <div style={{ width: "70%" }}>
+      <canvas ref={elemRef} />
+    </div>
+  );
 };
 
 export default LiveChart;

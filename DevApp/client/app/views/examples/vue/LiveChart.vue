@@ -4,7 +4,7 @@
       <canvas v-vmOn="{ Waveform: updateLineChart }"></canvas>
     </div>
     <div>
-      <canvas v-vmOn="{ Pie: updatePieChart }"></canvas>
+      <div style="width: 70%;"><canvas v-vmOn="{ Pie: updatePieChart }"></canvas></div>
       <canvas v-vmOn="{ Bar: updateBarChart }"></canvas>
     </div>
   </section>
@@ -12,7 +12,6 @@
 
 <script>
 import dotnetify from "dotnetify/vue";
-import "chartjs-plugin-streaming";
 
 export default {
   name: "LiveChart",
@@ -47,20 +46,16 @@ export default {
         },
         options: {
           scales: {
-            xAxes: [
-              {
-                type: "realtime",
-                realtime: { delay: 2000 }
+            x: {
+              type: "realtime",
+              realtime: { delay: 2000 }
+            },
+            y: {
+              ticks: {
+                suggestedMin: -1,
+                suggestedMax: 1
               }
-            ],
-            yAxes: [
-              {
-                ticks: {
-                  suggestedMin: -1,
-                  suggestedMax: 1
-                }
-              }
-            ]
+            }
           }
         }
       };
@@ -114,7 +109,8 @@ export default {
           ]
         },
         options: {
-          responsive: true
+          responsive: true,
+          plugins: { legend: { position: "left" } }
         }
       };
       return new Chart(elem.getContext("2d"), chartData);
