@@ -42,15 +42,17 @@ export default class Scope extends React.Component<IScopeProps> {
   };
 
   scoped(vmId: string) {
-    let scope = this.context.scoped
-      ? this.context.scoped(this.props.vm)
-      : this.props.vm;
+    //@ts-ignore
+    const scoped = this.context.scoped;
+    let scope = scoped ? scoped(this.props.vm) : this.props.vm;
     return scope ? scope + "." + vmId : vmId;
   }
 
   scopedOptions(options: IConnectOptions) {
+    //@ts-ignore
     let scopedOptions = this.context.scoped
-      ? this.context.scopedOptions(this.props.options)
+      ? //@ts-ignore
+        this.context.scopedOptions(this.props.options)
       : this.props.options;
     return scopedOptions ? { ...scopedOptions, ...options } : options;
   }
@@ -64,11 +66,7 @@ export default class Scope extends React.Component<IScopeProps> {
       connect: (vmId, component, options) => {
         component.vmId = _this.scoped(vmId);
         component.options = _this.scopedOptions(options);
-        component.vm = dotnetify.react.connect(
-          component.vmId,
-          component,
-          component.options
-        );
+        component.vm = dotnetify.react.connect(component.vmId, component, component.options);
         component.dispatch = state => component.vm.$dispatch(state);
 
         component.dispatchState = state => {

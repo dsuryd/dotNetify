@@ -155,6 +155,7 @@ export interface IRouteLinkProps {
   route: RouteType;
   style?: React.CSSProperties;
   className?: string;
+  children?: React.ReactNode;
   onClick?: (e: React.MouseEvent) => boolean;
 }
 
@@ -169,6 +170,7 @@ export class RouteTarget extends React.Component<IRouteTargetProps> {}
 export interface IScopeProps {
   vm: IDotnetifyVM;
   options?: IConnectOptions;
+  children?: React.ReactNode;
 }
 
 export class Scope extends React.Component<IScopeProps> {}
