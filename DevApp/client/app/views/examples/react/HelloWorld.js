@@ -3,8 +3,13 @@ import { useConnect } from "dotnetify";
 import TextBox from "../components/TextBox";
 import { HelloWorldCss } from "../components/css";
 
+const initialState = {
+  FirstName: "",
+  LastName: ""
+};
+
 const HelloWorld = () => {
-  const { vm, state, setState } = useConnect("HelloWorldVM");
+  const { vm, state, setState } = useConnect("HelloWorldVM", initialState);
 
   return (
     <HelloWorldCss>
