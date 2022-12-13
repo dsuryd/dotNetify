@@ -13,8 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import dotnetify from "./dotnetify-react";
 import DotnetifyVMRouter from "../core/dotnetify-vm-router";
 import DotnetifyRouter from "../core/dotnetify-router";
 import DotnetifyVM from "../core/dotnetify-vm";
@@ -25,6 +24,8 @@ import { RoutingStateType, RoutingTemplateType } from "../_typings";
 const _window = window || global || <any>{};
 
 export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
+  unmountTracker = [];
+
   get hasRoutingState(): boolean {
     const state = this.vm.State();
     return state && state.hasOwnProperty("RoutingState");
@@ -49,13 +50,7 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
   }
 
   // Loads a view into a target element.
-  loadView(
-    iTargetSelector: string,
-    iViewUrl: any,
-    iJsModuleUrl?: string,
-    iVmArg?: any,
-    iCallbackFn?: Function
-  ) {
+  loadView(iTargetSelector: string, iViewUrl: any, iJsModuleUrl?: string, iVmArg?: any, iCallbackFn?: Function) {
     const vm = this.vm;
     let reactProps: any;
 
@@ -63,19 +58,12 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
     // to build the absolute route path, and view model argument if provided.
     if (this.hasRoutingState) {
       if (this.RoutingState === null) {
-        console.error(
-          "router> the RoutingState prop of '" +
-            vm.$vmId +
-            "' was not initialized."
-        );
+        console.error("router> the RoutingState prop of '" + vm.$vmId + "' was not initialized.");
         return;
       }
 
       let root = this.VMRoot;
-      root =
-        root != null
-          ? "/" + utils.trim(this.RoutingState.Root) + "/" + utils.trim(root)
-          : this.RoutingState.Root;
+      root = root != null ? "/" + utils.trim(this.RoutingState.Root) + "/" + utils.trim(root) : this.RoutingState.Root;
       reactProps = { vmRoot: root, vmArg: iVmArg };
     }
 
@@ -83,40 +71,18 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
     iViewUrl = this.router.overrideUrl(iViewUrl, iTargetSelector);
     iJsModuleUrl = this.router.overrideUrl(iJsModuleUrl, iTargetSelector);
 
-    if (utils.endsWith(iViewUrl, "html"))
-      this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
+    if (utils.endsWith(iViewUrl, "html")) this.loadHtmlView(iTargetSelector, iViewUrl, iJsModuleUrl, iCallbackFn);
     else {
       let component = iViewUrl;
-      if (typeof iViewUrl === "string" && _window.hasOwnProperty(iViewUrl))
-        component = _window[iViewUrl];
+      if (typeof iViewUrl === "string" && _window.hasOwnProperty(iViewUrl)) component = _window[iViewUrl];
 
-      if (component instanceof HTMLElement)
-        this.loadHtmlElementView(
-          iTargetSelector,
-          component,
-          iJsModuleUrl,
-          reactProps,
-          iCallbackFn
-        );
-      else
-        this.loadReactView(
-          iTargetSelector,
-          component,
-          iJsModuleUrl,
-          reactProps,
-          iCallbackFn
-        );
+      if (component instanceof HTMLElement) this.loadHtmlElementView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
+      else this.loadReactView(iTargetSelector, component, iJsModuleUrl, reactProps, iCallbackFn);
     }
   }
 
   // Loads a React view.
-  loadReactView(
-    iTargetSelector: string,
-    iComponent: any,
-    iJsModuleUrl?: string,
-    iReactProps?: any,
-    iCallbackFn?: Function
-  ) {
+  loadReactView(iTargetSelector: string, iComponent: any, iJsModuleUrl?: string, iReactProps?: any, iCallbackFn?: Function) {
     return new Promise((resolve, reject) => {
       const vm = this.vm;
       const vmId = this.vm ? this.vm.$vmId : "";
@@ -124,11 +90,9 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
       const mountViewFunc = () => {
         let reactElement = null;
         try {
-          reactElement = React.createElement(iComponent, iReactProps);
+          reactElement = dotnetify.react.router.createElement(iComponent, iReactProps);
         } catch (e) {
-          console.error(
-            `[${vmId}] failed to load view '${iComponent}' because it's not a valid React element.`
-          );
+          console.error(`[${vmId}] failed to load view '${iComponent}' because it's not a valid React element.`);
           reject();
           return;
         }
@@ -136,19 +100,21 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
         this.unmountView(iTargetSelector);
 
         try {
-          const args = [reactElement, document.querySelector(iTargetSelector)];
-          if (vm.$dotnetify["ssrEnabled"] === true) ReactDOM.hydrate(...args);
-          else ReactDOM.render(...args);
+          const container = document.querySelector(iTargetSelector);
+          if (vm.$dotnetify["ssrEnabled"] === true) {
+            dotnetify.react.router.hydrate(reactElement, container);
+          } else {
+            const unmount = dotnetify.react.router.render(reactElement, container);
+            if (typeof unmount === "function") this.unmountTracker.push({ selector: iTargetSelector, unmount });
+          }
         } catch (e) {
           console.error(e);
         }
-        if (typeof iCallbackFn === "function")
-          iCallbackFn.call(vm, reactElement);
+        if (typeof iCallbackFn === "function") iCallbackFn.call(vm, reactElement);
         resolve(reactElement);
       };
 
-      if (iJsModuleUrl == null || this.vm.$dotnetify["ssr"] === true)
-        mountViewFunc();
+      if (iJsModuleUrl == null || this.vm.$dotnetify["ssr"] === true) mountViewFunc();
       else {
         // Load all javascripts first. Multiple files can be specified with comma delimiter.
         var getScripts = iJsModuleUrl.split(",").map(i => $.getScript(i));
@@ -160,7 +126,11 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
   // Unmount a React view if there's one on the target selector.
   unmountView(iTargetSelector: string) {
     try {
-      ReactDOM.unmountComponentAtNode(document.querySelector(iTargetSelector));
+      const unmount = this.unmountTracker.find(x => x.selector === iTargetSelector)?.unmount;
+      if (typeof unmount === "function") {
+        unmount();
+        this.unmountTracker = this.unmountTracker.filter(x => x.selector !== iTargetSelector);
+      }
     } catch (e) {
       console.warn(e);
     }

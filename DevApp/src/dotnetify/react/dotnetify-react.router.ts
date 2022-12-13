@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import dotnetify from "./dotnetify-react";
 import DotnetifyRouter from "../core/dotnetify-router";
 import DotnetifyReactVMRouter from "./dotnetify-react.vm-router";
@@ -20,6 +22,14 @@ import DotnetifyVM from "../core/dotnetify-vm";
 
 // Add plugin functions.
 dotnetify.react.router = new DotnetifyRouter(dotnetify.debug);
+
+// Abstract the React APIs.
+dotnetify.react.router.createElement = (component: any, props: any) => React.createElement(component, props);
+dotnetify.react.router.hydrate = (component: React.ReactElement, container: any) => ReactDOM.hydrate(component, container);
+dotnetify.react.router.render = (component: React.ReactElement, container: any) => {
+  ReactDOM.render(component, container);
+  return () => ReactDOM.unmountComponentAtNode(container);
+};
 
 // Inject a view model with functions.
 dotnetify.react.router.$inject = function (iVM: DotnetifyVM) {
@@ -40,19 +50,8 @@ dotnetify.react.router.$inject = function (iVM: DotnetifyVM) {
 };
 
 // Provide function to load a view.
-dotnetify.react.router.$mount = function (
-  iTargetSelector: string,
-  iComponent: any,
-  iProps?: any,
-  iCallbackFn?: Function
-) {
-  return DotnetifyReactVMRouter.prototype.loadReactView(
-    iTargetSelector,
-    iComponent,
-    null,
-    iProps,
-    iCallbackFn
-  );
+dotnetify.react.router.$mount = function (iTargetSelector: string, iComponent: any, iProps?: any, iCallbackFn?: Function) {
+  return DotnetifyReactVMRouter.prototype.loadReactView(iTargetSelector, iComponent, null, iProps, iCallbackFn);
 };
 
 // Register the plugin to dotNetify.
