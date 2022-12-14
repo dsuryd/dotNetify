@@ -35,6 +35,7 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
   _socket: WebSocket = null;
   _vmArgs = {};
   _reconnectCount = 0;
+  _reconnectTimeout = null;
   _connectionState = 0;
   _disconnectedHandler = () => {};
   _stateChangedHandler = (state: string) => {};
@@ -63,15 +64,16 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
         this._socket = new WebSocket(this.url);
 
         this._socket.addEventListener("open", _ => {
-          doneHandler();
           this._changeState(1);
+          this._cancelReconnect();
           this.connectedEvent.emit();
+          doneHandler();
         });
 
         this._socket.addEventListener("error", event => {
-          failHandler({ type: "DotNetifyHubException", message: "websocket error attempting to connect to " + this.url });
           this._onDisconnected();
           this.connectionFailedEvent.emit();
+          failHandler({ type: "DotNetifyHubException", message: "websocket error attempting to connect to " + this.url });
         });
 
         this._socket.addEventListener("close", event => {
@@ -80,7 +82,12 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
         });
 
         this._socket.addEventListener("message", event => {
-          console.log(event);
+          try {
+            const message: any = JSON.parse(event.data);
+            if (message.type === "Response_VM" && message.VMId) this.responseVM(message.VMId, message.VMData);
+          } catch (e) {
+            if (dotnetify.debug) console.log("DotNetifyHub: not a JSON string", event.data);
+          }
         });
       } catch (e) {
         console.error(e);
@@ -103,7 +110,7 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
 
       this._reconnectCount++;
 
-      setTimeout(
+      this._reconnectTimeout = setTimeout(
         function () {
           this._changeState(2);
           this.reconnectedEvent.emit();
@@ -111,6 +118,13 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
         delay * 1000
       );
     } else this._changeState(99);
+  }
+
+  _cancelReconnect() {
+    if (this._reconnectTimeout) {
+      clearTimeout(this._reconnectTimeout);
+      this._reconnectTimeout = 0;
+    }
   }
 
   _changeState(iNewState: number) {
@@ -123,6 +137,8 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
       4: "disconnected",
       99: "terminated"
     };
+
+    this.isConnected = iNewState === 1;
     if (iNewState == 1) this._reconnectCount = 0;
 
     this._stateChangedHandler(stateText[iNewState]);
@@ -138,46 +154,33 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
   }
 
   requestVM(iVMId: string, iVMArgs: any) {
-    // const vmArgs = iVMArgs || {};
-    // const vmArgQuery = vmArgs.$vmArg ? "?vmarg=" + JSON.stringify(vmArgs.$vmArg) : "";
-    // const headers = vmArgs.$headers || {};
-    // this._vmArgs[iVMId] = vmArgs;
-    // const url = this.url + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`;
-    // fetch("GET", url, null, request => {
-    //   Object.keys(headers).forEach(key => request.setRequestHeader(key, headers[key]));
-    //   if (typeof this.onRequest == "function") this.onRequest(url, request);
-    // })
-    //   .then(response => {
-    //     if (!response) response = "{}";
-    //     this.responseEvent.emit(iVMId, response);
-    //   })
-    //   .catch(request => console.error(`[${iVMId}] Request failed`, request));
+    const data = {
+      type: "Request_VM",
+      vmId: iVMId,
+      vmArgs: iVMArgs
+    };
+    this._socket.send(JSON.stringify(data));
   }
 
   updateVM(iVMId: string, iValue: any) {
-    // const vmArgs = this._vmArgs[iVMId] || {};
-    // const vmArgQuery = vmArgs.$vmArg ? "?vmarg=" + JSON.stringify(vmArgs.$vmArg) : "";
-    // const headers = vmArgs.$headers || {};
-    // const payload = typeof iValue == "object" ? JSON.stringify(iValue) : iValue;
-    // const url = this.url + `/api/dotnetify/vm/${iVMId}${vmArgQuery}`;
-    // fetch("POST", url, payload, request => {
-    //   request.setRequestHeader("Content-Type", "application/json");
-    //   Object.keys(headers).forEach(key => request.setRequestHeader(key, headers[key]));
-    //   if (typeof this.onRequest == "function") this.onRequest(url, request, payload);
-    // })
-    //   .then(response => {
-    //     if (!response) response = "{}";
-    //     this.responseEvent.emit(iVMId, response);
-    //   })
-    //   .catch(request => console.error(`[${iVMId}] Update failed`, request));
+    const data = {
+      type: "Update_VM",
+      vmId: iVMId,
+      value: iValue
+    };
+    this._socket.send(JSON.stringify(data));
   }
 
   disposeVM(iVMId: string) {
-    // delete this._vmArgs[iVMId];
-    // const url = this.url + `/api/dotnetify/vm/${iVMId}`;
-    // fetch("DELETE", url, null, request => {
-    //   if (typeof this.onRequest == "function") this.onRequest(url, request);
-    // }).catch(request => console.error(`[${iVMId}] Dispose failed`, request));
+    const data = {
+      type: "Dispose_VM",
+      vmId: iVMId
+    };
+    this._socket.send(JSON.stringify(data));
+  }
+
+  responseVM(iVMId: string, iVMData: any) {
+    this.responseEvent.emit(iVMId, iVMData);
   }
 }
 
