@@ -17,6 +17,7 @@ limitations under the License.
 import dotnetifyHub, { dotnetifyHubFactory } from "./dotnetify-hub";
 import localHub, { hasLocalVM } from "./dotnetify-hub-local";
 import webApiHub, { createWebApiHub } from "./dotnetify-hub-webapi";
+import { createWebSocketHub } from "./dotnetify-hub-websocket";
 import DotnetifyVM from "./dotnetify-vm";
 import {
   IDotnetify,
@@ -104,6 +105,11 @@ export class Dotnetify implements IDotnetify {
     return createWebApiHub(iBaseUrl, iRequestHandler);
   }
 
+  // Creates a WebSocket hub client.
+  createWebSocketHub(iUrl: string): IDotnetifyHub {
+    return createWebSocketHub(iUrl);
+  }
+
   // Configures hub connection to SignalR hub server.
   initHub(iHub?: IDotnetifyHub, iHubPath?: string, iHubServerUrl?: string, iHubLib?: any) {
     const hub = iHub || this.hub;
@@ -154,7 +160,7 @@ export class Dotnetify implements IDotnetify {
   }
 
   handleConnectionStateChanged(iState: string, iException: ExceptionType, iHub: IDotnetifyHub) {
-    if (this.debug) console.log("SignalR: " + (iException ? iException.message : iState));
+    if (this.debug) console.log("DotNetifyHub: " + (iException ? iException.message : iState));
     if (typeof this.connectionStateHandler === "function") this.connectionStateHandler(iState, iException, iHub);
     else if (iException) console.error(iException);
   }
