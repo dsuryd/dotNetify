@@ -36,6 +36,9 @@ export interface IDotnetify {
   // Creates a Web API hub client.
   createWebApiHub: (iBaseUrl: string, iRequestHandler: RequestHandlerType) => IDotnetifyHub;
 
+  // Creates a WebSocket hub client.
+  createWebSocketHub: (iUrl: string) => IDotnetifyHub;
+
   // Active view models.
   getViewModels(): IDotnetifyVM[];
 }
@@ -84,6 +87,7 @@ export interface IDotnetifyHub {
   startHub: (hubOptions: HubOptionsType, doneHandler: () => void, failHandler: (ex: any) => void, iForceRestart: boolean) => void;
 
   stateChanged: (handler: (state: string) => void) => void;
+  disconnected: (handler: () => void) => void;
 
   requestVM: (vmId: string, payload: RequestPayloadType) => void;
   updateVM: (vmId: string, payload: any) => void;

@@ -42,6 +42,7 @@ export class DotNetifyHubLocal implements IDotnetifyHub {
 
   init() {}
   stateChanged() {}
+  disconnected() {}
 
   startHub() {
     this.isConnected = true;
