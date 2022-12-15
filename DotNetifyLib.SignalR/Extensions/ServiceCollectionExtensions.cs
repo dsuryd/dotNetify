@@ -17,11 +17,11 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using DotNetify.Client;
 using DotNetify.Forwarding;
 using DotNetify.Security;
 using DotNetify.WebApi;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetify
 {
@@ -78,7 +78,7 @@ namespace DotNetify
          services.AddDotNetifyCore()
             // Add web API support.
             .AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
-         services.AddTransient<WebApiVMControllerFactory>();
+         services.AddSingleton<IWebApiVMControllerFactory, WebApiVMControllerFactory>();
          return services;
       }
 

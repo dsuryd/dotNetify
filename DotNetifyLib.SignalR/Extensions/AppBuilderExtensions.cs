@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using DotNetify.Forwarding;
 using DotNetify.Routing;
 using DotNetify.Security;
+using DotNetify.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,7 +75,12 @@ namespace DotNetify
 
          // Sets how long to keep a view model controller in memory after it hasn't been accessed for a while.
          if (dotNetifyConfig.VMControllerCacheExpiration.HasValue)
+         {
             vmControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
+
+            var webApiVMControllerFactory = provider.GetService<IWebApiVMControllerFactory>();
+            webApiVMControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
+         }
 
          // Add middleware to extract headers from incoming requests.
          if (!_middlewareTypes.Exists(t => t.Item1 == typeof(ExtractHeadersMiddleware)))
