@@ -93,7 +93,7 @@ namespace UnitTests
          var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
-         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var vmControllerFactory = new WebApiVMControllerFactory(_memoryCache, new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
@@ -120,7 +120,7 @@ namespace UnitTests
          var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
-         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var vmControllerFactory = new WebApiVMControllerFactory(_memoryCache, new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
@@ -158,7 +158,7 @@ namespace UnitTests
          var vmId = nameof(BasicVM);
          VMController.Register<BasicVM>();
 
-         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var vmControllerFactory = new WebApiVMControllerFactory(_memoryCache, new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
@@ -189,7 +189,7 @@ namespace UnitTests
 
          _middlewareFactories.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(typeof(CustomMiddleware), () => new CustomMiddleware()));
 
-         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var vmControllerFactory = new WebApiVMControllerFactory(_memoryCache, new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
@@ -218,7 +218,7 @@ namespace UnitTests
 
          _middlewareFactories.Add(Tuple.Create<Type, Func<IMiddlewarePipeline>>(typeof(CustomMiddleware), () => new CustomMiddleware()));
 
-         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var vmControllerFactory = new WebApiVMControllerFactory(_memoryCache, new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
@@ -248,7 +248,7 @@ namespace UnitTests
          var vmId = nameof(ThrowExceptionVM);
          VMController.Register<ThrowExceptionVM>();
 
-         var vmControllerFactory = new WebApiVMControllerFactory(new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
+         var vmControllerFactory = new WebApiVMControllerFactory(_memoryCache, new VMFactory(_memoryCache, new VMTypesAccessor()), new ServiceScopeFactory());
          var serviceProvider = new HubServiceProvider();
          var principalAccessor = new HubInfoAccessor();
          var hubPipeline = new HubPipeline(_middlewareFactories, _vmFilterFactories);
