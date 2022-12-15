@@ -65,7 +65,6 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
 
         this._socket.addEventListener("open", _ => {
           this._changeState(1);
-          this._cancelReconnect();
           this.connectedEvent.emit();
           doneHandler();
         });
@@ -83,10 +82,13 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
 
         this._socket.addEventListener("message", event => {
           try {
-            const message: any = JSON.parse(event.data);
-            if (message.type === "Response_VM" && message.VMId) this.responseVM(message.VMId, message.VMData);
+            if (event.data) {
+              if (dotnetify.debug) console.debug("ws message:", event.data);
+              const { callType, vmId, data } = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+              if (callType === "response_vm" && vmId && data) this.responseVM(vmId, data);
+            }
           } catch (e) {
-            if (dotnetify.debug) console.log("DotNetifyHub: not a JSON string", event.data);
+            if (dotnetify.debug) console.log("DotNetifyHub: not a valid JSON", event.data);
           }
         });
       } catch (e) {
@@ -112,19 +114,14 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
 
       this._reconnectTimeout = setTimeout(
         function () {
-          this._changeState(2);
-          this.reconnectedEvent.emit();
+          if (!this.isConnected) {
+            this._changeState(2);
+            this.reconnectedEvent.emit();
+          }
         }.bind(this),
         delay * 1000
       );
     } else this._changeState(99);
-  }
-
-  _cancelReconnect() {
-    if (this._reconnectTimeout) {
-      clearTimeout(this._reconnectTimeout);
-      this._reconnectTimeout = 0;
-    }
   }
 
   _changeState(iNewState: number) {
@@ -155,25 +152,25 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
 
   requestVM(iVMId: string, iVMArgs: any) {
     const data = {
-      type: "Request_VM",
+      callType: "request_vm",
       vmId: iVMId,
-      vmArgs: iVMArgs
+      vmArgs: JSON.stringify(iVMArgs)
     };
     this._socket.send(JSON.stringify(data));
   }
 
   updateVM(iVMId: string, iValue: any) {
     const data = {
-      type: "Update_VM",
+      callType: "update_vm",
       vmId: iVMId,
-      value: iValue
+      value: JSON.stringify(iValue)
     };
     this._socket.send(JSON.stringify(data));
   }
 
   disposeVM(iVMId: string) {
     const data = {
-      type: "Dispose_VM",
+      callType: "dispose_vm",
       vmId: iVMId
     };
     this._socket.send(JSON.stringify(data));
