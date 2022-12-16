@@ -17,6 +17,7 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -127,7 +128,7 @@ namespace DotNetify.WebApi
          var response = new IntegrationResponse { VMId = vmId, Data = data };
 
          if (_httpClient != null)
-            _ = _httpClient.PostAsync($"{connectionId}", new StringContent(JsonSerializer.Serialize(response, _jsonSerializerOptions)));
+            _ = _httpClient.PostAsync($"{connectionId}", new StringContent(JsonSerializer.Serialize(response, _jsonSerializerOptions), Encoding.UTF8, "application/json"));
          else
             throw new Exception("Missing HttpClient. Include 'services.AddHttpClient<DotNetifyWebApi>()' in the startup.");
 
