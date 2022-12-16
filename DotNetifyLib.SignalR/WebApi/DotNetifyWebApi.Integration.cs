@@ -16,9 +16,6 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetify.Security;
@@ -29,14 +26,6 @@ namespace DotNetify.WebApi
 {
    public partial class DotNetifyWebApi
    {
-      private readonly HttpClient _httpClient;
-
-      private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-      {
-         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-      };
-
       public class IntegrationPayload
       {
          public string CallType { get; set; }
@@ -60,15 +49,6 @@ namespace DotNetify.WebApi
       }
 
       /// <summary>
-      /// Constructor.
-      /// </summary>
-      /// <param name="httpClient">HTTP client for integration callback.</param>
-      public DotNetifyWebApi(HttpClient httpClient)
-      {
-         _httpClient = httpClient;
-      }
-
-      /// <summary>
       ///  This method is intended for integrating dotNetify with non-SignalR websocket server such as AWS Websocket API Gateway.
       ///  In this use case, clients make connections to the websocket server, and it passes the messages to the dotNetify server through HTTP calls.
       /// </summary>
@@ -85,7 +65,8 @@ namespace DotNetify.WebApi
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IDotNetifyHubResponseManager hubResponseManager)
+         [FromServices] IWebApiResponseManager responseManager
+         )
       {
          if (string.IsNullOrWhiteSpace(request.ConnectionId))
             throw new ArgumentNullException(nameof(request.ConnectionId));
@@ -98,41 +79,23 @@ namespace DotNetify.WebApi
 
             if (request.Payload.CallType.Equals("request_vm", StringComparison.OrdinalIgnoreCase))
             {
-               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, IntegrationResponseVMCallback, nameof(IDotNetifyHubMethod.Request_VM), vmId, request.Payload.VMArgs);
+               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Request_VM), vmId, request.Payload.VMArgs);
                await hub.RequestVMAsync(vmId, request.Payload.VMArgs);
             }
             else if (request.Payload.CallType.Equals("update_vm", StringComparison.OrdinalIgnoreCase))
             {
                var vmData = JsonSerializer.Deserialize<Dictionary<string, object>>(request.Payload.Value);
-               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, IntegrationResponseVMCallback, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
+               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
                await hub.UpdateVMAsync(vmId, vmData);
             }
             else if (request.Payload.CallType.Equals("dispose_vm", StringComparison.OrdinalIgnoreCase))
             {
-               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, IntegrationResponseVMCallback, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
+               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
                await hub.DisposeVMAsync(vmId);
             }
             else
                throw new InvalidOperationException("Type not recognized: " + request.Payload.CallType);
          }
-      }
-
-      /// <summary>
-      /// Response delegate to pass to the VMControllerFactory instance.
-      /// </summary>
-      /// <param name="connectionId">Identifies the connection.</param>
-      /// <param name="vmId">Identifies the view model.</param>
-      /// <param name="data">Response data.</param>
-      private Task IntegrationResponseVMCallback(string connectionId, string vmId, string data)
-      {
-         var response = new IntegrationResponse { VMId = vmId, Data = data };
-
-         if (_httpClient != null)
-            _ = _httpClient.PostAsync($"{connectionId}", new StringContent(JsonSerializer.Serialize(response, _jsonSerializerOptions), Encoding.UTF8, "application/json"));
-         else
-            throw new Exception("Missing HttpClient. Include 'services.AddHttpClient<DotNetifyWebApi>()' in the startup.");
-
-         return Task.CompletedTask;
       }
    }
 }
