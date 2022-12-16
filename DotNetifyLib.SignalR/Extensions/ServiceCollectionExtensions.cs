@@ -17,6 +17,7 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using DotNetify.Client;
 using DotNetify.Forwarding;
 using DotNetify.Security;
@@ -79,6 +80,7 @@ namespace DotNetify
             // Add web API support.
             .AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
          services.AddSingleton<IWebApiVMControllerFactory, WebApiVMControllerFactory>();
+         services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
          return services;
       }
 
@@ -90,6 +92,11 @@ namespace DotNetify
          services.AddSingleton<IUIThreadDispatcher, DefaultUIThreadDispatcher>();
 
          return services;
+      }
+
+      public static IHttpClientBuilder AddDotNetifyHttpClient(this IServiceCollection services, Action<HttpClient> configure)
+      {
+         return services.AddHttpClient(nameof(DotNetifyWebApi), configure);
       }
    }
 }
