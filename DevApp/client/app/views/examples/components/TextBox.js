@@ -27,9 +27,9 @@ const TextBox = ({ value, label, type, placeholder, errorText, onChange, onUpdat
     [onUpdate]
   );
 
-  const handleKeydown = useCallback(event => {
+  const handleKeydown = event => {
     if (event.keyCode == 13) handleBlur(event);
-  }, []);
+  };
 
   return (
     <div>
