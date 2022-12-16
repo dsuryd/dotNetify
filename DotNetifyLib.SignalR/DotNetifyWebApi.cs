@@ -90,6 +90,13 @@ namespace DotNetify.WebApi
       }
 
       /// <summary>
+      /// Default constructor.
+      /// </summary>
+      public DotNetifyWebApi()
+      {
+      }
+
+      /// <summary>
       /// This method is called by browser clients to request view model data.
       /// </summary>
       /// <param name="vmId">Identifies the view model.</param>

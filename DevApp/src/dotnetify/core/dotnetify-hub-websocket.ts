@@ -69,7 +69,7 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
           doneHandler();
         });
 
-        this._socket.addEventListener("error", event => {
+        this._socket.addEventListener("error", _ => {
           this._onDisconnected();
           this.connectionFailedEvent.emit();
           failHandler({ type: "DotNetifyHubException", message: "websocket error attempting to connect to " + this.url });
@@ -82,7 +82,9 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
 
         this._socket.addEventListener("message", event => {
           try {
-            if (event.data) {
+            if (event.data == 404) {
+              console.error("DotNetify server is not responding");
+            } else if (event.data) {
               if (dotnetify.debug) console.debug("ws message:", event.data);
               const { callType, vmId, data } = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
               if (callType === "response_vm" && vmId && data) this.responseVM(vmId, data);
