@@ -16,7 +16,8 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetify.Security;
@@ -27,6 +28,14 @@ namespace DotNetify.WebApi
 {
    public partial class DotNetifyWebApi
    {
+      private readonly HttpClient _httpClient;
+
+      private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+      {
+         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+      };
+
       public class IntegrationPayload
       {
          public string CallType { get; set; }
@@ -50,6 +59,15 @@ namespace DotNetify.WebApi
       }
 
       /// <summary>
+      /// Constructor.
+      /// </summary>
+      /// <param name="httpClient">HTTP client for integration callback.</param>
+      public DotNetifyWebApi(HttpClient httpClient)
+      {
+         _httpClient = httpClient;
+      }
+
+      /// <summary>
       ///  This method is intended for integrating dotNetify with non-SignalR websocket server such as AWS Websocket API Gateway.
       ///  In this use case, clients make connections to the websocket server, and it passes the messages to the dotNetify server through HTTP calls.
       /// </summary>
@@ -60,7 +78,7 @@ namespace DotNetify.WebApi
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
       /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       [HttpPost()]
-      public async Task<object> IntegrationEndpoint(
+      public async Task IntegrationEndpoint(
          [FromBody] IntegrationRequest request,
          [FromServices] IWebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
@@ -81,24 +99,12 @@ namespace DotNetify.WebApi
             {
                var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, IntegrationResponseVMCallback, nameof(IDotNetifyHubMethod.Request_VM), vmId, request.Payload.VMArgs);
                await hub.RequestVMAsync(vmId, request.Payload.VMArgs);
-
-               return new IntegrationResponse
-               {
-                  VMId = vmId,
-                  Data = _responses.Where(x => x.VMId == vmId).LastOrDefault()?.Data
-               };
             }
             else if (request.Payload.CallType.Equals("update_vm", StringComparison.OrdinalIgnoreCase))
             {
                var vmData = JsonSerializer.Deserialize<Dictionary<string, object>>(request.Payload.Value);
                var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, IntegrationResponseVMCallback, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
                await hub.UpdateVMAsync(vmId, vmData);
-
-               return new IntegrationResponse
-               {
-                  VMId = vmId,
-                  Data = _responses.Where(x => x.VMId == vmId).LastOrDefault()?.Data
-               };
             }
             else if (request.Payload.CallType.Equals("dispose_vm", StringComparison.OrdinalIgnoreCase))
             {
@@ -108,8 +114,6 @@ namespace DotNetify.WebApi
             else
                throw new InvalidOperationException("Type not recognized: " + request.Payload.CallType);
          }
-
-         return string.Empty;
       }
 
       /// <summary>
@@ -120,7 +124,13 @@ namespace DotNetify.WebApi
       /// <param name="data">Response data.</param>
       private Task IntegrationResponseVMCallback(string connectionId, string vmId, string data)
       {
-         _responses.Add(new VMResponse { ConnectionId = connectionId, VMId = vmId, Data = data });
+         var response = new IntegrationResponse { VMId = vmId, Data = data };
+
+         if (_httpClient != null)
+            _ = _httpClient.PostAsync($"{connectionId}", new StringContent(JsonSerializer.Serialize(response, _jsonSerializerOptions)));
+         else
+            throw new Exception("Missing HttpClient. Include 'services.AddHttpClient<DotNetifyWebApi>()' in the startup.");
+
          return Task.CompletedTask;
       }
    }

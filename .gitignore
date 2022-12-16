@@ -5,6 +5,8 @@ DevApp/dist/dist/*.map
 Demo/**/wwwroot/dist
 blog-dev
 
+appsettings.development.json
+
 ### Code ###
 # Visual Studio Code - https://code.visualstudio.com/
 .settings/
