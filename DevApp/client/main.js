@@ -1,5 +1,5 @@
 import { createRoot, hydrateRoot } from "react-dom/client";
-import dotnetify from "dotnetify";
+import dotnetify, { createWebSocketHub } from "dotnetify";
 import App from "./app/views/App";
 import "./app/styles/app.css";
 import "./app/styles/prism.css";
@@ -8,6 +8,9 @@ import * as views from "./app/views";
 //enableSsr();
 
 dotnetify.debug = true;
+
+//dotnetify.hub = createWebSocketHub("wss://ovcgrr6x5g.execute-api.us-east-1.amazonaws.com/sandbox");
+dotnetify.hub = createWebSocketHub("ws://localhost:3000");
 
 // Override dotnetify functions that invoke older React APIs with React 18 APIs.
 dotnetify.react.router.render = (component, container) => {
@@ -28,9 +31,9 @@ dotnetify.hubOptions.connectionBuilder = builder => builder.withHubProtocol(prot
 Object.assign(window, { ...views });
 
 const container = document.getElementById("App");
-hydrateRoot(container, <App />);
+//hydrateRoot(container, <App />);
 
 // ** FOR DEBUGGING **
-//import HelloWorld from "./app/views/examples/react/HelloWorld";
-//createRoot(container).render(<HelloWorld />);
+import HelloWorld from "./app/views/examples/react/HelloWorld";
+createRoot(container).render(<HelloWorld />);
 // **
