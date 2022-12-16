@@ -1,4 +1,4 @@
-﻿#define AWS_INTEGRATION
+﻿//#define AWS_INTEGRATION
 
 using System.Text;
 using Amazon.Runtime;
@@ -42,7 +42,8 @@ services
   .AddTransient(_ => new AwsSignatureHandlerSettings(builder.Configuration["Aws:Region"], "execute-api", awsCredentials))
   .AddHttpClient<DotNetifyWebApi>(client => { client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]); })
   .AddHttpMessageHandler<AwsSignatureHandler>();
-
+#else
+services.AddHttpClient<DotNetifyWebApi>(client => { client.BaseAddress = new Uri("http://localhost:3010/"); });
 #endif
 
 var app = builder.Build();
