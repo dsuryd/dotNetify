@@ -15,7 +15,7 @@ const httpServerPort = 3010;
 
 const dotnetifyUrl = "http://localhost:5000/api/dotnetify/vm";
 
-const wsClients = [];
+let wsClients = [];
 
 const wss = new WebSocket.Server({ server: wsServer });
 wss.on("connection", ws => {
