@@ -8,7 +8,6 @@ using DotNetify;
 using DotNetify.DevApp;
 using DotNetify.Pulse;
 using DotNetify.Security;
-using DotNetify.WebApi;
 using Jering.Javascript.NodeJS;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.IdentityModel.Tokens;
@@ -40,10 +39,10 @@ var awsCredentials = new ImmutableCredentials(builder.Configuration["Aws:AccessK
 services
   .AddTransient<AwsSignatureHandler>()
   .AddTransient(_ => new AwsSignatureHandlerSettings(builder.Configuration["Aws:Region"], "execute-api", awsCredentials))
-  .AddHttpClient<DotNetifyWebApi>(client => { client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]); })
+  .AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]))
   .AddHttpMessageHandler<AwsSignatureHandler>();
 #else
-services.AddHttpClient<DotNetifyWebApi>(client => { client.BaseAddress = new Uri("http://localhost:3010/"); });
+services.AddDotNetifyHttpClient(client => client.BaseAddress = new Uri("http://localhost:3010/"));
 #endif
 
 var app = builder.Build();
