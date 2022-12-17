@@ -19,7 +19,7 @@ dotnetify.react.router.hydrate = (component, container) => hydrateRoot(container
 
 // ** Uncomment this to enable integration with 3rd party websocket server like AWS API gateway **
 //dotnetify.hub = createWebSocketHub("wss://ovcgrr6x5g.execute-api.us-east-1.amazonaws.com/sandbox");
-//dotnetify.hub = createWebSocketHub("ws://localhost:3000");
+dotnetify.hub = createWebSocketHub("ws://localhost:3000");
 
 // ** Uncomment this to switch SignalR protocol from JSON to MessagePack **
 /*
@@ -32,8 +32,8 @@ dotnetify.hubOptions.connectionBuilder = builder => builder.withHubProtocol(prot
 Object.assign(window, { ...views });
 
 const container = document.getElementById("App");
-hydrateRoot(container, <App />);
+//hydrateRoot(container, <App />);
 
 // ** FOR DEV TESTING ONLY **
-//import TestApp from "./app/views/examples/react/CompositeView";
-//createRoot(container).render(<TestApp />);
+import TestApp from "./app/views/examples/react/SecurePage";
+createRoot(container).render(<TestApp />);
