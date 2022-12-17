@@ -13,9 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import dotnetify from "..";
+import dotnetify from "./dotnetify";
 import { createEventEmitter } from "../libs/utils";
-import { HubOptionsType, IDotnetifyHub, RequestHandlerType } from "../_typings";
+import { HubOptionsType, IDotnetifyHub } from "../_typings";
 
 export class DotNetifyHubWebSocket implements IDotnetifyHub {
   url = "";
