@@ -99,11 +99,10 @@ const SecurePageView = ({ accessToken, onExpiredAccess }) => {
     { SecureCaption: "Not authenticated" },
     {
       headers: { Authorization: "Bearer " + accessToken },
-      exceptionHandler: ex => {}
+      exceptionHandler: exception => exception.name == "UnauthorizedAccessException" && onExpiredAccess()
     }
   );
 
-  const handleExpiredAccess = () => this.props.onExpiredAccess();
   return (
     <div className="card">
       <div className="card-header">
@@ -113,7 +112,7 @@ const SecurePageView = ({ accessToken, onExpiredAccess }) => {
         <p>
           <b>{state.SecureData}</b>
         </p>
-        <AdminSecurePageView accessToken={accessToken} onExpiredAccess={handleExpiredAccess} />
+        <AdminSecurePageView accessToken={accessToken} />
       </div>
     </div>
   );
