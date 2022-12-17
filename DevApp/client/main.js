@@ -35,5 +35,5 @@ const container = document.getElementById("App");
 //hydrateRoot(container, <App />);
 
 // ** FOR DEV TESTING ONLY **
-import TestApp from "./app/views/examples/react/HelloWorld";
+import TestApp from "./app/views/examples/react/CompositeView";
 createRoot(container).render(<TestApp />);
