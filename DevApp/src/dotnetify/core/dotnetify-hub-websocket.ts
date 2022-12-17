@@ -59,20 +59,30 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
   }
 
   startHub(_: HubOptionsType, doneHandler: () => void, failHandler: (ex: any) => void, iForceRestart: boolean) {
+    const done = () => {
+      doneHandler && doneHandler();
+      this.connectedEvent.emit();
+    };
+    const fail = (ex: any) => {
+      failHandler && failHandler(ex);
+      this.connectionFailedEvent.emit();
+      throw ex;
+    };
+
     if (this._socket == null || iForceRestart === true) {
       try {
         this._socket = new WebSocket(this.url);
 
+        if (dotnetify.debug) console.log("DotNetifyHub: connecting to " + this.url);
+
         this._socket.addEventListener("open", _ => {
           this._changeState(1);
-          this.connectedEvent.emit();
-          doneHandler();
+          done();
         });
 
         this._socket.addEventListener("error", _ => {
           this._onDisconnected();
-          this.connectionFailedEvent.emit();
-          failHandler({ type: "DotNetifyHubException", message: "websocket error attempting to connect to " + this.url });
+          fail({ type: "DotNetifyHubException", message: "websocket error attempting to connect to " + this.url });
         });
 
         this._socket.addEventListener("close", event => {
@@ -100,6 +110,8 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
         this.connectionFailedEvent.emit();
         this._onDisconnected();
       }
+    } else if (this.isConnected) {
+      Promise.resolve().then(() => done());
     }
   }
 
