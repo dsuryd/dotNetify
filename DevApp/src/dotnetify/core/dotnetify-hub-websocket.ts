@@ -91,23 +91,25 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
         });
 
         this._socket.addEventListener("message", event => {
-          try {
-            if (event.data == 404) {
-              console.error("DotNetify server is not responding");
-            } else if (event.data) {
-              if (dotnetify.debug) console.debug("ws message:", event.data);
-              const { callType, vmId, data } = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-              if (callType === "response_vm" && vmId && data) this.responseVM(vmId, data);
+          if (event.data == 404) {
+            console.error("DotNetify server is not responding");
+          } else if (event.data) {
+            if (dotnetify.debug) console.debug("ws message:", event.data);
+            let jsonData;
+            try {
+              jsonData = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+            } catch (e) {
+              if (dotnetify.debug) console.log("DotNetifyHub: not a valid JSON", event.data);
             }
-          } catch (e) {
-            if (dotnetify.debug) console.log("DotNetifyHub: not a valid JSON", event.data);
+            const { callType, vmId, data } = jsonData;
+            if (callType === "response_vm" && vmId && data) {
+              this.responseVM(vmId, data);
+            }
           }
         });
       } catch (e) {
         console.error(e);
-
-        failHandler(e);
-        this.connectionFailedEvent.emit();
+        fail(e);
         this._onDisconnected();
       }
     } else if (this.isConnected) {
