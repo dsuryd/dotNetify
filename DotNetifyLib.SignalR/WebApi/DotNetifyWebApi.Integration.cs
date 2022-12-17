@@ -96,6 +96,14 @@ namespace DotNetify.WebApi
             else
                throw new InvalidOperationException("Type not recognized: " + request.Payload.CallType);
          }
+         else
+         {
+            if (request.State.Equals("closed", StringComparison.OrdinalIgnoreCase))
+            {
+               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, null, null);
+               await hub.OnDisconnectedAsync(null);
+            }
+         }
       }
    }
 }
