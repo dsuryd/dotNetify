@@ -79,8 +79,9 @@ namespace DotNetify.WebApi
 
             if (request.Payload.CallType.Equals("request_vm", StringComparison.OrdinalIgnoreCase))
             {
+               var vmArgs = JsonSerializer.Deserialize<object>(request.Payload.VMArgs);
                var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Request_VM), vmId, request.Payload.VMArgs);
-               await hub.RequestVMAsync(vmId, request.Payload.VMArgs);
+               await hub.RequestVMAsync(vmId, vmArgs);
             }
             else if (request.Payload.CallType.Equals("update_vm", StringComparison.OrdinalIgnoreCase))
             {
