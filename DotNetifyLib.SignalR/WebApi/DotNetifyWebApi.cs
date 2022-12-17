@@ -70,11 +70,11 @@ namespace DotNetify.WebApi
          private readonly HttpContext _httpContext;
 
          public override string ConnectionId { get; }
-         public override string UserIdentifier => _httpContext.User?.Identity?.Name;
-         public override ClaimsPrincipal User => _httpContext.User;
-         public override IDictionary<object, object> Items => _httpContext.Items;
-         public override IFeatureCollection Features => _httpContext.Features;
-         public override CancellationToken ConnectionAborted => _httpContext.RequestAborted;
+         public override string UserIdentifier { get; }
+         public override ClaimsPrincipal User { get; }
+         public override IDictionary<object, object> Items { get; }
+         public override IFeatureCollection Features { get; }
+         public override CancellationToken ConnectionAborted { get; }
 
          public override void Abort() => _httpContext.Abort();
 
@@ -82,18 +82,16 @@ namespace DotNetify.WebApi
          {
             _httpContext = httpContext;
 
+            ConnectionId = httpContext.Connection.Id;
+            UserIdentifier = httpContext.User?.Identity?.Name;
+            User = httpContext.User;
+            Items = httpContext.Items.ToDictionary(x => x.Key, x => x.Value);
+            Features = httpContext.Features;
+            ConnectionAborted = httpContext.RequestAborted;
+
             if (httpContext.Items.TryGetValue(nameof(ConnectionId), out object connectionId) && connectionId is string)
                ConnectionId = (string) connectionId;
-            else
-               ConnectionId = _httpContext.Connection.Id;
          }
-      }
-
-      /// <summary>
-      /// Default constructor.
-      /// </summary>
-      public DotNetifyWebApi()
-      {
       }
 
       /// <summary>
