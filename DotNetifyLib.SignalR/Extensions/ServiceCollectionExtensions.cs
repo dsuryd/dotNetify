@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2017-2020 Dicky Suryadi
+Copyright 2017-2023 Dicky Suryadi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,18 +22,30 @@ using DotNetify.Client;
 using DotNetify.Forwarding;
 using DotNetify.Security;
 using DotNetify.WebApi;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetify
 {
    public static class ServiceCollectionExtensions
    {
+      public static IServiceCollection AddDotNetify(this IServiceCollection services)
+      {
+         return services
+            .AddDotNetifyCore()
+            .AddDotNetifyWebApi();
+      }
+
       public static IServiceCollection AddDotNetifyCore(this IServiceCollection services)
       {
          // Add memory cache.
          if (!services.Any(x => x.ServiceType == typeof(Microsoft.Extensions.Caching.Memory.IMemoryCache)))
             services.AddMemoryCache();
          services.AddSingleton<IMemoryCache, MemoryCacheAdapter>();
+
+         // Add distributed cache if not injected yet.
+         if (!services.Any(x => x.ServiceType == typeof(IDistributedCache)))
+            services.AddDistributedMemoryCache();
 
          // Add view model controller factory, to be injected to dotNetify's signalR hub.
          services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
@@ -74,13 +86,12 @@ namespace DotNetify
          return services;
       }
 
-      public static IServiceCollection AddDotNetify(this IServiceCollection services)
+      public static IServiceCollection AddDotNetifyWebApi(this IServiceCollection services)
       {
-         services.AddDotNetifyCore()
-            // Add web API support.
-            .AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
+         services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
          services.AddSingleton<IWebApiVMControllerFactory, WebApiVMControllerFactory>();
          services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
+         services.AddTransient<ConnectionGroup>();
          return services;
       }
 
