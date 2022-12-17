@@ -40,6 +40,8 @@ wss.on("connection", ws => {
 
   ws.on("close", () => {
     console.log(ws.id, "close");
+    const data = { connectionId: ws.id, state: "closed" };
+    axios.post(dotnetifyUrl, data).then(res => console.log("dotNetify", "closed", res.status));
     wsClients = wsClients.filter(x => x !== ws);
   });
 
@@ -58,8 +60,12 @@ httpServer.use(bodyParser.urlencoded({ extended: true }));
 httpServer.post("/:id", (req, res) => {
   console.log(req.params.id, "callback", req.body);
   const ws = wsClients.find(x => x.id === req.params.id);
-  if (ws) ws.send(JSON.stringify(req.body));
-  res.send("");
+  if (ws) {
+    ws.send(JSON.stringify(req.body));
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(404);
+  }
 });
 
 httpServer.listen(httpServerPort, () => {
