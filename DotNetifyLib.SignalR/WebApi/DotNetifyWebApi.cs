@@ -26,20 +26,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace DotNetify.WebApi
 {
+   public interface IWebApiVMControllerFactory : IVMControllerFactory
+   { }
+
    /// <summary>
    /// Provides a separate view model controller factory for web API so that each request has its own factory to
    /// set its own response callback but still share in-memory cache for the view models.
    /// </summary>
-   public class WebApiVMControllerFactory : VMControllerFactory
+   public class WebApiVMControllerFactory : VMControllerFactory, IWebApiVMControllerFactory
    {
-      private readonly static IMemoryCache _cache = new MemoryCacheAdapter(new MemoryCache(new MemoryCacheOptions()));
-
-      public WebApiVMControllerFactory(IVMFactory vmFactory, IVMServiceScopeFactory serviceScopeFactory) :
-         base(_cache, vmFactory, serviceScopeFactory)
+      public WebApiVMControllerFactory(IMemoryCache cache, IVMFactory vmFactory, IVMServiceScopeFactory serviceScopeFactory) :
+         base(cache, vmFactory, serviceScopeFactory)
       {
          CacheExpiration = TimeSpan.FromMinutes(20);
       }
@@ -50,10 +50,17 @@ namespace DotNetify.WebApi
    /// </summary>
    [Route("api/dotnetify/vm")]
    [ApiController]
-   public class DotNetifyWebApi : ControllerBase
+   public partial class DotNetifyWebApi : ControllerBase
    {
       private readonly TaskCompletionSource<string> _taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-      private readonly List<string> _responses = new List<string>();
+      private readonly List<VMResponse> _responses = new List<VMResponse>();
+
+      private class VMResponse
+      {
+         public string ConnectionId { get; set; }
+         public string VMId { get; set; }
+         public string Data { get; set; }
+      }
 
       /// <summary>
       /// Adapter for the HTTP context.
@@ -62,18 +69,28 @@ namespace DotNetify.WebApi
       {
          private readonly HttpContext _httpContext;
 
-         public override string ConnectionId => _httpContext.Connection.Id;
-         public override string UserIdentifier => _httpContext.User?.Identity?.Name;
-         public override ClaimsPrincipal User => _httpContext.User;
-         public override IDictionary<object, object> Items => _httpContext.Items;
-         public override IFeatureCollection Features => _httpContext.Features;
-         public override CancellationToken ConnectionAborted => _httpContext.RequestAborted;
+         public override string ConnectionId { get; }
+         public override string UserIdentifier { get; }
+         public override ClaimsPrincipal User { get; }
+         public override IDictionary<object, object> Items { get; }
+         public override IFeatureCollection Features { get; }
+         public override CancellationToken ConnectionAborted { get; }
 
          public override void Abort() => _httpContext.Abort();
 
          public HttpCallerContext(HttpContext httpContext)
          {
             _httpContext = httpContext;
+
+            ConnectionId = httpContext.Connection.Id;
+            UserIdentifier = httpContext.User?.Identity?.Name;
+            User = httpContext.User;
+            Items = httpContext.Items.ToDictionary(x => x.Key, x => x.Value);
+            Features = httpContext.Features;
+            ConnectionAborted = httpContext.RequestAborted;
+
+            if (httpContext.Items.TryGetValue(nameof(ConnectionId), out object connectionId) && connectionId is string)
+               ConnectionId = (string) connectionId;
          }
       }
 
@@ -92,20 +109,19 @@ namespace DotNetify.WebApi
       public async Task<string> Request_VM(
          string vmId,
          [FromQuery] string vmArg,
-         [FromServices] WebApiVMControllerFactory vmControllerFactory,
+         [FromServices] IWebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
          [FromServices] IDotNetifyHubResponseManager hubResponseManager
-
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, ResponseVMCallback, nameof(IDotNetifyHubMethod.Request_VM), vmId, vmArg);
 
          try
          {
             await hub.RequestVMAsync(vmId, vmArg);
-            _taskCompletionSource.TrySetResult(_responses.LastOrDefault());
+            _taskCompletionSource.TrySetResult(_responses.Where(x => x.VMId == vmId).LastOrDefault()?.Data);
             _responses.Clear();
          }
          catch (Exception ex)
@@ -131,19 +147,19 @@ namespace DotNetify.WebApi
       public async Task<string> Update_VM(
          string vmId,
          [FromBody] Dictionary<string, object> vmData,
-         [FromServices] WebApiVMControllerFactory vmControllerFactory,
+         [FromServices] IWebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
          [FromServices] IDotNetifyHubResponseManager hubResponseManager
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, ResponseVMCallback, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
 
          try
          {
             await hub.UpdateVMAsync(vmId, vmData);
-            _taskCompletionSource.TrySetResult(_responses.LastOrDefault());
+            _taskCompletionSource.TrySetResult(_responses.Where(x => x.VMId == vmId).LastOrDefault()?.Data);
             _responses.Clear();
          }
          catch (Exception ex)
@@ -167,14 +183,14 @@ namespace DotNetify.WebApi
       [HttpDelete("{vmId}")]
       public async Task Dispose_VM(
          string vmId,
-         [FromServices] WebApiVMControllerFactory vmControllerFactory,
+         [FromServices] IWebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
          [FromServices] IDotNetifyHubResponseManager hubResponseManager
          )
       {
-         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager, ResponseVMCallback, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
          await hub.DisposeVMAsync(vmId);
       }
 
@@ -196,6 +212,7 @@ namespace DotNetify.WebApi
          IPrincipalAccessor principalAccessor,
          IHubPipeline hubPipeline,
          IDotNetifyHubResponseManager hubResponseManager,
+         VMController.VMResponseDelegate responseVMVCallback,
          string callType,
          string vmId,
          object data = null)
@@ -212,7 +229,7 @@ namespace DotNetify.WebApi
          return new DotNetifyHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, hubResponseManager)
          {
             CallerContext = httpCallerContext,
-            OnVMResponse = ResponseVMCallback
+            OnVMResponse = responseVMVCallback
          };
       }
 
@@ -224,7 +241,7 @@ namespace DotNetify.WebApi
       /// <param name="data">Response data.</param>
       private Task ResponseVMCallback(string connectionId, string vmId, string data)
       {
-         _responses.Add(data);
+         _responses.Add(new VMResponse { ConnectionId = connectionId, VMId = vmId, Data = data });
          return Task.CompletedTask;
       }
    }

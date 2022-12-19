@@ -46,6 +46,7 @@ export class DotNetifyHubWebApi implements IDotnetifyHub {
 
   init() {}
   stateChanged() {}
+  disconnected() {}
 
   startHub() {
     this.isConnected = true;

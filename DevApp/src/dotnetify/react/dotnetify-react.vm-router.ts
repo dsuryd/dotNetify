@@ -31,7 +31,7 @@ export default class DotnetifyReactVMRouter extends DotnetifyVMRouter {
     return state && state.hasOwnProperty("RoutingState");
   }
   get RoutingState(): RoutingStateType {
-    return this.vm.State().RoutingState;
+    return this.vm.State()?.RoutingState;
   }
   get VMRoot(): string {
     return this.vm.Props("vmRoot");
