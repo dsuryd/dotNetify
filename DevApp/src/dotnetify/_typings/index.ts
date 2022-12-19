@@ -1,5 +1,6 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import * as React from "react";
+import { IDotnetifyReact } from "./react";
+export { IDotnetifyReact, IRouteLinkProps, IScopeProps, IRouteTargetProps, RouteLink, RouteTarget, Scope, useConnect } from "./react";
 
 declare const dotnetify: IDotnetify;
 export default dotnetify;
@@ -41,10 +42,6 @@ export interface IDotnetify {
 
   // Active view models.
   getViewModels(): IDotnetifyVM[];
-}
-
-export interface IDotnetifyReact {
-  connect(iVMId: string, iReact: React.Component | any, iOptions?: IConnectOptions): IDotnetifyVM;
 }
 
 export interface IDotnetifyVue {
@@ -153,34 +150,3 @@ export type RouteType = {
 };
 
 export type OnRouteEnterType = (path: string, template: RoutingTemplateType) => void | boolean | Promise<boolean>;
-
-export interface IRouteLinkProps {
-  vm: IDotnetifyVM;
-  route: RouteType;
-  style?: React.CSSProperties;
-  className?: string;
-  children?: React.ReactNode;
-  onClick?: (e: React.MouseEvent) => boolean;
-}
-
-export class RouteLink extends React.Component<IRouteLinkProps> {}
-
-export interface IRouteTargetProps extends React.HTMLAttributes<HTMLElement> {
-  id: string;
-}
-
-export class RouteTarget extends React.Component<IRouteTargetProps> {}
-
-export interface IScopeProps {
-  vm: IDotnetifyVM;
-  options?: IConnectOptions;
-  children?: React.ReactNode;
-}
-
-export class Scope extends React.Component<IScopeProps> {}
-
-export declare const useConnect: <T>(
-  vmId: string,
-  component?: any,
-  options?: IConnectOptions
-) => { vm: IDotnetifyVM; state: T; setState: React.Dispatch<any> };
