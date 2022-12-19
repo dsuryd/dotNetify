@@ -22,7 +22,6 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
   mode = "websocket";
   debug = false;
   isConnected = false;
-  isHubStarted = false;
 
   responseEvent = createEventEmitter();
   reconnectedEvent = createEventEmitter();
@@ -39,6 +38,10 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
   _connectionState = 0;
   _disconnectedHandler = () => {};
   _stateChangedHandler = (state: string) => {};
+
+  get isHubStarted(): boolean {
+    return !!this._socket;
+  }
 
   constructor(iUrl: string) {
     this.url = iUrl;
