@@ -13,7 +13,8 @@ const wsServerPort = 3000;
 const httpServer = express();
 const httpServerPort = 3010;
 
-const dotnetifyUrl = "http://localhost:5000/api/dotnetify/vm";
+const dotnetifyMessageUrl = "http://localhost:5000/api/dotnetify/vm";
+const dotnetifyDisconnectUrl = "http://localhost:5000/api/dotnetify/vm/disconnect";
 
 let wsClients = [];
 
@@ -23,16 +24,13 @@ wss.on("connection", ws => {
   console.log(ws.id, "open");
   wsClients.push(ws);
 
-  const data = { connectionId: ws.id, state: "open" };
-  axios.post(dotnetifyUrl, data).then(res => console.log("dotNetify", "open", res.status));
-
   ws.on("message", message => {
     const data = {
       connectionId: ws.id,
       payload: JSON.parse(message.toString())
     };
     console.log(ws.id, data);
-    axios.post(dotnetifyUrl, data).then(res => {
+    axios.post(dotnetifyMessageUrl, data).then(res => {
       console.log("dotNetify", "message", res.status, res.data);
       ws.send(JSON.stringify(res.data));
     });
@@ -40,8 +38,8 @@ wss.on("connection", ws => {
 
   ws.on("close", () => {
     console.log(ws.id, "close");
-    const data = { connectionId: ws.id, state: "closed" };
-    axios.post(dotnetifyUrl, data).then(res => console.log("dotNetify", "closed", res.status));
+    const data = { connectionId: ws.id };
+    axios.post(dotnetifyDisconnectUrl, data).then(res => console.log("dotNetify", "closed", res.status));
     wsClients = wsClients.filter(x => x !== ws);
   });
 

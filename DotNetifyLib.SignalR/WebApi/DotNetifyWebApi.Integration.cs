@@ -37,7 +37,6 @@ namespace DotNetify.WebApi
       public class IntegrationRequest
       {
          public string ConnectionId { get; set; }
-         public string State { get; set; }
          public IntegrationPayload Payload { get; set; }
       }
 
@@ -59,7 +58,7 @@ namespace DotNetify.WebApi
       /// <param name="hubPipeline">Manages middlewares and view model filters.</param>
       /// <param name="hubResponseFactory">Factory of objects to send responses back to hub clients.</param>
       [HttpPost()]
-      public async Task IntegrationEndpoint(
+      public async Task IntegrationMessage(
          [FromBody] IntegrationRequest request,
          [FromServices] IWebApiVMControllerFactory vmControllerFactory,
          [FromServices] IHubServiceProvider hubServiceProvider,
@@ -97,14 +96,25 @@ namespace DotNetify.WebApi
             else
                throw new InvalidOperationException("Type not recognized: " + request.Payload.CallType);
          }
-         else
-         {
-            if (request.State.Equals("closed", StringComparison.OrdinalIgnoreCase))
-            {
-               var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, null, null);
-               await hub.OnDisconnectedAsync(null);
-            }
-         }
+      }
+
+      [HttpPost("disconnect")]
+      public async Task IntegrationDisconnect(
+         [FromBody] IntegrationRequest request,
+         [FromServices] IWebApiVMControllerFactory vmControllerFactory,
+         [FromServices] IHubServiceProvider hubServiceProvider,
+         [FromServices] IPrincipalAccessor principalAccessor,
+         [FromServices] IHubPipeline hubPipeline,
+         [FromServices] IWebApiResponseManager responseManager
+         )
+      {
+         if (string.IsNullOrWhiteSpace(request.ConnectionId))
+            throw new ArgumentNullException(nameof(request.ConnectionId));
+
+         HttpContext.Items.Add(nameof(HttpCallerContext.ConnectionId), request.ConnectionId);
+
+         var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, null, null);
+         await hub.OnDisconnectedAsync(null);
       }
    }
 }
