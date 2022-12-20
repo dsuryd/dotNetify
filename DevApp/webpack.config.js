@@ -5,6 +5,7 @@ const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+require("dotenv").config({ path: "./.env" });
 
 module.exports = {
   mode: "development",
@@ -51,6 +52,7 @@ module.exports = {
   },
   plugins: [
     new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
+    new webpack.DefinePlugin({ "process.env": JSON.stringify(process.env) }),
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin(),
     new CopyPlugin([{ from: "node_modules/dotnetify-elements/lib/dotnetify-elements.bundle.js" }])

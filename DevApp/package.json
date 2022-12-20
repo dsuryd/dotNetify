@@ -55,6 +55,7 @@
     "babel-preset-react": "~6.24.1",
     "copy-webpack-plugin": "^4.5.2",
     "css-loader": "~0.28.11",
+    "dotenv": "^16.0.3",
     "file-loader": "~1.1.11",
     "html-loader": "~0.5.5",
     "mini-css-extract-plugin": "~0.4.0",
