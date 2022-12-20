@@ -13,7 +13,7 @@ import "../dist/react/v18-compatibility";
 dotnetify.debug = true;
 
 // ** Uncomment this to enable integration with 3rd party websocket server like AWS API gateway **
-dotnetify.hub = createWebSocketHub(process.env.AWS_WS_GATEWAY);
+//dotnetify.hub = createWebSocketHub(process.env.AWS_WS_GATEWAY);
 //dotnetify.hub = createWebSocketHub("ws://localhost:3000");
 
 // ** Uncomment this to switch SignalR protocol from JSON to MessagePack **
