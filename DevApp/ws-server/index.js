@@ -30,16 +30,23 @@ wss.on("connection", ws => {
       payload: JSON.parse(message.toString())
     };
     console.log(ws.id, data);
-    axios.post(dotnetifyMessageUrl, data).then(res => {
-      console.log("dotNetify", "message", res.status, res.data);
-      ws.send(JSON.stringify(res.data));
-    });
+    axios
+      .post(dotnetifyMessageUrl, data)
+      .then(res => {
+        console.log("dotNetify", "message", res.status, res.data);
+        ws.send(JSON.stringify(res.data));
+      })
+      .catch(e => console.error(e));
   });
 
   ws.on("close", () => {
     console.log(ws.id, "close");
     const data = { connectionId: ws.id };
-    axios.post(dotnetifyDisconnectUrl, data).then(res => console.log("dotNetify", "closed", res.status));
+    axios
+      .post(dotnetifyDisconnectUrl, data)
+      .then(res => console.log("dotNetify", "closed", res.status))
+      .catch(e => console.error(e));
+
     wsClients = wsClients.filter(x => x !== ws);
   });
 
