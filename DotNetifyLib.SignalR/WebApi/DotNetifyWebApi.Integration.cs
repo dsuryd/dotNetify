@@ -64,7 +64,8 @@ namespace DotNetify.WebApi
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IWebApiResponseManager responseManager
+         [FromServices] IWebApiResponseManager responseManager,
+         [FromServices] IWebApiConnectionCache connectionCache
          )
       {
          if (string.IsNullOrWhiteSpace(request.ConnectionId))
@@ -81,17 +82,23 @@ namespace DotNetify.WebApi
                var vmArgs = JsonSerializer.Deserialize<object>(request.Payload.VMArgs);
                var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Request_VM), vmId, request.Payload.VMArgs);
                await hub.RequestVMAsync(vmId, vmArgs);
+
+               _ = connectionCache.AddVMAsync(request.ConnectionId, vmId);
             }
             else if (request.Payload.CallType.Equals("update_vm", StringComparison.OrdinalIgnoreCase))
             {
                var vmData = JsonSerializer.Deserialize<Dictionary<string, object>>(request.Payload.Value);
                var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Update_VM), vmId, vmData);
                await hub.UpdateVMAsync(vmId, vmData);
+
+               _ = connectionCache.RefreshAsync(request.ConnectionId);
             }
             else if (request.Payload.CallType.Equals("dispose_vm", StringComparison.OrdinalIgnoreCase))
             {
                var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Dispose_VM), vmId);
                await hub.DisposeVMAsync(vmId);
+
+               _ = connectionCache.RemoveVMAsync(request.ConnectionId, vmId);
             }
             else
                throw new InvalidOperationException("Type not recognized: " + request.Payload.CallType);
@@ -105,7 +112,8 @@ namespace DotNetify.WebApi
          [FromServices] IHubServiceProvider hubServiceProvider,
          [FromServices] IPrincipalAccessor principalAccessor,
          [FromServices] IHubPipeline hubPipeline,
-         [FromServices] IWebApiResponseManager responseManager
+         [FromServices] IWebApiResponseManager responseManager,
+         [FromServices] IWebApiConnectionCache connectionCache
          )
       {
          if (string.IsNullOrWhiteSpace(request.ConnectionId))
@@ -115,6 +123,8 @@ namespace DotNetify.WebApi
 
          var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, null, null);
          await hub.OnDisconnectedAsync(null);
+
+         _ = connectionCache.RemoveAsync(request.ConnectionId);
       }
    }
 }

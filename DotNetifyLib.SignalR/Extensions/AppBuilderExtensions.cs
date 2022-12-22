@@ -79,7 +79,12 @@ namespace DotNetify
             vmControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
 
             var webApiVMControllerFactory = provider.GetService<IWebApiVMControllerFactory>();
-            webApiVMControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
+            if (webApiVMControllerFactory != null)
+               webApiVMControllerFactory.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
+
+            var webApiConnectionCache = provider.GetService<IWebApiConnectionCache>();
+            if (webApiConnectionCache != null)
+               webApiConnectionCache.CacheExpiration = dotNetifyConfig.VMControllerCacheExpiration;
          }
 
          // Add middleware to extract headers from incoming requests.

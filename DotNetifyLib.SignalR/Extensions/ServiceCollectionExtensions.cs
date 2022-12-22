@@ -91,6 +91,8 @@ namespace DotNetify
          services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
          services.AddSingleton<IWebApiVMControllerFactory, WebApiVMControllerFactory>();
          services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
+         services.AddSingleton<IWebApiConnectionCache, WebApiConnectionCache>();
+         services.AddTransient<Connection>();
          services.AddTransient<ConnectionGroup>();
          return services;
       }
