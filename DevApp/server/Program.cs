@@ -1,6 +1,4 @@
-﻿//#define AWS_INTEGRATION
-
-using System.Text;
+﻿using System.Text;
 using Amazon.Runtime;
 using AwsSignatureVersion4;
 using DotInitializr;
@@ -33,17 +31,23 @@ services.AddSingleton<IWebStoreService, WebStoreService>();
 
 StaticNodeJSService.Configure<OutOfProcessNodeJSServiceOptions>(options => options.TimeoutMS = 2000);
 
-#if AWS_INTEGRATION
+// If enabled, configure AWS API gateway integration.
+if (builder.Configuration["Aws:Enabled"] == "true")
+{
+   var awsCredentials = new ImmutableCredentials(builder.Configuration["Aws:AccessKeyId"], builder.Configuration["Aws:SecretAccessKey"], null);
+   services
+     .AddTransient<AwsSignatureHandler>()
+     .AddTransient(_ => new AwsSignatureHandlerSettings(builder.Configuration["Aws:Region"], "execute-api", awsCredentials))
+     .AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]))
+     .AddHttpMessageHandler<AwsSignatureHandler>();
+}
+else
+// Configure intergration with websocket server.
+if (!string.IsNullOrWhiteSpace(builder.Configuration["WSServer:ConnectionUrl"]))
+   services.AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(builder.Configuration["WSServer:ConnectionUrl"]));
 
-var awsCredentials = new ImmutableCredentials(builder.Configuration["Aws:AccessKeyId"], builder.Configuration["Aws:SecretAccessKey"], null);
-services
-  .AddTransient<AwsSignatureHandler>()
-  .AddTransient(_ => new AwsSignatureHandlerSettings(builder.Configuration["Aws:Region"], "execute-api", awsCredentials))
-  .AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]))
-  .AddHttpMessageHandler<AwsSignatureHandler>();
-#else
-services.AddDotNetifyHttpClient(client => client.BaseAddress = new Uri("http://localhost:3010/"));
-#endif
+if (!string.IsNullOrWhiteSpace(builder.Configuration["Redis:ConnectionString"]))
+   services.AddStackExchangeRedisCache(options => options.Configuration = builder.Configuration["Redis:ConnectionString"]);
 
 var app = builder.Build();
 

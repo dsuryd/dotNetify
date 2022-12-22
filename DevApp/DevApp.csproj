@@ -18,6 +18,7 @@
     <PackageReference Include="DotNetify.Pulse" Version="1.0.0" />
     <PackageReference Include="Jering.Javascript.NodeJS" Version="6.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.1" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.5.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
