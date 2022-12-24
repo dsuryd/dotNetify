@@ -122,6 +122,9 @@ namespace DotNetify.WebApi
       /// <param name="vmData">View model data.</param>
       public async Task SendAsync(string connectionId, string vmId, string vmData)
       {
+         if (WebApiConnectionStateRestore.IsRestoring)
+            return;
+
          var response = new DotNetifyWebApi.IntegrationResponse { VMId = vmId, Data = vmData };
 
          var httpClient = _httpClientFactory.CreateClient(nameof(DotNetifyWebApi));

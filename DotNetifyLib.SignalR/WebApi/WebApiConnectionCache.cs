@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MemoryPack;
 using Microsoft.Extensions.Caching.Distributed;
@@ -29,7 +30,7 @@ namespace DotNetify.WebApi
    {
       TimeSpan? CacheExpiration { get; set; }
 
-      Task AddVMAsync(string connectionId, string vmId);
+      Task AddVMAsync(string connectionId, string vmId, string vmArgs);
 
       Task RemoveVMAsync(string connectionId, string vmId);
 
@@ -48,7 +49,7 @@ namespace DotNetify.WebApi
    public partial class Connection
    {
       public string Id { get; set; }
-      public List<string> VMIds { get; set; } = new List<string>();
+      public List<ConnectionVMInfo> VMInfo { get; set; } = new List<ConnectionVMInfo>();
    }
 
    [MemoryPackable]
@@ -56,6 +57,13 @@ namespace DotNetify.WebApi
    {
       public string Name { get; set; }
       public HashSet<string> ConnectionIds { get; set; } = new HashSet<string>();
+   }
+
+   [MemoryPackable]
+   public partial class ConnectionVMInfo
+   {
+      public string VMId { get; set; }
+      public string VMArgs { get; set; }
    }
 
    /// <summary>
@@ -76,13 +84,13 @@ namespace DotNetify.WebApi
          _cache = cache;
       }
 
-      public async Task AddVMAsync(string connectionId, string vmId)
+      public async Task AddVMAsync(string connectionId, string vmId, string vmArgs)
       {
          var bytes = await _cache.GetAsync(CONNECTION_KEY_PREFIX + connectionId);
          var connection = bytes != null ? MemoryPackSerializer.Deserialize<Connection>(bytes) : new Connection { Id = connectionId };
-         if (!connection.VMIds.Contains(vmId))
+         if (!connection.VMInfo.Any(x => x.VMId == vmId))
          {
-            connection.VMIds.Add(vmId);
+            connection.VMInfo.Add(new ConnectionVMInfo { VMId = vmId, VMArgs = vmArgs });
             await _cache.SetAsync(CONNECTION_KEY_PREFIX + connectionId, MemoryPackSerializer.Serialize(connection));
          }
       }
@@ -91,9 +99,9 @@ namespace DotNetify.WebApi
       {
          var bytes = await _cache.GetAsync(CONNECTION_KEY_PREFIX + connectionId);
          var connection = bytes != null ? MemoryPackSerializer.Deserialize<Connection>(bytes) : null;
-         if (connection?.VMIds.Contains(vmId) == true)
+         if (connection?.VMInfo.Any(x => x.VMId == vmId) == true)
          {
-            connection.VMIds.Remove(vmId);
+            connection.VMInfo = connection.VMInfo.Where(x => x.VMId != vmId).ToList();
             await _cache.SetAsync(CONNECTION_KEY_PREFIX + connectionId, MemoryPackSerializer.Serialize(connection), new DistributedCacheEntryOptions
             {
                SlidingExpiration = CacheExpiration

@@ -103,6 +103,10 @@ namespace DotNetify
          var filterFactories = provider.GetService<IDictionary<Type, Func<IVMFilter>>>();
          _filterTypes.ForEach(t => filterFactories?.Add(t.Item1, () => (IVMFilter) factoryMethod(t.Item1, t.Item2)));
 
+         // If there active web API connections on previous server run, restore their view models.
+         if (dotNetifyConfig.RestoreWebApiConnectionStateOnRestart)
+            appBuilder.RestoreWebApiConnectionState();
+
          _useDotNetify = true;
          return appBuilder;
       }
