@@ -90,10 +90,7 @@ namespace DotNetify
       {
          services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
          services.AddSingleton<IWebApiVMControllerFactory, WebApiVMControllerFactory>();
-         services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
-         services.AddSingleton<IWebApiConnectionCache, WebApiConnectionCache>();
-         services.AddTransient<Connection>();
-         services.AddTransient<ConnectionGroup>();
+
          return services;
       }
 
@@ -107,8 +104,16 @@ namespace DotNetify
          return services;
       }
 
-      public static IHttpClientBuilder AddDotNetifyHttpClient(this IServiceCollection services, Action<HttpClient> configure)
+      public static IHttpClientBuilder AddDotNetifyIntegrationWebApi(this IServiceCollection services, Action<HttpClient> configure)
       {
+         if (!services.Any(x => x.ServiceType == typeof(IWebApiVMControllerFactory)))
+            services.AddDotNetifyWebApi();
+
+         services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
+         services.AddSingleton<IWebApiConnectionCache, WebApiConnectionCache>();
+         services.AddTransient<Connection>();
+         services.AddTransient<ConnectionGroup>();
+
          return services.AddHttpClient(nameof(DotNetifyWebApi), configure);
       }
    }

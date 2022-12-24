@@ -38,13 +38,13 @@ if (builder.Configuration["Aws:Enabled"] == "true")
    services
      .AddTransient<AwsSignatureHandler>()
      .AddTransient(_ => new AwsSignatureHandlerSettings(builder.Configuration["Aws:Region"], "execute-api", awsCredentials))
-     .AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]))
+     .AddDotNetifyIntegrationWebApi(client => client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]))
      .AddHttpMessageHandler<AwsSignatureHandler>();
 }
 else
 // Configure intergration with websocket server.
 if (!string.IsNullOrWhiteSpace(builder.Configuration["WSServer:ConnectionUrl"]))
-   services.AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(builder.Configuration["WSServer:ConnectionUrl"]));
+   services.AddDotNetifyIntegrationWebApi(client => client.BaseAddress = new Uri(builder.Configuration["WSServer:ConnectionUrl"]));
 
 if (!string.IsNullOrWhiteSpace(builder.Configuration["Redis:ConnectionString"]))
    services.AddStackExchangeRedisCache(options => options.Configuration = builder.Configuration["Redis:ConnectionString"]);
@@ -93,11 +93,11 @@ app.UseDotNetifyPulse();
 if (app.Environment.IsDevelopment())
 {
 #pragma warning disable 618
-   app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-   {
-      HotModuleReplacement = true,
-      HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
-   });
+   //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+   //{
+   //   HotModuleReplacement = true,
+   //   HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
+   //});
 #pragma warning restore 618
 }
 
