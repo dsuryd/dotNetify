@@ -1,5 +1,5 @@
 import { hydrateRoot, createRoot } from "react-dom/client";
-import dotnetify, { createWebSocketHub } from "dotnetify";
+import dotnetify from "dotnetify";
 import App from "./app/views/App";
 import "./app/styles/app.css";
 import "./app/styles/prism.css";
@@ -14,8 +14,8 @@ dotnetify.debug = true;
 
 // ** Enable integration with 3rd party websocket server like AWS API gateway **
 if (process.env.ENABLE_AWS_INTEGRATION) {
-  dotnetify.hub = createWebSocketHub(process.env.AWS_API_GATEWAY);
-  //dotnetify.hub = createWebSocketHub(process.env.LOCAL_WS_SERVER);
+  dotnetify.hub = dotnetify.createWebSocketHub(process.env.AWS_API_GATEWAY);
+  //dotnetify.hub = dotnetify.createWebSocketHub(process.env.LOCAL_WS_SERVER);
 }
 
 // ** Switch SignalR protocol from JSON to MessagePack **
@@ -30,5 +30,5 @@ const container = document.getElementById("App");
 hydrateRoot(container, <App />);
 
 // ** DEV TESTING **
-//import TestApp from "./app/views/examples/react/ChatRoom";
+//import TestApp from "./app/views/examples/react/HelloWorld";
 //createRoot(container).render(<TestApp />);
