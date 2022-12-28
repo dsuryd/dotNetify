@@ -68,7 +68,7 @@ Resources:
             ConnectionType: "INTERNET"
             IntegrationMethod: "POST"
             IntegrationType: "HTTP"
-            IntegrationUri: "https://{your-url-domain}/api/dotnetify/vm"
+            IntegrationUri: "https://<your-url-domain>/api/dotnetify/vm"
             PassthroughBehavior: "WHEN_NO_MATCH"
             RequestTemplates: 
                 "$default": |
@@ -86,7 +86,7 @@ Resources:
             ConnectionType: "INTERNET"
             IntegrationMethod: "POST"
             IntegrationType: "HTTP"
-            IntegrationUri: "https://{your-url-domain}/api/dotnetify/vm"
+            IntegrationUri: "https://<your-url-domain>/api/dotnetify/vm"
             PassthroughBehavior: "WHEN_NO_MATCH"
             RequestTemplates: 
                 "$default": |
@@ -105,7 +105,7 @@ Resources:
             ConnectionType: "INTERNET"
             IntegrationMethod: "POST"
             IntegrationType: "HTTP"
-            IntegrationUri: "https://{your-url-domain}/api/dotnetify/vm"
+            IntegrationUri: "https://<your-url-domain>/api/dotnetify/vm"
             PassthroughBehavior: "WHEN_NO_MATCH"
             RequestTemplates: 
                 "$default": |
