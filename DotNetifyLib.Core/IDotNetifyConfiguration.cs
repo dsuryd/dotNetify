@@ -37,11 +37,6 @@ namespace DotNetify
       bool CamelCaseSerialization { set; }
 
       /// <summary>
-      /// Recreates view model instances of active web API connections on server restart.
-      /// </summary>
-      bool RestoreWebApiConnectionStateOnRestart { get; set; }
-
-      /// <summary>
       /// Provides a factory method to create view model instances.
       /// The method accepts a class type and constructor arguments, and returns an instance of that type.
       /// </summary>
