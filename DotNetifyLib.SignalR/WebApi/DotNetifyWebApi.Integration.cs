@@ -83,7 +83,7 @@ namespace DotNetify.WebApi
                var hub = CreateHubHandler(vmControllerFactory, hubServiceProvider, principalAccessor, hubPipeline, responseManager, null, nameof(IDotNetifyHubMethod.Request_VM), vmId, request.Payload.VMArgs);
                await hub.RequestVMAsync(vmId, vmArgs);
 
-               _ = connectionCache.AddVMAsync(request.ConnectionId, vmId);
+               _ = connectionCache.AddVMAsync(request.ConnectionId, vmId, request.Payload.VMArgs);
             }
             else if (request.Payload.CallType.Equals("update_vm", StringComparison.OrdinalIgnoreCase))
             {

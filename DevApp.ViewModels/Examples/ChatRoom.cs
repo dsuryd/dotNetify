@@ -1,9 +1,12 @@
-﻿using DotNetify.Elements;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using DotNetify.Elements;
+using MemoryPack;
+using Microsoft.Extensions.Caching.Distributed;
 using UAParser;
 
 namespace DotNetify.DevApp
@@ -28,24 +31,31 @@ namespace DotNetify.DevApp
       }
    }
 
-   public class ChatMessage
+   [MemoryPackable]
+   public partial class ChatMessage
    {
-      public int Id { get; set; }
+      public long Id { get; set; }
       public string UserId { get; set; }
       public string UserName { get; set; }
       public DateTimeOffset Date { get; set; }
       public string Text { get; set; }
    }
 
-   public class ChatUser
+   [MemoryPackable]
+   public partial class ChatUser
    {
-      private static int _counter = 0;
+      internal static int _counter = 0;
 
       public string Id { get; set; }
       public string CorrelationId { get; set; }
+
       public string Name { get; set; }
       public string IpAddress { get; set; }
       public string Browser { get; set; }
+
+      [MemoryPackConstructor]
+      public ChatUser()
+      { }
 
       public ChatUser(IConnectionContext connectionContext, string correlationId)
       {
@@ -67,16 +77,18 @@ namespace DotNetify.DevApp
    public class ChatRoomVM : MulticastVM
    {
       private readonly IConnectionContext _connectionContext;
+      private readonly IDistributedCache _cache;
 
       [ItemKey(nameof(ChatMessage.Id))]
-      public List<ChatMessage> Messages { get; } = new List<ChatMessage>();
+      public List<ChatMessage> Messages { get; private set; } = new List<ChatMessage>();
 
       [ItemKey(nameof(ChatUser.Id))]
-      public List<ChatUser> Users { get; } = new List<ChatUser>();
+      public List<ChatUser> Users { get; private set; } = new List<ChatUser>();
 
-      public ChatRoomVM(IConnectionContext connectionContext)
+      public ChatRoomVM(IConnectionContext connectionContext, IDistributedCache cache)
       {
          _connectionContext = connectionContext;
+         _cache = cache;
       }
 
       public override void Dispose()
@@ -86,10 +98,16 @@ namespace DotNetify.DevApp
          base.Dispose();
       }
 
+      public override Task OnCreatedAsync()
+      {
+         // Restore view model state from a distributed cache.
+         return LoadStateAsync();
+      }
+
       public void SendMessage(ChatMessage chat)
       {
          string userId = _connectionContext.ConnectionId;
-         chat.Id = Messages.Count + 1;
+         chat.Id = DateTime.UtcNow.Ticks;
          chat.UserId = userId;
          chat.UserName = UpdateUserName(userId, chat.UserName);
 
@@ -102,6 +120,7 @@ namespace DotNetify.DevApp
             {
                Messages.Add(chat);
                this.AddList(nameof(Messages), chat);
+               SaveState();
             }
          }
       }
@@ -113,6 +132,7 @@ namespace DotNetify.DevApp
          {
             Users.Add(user);
             this.AddList(nameof(Users), user);
+            SaveState();
          }
       }
 
@@ -125,6 +145,7 @@ namespace DotNetify.DevApp
             {
                Users.Remove(user);
                this.RemoveList(nameof(Users), user.Id);
+               SaveState();
             }
          }
       }
@@ -140,11 +161,43 @@ namespace DotNetify.DevApp
                {
                   user.Name = userName;
                   this.UpdateList(nameof(Users), user);
+                  SaveState();
                }
                return user.Name;
             }
          }
          return userId;
+      }
+
+      private void SaveState()
+      {
+         if (Users.Count > 0)
+         {
+            var entryOptions = new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(5) };
+            _cache.SetAsync(nameof(ChatRoomVM) + "_users", MemoryPackSerializer.Serialize(Users), entryOptions);
+            _cache.SetAsync(nameof(ChatRoomVM) + "_messages", MemoryPackSerializer.Serialize(Messages), entryOptions);
+         }
+         else
+         {
+            _cache.Remove(nameof(ChatRoomVM) + "_users");
+            _cache.Remove(nameof(ChatRoomVM) + "_messages");
+         }
+      }
+
+      private async Task LoadStateAsync()
+      {
+         var bytes = await _cache.GetAsync(nameof(ChatRoomVM) + "_users");
+         if (bytes != null)
+         {
+            Users = MemoryPackSerializer.Deserialize<List<ChatUser>>(bytes);
+            ChatUser._counter = Users.Count;
+         }
+
+         bytes = await _cache.GetAsync(nameof(ChatRoomVM) + "_messages");
+         if (bytes != null)
+         {
+            Messages = MemoryPackSerializer.Deserialize<List<ChatMessage>>(bytes);
+         }
       }
    }
 }

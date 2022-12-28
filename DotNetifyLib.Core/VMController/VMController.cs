@@ -238,6 +238,13 @@ namespace DotNetify
       }
 
       /// <summary>
+      /// Checks whether this controller has a view model instance.
+      /// </summary>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <returns>True if the controller has the view model.</returns>
+      public bool HasVM(string vmId) => _activeVMs.ContainsKey(vmId);
+
+      /// <summary>
       /// Handles a request for a view model from a browser client.
       /// </summary>
       /// <param name="connectionId">Identifies the client connection.</param>
@@ -257,10 +264,10 @@ namespace DotNetify
       /// <param name="vmId">Identifies the view model.</param>
       /// <param name="vmArg">Optional view model's initialization argument.</param>
       /// <returns>Group name, if the request is for a multicast view model associated with one.</returns>
-      public async virtual Task<string> OnRequestVMAsync(string connectionId, string vmId, object vmArg = null)
+      public virtual async Task<string> OnRequestVMAsync(string connectionId, string vmId, object vmArg = null)
       {
          BaseVM vmInstance = null;
-         if (_activeVMs.ContainsKey(vmId))
+         if (HasVM(vmId))
             vmInstance = _activeVMs[vmId].Instance;
          else
          {
@@ -285,7 +292,7 @@ namespace DotNetify
                vmInstance.AcceptChangedProperties();
 
             // Add the view model instance to the controller.
-            if (!_activeVMs.ContainsKey(vmId))
+            if (!HasVM(vmId))
             {
                var vmInfo = new VMInfo(id: vmId, instance: vmInstance, connectionId: connectionId, groupName: groupName);
                vmInstance.RequestPushUpdates += VmInstance_RequestPushUpdates;
@@ -328,7 +335,7 @@ namespace DotNetify
       /// <param name="iData">View model update.</param>
       public async Task OnUpdateVMAsync(string connectionId, string vmId, Dictionary<string, object> data)
       {
-         if (!_activeVMs.ContainsKey(vmId))
+         if (!HasVM(vmId))
          {
             Logger.LogError($"Update to '{vmId}' received before connect request");
             return;
@@ -410,7 +417,7 @@ namespace DotNetify
                   if (id.Contains('.'))
                   {
                      var masterVMId = id.Remove(id.LastIndexOf('.'));
-                     if (_activeVMs.ContainsKey(masterVMId))
+                     if (HasVM(masterVMId))
                         _activeVMs[masterVMId].Instance.OnSubVMDisposing(vmInfo.Instance);
                   }
 
@@ -442,7 +449,7 @@ namespace DotNetify
             masterVMId = vmId.Remove(vmId.LastIndexOf('.'));
             lock (_activeVMs)
             {
-               if (!_activeVMs.ContainsKey(masterVMId))
+               if (!HasVM(masterVMId))
                {
                   masterVM = CreateVM(masterVMId, null, vmNamespace);
                   _activeVMs.TryAdd(masterVMId, new VMInfo(id: masterVMId, instance: masterVM, connectionId: null));

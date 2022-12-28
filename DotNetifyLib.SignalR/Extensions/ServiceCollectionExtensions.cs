@@ -90,10 +90,7 @@ namespace DotNetify
       {
          services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
          services.AddSingleton<IWebApiVMControllerFactory, WebApiVMControllerFactory>();
-         services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
-         services.AddSingleton<IWebApiConnectionCache, WebApiConnectionCache>();
-         services.AddTransient<Connection>();
-         services.AddTransient<ConnectionGroup>();
+
          return services;
       }
 
@@ -107,9 +104,26 @@ namespace DotNetify
          return services;
       }
 
-      public static IHttpClientBuilder AddDotNetifyHttpClient(this IServiceCollection services, Action<HttpClient> configure)
+      public static IHttpClientBuilder AddDotNetifyIntegrationWebApi(this IServiceCollection services, Action<DotNetifyWebApiConfiguration> configure)
       {
-         return services.AddHttpClient(nameof(DotNetifyWebApi), configure);
+         if (!services.Any(x => x.ServiceType == typeof(IWebApiVMControllerFactory)))
+            services.AddDotNetifyWebApi();
+
+         services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
+         services.AddSingleton<IWebApiConnectionCache, WebApiConnectionCache>();
+
+         var config = new DotNetifyWebApiConfiguration();
+         configure?.Invoke(config);
+
+         if (config.MaxParallelHttpRequests > 0)
+            WebApiResponseManager.MaxParallelHttpRequests = config.MaxParallelHttpRequests;
+
+         return services.AddHttpClient(nameof(DotNetifyWebApi), config.ConfigureHttpClient);
+      }
+
+      public static IHttpClientBuilder AddDotNetifyIntegrationWebApi(this IServiceCollection services, Action<HttpClient> configureHttpClient)
+      {
+         return services.AddDotNetifyIntegrationWebApi(configure => configure.ConfigureHttpClient = configureHttpClient);
       }
    }
 }

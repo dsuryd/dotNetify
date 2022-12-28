@@ -92,6 +92,13 @@ namespace DotNetify.WebApi
             if (httpContext.Items.TryGetValue(nameof(ConnectionId), out object connectionId) && connectionId is string)
                ConnectionId = (string) connectionId;
          }
+
+         public HttpCallerContext(string connectionId)
+         {
+            ConnectionId = connectionId;
+            User = new ClaimsPrincipal();
+            Items = new Dictionary<object, object>();
+         }
       }
 
       /// <summary>

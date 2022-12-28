@@ -6,6 +6,7 @@ using DotNetify;
 using DotNetify.DevApp;
 using DotNetify.Pulse;
 using DotNetify.Security;
+using DotNetify.WebApi;
 using Jering.Javascript.NodeJS;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.IdentityModel.Tokens;
@@ -38,21 +39,24 @@ if (builder.Configuration["Aws:Enabled"] == "true")
    services
      .AddTransient<AwsSignatureHandler>()
      .AddTransient(_ => new AwsSignatureHandlerSettings(builder.Configuration["Aws:Region"], "execute-api", awsCredentials))
-     .AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]))
+     .AddDotNetifyIntegrationWebApi(client => client.BaseAddress = new Uri(@builder.Configuration["Aws:ConnectionUrl"]))
      .AddHttpMessageHandler<AwsSignatureHandler>();
 }
 else
 // Configure intergration with websocket server.
 if (!string.IsNullOrWhiteSpace(builder.Configuration["WSServer:ConnectionUrl"]))
-   services.AddDotNetifyHttpClient(client => client.BaseAddress = new Uri(builder.Configuration["WSServer:ConnectionUrl"]));
+   services.AddDotNetifyIntegrationWebApi(client => client.BaseAddress = new Uri(builder.Configuration["WSServer:ConnectionUrl"]));
 
 if (!string.IsNullOrWhiteSpace(builder.Configuration["Redis:ConnectionString"]))
+{
    services.AddStackExchangeRedisCache(options => options.Configuration = builder.Configuration["Redis:ConnectionString"]);
+}
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseWebSockets();
+
 app.UseDotNetify(config =>
 {
    config.RegisterAssembly("DotNetify.DevApp.ViewModels");
@@ -88,6 +92,7 @@ app.UseDotNetify(config =>
    // Demonstration filter that passes access token from the middleware to the ViewModels.SecurePageVM class instance.
    config.UseFilter<SetAccessTokenFilter>();
 });
+
 app.UseDotNetifyPulse();
 
 if (app.Environment.IsDevelopment())

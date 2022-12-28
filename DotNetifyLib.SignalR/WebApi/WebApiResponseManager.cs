@@ -21,13 +21,24 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DotNetify.WebApi
 {
    public interface IWebApiResponseManager : IDotNetifyHubResponseManager
-   { }
+   {
+      event EventHandler<WebApiResponseManagerSendEventArgs> Sending;
+   }
+
+   public class WebApiResponseManagerSendEventArgs : EventArgs
+   {
+      public List<string> ConnectionIds { get; set; }
+      public string VMId { get; set; }
+      public string VMData { get; set; }
+      public bool Handled { get; set; }
+   }
 
    /// <summary>
    /// This class manages sending responses to the web socket server that has forwarded view model requests/updates from its clients
@@ -43,6 +54,16 @@ namespace DotNetify.WebApi
          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
          Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
       };
+
+      /// <summary>
+      /// Maximum number of parallel HTTP requests when broadcasting a response.
+      /// </summary>
+      public static int MaxParallelHttpRequests { get; set; } = 1000;
+
+      /// <summary>
+      /// Invoked before sending or broadcasting a response to clients.
+      /// </summary>
+      public event EventHandler<WebApiResponseManagerSendEventArgs> Sending;
 
       /// <summary>
       /// Constructor.
@@ -122,17 +143,7 @@ namespace DotNetify.WebApi
       /// <param name="vmData">View model data.</param>
       public async Task SendAsync(string connectionId, string vmId, string vmData)
       {
-         var response = new DotNetifyWebApi.IntegrationResponse { VMId = vmId, Data = vmData };
-
-         var httpClient = _httpClientFactory.CreateClient(nameof(DotNetifyWebApi));
-         if (httpClient != null)
-         {
-            var result = await httpClient.PostAsync($"{connectionId}", new StringContent(JsonSerializer.Serialize(response, _jsonSerializerOptions), Encoding.UTF8, "application/json"));
-            if (!result.IsSuccessStatusCode)
-               RemoveInstance(connectionId);
-         }
-         else
-            throw new Exception("Missing HttpClient. Include 'services.AddDotNetifyHttpClient()' in the startup.");
+         await SendConnectionsAsync(new string[] { connectionId }, vmId, vmData);
       }
 
       /// <summary>
@@ -158,15 +169,14 @@ namespace DotNetify.WebApi
          var active = await _cache.GetGroupAsync(WebApiConnectionCache.ACTIVE_GROUP);
 
          var group = await _cache.GetGroupAsync(groupName);
-         var activeConnectionIds = group.ConnectionIds.Where(id => active.ConnectionIds.Contains(id)).ToHashSet();
+         var activeConnectionIds = group.ConnectionIds.Where(id => active.ConnectionIds.Contains(id)).ToList();
          if (activeConnectionIds.Count != group.ConnectionIds.Count)
          {
             group.ConnectionIds = activeConnectionIds;
             await _cache.SaveGroupAsync(group);
          }
 
-         foreach (var connectionId in group.ConnectionIds.Except(excludedIds))
-            _ = SendAsync(connectionId, vmId, vmData);
+         await SendConnectionsAsync(group.ConnectionIds.Except(excludedIds), vmId, vmData);
       }
 
       /// <summary>
@@ -179,8 +189,7 @@ namespace DotNetify.WebApi
       {
          var active = await _cache.GetGroupAsync(WebApiConnectionCache.ACTIVE_GROUP);
 
-         foreach (var connectionId in connectionIds.Where(id => active.ConnectionIds.Contains(id)))
-            _ = SendAsync(connectionId, vmId, vmData);
+         await SendConnectionsAsync(connectionIds.Where(id => active.ConnectionIds.Contains(id)), vmId, vmData);
       }
 
       /// <summary>
@@ -189,6 +198,52 @@ namespace DotNetify.WebApi
       public Task SendToUsersAsync(IReadOnlyList<string> userIds, string vmId, string vmData)
       {
          throw new NotImplementedException();
+      }
+
+      /// <summary>
+      /// Sends a view model response to the connection client via the WebSocket servers' callback HTTP URL.
+      /// </summary>
+      /// <param name="connectionId">WebSocket connection.</param>
+      /// <param name="vmId">Identifies the view model.</param>
+      /// <param name="vmData">View model data.</param>
+      private async Task SendConnectionsAsync(IEnumerable<string> connectionIds, string vmId, string vmData)
+      {
+         // Give a chance for any external party to handle client broadcast.
+         var eventArgs = new WebApiResponseManagerSendEventArgs
+         {
+            ConnectionIds = connectionIds.ToList(),
+            VMId = vmId,
+            VMData = vmData
+         };
+         Sending?.Invoke(this, eventArgs);
+         if (eventArgs.Handled)
+            return;
+
+         var response = new DotNetifyWebApi.IntegrationResponse { VMId = vmId, Data = vmData };
+         var content = new StringContent(JsonSerializer.Serialize(response, _jsonSerializerOptions), Encoding.UTF8, "application/json");
+
+         var semaphore = new SemaphoreSlim(MaxParallelHttpRequests);
+
+         await Task.WhenAll(connectionIds.Select(connectionId => DoHttpHrequestAsync(connectionId, content, semaphore)));
+      }
+
+      private async Task DoHttpHrequestAsync(string connectionId, StringContent content, SemaphoreSlim semaphore)
+      {
+         await semaphore.WaitAsync();
+
+         try
+         {
+            using (var httpClient = _httpClientFactory.CreateClient(nameof(DotNetifyWebApi)))
+            {
+               var result = await httpClient.PostAsync($"{connectionId}", content);
+               if (!result.IsSuccessStatusCode)
+                  RemoveInstance(connectionId);
+            }
+         }
+         finally
+         {
+            semaphore.Release();
+         }
       }
    }
 }

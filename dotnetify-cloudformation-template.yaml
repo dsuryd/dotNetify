@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ""
+Resources:
+    ApiGatewayV2Api:
+        Type: "AWS::ApiGatewayV2::Api"
+        Properties:
+            Name: "<your-api-gateway-name>"
+            ApiKeySelectionExpression: "$request.header.x-api-key"
+            ProtocolType: "WEBSOCKET"
+            RouteSelectionExpression: "$request.body.action"
+            DisableExecuteApiEndpoint: false
+
+    ApiGatewayV2Route:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ApiKeyRequired: false
+            AuthorizationType: "NONE"
+            RouteKey: "$disconnect"
+            RouteResponseSelectionExpression: "$default"
+            Target: !Sub "integrations/${ApiGatewayV2Integration}"
+
+    ApiGatewayV2Route2:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ApiKeyRequired: false
+            AuthorizationType: "NONE"
+            RouteKey: "$default"
+            RouteResponseSelectionExpression: "$default"
+            Target: !Sub "integrations/${ApiGatewayV2Integration2}"
+
+    ApiGatewayV2Route3:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ApiKeyRequired: false
+            AuthorizationType: "NONE"
+            RouteKey: "$connect"
+            RouteResponseSelectionExpression: "$default"
+            Target: !Sub "integrations/${ApiGatewayV2Integration3}"
+
+    ApiGatewayV2RouteResponse:
+        Type: "AWS::ApiGatewayV2::RouteResponse"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            RouteResponseKey: "$default"
+            RouteId: !Ref ApiGatewayV2Route2
+
+    ApiGatewayV2RouteResponse2:
+        Type: "AWS::ApiGatewayV2::RouteResponse"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            RouteResponseKey: "$default"
+            RouteId: !Ref ApiGatewayV2Route
+
+    ApiGatewayV2RouteResponse3:
+        Type: "AWS::ApiGatewayV2::RouteResponse"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            RouteResponseKey: "$default"
+            RouteId: !Ref ApiGatewayV2Route3
+
+    ApiGatewayV2Integration:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ConnectionType: "INTERNET"
+            IntegrationMethod: "POST"
+            IntegrationType: "HTTP"
+            IntegrationUri: "https://{your-url-domain}/api/dotnetify/vm"
+            PassthroughBehavior: "WHEN_NO_MATCH"
+            RequestTemplates: 
+                "$default": |
+                    {
+                       "connectionId": "$context.connectionId"
+                    }
+            TemplateSelectionExpression: "\\$default"
+            TimeoutInMillis: 29000
+            PayloadFormatVersion: "1.0"
+
+    ApiGatewayV2Integration2:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ConnectionType: "INTERNET"
+            IntegrationMethod: "POST"
+            IntegrationType: "HTTP"
+            IntegrationUri: "https://{your-url-domain}/api/dotnetify/vm"
+            PassthroughBehavior: "WHEN_NO_MATCH"
+            RequestTemplates: 
+                "$default": |
+                    {
+                       "connectionId": "$context.connectionId",
+                       "payload": $input.body
+                    }
+            TemplateSelectionExpression: "\\$default"
+            TimeoutInMillis: 29000
+            PayloadFormatVersion: "1.0"
+
+    ApiGatewayV2Integration3:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ConnectionType: "INTERNET"
+            IntegrationMethod: "POST"
+            IntegrationType: "HTTP"
+            IntegrationUri: "https://{your-url-domain}/api/dotnetify/vm"
+            PassthroughBehavior: "WHEN_NO_MATCH"
+            RequestTemplates: 
+                "$default": |
+                    {
+                       "connectionId": "$context.connectionId"
+                    }
+            TemplateSelectionExpression: "\\$default"
+            TimeoutInMillis: 29000
+            PayloadFormatVersion: "1.0"
+
+    ApiGatewayV2IntegrationResponse:
+        Type: "AWS::ApiGatewayV2::IntegrationResponse"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            IntegrationId: !Ref ApiGatewayV2Integration
+            IntegrationResponseKey: "$default"
+
+    ApiGatewayV2IntegrationResponse2:
+        Type: "AWS::ApiGatewayV2::IntegrationResponse"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            IntegrationId: !Ref ApiGatewayV2Integration2
+            IntegrationResponseKey: "$default"
+
+    ApiGatewayV2IntegrationResponse3:
+        Type: "AWS::ApiGatewayV2::IntegrationResponse"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            IntegrationId: !Ref ApiGatewayV2Integration3
+            IntegrationResponseKey: "$default"
+
