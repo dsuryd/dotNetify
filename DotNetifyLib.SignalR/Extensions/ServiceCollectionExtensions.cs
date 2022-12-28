@@ -104,17 +104,26 @@ namespace DotNetify
          return services;
       }
 
-      public static IHttpClientBuilder AddDotNetifyIntegrationWebApi(this IServiceCollection services, Action<HttpClient> configure)
+      public static IHttpClientBuilder AddDotNetifyIntegrationWebApi(this IServiceCollection services, Action<DotNetifyWebApiConfiguration> configure)
       {
          if (!services.Any(x => x.ServiceType == typeof(IWebApiVMControllerFactory)))
             services.AddDotNetifyWebApi();
 
          services.AddSingleton<IWebApiResponseManager, WebApiResponseManager>();
          services.AddSingleton<IWebApiConnectionCache, WebApiConnectionCache>();
-         services.AddTransient<Connection>();
-         services.AddTransient<ConnectionGroup>();
 
-         return services.AddHttpClient(nameof(DotNetifyWebApi), configure);
+         var config = new DotNetifyWebApiConfiguration();
+         configure?.Invoke(config);
+
+         if (config.MaxParallelHttpRequests > 0)
+            WebApiResponseManager.MaxParallelHttpRequests = config.MaxParallelHttpRequests;
+
+         return services.AddHttpClient(nameof(DotNetifyWebApi), config.ConfigureHttpClient);
+      }
+
+      public static IHttpClientBuilder AddDotNetifyIntegrationWebApi(this IServiceCollection services, Action<HttpClient> configureHttpClient)
+      {
+         return services.AddDotNetifyIntegrationWebApi(configure => configure.ConfigureHttpClient = configureHttpClient);
       }
    }
 }
