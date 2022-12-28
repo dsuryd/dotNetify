@@ -95,7 +95,7 @@ export class DotNetifyHubWebSocket implements IDotnetifyHub {
 
         this._socket.addEventListener("message", event => {
           if (event.data == 404) {
-            console.error("The WebSocket server cannot reached the DotNetify server's integration endpoint.");
+            console.error("The websocket server couldn't reach the dotNetify server's integration endpoint.");
           } else if (event.data) {
             if (dotnetify.debug) console.debug("ws message:", event.data);
             let jsonData;
