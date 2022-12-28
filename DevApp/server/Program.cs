@@ -6,6 +6,7 @@ using DotNetify;
 using DotNetify.DevApp;
 using DotNetify.Pulse;
 using DotNetify.Security;
+using DotNetify.WebApi;
 using Jering.Javascript.NodeJS;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.IdentityModel.Tokens;
@@ -47,12 +48,15 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["WSServer:ConnectionUrl"]))
    services.AddDotNetifyIntegrationWebApi(client => client.BaseAddress = new Uri(builder.Configuration["WSServer:ConnectionUrl"]));
 
 if (!string.IsNullOrWhiteSpace(builder.Configuration["Redis:ConnectionString"]))
+{
    services.AddStackExchangeRedisCache(options => options.Configuration = builder.Configuration["Redis:ConnectionString"]);
+}
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseWebSockets();
+
 app.UseDotNetify(config =>
 {
    config.RegisterAssembly("DotNetify.DevApp.ViewModels");
@@ -88,16 +92,17 @@ app.UseDotNetify(config =>
    // Demonstration filter that passes access token from the middleware to the ViewModels.SecurePageVM class instance.
    config.UseFilter<SetAccessTokenFilter>();
 });
+
 app.UseDotNetifyPulse();
 
 if (app.Environment.IsDevelopment())
 {
 #pragma warning disable 618
-   //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-   //{
-   //   HotModuleReplacement = true,
-   //   HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
-   //});
+   app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+   {
+      HotModuleReplacement = true,
+      HotModuleReplacementClientOptions = new Dictionary<string, string> { { "reload", "true" } },
+   });
 #pragma warning restore 618
 }
 

@@ -13,8 +13,10 @@ dotnetify.debug = true;
 // enableSsr();
 
 // ** Enable integration with 3rd party websocket server like AWS API gateway **
-//dotnetify.hub = createWebSocketHub(process.env.AWS_API_GATEWAY);
-//dotnetify.hub = createWebSocketHub(process.env.LOCAL_WS_SERVER);
+if (process.env.ENABLE_AWS_INTEGRATION) {
+  dotnetify.hub = createWebSocketHub(process.env.AWS_API_GATEWAY);
+  //dotnetify.hub = createWebSocketHub(process.env.LOCAL_WS_SERVER);
+}
 
 // ** Switch SignalR protocol from JSON to MessagePack **
 // import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
@@ -28,5 +30,5 @@ const container = document.getElementById("App");
 hydrateRoot(container, <App />);
 
 // ** DEV TESTING **
-// import TestApp from "./app/views/examples/react/HelloWorld";
-// createRoot(container).render(<TestApp />);
+//import TestApp from "./app/views/examples/react/ChatRoom";
+//createRoot(container).render(<TestApp />);
