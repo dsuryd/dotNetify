@@ -4,14 +4,14 @@ The following steps will create a simple real-time Hello World ASP.NET Core app 
 
 Prerequisites:
 
-- Visual Studio 2019 with .NET 5 SDK
+- Visual Studio 2022
 - Node.js
 
 [inset]
 
 ##### Create Project
 
-Create an empty ASP.NET 5 Web Application project and name it _HelloWorld_. Then use the NuGet Package Manager Console to install the dotNetify package:
+Create an empty ASP.NET Web Application project and name it _HelloWorld_. Then use the NuGet Package Manager Console to install the dotNetify package:
 
 ```csharp
 install-package DotNetify.SignalR

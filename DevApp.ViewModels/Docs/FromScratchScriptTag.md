@@ -4,7 +4,7 @@ The following steps will create a simple real-time Hello World ASP.NET Core app 
 
 Prerequisites:
 
-- .NET Core 5 SDK.
+- [.NET SDK](https://dotnet.microsoft.com/en-us/download).
 
 [inset]
 
@@ -75,8 +75,8 @@ Add a new file _wwwroot/index.html_ with the following content:
     <!-- Polyfills for IE 11 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill.min.js"></script>
 
-    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@5/dist/browser/signalr.min.js"></script>
     <script src="https://unpkg.com/dotnetify@latest/dist/dotnetify-react.min.js"></script>
