@@ -18,8 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MemoryPack;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace DotNetify.WebApi
 {
@@ -38,110 +36,103 @@ namespace DotNetify.WebApi
 
       Task RemoveAsync(string connectionId);
 
-      Task<List<Connection>> GetConnections();
+      Task<List<Connection>> GetConnectionsAsync();
 
       Task<ConnectionGroup> GetGroupAsync(string groupName);
 
       Task SaveGroupAsync(ConnectionGroup group);
    }
 
-   [MemoryPackable]
-   public partial class Connection
+   public class Connection
    {
       public string Id { get; set; }
       public List<ConnectionVMInfo> VMInfo { get; set; } = new List<ConnectionVMInfo>();
    }
 
-   [MemoryPackable]
-   public partial class ConnectionGroup
+   public class ConnectionGroup
    {
       public string Name { get; set; }
       public HashSet<string> ConnectionIds { get; set; } = new HashSet<string>();
    }
 
-   [MemoryPackable]
-   public partial class ConnectionVMInfo
+   public class ConnectionVMInfo
    {
       public string VMId { get; set; }
       public string VMArgs { get; set; }
    }
 
    /// <summary>
-   /// Persists Web API connection info on a distributed cache.
+   /// Stores Web API connection info.
    /// </summary>
    public class WebApiConnectionCache : IWebApiConnectionCache
    {
-      private readonly IDistributedCache _cache;
+      private readonly IMemoryCache _cache;
 
-      private const string CONNECTION_KEY_PREFIX = "$dotnetifyConn__";
-      private const string GROUP_KEY_PREFIX = "$dotnetifyGroup__";
+      protected const string CONNECTION_KEY_PREFIX = "$dotnetifyConn__";
+      protected const string GROUP_KEY_PREFIX = "$dotnetifyGroup__";
       internal const string ACTIVE_GROUP = "$active";
 
       public TimeSpan? CacheExpiration { get; set; } = TimeSpan.FromHours(2);
 
-      public WebApiConnectionCache(IDistributedCache cache)
+      public WebApiConnectionCache(IMemoryCache cache)
       {
          _cache = cache;
       }
 
-      public async Task AddVMAsync(string connectionId, string vmId, string vmArgs)
+      public Task AddVMAsync(string connectionId, string vmId, string vmArgs)
       {
-         var bytes = await _cache.GetAsync(CONNECTION_KEY_PREFIX + connectionId);
-         var connection = bytes != null ? MemoryPackSerializer.Deserialize<Connection>(bytes) : new Connection { Id = connectionId };
+         var connection = (_cache.Get(CONNECTION_KEY_PREFIX + connectionId) as Connection) ?? new Connection { Id = connectionId };
          if (!connection.VMInfo.Any(x => x.VMId == vmId))
          {
             connection.VMInfo.Add(new ConnectionVMInfo { VMId = vmId, VMArgs = vmArgs });
-            await _cache.SetAsync(CONNECTION_KEY_PREFIX + connectionId, MemoryPackSerializer.Serialize(connection));
+            _cache.Set(CONNECTION_KEY_PREFIX + connectionId, connection);
          }
+         return Task.CompletedTask;
       }
 
-      public async Task RemoveVMAsync(string connectionId, string vmId)
+      public Task RemoveVMAsync(string connectionId, string vmId)
       {
-         var bytes = await _cache.GetAsync(CONNECTION_KEY_PREFIX + connectionId);
-         var connection = bytes != null ? MemoryPackSerializer.Deserialize<Connection>(bytes) : null;
+         var connection = _cache.Get(CONNECTION_KEY_PREFIX + connectionId) as Connection;
          if (connection?.VMInfo.Any(x => x.VMId == vmId) == true)
          {
             connection.VMInfo = connection.VMInfo.Where(x => x.VMId != vmId).ToList();
-            await _cache.SetAsync(CONNECTION_KEY_PREFIX + connectionId, MemoryPackSerializer.Serialize(connection), new DistributedCacheEntryOptions
-            {
-               SlidingExpiration = CacheExpiration
-            });
+            _cache.Set(CONNECTION_KEY_PREFIX + connectionId, connection);
          }
+         return Task.CompletedTask;
       }
 
       public Task RefreshAsync(string connectionId)
       {
-         return _cache.GetAsync(CONNECTION_KEY_PREFIX + connectionId);
+         _cache.Get(CONNECTION_KEY_PREFIX + connectionId);
+         return Task.CompletedTask;
       }
 
       public Task RemoveAsync(string connectionId)
       {
-         return _cache.RemoveAsync(CONNECTION_KEY_PREFIX + connectionId);
+         _cache.Remove(CONNECTION_KEY_PREFIX + connectionId);
+         return Task.CompletedTask;
       }
 
-      public async Task<ConnectionGroup> GetGroupAsync(string groupName)
+      public Task<ConnectionGroup> GetGroupAsync(string groupName)
       {
-         var bytes = await _cache.GetAsync(GROUP_KEY_PREFIX + groupName);
-         return bytes != null ? MemoryPackSerializer.Deserialize<ConnectionGroup>(bytes) : new ConnectionGroup { Name = groupName };
+         var group = _cache.Get(GROUP_KEY_PREFIX + groupName) as ConnectionGroup;
+         return Task.FromResult(group ?? new ConnectionGroup { Name = groupName });
       }
 
       public Task SaveGroupAsync(ConnectionGroup group)
       {
-         return _cache.SetAsync(GROUP_KEY_PREFIX + group.Name, MemoryPackSerializer.Serialize(group), new DistributedCacheEntryOptions
-         {
-            SlidingExpiration = CacheExpiration
-         });
+         _cache.Set(GROUP_KEY_PREFIX + group.Name, group);
+         return Task.CompletedTask;
       }
 
-      public async Task<List<Connection>> GetConnections()
+      public async Task<List<Connection>> GetConnectionsAsync()
       {
          var connections = new List<Connection>();
 
          var active = await GetGroupAsync(ACTIVE_GROUP);
          foreach (var connectionId in active.ConnectionIds)
          {
-            var bytes = await _cache.GetAsync(CONNECTION_KEY_PREFIX + connectionId);
-            var connection = bytes != null ? MemoryPackSerializer.Deserialize<Connection>(bytes) : null;
+            var connection = _cache.Get(CONNECTION_KEY_PREFIX + connectionId) as Connection;
             if (connection != null)
                connections.Add(connection);
          }
