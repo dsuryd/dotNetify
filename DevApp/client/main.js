@@ -13,7 +13,7 @@ dotnetify.debug = true;
 // enableSsr();
 
 // ** Enable integration with 3rd party websocket server like AWS API gateway **
-if (process.env.ENABLE_AWS_INTEGRATION) {
+if (process.env.ENABLE_AWS_INTEGRATION !== "false") {
   dotnetify.hub = dotnetify.createWebSocketHub(process.env.AWS_API_GATEWAY);
   //dotnetify.hub = dotnetify.createWebSocketHub(process.env.LOCAL_WS_SERVER);
 }
