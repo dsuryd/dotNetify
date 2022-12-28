@@ -79,10 +79,10 @@
     <PackageReference Include="DotNetify.Elements" Version="1.5.1" />
     <PackageReference Include="MemoryPack" Version="1.9.7" />
 	  <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Bogus" Version="34.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.12" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.15.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.15" />
+    <PackageReference Include="Bogus" Version="34.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.25.1" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.24" />
     <PackageReference Include="UAParser" Version="3.1.47" />        
   </ItemGroup>
 

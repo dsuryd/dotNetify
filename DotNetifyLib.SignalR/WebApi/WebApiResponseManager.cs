@@ -169,7 +169,7 @@ namespace DotNetify.WebApi
          var active = await _cache.GetGroupAsync(WebApiConnectionCache.ACTIVE_GROUP);
 
          var group = await _cache.GetGroupAsync(groupName);
-         var activeConnectionIds = group.ConnectionIds.Where(id => active.ConnectionIds.Contains(id)).ToHashSet();
+         var activeConnectionIds = group.ConnectionIds.Where(id => active.ConnectionIds.Contains(id)).ToList();
          if (activeConnectionIds.Count != group.ConnectionIds.Count)
          {
             group.ConnectionIds = activeConnectionIds;
@@ -233,15 +233,12 @@ namespace DotNetify.WebApi
 
          try
          {
-            using var httpClient = _httpClientFactory.CreateClient(nameof(DotNetifyWebApi));
-            if (httpClient != null)
+            using (var httpClient = _httpClientFactory.CreateClient(nameof(DotNetifyWebApi)))
             {
                var result = await httpClient.PostAsync($"{connectionId}", content);
                if (!result.IsSuccessStatusCode)
                   RemoveInstance(connectionId);
             }
-            else
-               throw new Exception("Missing HttpClient. Include 'services.AddDotNetifyHttpClient()' in the startup.");
          }
          finally
          {

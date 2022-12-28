@@ -52,7 +52,7 @@ namespace DotNetify.WebApi
    public class ConnectionGroup
    {
       public string Name { get; set; }
-      public HashSet<string> ConnectionIds { get; set; } = new HashSet<string>();
+      public List<string> ConnectionIds { get; set; } = new List<string>();
    }
 
    public class ConnectionVMInfo
