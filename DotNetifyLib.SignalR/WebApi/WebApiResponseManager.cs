@@ -237,8 +237,16 @@ namespace DotNetify.WebApi
             {
                var result = await httpClient.PostAsync($"{connectionId}", content);
                if (!result.IsSuccessStatusCode)
+               {
                   RemoveInstance(connectionId);
+                  Logger.LogError($"Integration callback responds with {(int) result.StatusCode} {result.ReasonPhrase}");
+               }
             }
+         }
+         catch (Exception ex)
+         {
+            Logger.LogError($"Failed to send integration response: {ex.Message}");
+            throw;
          }
          finally
          {
