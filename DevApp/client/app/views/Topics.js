@@ -2,6 +2,7 @@ import React from "react";
 import { Markdown, withTheme } from "dotnetify-elements";
 import Article from "../components/Article";
 import MfeImage from "../images/MicroFrontend.svg";
+import AwsImage from "../images/AWSIntegration.svg";
 
 const Image = styled.img`
   display: flex;
@@ -9,6 +10,7 @@ const Image = styled.img`
   justify-content: center;
   max-width: 800px;
   width: 90%;
+  margin: auto;
 `;
 
 export const MicroFrontend = withTheme(() => (
@@ -39,6 +41,8 @@ export const Scaleout = withTheme(() => (
 
 export const AWSIntegration = withTheme(() => (
   <Article vm="AWSIntegration" id="Content">
-    <Markdown id="Content" />
+    <Markdown id="Content">
+      <Image src={AwsImage} style={{ width: "80%" }} />
+    </Markdown>
   </Article>
 ));

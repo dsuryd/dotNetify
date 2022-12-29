@@ -1,12 +1,16 @@
 ## AWS Integration
 
-Even though by default DotNetify uses SignalR for client-server communication, it can switch to use the browser's native WebSocket API and communicate to other WebSocket server implementations, most notably the Amazon API Gateway, which is a great option for scaling out.
+Even though by default DotNetify uses SignalR for client-server communication, it can switch to use the browser's native WebSocket API and communicate to other WebSocket server implementations, most notably Amazon API Gateway, which is a great option for scaling out.
 
-With the Amazon API Gateway, you won't have to worry about self-hosting a web server that can handle large-scale WebSocket connections. This fully-managed service will maintain persistent connections and handle the message transfer between the clients and your dotNetify application server through built-in HTTP integration endpoints.
+With Amazon API Gateway, you won't have to worry about self-hosting a web server that can handle large-scale WebSocket connections. This fully-managed service will maintain persistent connections and handle the message transfer between the clients and your dotNetify application server through built-in HTTP integration endpoints.
 
-To get your dotNetify application communicating through the Amazon API Gateway, first you need to do the following tasks:
+[inset]
 
-- Create, configure, and deploy a WebSocket API on the Amazon API Gateway.
+<br/>
+
+To get your dotNetify application communicating through Amazon API Gateway, first you need to do the following tasks:
+
+- Create, configure, and deploy a WebSocket API on Amazon API Gateway.
 - Create an IAM authorization for allowing access to the API.
 - Configure the HTTP integration endpoints and the IAM credentials on the dotNetify app server.
 - Point the dotNetify client to the API's WebSocket URL.
@@ -17,11 +21,11 @@ Go to your AWS Management Console, and use the below template to add a new WebSo
 
 [**dotnetify-cloudformation-template.yaml**](https://github.com/dsuryd/dotNetify/blob/master/dotnetify-cloudformation-template.yaml)
 
-The template defines an ApiGatewayV2 API of WebSocket protocol type, the routes and integration contracts with a dotNetify server. Copy and edit the template to replace `<your-domain-url>` with the domain name of your deployed dotNetify app server.
+The template defines an ApiGatewayV2 API of WebSocket protocol type, the routes and integration contracts with dotNetify HTTP endpoints. Copy and edit the template to replace `<your-domain-url>` with the domain name of your deployed dotNetify app server.
 
 After the API has been created, go to the API Gateway service and deploy it. Notice the two URLs that are provided on the Deployment Stage page: _the WebSocket URL_ and the _Connection URL_. Use the [wscat](https://github.com/websockets/wscat) tool to verify the _WebSocket URL_ is accepting connections.
 
-The last thing to do on the AWS Console is creating an IAM user with enough permission for the dotNetify server to call the _Connection URL_ so it can push data to clients. You can use an AWS policy `AmazonAPIGatewayInvokeFullAccess` for this. Once it's created, generate an access key for the next step.
+Finally, create an IAM user with sufficient permission for the dotNetify server to call the _Connection URL_ so it can push data to clients. You can use an AWS policy `AmazonAPIGatewayInvokeFullAccess` for this. Once it's created, generate an access key for our next step.
 
 #### DotNetify Server Setup
 
@@ -68,14 +72,14 @@ To handle network interruption, the client employs an automatic reconnection mec
 
 #### Troubleshooting Tips
 
-For troubleshooting, it's recommended to enable debug logging on the client: `dotnetify.debug = true`. If the client is successfully connected to the API Gateway, you should see this browser console output:
+For troubleshooting, it's recommended to enable debug logging on the client: `dotnetify.debug = true`. If the client is successfully connected to Amazon API Gateway, you should see this browser console output:
 
 ```
 DotNetifyHub: connecting to <aws-api-websocket-url>
 DotNetifyHub: connected
 ```
 
-In the case of dotNetify server URL misconfiguration in the API Gateway, you will see this browser console error:
+In the case of dotNetify server URL misconfiguration in Amazon API Gateway, you will see this browser console error:
 
 ```
 The websocket server couldn't reach the dotNetify server's integration endpoint.
