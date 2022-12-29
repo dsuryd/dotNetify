@@ -38,56 +38,16 @@ namespace DotNetify
 
       public static IServiceCollection AddDotNetifyCore(this IServiceCollection services)
       {
-         // Add memory cache.
-         if (!services.Any(x => x.ServiceType == typeof(Microsoft.Extensions.Caching.Memory.IMemoryCache)))
-            services.AddMemoryCache();
-         services.AddSingleton<IMemoryCache, MemoryCacheAdapter>();
-
-         // Add distributed cache if not injected yet.
-         if (!services.Any(x => x.ServiceType == typeof(IDistributedCache)))
-            services.AddDistributedMemoryCache();
-
-         // Add view model controller factory, to be injected to dotNetify's signalR hub.
-         services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
-
-         // Add view model factory.
-         services.AddSingleton<IVMTypesAccessor, VMTypesAccessor>();
-         services.AddSingleton<IVMFactory, VMFactory>();
-
-         // Add the dependency injection service scope factory for view model controllers.
-         services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
-
-         // Add service to handle hub messages.
-         services.AddTransient<IDotNetifyHubHandler, DotNetifyHubHandler>();
-         services.AddTransient<IDotNetifyHubResponse, DotNetifyHubResponse>();
-         services.AddSingleton<IDotNetifyHubResponseManager, DotNetifyHubResponseManager>();
-
-         // Add service to get the hub principal and the associated connection context.
-         services.AddSingleton<IPrincipalAccessor, HubInfoAccessor>();
-         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IDotNetifyHubContextAccessor);
-         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IHubCallerContextAccessor);
-         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IConnectionContext);
-
-         // Add service to get the service provider for the view models.
-         services.AddSingleton<IHubServiceProvider, HubServiceProvider>();
-
-         // Add service to run middleware and filters.
-         services.AddTransient<IHubPipeline, HubPipeline>();
-
-         // Add middleware and filter factories.
-         services.AddSingleton<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>(p => new List<Tuple<Type, Func<IMiddlewarePipeline>>>());
-         services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
-
-         // Add factories used for hub forwarding.
-         services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
-         services.AddSingleton<IDotNetifyHubForwarderFactory, DotNetifyHubForwarderFactory>();
-         services.AddSingleton<IDotNetifyHubForwardResponseFactory, DotNetifyHubForwardResponseFactory>();
-
-         return services;
+         return services
+            .AddDotNetifyCoreServices()
+            .AddDotNetifySignalRServices();
       }
 
       public static IServiceCollection AddDotNetifyWebApi(this IServiceCollection services)
       {
+         if (!services.Any(x => x.ServiceType == typeof(IVMControllerFactory)))
+            services.AddDotNetifyCoreServices();
+
          services.AddMvcCore().AddApplicationPart(typeof(DotNetifyWebApi).Assembly).AddControllersAsServices();
          services.AddSingleton<IWebApiVMControllerFactory, WebApiVMControllerFactory>();
 
@@ -124,6 +84,61 @@ namespace DotNetify
       public static IHttpClientBuilder AddDotNetifyIntegrationWebApi(this IServiceCollection services, Action<HttpClient> configureHttpClient)
       {
          return services.AddDotNetifyIntegrationWebApi(configure => configure.ConfigureHttpClient = configureHttpClient);
+      }
+
+      private static IServiceCollection AddDotNetifyCoreServices(this IServiceCollection services)
+      {
+         // Add memory cache.
+         if (!services.Any(x => x.ServiceType == typeof(Microsoft.Extensions.Caching.Memory.IMemoryCache)))
+            services.AddMemoryCache();
+         services.AddSingleton<IMemoryCache, MemoryCacheAdapter>();
+
+         // Add distributed cache if not injected yet.
+         if (!services.Any(x => x.ServiceType == typeof(IDistributedCache)))
+            services.AddDistributedMemoryCache();
+
+         // Add view model controller factory, to be injected to dotNetify's signalR hub.
+         services.AddSingleton<IVMControllerFactory, VMControllerFactory>();
+
+         // Add view model factory.
+         services.AddSingleton<IVMTypesAccessor, VMTypesAccessor>();
+         services.AddSingleton<IVMFactory, VMFactory>();
+
+         // Add the dependency injection service scope factory for view model controllers.
+         services.AddSingleton<IVMServiceScopeFactory, VMServiceScopeFactory>();
+
+         // Add service to get the hub principal and the associated connection context.
+         services.AddSingleton<IPrincipalAccessor, HubInfoAccessor>();
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IDotNetifyHubContextAccessor);
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IHubCallerContextAccessor);
+         services.AddSingleton(x => x.GetService<IPrincipalAccessor>() as IConnectionContext);
+
+         // Add service to get the service provider for the view models.
+         services.AddSingleton<IHubServiceProvider, HubServiceProvider>();
+
+         // Add service to run middleware and filters.
+         services.AddTransient<IHubPipeline, HubPipeline>();
+
+         // Add middleware and filter factories.
+         services.AddSingleton<IList<Tuple<Type, Func<IMiddlewarePipeline>>>>(p => new List<Tuple<Type, Func<IMiddlewarePipeline>>>());
+         services.AddSingleton<IDictionary<Type, Func<IVMFilter>>>(p => new Dictionary<Type, Func<IVMFilter>>());
+
+         return services;
+      }
+
+      private static IServiceCollection AddDotNetifySignalRServices(this IServiceCollection services)
+      {
+         // Add service to handle hub messages.
+         services.AddTransient<IDotNetifyHubHandler, DotNetifyHubHandler>();
+         services.AddTransient<IDotNetifyHubResponse, DotNetifyHubResponse>();
+         services.AddSingleton<IDotNetifyHubResponseManager, DotNetifyHubResponseManager>();
+
+         // Add factories used for hub forwarding.
+         services.AddSingleton<IDotNetifyHubProxyFactory, DotNetifyHubProxyFactory>();
+         services.AddSingleton<IDotNetifyHubForwarderFactory, DotNetifyHubForwarderFactory>();
+         services.AddSingleton<IDotNetifyHubForwardResponseFactory, DotNetifyHubForwardResponseFactory>();
+
+         return services;
       }
    }
 }
