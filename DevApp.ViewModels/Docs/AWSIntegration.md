@@ -37,24 +37,26 @@ Configure the startup class as follows:
 using Amazon.Runtime;
 using AwsSignatureVersion4;
 using DotNetify;
-using DotNetify.WebApi;
 ...
 
 public void ConfigureServices(IServiceCollection services)
 {
+  ...
   var awsCredentials = new ImmutableCredentials("<aws-access-key-id>", "<aws-secret-access-key>", null);
 
   services
     .AddTransient<AwsSignatureHandler>()
     .AddTransient(_ => new AwsSignatureHandlerSettings("<aws-region>", "execute-api", awsCredentials));
-
-  services
-    .AddDotNetify();
     .AddDotNetifyIntegrationWebApi(client =>
       client.BaseAddress = new Uri("<api-connection-url>/") /* Uri string must end with a slash! */
     )
     .AddHttpMessageHandler<AwsSignatureHandler>();
+}
+
+public void Configure(IApplicationBuilder app)
+{
   ...
+  app.MapControllers();
 }
 ```
 
