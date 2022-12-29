@@ -4,11 +4,11 @@ _DotNetify-Testing_ provides a simple and effective way to test dotNetify view m
 
 <d-alert info="true">
 
-<b>This is a closed source library for Pro, Team, and Enterprise sponsors.</b> If you are one, send an email to _admin@dotnetify.net_ with your username to get your license key.  
+<b>This is a closed-source library for Pro, Team, and Enterprise sponsors.</b> If you are one, send an email to _admin@dotnetify.net_ with your username to get your license key.
 
-- Pro sponsor: single developer, up to 50 client connections per test project.
-- Team sponsor: up to 10 developers, unlimited client connections + private email support.
-- Enterprise sponsor: usage is unlimited + private email support.
+- Pro sponsor: single developer, up to 100 client connections per test project.
+- Team sponsor: up to 10 developers, unlimited usage + private email support.
+- Enterprise sponsor: unlimited usage + private email support.
 
 </d-alert>
 

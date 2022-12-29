@@ -1,9 +1,6 @@
 import Overview from "./Overview";
 import DataFlow from "./DataFlow";
-import Reactive from "./Reactive";
-import Scaleout from "./Scaleout";
-import MicroFrontend from "./MicroFrontend";
-import RealtimePostgres from "./RealtimePostgres";
+import { MicroFrontend, Reactive, RealtimePostgres, Scaleout, AWSIntegration } from "./Topics";
 import GetStarted from "./GetStarted";
 import FromScratchWebPack from "./from-scratch/FromScratchWebPack";
 import FromScratchScriptTag from "./from-scratch/FromScratchScriptTag";
@@ -29,7 +26,7 @@ import Multicast from "./apis/Multicast";
 import Routing from "./apis/Routing";
 import Security from "./apis/Security";
 import WebApiMode from "./apis/WebApiMode";
-import { DotNetifyTesting, DotNetifyLoadTester, DotNetifyObserver } from "./Premium";
+import { DotNetifyTesting, DotNetifyLoadTester, DotNetifyObserver, DotNetifyResiliencyAddon } from "./Premium";
 
 const NotFound404 = () => (
   <div style={{ padding: "1.5rem" }}>
@@ -50,6 +47,7 @@ export {
   MicroFrontend,
   RealtimePostgres,
   Scaleout,
+  AWSIntegration,
   GetStarted,
   HelloWorld,
   ControlTypes,
@@ -74,5 +72,6 @@ export {
   DotNetifyTesting,
   DotNetifyLoadTester,
   DotNetifyObserver,
+  DotNetifyResiliencyAddon,
   NotFound404
 };

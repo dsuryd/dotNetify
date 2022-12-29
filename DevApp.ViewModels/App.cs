@@ -21,6 +21,7 @@ namespace DotNetify.DevApp
          RealtimePostgres,
          MicroFrontend,
          Scaleout,
+         AWSIntegration,
          GetStarted,
          HelloWorld,
          ControlTypes,
@@ -45,6 +46,7 @@ namespace DotNetify.DevApp
          DotNetifyTesting,
          DotNetifyLoadTester,
          DotNetifyObserver,
+         DotNetifyResiliencyAddon,
          NotFound404
       }
 
@@ -64,6 +66,7 @@ namespace DotNetify.DevApp
            new RouteTemplate (nameof (Route.MicroFrontend)) { UrlPattern = "mfe" },
            new RouteTemplate (nameof (Route.Scaleout)) { UrlPattern = "scaleout" },
            new RouteTemplate (nameof (Route.RealtimePostgres)) { UrlPattern = "postgres" },
+           new RouteTemplate (nameof (Route.AWSIntegration)) { UrlPattern = "aws-integration" },
            new RouteTemplate (nameof (Route.GetStarted)) { UrlPattern = "getstarted" },
 
            new RouteTemplate (nameof (Route.HelloWorld)) { UrlPattern = "examples/helloworld" },
@@ -95,6 +98,7 @@ namespace DotNetify.DevApp
            new RouteTemplate (nameof (Route.DotNetifyTesting)) { UrlPattern = "dotnetify-testing" },
            new RouteTemplate (nameof (Route.DotNetifyLoadTester)) { UrlPattern = "dotnetify-loadtester" },
            new RouteTemplate (nameof (Route.DotNetifyObserver)) { UrlPattern = "dotnetify-observer" },
+           new RouteTemplate (nameof (Route.DotNetifyResiliencyAddon)) { UrlPattern = "dotnetify-resiliencyaddon" },
 
            new RouteTemplate (nameof (Route.NotFound404)) { UrlPattern = "*", ViewUrl = "NotFound404" },
          });
@@ -109,6 +113,7 @@ namespace DotNetify.DevApp
                Label = "Topics",
                Routes = new NavRoute[]
                {
+                  new NavRoute ("AWS Integration", this.GetRoute (nameof (Route.AWSIntegration))),
                   new NavRoute ("Data Flow Pattern", this.GetRoute (nameof (Route.DataFlow))),
                   new NavRoute ("Micro-Frontend", this.GetRoute (nameof (Route.MicroFrontend))),
                   new NavRoute ("Reactive Programming", this.GetRoute (nameof (Route.Reactive))),
@@ -168,6 +173,7 @@ namespace DotNetify.DevApp
               Icon = "material-icons volunteer_activism",
                Routes = new NavRoute[]
               {
+                 new NavRoute ("DotNetify-ResiliencyAddon", this.GetRoute (nameof (Route.DotNetifyResiliencyAddon))),
                  new NavRoute ("DotNetify-Observer", this.GetRoute (nameof (Route.DotNetifyObserver))),
                  new NavRoute ("DotNetify-LoadTester", this.GetRoute (nameof (Route.DotNetifyLoadTester))),
                  new NavRoute ("DotNetify-Testing", this.GetRoute (nameof (Route.DotNetifyTesting))),

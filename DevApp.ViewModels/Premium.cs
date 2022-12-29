@@ -16,4 +16,9 @@ namespace DotNetify.DevApp
    {
       public string Content => new Markdown("DotNetify.DevApp.Docs.Premium.DotNetifyObserver.md");
    }
+
+   public class DotNetifyResiliencyAddon : BaseVM
+   {
+      public string Content => new Markdown("DotNetify.DevApp.Docs.Premium.DotNetifyResiliencyAddon.md");
+   }
 }

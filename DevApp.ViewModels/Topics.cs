@@ -21,4 +21,9 @@ namespace DotNetify.DevApp
    {
       public string Content => new Markdown("DotNetify.DevApp.Docs.Scaleout.md");
    }
+
+   public class AWSIntegration : BaseVM
+   {
+      public string Content => new Markdown("DotNetify.DevApp.Docs.AWSIntegration.md");
+   }
 }

@@ -19,3 +19,9 @@ export const DotNetifyObserver = withTheme(() => (
     <Markdown id="Content" />
   </Article>
 ));
+
+export const DotNetifyResiliencyAddon = withTheme(() => (
+  <Article vm="DotNetifyResiliencyAddon" id="Content">
+    <Markdown id="Content" />
+  </Article>
+));

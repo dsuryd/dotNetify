@@ -72,6 +72,12 @@ If using script tags, include _React_, _signalR_, and _dotNetify_ from their res
 <script src="https://unpkg.com/dotnetify@latest/dist/dotnetify-react.min.js"></script>
 ```
 
+If you plan to use React 18, import the following in your main entry file:
+
+```jsx
+import "dotnetify/dist/react/v18-compatibility";
+```
+
 #### .NET Framework
 
 > The library for .NET Framework is no longer maintained. All features and bug fixes introduced after v3.6.1 will only apply to the library for .NET Core. However, private support is possible through sponsorship.

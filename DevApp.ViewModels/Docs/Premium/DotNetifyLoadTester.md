@@ -4,15 +4,15 @@ _DotNetify-LoadTester_ is a tool for authoring and running performance testing o
 
 <d-alert info="true">
 
-<b>This is a closed source library for Pro, Team, and Enterprise sponsors.</b> If you are one, send an email to _admin@dotnetify.net_ with your username to get your license key.  
+<b>This is a closed-source library for Pro, Team, and Enterprise sponsors.</b> If you are one, send an email to _admin@dotnetify.net_ with your username to get your license key.
 
 - Pro sponsor: single developer, up to 100 client connections.
-- Team sponsor: up to 10 developers, up to 1000 client connections + private email support.
-- Enterprise sponsor: up to 10000 client connections + private email support.
+- Team sponsor: up to 10 developers, unlimited usage + private email support.
+- Enterprise sponsor: unlimited usage + private email support.
 
 </d-alert>
 
-Check out the demo video on the [Scale-Out page](/core/scaleout) to see this tool in action. 
+Check out the demo video on the [Scale-Out page](/core/scaleout) to see this tool in action.
 
 #### Installation
 
