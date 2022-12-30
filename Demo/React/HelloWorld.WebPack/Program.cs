@@ -1,18 +1,19 @@
-﻿using System;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using DotNetify;
+using BrunoLau.SpaServices.Webpack;
 
-namespace HelloWorld
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateWebHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder(args);
+         
+builder.Services.AddSignalR();
+builder.Services.AddDotNetify(); 
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
-    }
-}
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+  app.UseWebpackDevMiddlewareEx(new WebpackDevMiddlewareOptions { HotModuleReplacement = true });
+
+app.UseDotNetify();
+
+app.MapHub<DotNetifyHub>("/dotnetify"); 
+app.MapFallbackToFile("index.html");
+
+app.Run();
