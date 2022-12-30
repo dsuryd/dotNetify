@@ -46,7 +46,7 @@ public void ConfigureServices(IServiceCollection services)
 
   services
     .AddTransient<AwsSignatureHandler>()
-    .AddTransient(_ => new AwsSignatureHandlerSettings("<aws-region>", "execute-api", awsCredentials));
+    .AddTransient(_ => new AwsSignatureHandlerSettings("<aws-region>", "execute-api", awsCredentials))
     .AddDotNetifyIntegrationWebApi(client =>
       client.BaseAddress = new Uri("<api-connection-url>/") /* Uri string must end with a slash! */
     )
