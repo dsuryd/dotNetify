@@ -4,11 +4,12 @@
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 [![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/)
 
-DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org), [Knockout](http://knockoutjs.com) or [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) front-end on C# .NET back-end via WebSocket (SignalR).
+DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org), [Knockout](http://knockoutjs.com) or [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) front-end on C# .NET back-end via WebSocket (SignalR or Amazon API Gateway).
 
 ## What's New
 
-- **Minimal API** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.3) - [blog](https://dsuryd.github.io/dotNetify/minimal-api/).
+- **AWS Integration** - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.4)
+- Minimal API - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.3) - [blog](https://dsuryd.github.io/dotNetify/minimal-api/).
 - Scale-out, Vue 3.x support - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v5.0).
 - Async view model - [release notes](https://github.com/dsuryd/dotNetify/releases/tag/v4.1).
 
@@ -18,13 +19,14 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 - Simple and lightweight - no heavy client-side framework, no REST APIs.
 - Reactive back-end MVVM architecture on ASP.NET server.
-- Built-in real-time across WebSocket with SignalR.
+- Built-in real-time across WebSocket with either SignalR or Amazon API Gateway.
 - Support local (client-side only) and Web API modes.
 - Full support for single-page apps, including deep-linked, nested routing and token-based authentication.
 - Powerful back-end infrastructure, including dependency injection, WebSocket request/response pipelines, and modern tooling.
 
 ## Premium Features
 
+- [**DotNetify-ResiliencyAddon**](https://www.dotnetify.net/core/dotnetify-resiliencyaddon): resilient app server when used with Amazon API Gateway.
 - [**DotNetify-Observer**](https://www.dotnetify.net/core/dotnetify-observer): real-time connection visualization dashboard.
 - [**DotNetify-LoadTester**](https://www.dotnetify.net/core/dotnetify-loadtester): performance testing tool for dotNetify apps.
 - [**DotNetify-Testing**](https://www.dotnetify.net/core/dotnetify-testing): testing library for dotNetify apps.
