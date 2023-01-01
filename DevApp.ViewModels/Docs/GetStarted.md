@@ -72,10 +72,10 @@ If using script tags, include _React_, _signalR_, and _dotNetify_ from their res
 <script src="https://unpkg.com/dotnetify@latest/dist/dotnetify-react.min.js"></script>
 ```
 
-If you plan to use React 18, import the following in your main entry file:
+If you're using dotNetify router and plan to migrate to React 18, import the following in your main entry file:
 
 ```jsx
-import "dotnetify/dist/react/v18-compatibility";
+import "dotnetify/react/v18-compatibility";
 ```
 
 #### .NET Framework
