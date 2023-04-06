@@ -2,9 +2,10 @@
 title: Scaling DotNetify Apps with AWS WebSockets
 date: "2023-03-06T00:00:00Z"
 description: "Use Amazon API Gateway and WebSocket API to scale your dotNetify app and handle large-scale WebSocket connections."
+thumbnail: "./thumbnail.png"
 ---
 
-If you're a dotNetify user, you might be interested to know that the AWS WebSocket API integration capability was just added to the framework early this year. By default, dotNetify uses SignalR for client-server communication, but with this update, it can also use the browser's native WebSocket API to communicate with other WebSocket server implementations, such as Amazon API Gateway.
+If you're a [dotNetify](https://dotnetify.net) user, you might be interested to know that the AWS WebSocket API integration capability was just added to the framework early this year. By default, dotNetify uses SignalR for client-server communication, but with this update, it can also use the browser's native WebSocket API to communicate with other WebSocket server implementations, such as Amazon API Gateway.
 
 Amazon API Gateway is a great option for scaling out. It is a fully-managed service that maintains persistent connections and handles the message transfer between the clients and your application server through built-in HTTP integration endpoints. With Amazon API Gateway, you won't have to worry about self-hosting a web server that can handle large-scale WebSocket connections.
 
@@ -66,4 +67,4 @@ And just like that, your dotNetify application server is now scalable and able t
 
 Of course, there may be some troubleshooting involved along the way, but don't worry, it's not too difficult to figure out. Just make sure to enable debug logging on the client and check the app server logs if you're not seeing data being pushed to the client.
 
-In conclusion, using Amazon API Gateway to scale out your dotNetify application server is a great option that can save you a lot of time and effort. It's not too difficult to set up, and once it's done, you can sit back, relax, and enjoy your scalable real-time, reactive web applications.
+In conclusion, using Amazon API Gateway to scale out your dotNetify application server is a great option that can save you a lot of time and effort and it's not at all difficult to set up.
