@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Virtual Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica+Neue">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="text/javascript" src="./main.js"></script>
+  </head>
+
+  <body>
+    <div class="chat-container">
+      <div id="header" class="header record-inactive">
+        <button id="record" type="button" class="record-btn" onclick="onRecordPress()"">
+          <i class="fas fa-microphone"></i><span>Start</span>
+        </button>
+
+      </div>
+      <div id="transcribedText" class="chat-box">
+      </div>
+    </div>
+
+    <script type="text/javascript" src="./main.js"></script>
+  </body>
+</html>
+
+html  {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+  body {
+    font-family: 'Helvetica Neue', arial, sans-serif;
+    background-color: #f2f2f7;
+    display: flex;
+    justify-content: center;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 1.25em;
+  }
+  
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: calc(100vh - 20px);
+    width: 500px;
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #007aff;
+    color: #fff;
+  }
+  
+  .record-btn {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .record-btn i {
+    margin-right: 10px;
+  }
+ 
+  .header.record-active {
+    background-color: #ff3b30;
+  }
+
+  .header.record-inactive {
+    background-color: #34c759;
+  }  
+  
+  .chat-box {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    flex-grow: 1;
+  }
+  
+  .chat-message {
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    max-width: 70%;
+  }
+  
+  .chat-message.left {
+    background-color: #efeff4;
+    align-self: flex-start;
+    color: #222;
+  }
+  
+  .chat-message.right {
+    background-color: #007aff;
+    align-self: flex-end;
+    color: #fff;
+  }
+
+  .chat-message.error {
+    background-color: #FF3B30;
+  }
+  
+  .chat-input {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .chat-input input {
+    flex-grow: 1;
+  }  
+
+  .lds-ellipsis {
+    align-self: flex-end;
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    transform: scale(0.5);
+  }
+  .lds-ellipsis div {
+    position: absolute;
+    top: 33px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #D3D3D3;
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  }
+  .lds-ellipsis div:nth-child(1) {
+    left: 8px;
+    animation: lds-ellipsis1 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(2) {
+    left: 8px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(3) {
+    left: 32px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(4) {
+    left: 56px;
+    animation: lds-ellipsis3 0.6s infinite;
+  }
+  @keyframes lds-ellipsis1 {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes lds-ellipsis3 {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes lds-ellipsis2 {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(24px, 0);
+    }
+  }
