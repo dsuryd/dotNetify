@@ -184,8 +184,8 @@ namespace DotNetify.Postgres
                transactionEvent.DataEvents.Add(new UpdateEvent
                {
                   Relation = _relations.ContainsKey(updateMsg.Relation.RelationId) ? _relations[updateMsg.Relation.RelationId] : null,
+                  OldColumnValues = await ToStringArrayAsync(updateMsg.OldRow),
                   ColumnValues = await ToStringArrayAsync(updateMsg.NewRow),
-                  OldColumnValues = await ToStringArrayAsync(updateMsg.OldRow)
                });
             }
             else if (messageType == typeof(KeyDeleteMessage))
