@@ -15,6 +15,7 @@ limitations under the License.
  */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -40,7 +41,7 @@ namespace DotNetify.Postgres
    public class DbChangeObserver : IDbChangeObserver
    {
       private IPostgresReplicationSubscriber _postgresReplication;
-      private Dictionary<Type, Dictionary<string, PropertyInfo>> _tableProps = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
+      private ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> _tableProps = new ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>>();
 
       public DbChangeObserver(IPostgresReplicationSubscriber postgresReplication)
       {
@@ -58,7 +59,7 @@ namespace DotNetify.Postgres
                return KeyValuePair.Create(columnAttr != null ? columnAttr.Name : prop.Name, prop);
             }).ToDictionary(x => x.Key, x => x.Value);
 
-            _tableProps.Add(typeof(TTable), tableProps);
+            _tableProps.TryAdd(typeof(TTable), tableProps);
          }
 
          return _postgresReplication.Transaction.Where(Filter<TTable>).SelectMany(Map<TTable>);
