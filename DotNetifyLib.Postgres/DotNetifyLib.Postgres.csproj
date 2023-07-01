@@ -9,7 +9,7 @@
     <Company />
     <Description>Send data updates from PostgreSQL databases to web applications in real-time.</Description>
     <Copyright>Copyright 2021-2023</Copyright>
-	<VersionPrefix>3.0.0</VersionPrefix>
+	<VersionPrefix>3.0.1</VersionPrefix>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>https://dotnetify.net/</PackageProjectUrl>
     <PackageIcon>dotnetify.png</PackageIcon>
@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="DotNetify.Core" Version="5.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Npgsql" Version="7.0.2" />
+    <PackageReference Include="Npgsql" Version="7.0.4" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
