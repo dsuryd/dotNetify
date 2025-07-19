@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DotNetify.DevApp.ViewModels</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Services\AFITop100.json" />
+    <None Remove="Services\webstore.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Services\AFITop100.json" />
+    <EmbeddedResource Include="Services\webstore.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="25.0.4" />
+    <PackageReference Include="DotNetify.SignalR" Version="5.3.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.9.2" />
+    <PackageReference Include="UAParser" Version="3.1.35" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,702 @@
+[
+   {
+      "Rank": 1,
+      "Movie": "Citizen Kane",
+      "Year": 1941,
+      "Cast": "Orson Welles, Joseph Cotten, Dorothy Comingore",
+      "Director": "Orson Welles"
+   },
+   {
+      "Rank": 2,
+      "Movie": "The Godfather",
+      "Year": 1972,
+      "Cast": "Marlon Brando, Al Pacino, James Caan",
+      "Director": "Francis Ford Coppola"
+   },
+   {
+      "Rank": 3,
+      "Movie": "Casablanca",
+      "Year": 1942,
+      "Cast": "Humphrey Bogart, Ingrid Bergman, Paul Henreid",
+      "Director": "Michael Curtiz"
+   },
+   {
+      "Rank": 4,
+      "Movie": "Raging Bull",
+      "Year": 1980,
+      "Cast": "Robert De Niro",
+      "Director": "Martin Scorsese"
+   },
+   {
+      "Rank": 5,
+      "Movie": "Singin' In The Rain",
+      "Year": 1952,
+      "Cast": "Gene Kelly, Donald O'Connor, Debbie Reynolds",
+      "Director": "Gene Kelly"
+   },
+   {
+      "Rank": 6,
+      "Movie": "Gone With The Wind",
+      "Year": 1940,
+      "Cast": "Vivien Leigh, Clark Gable",
+      "Director": "Victor Fleming"
+   },
+   {
+      "Rank": 7,
+      "Movie": "Lawrence Of Arabia",
+      "Year": 1962,
+      "Cast": "Peter O'Toole, Alec Guinness, Anthony Quinn",
+      "Director": "David Lean"
+   },
+   {
+      "Rank": 8,
+      "Movie": "Schindler's List",
+      "Year": 1993,
+      "Cast": "Liam Neeson, Ben Kingsley, Ralph Fiennes",
+      "Director": "Steven Spielberg"
+   },
+   {
+      "Rank": 9,
+      "Movie": "Vertigo",
+      "Year": 1958,
+      "Cast": "James Stewart, Kim Novak",
+      "Director": "Alfred Hitchcock"
+   },
+   {
+      "Rank": 10,
+      "Movie": "The Wizard Of Oz",
+      "Year": 1939,
+      "Cast": "Judy Garland, Frank Morgan, Ray Bolger, Jack Haley, Bert Lahr",
+      "Director": "Victor Fleming"
+   },
+   {
+      "Rank": 11,
+      "Movie": "City Lights",
+      "Year": 1931,
+      "Cast": "Charlie Chaplin",
+      "Director": "Charlie Chaplin"
+   },
+   {
+      "Rank": 12,
+      "Movie": "The Searchers",
+      "Year": 1956,
+      "Cast": "John Wayne",
+      "Director": "John Ford"
+   },
+   {
+      "Rank": 13,
+      "Movie": "Star Wars",
+      "Year": 1977,
+      "Cast": "Mark Hamill, Harrison Ford, Carrie Fisher",
+      "Director": "George Lucas"
+   },
+   {
+      "Rank": 14,
+      "Movie": "Psycho",
+      "Year": 1960,
+      "Cast": "Anthony Perkins, Janet Leigh",
+      "Director": "Alfred Hitchcock"
+   },
+   {
+      "Rank": 15,
+      "Movie": "2001: A Space Odyssey",
+      "Year": 1968,
+      "Cast": "Keir Dullea, Gary Lockwood",
+      "Director": "Stanley Kubrick"
+   },
+   {
+      "Rank": 16,
+      "Movie": "Sunset Blvd.",
+      "Year": 1950,
+      "Cast": "William Holden, Gloria Swanson",
+      "Director": "Billy Wilder"
+   },
+   {
+      "Rank": 17,
+      "Movie": "The Graduate",
+      "Year": 1967,
+      "Cast": "Dustin Hoffman, Anne Bancroft",
+      "Director": "Mike Nichols"
+   },
+   {
+      "Rank": 18,
+      "Movie": "The General",
+      "Year": 1927,
+      "Cast": "Buster Keaton",
+      "Director": "Buster Keaton"
+   },
+   {
+      "Rank": 19,
+      "Movie": "On The Waterfront",
+      "Year": 1954,
+      "Cast": "Marlon Brando",
+      "Director": "Elia Kazan"
+   },
+   {
+      "Rank": 20,
+      "Movie": "It's A Wonderful Life",
+      "Year": 1946,
+      "Cast": "James Steward, Donna Reed",
+      "Director": "Frank Capra"
+   },
+   {
+      "Rank": 21,
+      "Movie": "Chinatown",
+      "Year": 1974,
+      "Cast": "Jack Nicholson, Faye Dunaway",
+      "Director": "Roman Polanski"
+   },
+   {
+      "Rank": 22,
+      "Movie": "Some Like It Hot",
+      "Year": 1959,
+      "Cast": "Marylin Monroe, Tony Curtis, Jack Lemmon",
+      "Director": "Billy Wilder"
+   },
+   {
+      "Rank": 23,
+      "Movie": "The Grapes Of Wrath",
+      "Year": 1940,
+      "Cast": "Henry Fonda",
+      "Director": "John Ford"
+   },
+   {
+      "Rank": 24,
+      "Movie": "E.T. The Extra-Terrestrial",
+      "Year": 1982,
+      "Cast": "Henry Thomas, Drew Barrymore, Peter Coyote, Dee Wallace",
+      "Director": "Steven Spielberg"
+   },
+   {
+      "Rank": 25,
+      "Movie": "To Kill A Mockingbird",
+      "Year": 1962,
+      "Cast": "Gregory Peck",
+      "Director": "Robert Mulligan"
+   },
+   {
+      "Rank": 26,
+      "Movie": "Mr. Smith Goes To Washington",
+      "Year": 1939,
+      "Cast": "James Stewart",
+      "Director": "Frank Capra"
+   },
+   {
+      "Rank": 27,
+      "Movie": "High Noon",
+      "Year": 1952,
+      "Cast": "Gary Cooper",
+      "Director": "Fred Zinnemann"
+   },
+   {
+      "Rank": 28,
+      "Movie": "All About Eve",
+      "Year": 1950,
+      "Cast": "Bette Davis, Anne Baxter, George Sanders, Celeste Holm",
+      "Director": "Joseph L. Mankiewicz"
+   },
+   {
+      "Rank": 29,
+      "Movie": "Double Indemnity",
+      "Year": 1944,
+      "Cast": "Fred MacMurray, Barbara Stanwyck, Edward G. Robinson",
+      "Director": "Billy Wilder"
+   },
+   {
+      "Rank": 30,
+      "Movie": "Apocalypse Now",
+      "Year": 1979,
+      "Cast": "Marlon Brando, Robert Duvall, Martin Sheen",
+      "Director": "Francis Coppola"
+   },
+   {
+      "Rank": 31,
+      "Movie": "The Maltese Falcon",
+      "Year": 1941,
+      "Cast": "Humphrey Bogart, Mary Astor",
+      "Director": "John Huston"
+   },
+   {
+      "Rank": 32,
+      "Movie": "The Godfather Part II",
+      "Year": 1974,
+      "Cast": "Al Pacino, Robert Duvall, Diane Keaton, Robert De Niro",
+      "Director": "Francis Ford Coppola"
+   },
+   {
+      "Rank": 33,
+      "Movie": "One Flew Over The Cuckoo's Nest",
+      "Year": 1975,
+      "Cast": "Jack Nicholson, Louise Fletcher, Danny DeVito",
+      "Director": "Milos Forman"
+   },
+   {
+      "Rank": 34,
+      "Movie": "Snow White And The Seven Dwarfs",
+      "Year": 1938,
+      "Cast": "Adriana Caselotti, Lucille LaVerne",
+      "Director": "David Hand"
+   },
+   {
+      "Rank": 35,
+      "Movie": "Annie Hall",
+      "Year": 1977,
+      "Cast": "Woody Allen, Diane Keaton",
+      "Director": "Woody Allen"
+   },
+   {
+      "Rank": 36,
+      "Movie": "The Bridge On The River Kwai",
+      "Year": 1957,
+      "Cast": "William Holden, Alec Guinness, Jack Hawkins",
+      "Director": "David Lean"
+   },
+   {
+      "Rank": 37,
+      "Movie": "The Best Year Of Our Lives",
+      "Year": 1946,
+      "Cast": "Myrna Loy, Fredric March, Dana Andrews",
+      "Director": "William Wyler"
+   },
+   {
+      "Rank": 38,
+      "Movie": "The Treasure Of The Sierra Madre",
+      "Year": 1948,
+      "Cast": "Humphrey Bogart, Walter Huston, Tim Holt",
+      "Director": "John Huston"
+   },
+   {
+      "Rank": 39,
+      "Movie": "Dr. Strangelove",
+      "Year": 1964,
+      "Cast": "Peter Sellers, George C. Scott",
+      "Director": "Stanley Kubrick"
+   },
+   {
+      "Rank": 40,
+      "Movie": "The Sound Of Music",
+      "Year": 1965,
+      "Cast": "Julie Andrews, Christopher Plummer, Eleanor Parker",
+      "Director": "Robert Wise"
+   },
+   {
+      "Rank": 41,
+      "Movie": "King Kong",
+      "Year": 1933,
+      "Cast": "Fay Wray, Robert Armstrong, Bruce Cabot",
+      "Director": "Merian C. Cooper"
+   },
+   {
+      "Rank": 42,
+      "Movie": "Bonnie And Clyde",
+      "Year": 1967,
+      "Cast": "Warren Beatty, Faye Dunaway",
+      "Director": "Arthur Penn"
+   },
+   {
+      "Rank": 43,
+      "Movie": "Midnight Cowboy",
+      "Year": 1969,
+      "Cast": "Dustin Hoffman, Jon Voight",
+      "Director": "John Schlesinger"
+   },
+   {
+      "Rank": 44,
+      "Movie": "The Philadelphia Story",
+      "Year": 1940,
+      "Cast": "Cary Grant, Katharine Hepburn, James Stewart",
+      "Director": "George Cukor"
+   },
+   {
+      "Rank": 45,
+      "Movie": "Shane",
+      "Year": 1953,
+      "Cast": "Alan Ladd, Jean Arthur, Van Heflin",
+      "Director": "George Stevens"
+   },
+   {
+      "Rank": 46,
+      "Movie": "It Happened One Night",
+      "Year": 1934,
+      "Cast": "Clark Gable, Claudette Colbert",
+      "Director": "Frank Capra"
+   },
+   {
+      "Rank": 47,
+      "Movie": "A Streetcar Named Desire",
+      "Year": 1951,
+      "Cast": "Vivien Leigh, Marlon Brando",
+      "Director": "Elia Kazan"
+   },
+   {
+      "Rank": 48,
+      "Movie": "Rear Window",
+      "Year": 1954,
+      "Cast": "James Stewart, Grace Kelly",
+      "Director": "Alfred Hitchcock"
+   },
+   {
+      "Rank": 49,
+      "Movie": "Intolerance",
+      "Year": 1916,
+      "Cast": "Vera Lewis, Ralph Lewis, Mae Marsh",
+      "Director": "D. W. Griffith"
+   },
+   {
+      "Rank": 50,
+      "Movie": "The Lord Of The Rings: The Fellowship Of The Ring",
+      "Year": 2001,
+      "Cast": "Elijah Wood, Ian McKellen, Viggo Mortensen",
+      "Director": "Peter Jackson"
+   },
+   {
+      "Rank": 51,
+      "Movie": "West Side Story",
+      "Year": 1961,
+      "Cast": "Natalie Wood, Richard Beymer",
+      "Director": "Robert Wise"
+   },
+   {
+      "Rank": 52,
+      "Movie": "Taxi Driver",
+      "Year": 1976,
+      "Cast": "Robert De Niro, Jodie Foster",
+      "Director": "Martin Scorsese"
+   },
+   {
+      "Rank": 53,
+      "Movie": "The Deer Hunter",
+      "Year": 1978,
+      "Cast": "Robert De Niro, Meryl Streep",
+      "Director": "Michael Cimino"
+   },
+   {
+      "Rank": 54,
+      "Movie": "M*A*S*H",
+      "Year": 1970,
+      "Cast": "Donald Sutherland, Elliott Gould, Tom Skerritt, Sally Kellerman, Robert Duvall",
+      "Director": "Robert Altman"
+   },
+   {
+      "Rank": 55,
+      "Movie": "North By Northwest",
+      "Year": 1959,
+      "Cast": "Cary Grant, Eva Marie Saint, James Mason",
+      "Director": "Alfred Hitchcock"
+   },
+   {
+      "Rank": 56,
+      "Movie": "Jaws",
+      "Year": 1975,
+      "Cast": "Roy Scheider, Robert Shaw, Richard Dreyfuss",
+      "Director": "Steven Spielberg"
+   },
+   {
+      "Rank": 57,
+      "Movie": "Rocky",
+      "Year": 1976,
+      "Cast": "Sylvester Stallone",
+      "Director": "John G. Avildsen"
+   },
+   {
+      "Rank": 58,
+      "Movie": "The Gold Rush",
+      "Year": 1925,
+      "Cast": "Charlie Chaplin",
+      "Director": "Charlie Chaplin"
+   },
+   {
+      "Rank": 59,
+      "Movie": "Nashville",
+      "Year": 1975,
+      "Cast": "David Arkin, Barbara Baxley, Ned Beatty",
+      "Director": "Robert Altman"
+   },
+   {
+      "Rank": 60,
+      "Movie": "Duck Soup",
+      "Year": 1933,
+      "Cast": "Groucho Marx, Harpo Marx, Chico Marx, Zeppo Marx",
+      "Director": "Leo McCarey"
+   },
+   {
+      "Rank": 61,
+      "Movie": "Sullivan's Travels",
+      "Year": 1941,
+      "Cast": "Joel McCrea, Veronica Lake, Robert Warwick",
+      "Director": "Preston Sturges"
+   },
+   {
+      "Rank": 62,
+      "Movie": "American Graffiti",
+      "Year": 1973,
+      "Cast": "Richard Dreyfuss, Ronny Howard, Paul Le Mat",
+      "Director": "George Lucas"
+   },
+   {
+      "Rank": 63,
+      "Movie": "Cabaret",
+      "Year": 1972,
+      "Cast": "Liza Minnelli, Michael York, Helmut Griem",
+      "Director": "Bob Fosse"
+   },
+   {
+      "Rank": 64,
+      "Movie": "Network",
+      "Year": 1976,
+      "Cast": "Faye Dunaway, William Holden, Peter Finch, Robert Duvall",
+      "Director": "Sydney Lumet"
+   },
+   {
+      "Rank": 65,
+      "Movie": "The African Queen",
+      "Year": 1951,
+      "Cast": "Humphrey Bogart, Katharine Hepburn",
+      "Director": "John Huston"
+   },
+   {
+      "Rank": 66,
+      "Movie": "Raiders Of The Lost Ark",
+      "Year": 1981,
+      "Cast": "Harrison Ford, Karen Allen, Paul Freeman",
+      "Director": "Steven Spielberg"
+   },
+   {
+      "Rank": 67,
+      "Movie": "Who's Afraid Of Virginia Woolf?",
+      "Year": 1966,
+      "Cast": "Elizabeth Taylor, Richard Burton",
+      "Director": "Mike Nichols"
+   },
+   {
+      "Rank": 68,
+      "Movie": "Unforgiven",
+      "Year": 1992,
+      "Cast": "Clint Eastwood, Gene Hackman, Morgan Freeman",
+      "Director": "Clint Eastwood"
+   },
+   {
+      "Rank": 69,
+      "Movie": "Tootsie",
+      "Year": 1982,
+      "Cast": "Dustin Hoffman, Jessica Lange",
+      "Director": "Sydney Pollack"
+   },
+   {
+      "Rank": 70,
+      "Movie": "A Clockwork Orange",
+      "Year": 1971,
+      "Cast": "Malcolm McDowell, Patrick Magee",
+      "Director": "Stanley Kubrick"
+   },
+   {
+      "Rank": 71,
+      "Movie": "Saving Private Ryan",
+      "Year": 1998,
+      "Cast": "Tom Hanks, Matt Damon, Tom Sizemore, Jeremy Davies",
+      "Director": "Steven Spielberg"
+   },
+   {
+      "Rank": 72,
+      "Movie": "The Shawshank Redemption",
+      "Year": 1994,
+      "Cast": "Tim Robbins, Morgan Freeman",
+      "Director": "Frank Darabont"
+   },
+   {
+      "Rank": 73,
+      "Movie": "Butch Cassidy And The Sundance Kid",
+      "Year": 1969,
+      "Cast": "Paul Newman, Robert Redford, Katharine Ross",
+      "Director": "George Roy Hill"
+   },
+   {
+      "Rank": 74,
+      "Movie": "The Silence Of The Lambs",
+      "Year": 1991,
+      "Cast": "Jodie Foster, Anthony Hopkins",
+      "Director": "Jonathan Demme"
+   },
+   {
+      "Rank": 75,
+      "Movie": "In The Heat Of The Night",
+      "Year": 1967,
+      "Cast": "Sydney Poitier, Rod Steiger",
+      "Director": "Norman Jewison"
+   },
+   {
+      "Rank": 76,
+      "Movie": "Forrest Gump",
+      "Year": 1994,
+      "Cast": "Tom Hanks, Robin Wright, Gary Sinise",
+      "Director": "Robert Zemeckis"
+   },
+   {
+      "Rank": 77,
+      "Movie": "All The President's Men",
+      "Year": 1976,
+      "Cast": "Dustin Hoffman, Robert Redford",
+      "Director": "Alan J. Pakula"
+   },
+   {
+      "Rank": 78,
+      "Movie": "Modern Times",
+      "Year": 1936,
+      "Cast": "Charlie Chaplin",
+      "Director": "Charlie Chaplin"
+   },
+   {
+      "Rank": 79,
+      "Movie": "The Wild Bunch",
+      "Year": 1969,
+      "Cast": "William Holden, Ernest Borgnine",
+      "Director": "Sam Peckinpah"
+   },
+   {
+      "Rank": 80,
+      "Movie": "The Apartment",
+      "Year": 1960,
+      "Cast": "Jack Lemmon, Shirley McLaine, Fred MacMurray",
+      "Director": "Billy Wilder"
+   },
+   {
+      "Rank": 81,
+      "Movie": "Spartacus",
+      "Year": 1960,
+      "Cast": "Kirk Douglas, Laurence Olivier, Jean Simmons, Charles Laughton, Peter Ustinov, John Gavin",
+      "Director": "Stanley Kubrick"
+   },
+   {
+      "Rank": 82,
+      "Movie": "Sunrise",
+      "Year": 1927,
+      "Cast": "George O'Brien, Janet Gaynor, Margaret Livingston",
+      "Director": "F. W. Murnau"
+   },
+   {
+      "Rank": 83,
+      "Movie": "Titanic",
+      "Year": 1997,
+      "Cast": "Leonardo DiCaprio, Kate Winslet, Billy Zane",
+      "Director": "James Cameron"
+   },
+   {
+      "Rank": 84,
+      "Movie": "Easy Rider",
+      "Year": 1969,
+      "Cast": "Peter Fonda, Dennis Hopper",
+      "Director": "Dennis Hopper"
+   },
+   {
+      "Rank": 85,
+      "Movie": "A Night At The Opera",
+      "Year": 1935,
+      "Cast": "Groucho Marx, Chico Marx, Harpo Marx",
+      "Director": "Sam Wood"
+   },
+   {
+      "Rank": 86,
+      "Movie": "Platoon",
+      "Year": 1986,
+      "Cast": "Tom Berenger, Willem Dafoe, Charlie Sheen",
+      "Director": "Oliver Stone"
+   },
+   {
+      "Rank": 87,
+      "Movie": "12 Angry Men",
+      "Year": 1957,
+      "Cast": "Henry Fonda, Lee J. Cobb, Ed Begley",
+      "Director": "Sydney Lumet"
+   },
+   {
+      "Rank": 88,
+      "Movie": "Bringing Up Baby",
+      "Year": 1938,
+      "Cast": "Katharine Hepburn, Cary Grant",
+      "Director": "Howard Hawks"
+   },
+   {
+      "Rank": 89,
+      "Movie": "The Sixth Sense",
+      "Year": 1999,
+      "Cast": "Bruce Willis, Haley Joel Osment, Toni Collette",
+      "Director": "M. Night Shyamalan"
+   },
+   {
+      "Rank": 90,
+      "Movie": "Swing Time",
+      "Year": 1936,
+      "Cast": "Fred Astaire, Ginger Rogers",
+      "Director": "George Stevens"
+   },
+   {
+      "Rank": 91,
+      "Movie": "Sophie's Choice",
+      "Year": 1982,
+      "Cast": "Meryl Streep, Kevin Kline, Peter MacNicol",
+      "Director": "Alan J. Pakula"
+   },
+   {
+      "Rank": 92,
+      "Movie": "Goodfellas",
+      "Year": 1990,
+      "Cast": "Robert De Niro, Ray Liotta, Joe Pesci, Lorraine Bracco, Paul Sorvino",
+      "Director": "Martin Scorsese"
+   },
+   {
+      "Rank": 93,
+      "Movie": "The French Connection",
+      "Year": 1971,
+      "Cast": "Gene Hackman, Fernando Rey, Roy Scheider",
+      "Director": "William Friedkin"
+   },
+   {
+      "Rank": 94,
+      "Movie": "Pulp Fiction",
+      "Year": 1994,
+      "Cast": "John Travolta, Samuel L. Jackson",
+      "Director": "Quentin Tarantino"
+   },
+   {
+      "Rank": 95,
+      "Movie": "The Last Picture Show",
+      "Year": 1971,
+      "Cast": "Timothy Bottoms, Jeff Bridges, Cybill Shepherd",
+      "Director": "Peter Bogdanovich"
+   },
+   {
+      "Rank": 96,
+      "Movie": "Do The Right Thing",
+      "Year": 1989,
+      "Cast": "Danny Aiello, Ossie Davis, Ruby Dee",
+      "Director": "Spike Lee"
+   },
+   {
+      "Rank": 97,
+      "Movie": "Blade Runner",
+      "Year": 1982,
+      "Cast": "Harrison Ford, Sean Young",
+      "Director": "Ridley Scott"
+   },
+   {
+      "Rank": 98,
+      "Movie": "Yankee Doodle Dandy",
+      "Year": 1942,
+      "Cast": "James Cagney, Joan Leslie",
+      "Director": "Michael Curtiz"
+   },
+   {
+      "Rank": 99,
+      "Movie": "Toy Story",
+      "Year": 1995,
+      "Cast": "Tom Hanks, Tim Allen",
+      "Director": "John Lasseter"
+   },
+   {
+      "Rank": 100,
+      "Movie": "Ben-Hur",
+      "Year": 1959,
+      "Cast": "Charlton Heston, Jack Hawkins",
+      "Director": "William Wyler"
+   }
+]

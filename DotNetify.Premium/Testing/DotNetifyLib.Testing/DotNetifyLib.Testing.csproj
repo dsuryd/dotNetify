@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>DotNetify.Testing</RootNamespace>
+    <AssemblyName>DotNetify.Testing</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Version>3.0.1</Version>
+    <Authors>Dicky Suryadi</Authors>
+    <Company />
+    <Copyright>Copyright 2019-2023</Copyright>
+    <PackageProjectUrl>https://dotnetify.net/core/dotnetify-testing</PackageProjectUrl>
+    <Description>Testing library for dotNetify applications.</Description>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageIcon>dotnetify.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.5" />
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="DotNetify.SignalR" Version="5.3.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+
+</Project>
