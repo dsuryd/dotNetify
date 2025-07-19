@@ -1,10 +1,17 @@
 <p align="center"><img width="400px" src="http://dotnetify.net/content/images/dotnetify-logo.png"></p>
 
-![alt build](https://github.com/dsuryd/dotNetify/actions/workflows/build.yml/badge.svg)
 [![npm version](https://badge.fury.io/js/dotnetify.svg)](https://badge.fury.io/js/dotnetify)
 [![NuGet](https://img.shields.io/nuget/v/DotNetify.SignalR.svg?style=flat-square)](https://www.nuget.org/packages/DotNetify.SignalR/)
 
 DotNetify is a free, open source project that lets you create real-time, reactive, cross-platform apps with [React](https://facebook.github.io/react/), [React Native](https://facebook.github.io/react-native/), [Vue](https://vuejs.org), [Knockout](http://knockoutjs.com) or [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) front-end on C# .NET back-end via WebSocket (SignalR or Amazon API Gateway).
+ 
+> 
+> ## 🚨 **Notice:** Project No Longer Actively Maintained
+>  
+> **Thank you** to everyone who has found value in this project — whether personally, professionally, or commercially. It's been incredibly rewarding to see how this project has been used, extended, and supported over the years.
+> Special thanks to all the contributors who helped shape this library. Your time, ideas, and code have been deeply appreciated.
+> 
+> To support the community going forward, I’ve open-sourced the premium library. If you'd like to continue development, feel free to fork and carry the torch in your own direction. I wish you the best of luck.
 
 ## What's New
 
@@ -26,14 +33,14 @@ DotNetify is a free, open source project that lets you create real-time, reactiv
 
 ## Premium Features
 
-- [**DotNetify-ResiliencyAddon**](https://www.dotnetify.net/core/dotnetify-resiliencyaddon): resilient app server when used with Amazon API Gateway.
-- [**DotNetify-Observer**](https://www.dotnetify.net/core/dotnetify-observer): real-time connection visualization dashboard.
-- [**DotNetify-LoadTester**](https://www.dotnetify.net/core/dotnetify-loadtester): performance testing tool for dotNetify apps.
-- [**DotNetify-Testing**](https://www.dotnetify.net/core/dotnetify-testing): testing library for dotNetify apps.
+- [**DotNetify-ResiliencyAddon**](https://github.com/dsuryd/dotNetify/tree/master/DotNetify.Premium/ResiliencyAddon): resilient app server when used with Amazon API Gateway.
+- [**DotNetify-Observer**](https://github.com/dsuryd/dotNetify/tree/master/DotNetify.Premium/dotNetify-Observer): real-time connection visualization dashboard.
+- [**DotNetify-LoadTester**](https://github.com/dsuryd/dotNetify/tree/master/DotNetify.Premium/LoadTester): performance testing tool for dotNetify apps.
+- [**DotNetify-Testing**](https://github.com/dsuryd/dotNetify/tree/master/DotNetify.Premium/Testing/DotNetifyLib.Testing): testing library for dotNetify apps.
 
 ## Documentation
 
-Documentation and live demo can be found at [https://dotnetify.net](https://dotnetify.net).
+~~Documentation and live demo can be found at [https://dotnetify.net](https://dotnetify.net).~~
 
 ## Code Examples
 
