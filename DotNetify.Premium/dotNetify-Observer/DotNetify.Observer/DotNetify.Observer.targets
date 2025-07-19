@@ -1,0 +1,8 @@
+﻿<Project>
+   <ItemGroup>
+      <UIFiles Include="$(MSBuildThisFileDirectory)..\observer-ui\**\*.*" />
+   </ItemGroup>
+   <Target Name="CopyUIFiles" BeforeTargets="Build">
+      <Copy SourceFiles="@(UIFiles)" DestinationFolder="$(ProjectDir)wwwroot\observer-ui\%(RecursiveDir)" />
+   </Target>
+</Project>

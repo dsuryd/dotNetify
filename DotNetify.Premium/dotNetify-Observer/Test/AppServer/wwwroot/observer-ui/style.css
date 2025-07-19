@@ -1,0 +1,19 @@
+html {
+  height: 100vh;
+  font-family: Segoe UI, Arial, sans-serif;
+  font-size: 14px;
+}
+
+body {
+  -webkit-overflow-scrolling: touch;
+  margin: 0;
+  height: inherit;
+}
+
+body > *:first-child {
+  height: inherit;
+}
+
+a {
+  text-decoration: none;
+}

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+	 <TargetFramework>net6.0</TargetFramework>
+     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+     <AssemblyName>UI</AssemblyName>
+     <RootNamespace>UI</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.0.0" />
+  </ItemGroup> 
+
+</Project>

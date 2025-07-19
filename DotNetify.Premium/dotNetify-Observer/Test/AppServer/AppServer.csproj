@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+     <TargetFramework>net6.0</TargetFramework>
+     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+     <AssemblyName>AppServer</AssemblyName>
+     <RootNamespace>AppServer</RootNamespace>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="DotNetify.LoadTester.Profiles" Version="1.0.1" />
+    <PackageReference Include="DotNetify.Observer" Version="1.0.0" />
+    <PackageReference Include="DotNetify.Observer.Client" Version="1.0.0" />
+    <PackageReference Include="DotNetify.SignalR" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\observer-ui\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DotNetify.Observer.Client\DotNetify.Observer.Client.csproj" />
+    <ProjectReference Include="..\..\DotNetify.Observer\DotNetify.Observer.csproj" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <Exec Command="xcopy &quot;$(SolutionDir)DotNetify.Observer\observer-ui&quot; &quot;$(ProjectDir)wwwroot\observer-ui&quot; /y /d /e" />
+  </Target>
+</Project>

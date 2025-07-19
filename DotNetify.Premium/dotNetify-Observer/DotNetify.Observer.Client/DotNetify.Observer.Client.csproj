@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RootNamespace>DotNetify.Observer</RootNamespace>
+    <Version>1.0.1</Version>
+    <Copyright>Copyright 2021</Copyright>
+    <Authors>Dicky Suryadi</Authors>
+    <Company />
+    <Description>Client for dotNetify-Observer.</Description>
+    <PackageProjectUrl>https://dotnetify.net/core/dotnetify-observer</PackageProjectUrl>
+    <PackageTags>realtime signalr websocket netcore observability monitoring</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetify.SignalR" Version="5.0.0" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />
+  </ItemGroup>
+
+
+</Project>

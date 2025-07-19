@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <RootNamespace>DotNetify.Observer</RootNamespace>
+    <Version>1.0.1</Version>
+    <Authors>Dicky Suryadi</Authors>
+    <Company />
+    <Description>Real-time monitoring of connections for dotNetify applications.</Description>
+    <PackageProjectUrl>https://dotnetify.net/core/dotnetify-observer</PackageProjectUrl>
+    <Copyright>Copyright 2021</Copyright>
+    <PackageTags>realtime signalr websocket netcore observability monitoring</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+   <ItemGroup>
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <Content Include="DotNetify.Observer.targets" PackagePath="build/DotNetify.Observer.targets" />
+      <Content Include="observer-ui\**">
+         <Pack>true</Pack>
+         <PackagePath>\observer-ui\</PackagePath>
+         <PackageCopyToOutput>true</PackageCopyToOutput>
+      </Content>
+   </ItemGroup> 
+   
+   <ItemGroup>
+     <None Remove="DotNetify.Observer.targets" />
+   </ItemGroup>
+   
+  <ItemGroup>
+    <PackageReference Include="DotNetify.SignalR" Version="5.0.0" />
+    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.12" />
+    <PackageReference Include="QuikGraph" Version="2.2.0" />
+    <PackageReference Include="UAParser" Version="3.1.44" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="observer-ui\dist\main.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="observer-ui\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="observer-ui\logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="observer-ui\style.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+	
+<!--
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <Exec Command="xcopy &quot;$(SolutionDir)dotNetify-observer\DotNetify.Observer.UI\wwwroot&quot; &quot;$(ProjectDir)&quot; /y /d /e" />
+  </Target>
+	-->
+
+</Project>

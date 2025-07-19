@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+     <TargetFramework>net6.0</TargetFramework>
+     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+     <AssemblyName>ProxyServer</AssemblyName>
+     <RootNamespace>ProxyServer</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetify.Observer.Client" Version="1.0.0" />
+    <PackageReference Include="DotNetify.SignalR" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
